@@ -1,0 +1,23 @@
+# local config file
+config.scons
+
+# scons and build results
+.sconsign.dblite
+*.o
+build
+bin
+test_crypto
+
+# MacOS
+.DS_Store
+
+# XCode
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata

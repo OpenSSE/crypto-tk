@@ -28,12 +28,37 @@ namespace crypto
 template <uint8_t NBYTES> class PrfKey
 {
 public:
-	static constexpr uint8_t kKeySize = 16;
+	static constexpr uint8_t kKeySize = 32;
 		
 	PrfKey(const void* k)
 	{
 		std::memcpy(key_.data(),k,kKeySize);
 	};
+
+	PrfKey(const void* k, const uint8_t &len)
+	{
+		assert(len <= kKeySize);
+		uint8_t l = (kKeySize < len) ? kKeySize : len;
+		
+		std::memset(key_.data(), 0x00, kKeySize);
+		std::memcpy(key_.data(),k,l);
+	};
+	
+	PrfKey(const std::string& k)
+	{
+		uint8_t l = (kKeySize < k.size()) ? kKeySize : k.size();
+		
+		std::memset(key_.data(), 0x00, kKeySize);
+		std::memcpy(key_.data(),k.data(),l);
+	}
+	
+	PrfKey(const std::string& k, const uint8_t &len)
+	{
+		uint8_t l = (kKeySize < len) ? kKeySize : len;
+		
+		std::memset(key_.data(), 0x00, kKeySize);
+		std::memcpy(key_.data(),k.data(),l);
+	}
 	
 	PrfKey(const std::array<uint8_t,kKeySize>& k) : key_(k)
 	{	

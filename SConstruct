@@ -25,5 +25,9 @@ else:
 
 
 objects = SConscript('src/build.scons', exports='env', variant_dir='build', duplicate=0)
+test_objects = SConscript('tests/build.scons', exports='env', variant_dir='build_test', duplicate=0)
+
 Clean(objects, 'build')
-env.Program('test_crypto',['main.cpp'] + objects)
+Clean(test_objects, 'build_test')
+
+env.Program('test_crypto',['main.cpp'] + objects + test_objects)

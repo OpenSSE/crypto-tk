@@ -2,6 +2,8 @@
 
 #include "random.hpp"
 
+#include <exception>
+
 #include <openssl/aes.h>
 
 namespace sse
@@ -87,6 +89,7 @@ void Cipher::CipherImpl::gen_subkeys(const unsigned char *userKey)
 	if (!AES_set_encrypt_key(userKey, 128, &aes_enc_key_))
 	{
 		// throw an exception
+		throw std::runtime_error("Unable to init AES subkeys");
 	}
 	
 	remaining_block_count_ = 0xffffffffffffffff; // maximum value;
@@ -101,6 +104,7 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
 {
 	if(remaining_block_count_ < len){
 		// throw an exception
+		throw std::runtime_error("Too many blocks were encrypted with the same key. Encrypting using this key is now insecure.");
 	}
 	
     unsigned char ecount[AES_BLOCK_SIZE];

@@ -1,6 +1,7 @@
 #include "src/prf.hpp"
 
 #include "tests/prf_hmac.hpp"
+#include "tests/encryption.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -14,6 +15,7 @@ typedef sse::crypto::PrfKey<64> PrfKey_64;
 int main( int argc, char* argv[] ) {
 
 	hmac_tests();
+	encryption_decryption_test();
 	
 	return 0;	
 }

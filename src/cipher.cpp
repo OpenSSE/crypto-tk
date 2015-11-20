@@ -32,7 +32,6 @@ public:
 
 private:	
 	AES_KEY aes_enc_key_;
-	AES_KEY aes_dec_key_;
 	
 	unsigned char iv_[AES_BLOCK_SIZE];
 	uint64_t remaining_block_count_;
@@ -81,16 +80,11 @@ Cipher::CipherImpl::~CipherImpl()
 { 
 	// erase subkeys
 	memset(&aes_enc_key_, 0x00, sizeof(AES_KEY));
-	memset(&aes_dec_key_, 0x00, sizeof(AES_KEY));
 }
 
 void Cipher::CipherImpl::gen_subkeys(const unsigned char *userKey)
 {
 	if (!AES_set_encrypt_key(userKey, 128, &aes_enc_key_))
-	{
-		// throw an exception
-	}
-	if (!AES_set_decrypt_key(userKey, 128, &aes_dec_key_))
 	{
 		// throw an exception
 	}
@@ -141,7 +135,7 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
 	memcpy(dec_iv, in, AES_BLOCK_SIZE); // copy iv first
 	
 	// now append the ciphertext
-    AES_ctr128_encrypt(in+AES_BLOCK_SIZE, out, len, &aes_dec_key_, dec_iv, ecount, &num);
+    AES_ctr128_encrypt(in+AES_BLOCK_SIZE, out, len, &aes_enc_key_, dec_iv, ecount, &num);
 	
 	// erase ecount to avoid (partial) recovery of the last block
 	memset(ecount, 0x00, AES_BLOCK_SIZE);

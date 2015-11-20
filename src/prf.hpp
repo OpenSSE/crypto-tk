@@ -1,5 +1,7 @@
 #pragma once
 
+#include "random.hpp"
+
 #include <cstdint>
 #include <cstring>
 #include <cassert>
@@ -30,6 +32,11 @@ template <uint8_t NBYTES> class PrfKey
 public:
 	static constexpr uint8_t kKeySize = 32;
 		
+	PrfKey()
+	{
+		random_bytes(kKeySize, key_.data());
+	};
+	
 	PrfKey(const void* k)
 	{
 		std::memcpy(key_.data(),k,kKeySize);

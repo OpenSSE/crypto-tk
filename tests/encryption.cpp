@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void encryption_decryption_test()
+bool encryption_decryption_test()
 {
 	string in_enc = "This is a test input.";
 	string out_enc, out_dec;
@@ -53,8 +53,8 @@ void encryption_decryption_test()
 			cout << hex << setw(2) << setfill('0') << (uint) c;
 		}
 		cout << endl;
-
+		return false;
 	}
 	cout << "Encryption/decryption test succeeded!\n";
-	
+	return true;
 }

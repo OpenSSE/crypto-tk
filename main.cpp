@@ -10,8 +10,8 @@
 
 using namespace std;
 
-typedef sse::crypto::PrfKey<16> PrfKey_16;
-typedef sse::crypto::PrfKey<64> PrfKey_64;
+typedef sse::crypto::Prf<16> Prf_16;
+typedef sse::crypto::Prf<64> Prf_64;
 
 int main( int argc, char* argv[] ) {
 

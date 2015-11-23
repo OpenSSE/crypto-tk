@@ -19,30 +19,30 @@ namespace crypto
 
 
 /*****
- * PrfKey class
+ * Prf class
  *
- * A wrapper for cryptographic keys (i.e. array of bytes).
- * Keys are templatized according to the length output: 
- * one must not be able to use the same key for two PRFs 
+ * A wrapper for cryptographic keys pseudo-random function.
+ * PRFs are templatized according to the length output: 
+ * one must not be able to use the same PRF 
  * with different output lenght
 ******/
 
-template <uint8_t NBYTES> class PrfKey
+template <uint8_t NBYTES> class Prf
 {
 public:
 	static constexpr uint8_t kKeySize = 32;
 		
-	PrfKey()
+	Prf()
 	{
 		random_bytes(kKeySize, key_.data());
 	};
 	
-	PrfKey(const void* k)
+	Prf(const void* k)
 	{
 		std::memcpy(key_.data(),k,kKeySize);
 	};
 
-	PrfKey(const void* k, const uint8_t &len)
+	Prf(const void* k, const uint8_t &len)
 	{
 		assert(len <= kKeySize);
 		uint8_t l = (kKeySize < len) ? kKeySize : len;
@@ -51,7 +51,7 @@ public:
 		std::memcpy(key_.data(),k,l);
 	};
 	
-	PrfKey(const std::string& k)
+	Prf(const std::string& k)
 	{
 		uint8_t l = (kKeySize < k.size()) ? kKeySize : k.size();
 		
@@ -59,7 +59,7 @@ public:
 		std::memcpy(key_.data(),k.data(),l);
 	}
 	
-	PrfKey(const std::string& k, const uint8_t &len)
+	Prf(const std::string& k, const uint8_t &len)
 	{
 		uint8_t l = (kKeySize < len) ? kKeySize : len;
 		
@@ -67,17 +67,17 @@ public:
 		std::memcpy(key_.data(),k.data(),l);
 	}
 	
-	PrfKey(const std::array<uint8_t,kKeySize>& k) : key_(k)
+	Prf(const std::array<uint8_t,kKeySize>& k) : key_(k)
 	{	
 	};
 
-	PrfKey(const PrfKey<NBYTES>& k) : key_(k.key_)
+	Prf(const Prf<NBYTES>& k) : key_(k.key_)
 	{	
 	};
 
 	// Destructor.
 	// Set the content of the key to zero before destruction: remove all traces of the key in memory.
-	~PrfKey() 
+	~Prf() 
 	{ 
 		std::fill(key_.begin(), key_.end(), 0); 
 	}; 
@@ -92,6 +92,8 @@ public:
 		return key_.data();
 	};
 	
+	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;
+	std::array<uint8_t, NBYTES> prf(const std::string &s) const;
 	
 private:
 	std::array<uint8_t,kKeySize> key_;
@@ -101,7 +103,7 @@ private:
 
 // PRF instantiation
 // For now, use OpenSSL's HMAC-512 implementation
-template <uint8_t NBYTES> std::array<uint8_t, NBYTES> prf(const PrfKey<NBYTES> &key, const unsigned char* in, const size_t &length)
+template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in, const size_t &length) const
 {
 	static_assert(NBYTES != 0, "PRF output length invalid: length must be strictly larger than 0");
 
@@ -119,7 +121,7 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> prf(const PrfKey<NBYTES> &
 				
 		HMAC_CTX_init(&ctx);
 		
-	    HMAC_Init_ex(&ctx, key.key_data(), PrfKey<NBYTES>::kKeySize, EVP_sha512(), NULL);
+	    HMAC_Init_ex(&ctx, key_.data(), kKeySize, EVP_sha512(), NULL);
 		
 		HMAC_Update(&ctx, in, length);
 		HMAC_Final(&ctx, buffer, &len);
@@ -138,9 +140,9 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> prf(const PrfKey<NBYTES> &
 }
 
 // Convienience function to run the PRF over a C++ string
-template <uint8_t NBYTES> inline std::array<uint8_t, NBYTES> prf(const PrfKey<NBYTES> &key, const std::string &s)
+template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::string &s) const
 {
-	return prf<NBYTES>(key, (unsigned char*)s.data() , s.length());
+	return prf((unsigned char*)s.data() , s.length());
 }
 
 } // namespace crypto

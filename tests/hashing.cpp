@@ -8,12 +8,12 @@
 
 using namespace std;
 
-bool sha_512_256_test_vectors()
+bool sha_512_test_vectors()
 {
-	return sha_512_256_vector_1() && sha_512_256_vector_2() && sha_512_256_vector_3()&& sha_512_256_vector_4() && sha_512_256_vector_5();
+	return sha_512_vector_1() && sha_512_vector_2() && sha_512_vector_3()&& sha_512_vector_4() && sha_512_vector_5();
 }
 
-bool sha_512_256_vector_1()
+bool sha_512_vector_1()
 {
 	string in = "abc";
 	string out = sse::crypto::Hash::hash(in);
@@ -51,7 +51,7 @@ bool sha_512_256_vector_1()
 	return true;
 }
 
-bool sha_512_256_vector_2()
+bool sha_512_vector_2()
 {
 	string in = "";
 	string out = sse::crypto::Hash::hash(in);
@@ -89,7 +89,7 @@ bool sha_512_256_vector_2()
 	return true;
 }
 
-bool sha_512_256_vector_3()
+bool sha_512_vector_3()
 {
 	string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
 	string out = sse::crypto::Hash::hash(in);
@@ -127,7 +127,7 @@ bool sha_512_256_vector_3()
 	return true;
 }
 
-bool sha_512_256_vector_4()
+bool sha_512_vector_4()
 {
 	string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
 	string out = sse::crypto::Hash::hash(in);
@@ -165,7 +165,7 @@ bool sha_512_256_vector_4()
 	return true;
 }
 
-bool sha_512_256_vector_5()
+bool sha_512_vector_5()
 {
 	string in(1e6, 'a');
 	string out = sse::crypto::Hash::hash(in);

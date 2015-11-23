@@ -3,7 +3,7 @@
 /*******
 *  hashing.cpp
 *
-*  Implementation of SHA-512/256's test vector verification.
+*  Implementation of SHA-512's test vector verification.
 *  Reference vectors are taken from NIST's test vectors.
 ********/	
 

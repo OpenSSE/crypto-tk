@@ -1,6 +1,7 @@
 #pragma once
 
 #include "random.hpp"
+#include "hash.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -30,16 +31,18 @@ namespace crypto
 template <uint8_t NBYTES> class Prf
 {
 public:
-	static constexpr uint8_t kKeySize = 32;
+	static constexpr uint8_t kKeySize = Hash::kBlockSize;
 		
 	Prf()
 	{
 		random_bytes(kKeySize, key_.data());
+		gen_padded_keys(key_);
 	};
 	
 	Prf(const void* k)
 	{
 		std::memcpy(key_.data(),k,kKeySize);
+		gen_padded_keys(key_);
 	};
 
 	Prf(const void* k, const uint8_t &len)
@@ -49,6 +52,8 @@ public:
 		
 		std::memset(key_.data(), 0x00, kKeySize);
 		std::memcpy(key_.data(),k,l);
+
+		gen_padded_keys(key_);
 	};
 	
 	Prf(const std::string& k)
@@ -57,6 +62,8 @@ public:
 		
 		std::memset(key_.data(), 0x00, kKeySize);
 		std::memcpy(key_.data(),k.data(),l);
+
+		gen_padded_keys(key_);
 	}
 	
 	Prf(const std::string& k, const uint8_t &len)
@@ -65,14 +72,18 @@ public:
 		
 		std::memset(key_.data(), 0x00, kKeySize);
 		std::memcpy(key_.data(),k.data(),l);
+
+		gen_padded_keys(key_);
 	}
 	
 	Prf(const std::array<uint8_t,kKeySize>& k) : key_(k)
 	{	
+		gen_padded_keys(k);
 	};
 
-	Prf(const Prf<NBYTES>& k) : key_(k.key_)
+	Prf(const Prf<NBYTES>& k) : key_(k.key_), o_key_(k.o_key_), i_key_(k.i_key_)
 	{	
+		
 	};
 
 	// Destructor.
@@ -96,10 +107,25 @@ public:
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;
 	
 private:
+	void gen_padded_keys(const std::array<uint8_t,kKeySize> &key);
+	
 	std::array<uint8_t,kKeySize> key_;
+	std::array<uint8_t,kKeySize> o_key_;
+	std::array<uint8_t,kKeySize> i_key_;
 
 };
 
+template <uint8_t NBYTES> void Prf<NBYTES>::gen_padded_keys(const std::array<uint8_t,kKeySize> &key)
+{
+	memcpy(o_key_.data(), key.data(), kKeySize);
+	memcpy(i_key_.data(), key.data(), kKeySize);
+	
+	for(uint8_t i = 0; i < kKeySize; ++i)
+	{
+		o_key_[i] ^= 0x5c;
+		i_key_[i] ^= 0x36;
+	}
+}
 
 // PRF instantiation
 // For now, use OpenSSL's HMAC-512 implementation
@@ -109,30 +135,34 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const uns
 
 	std::array<uint8_t, NBYTES> result;
 	
-    
-	if(NBYTES <= 64){
-		HMAC_CTX ctx;
-	    unsigned char* buffer;
-		unsigned int len = 64;
-		
-		buffer = new unsigned char [len];
-		
+	assert(NBYTES <= sse::crypto::Hash::kDigestSize);
+	
+	if(NBYTES <= sse::crypto::Hash::kDigestSize){
 		// only need one output bloc of HMAC.
-				
-		HMAC_CTX_init(&ctx);
+
+	    unsigned char* buffer, *tmp;
+		unsigned int i_len = Hash::kBlockSize + length;
+		unsigned int o_len = Hash::kBlockSize + Hash::kDigestSize;
+		unsigned int buffer_len = (i_len > Hash::kDigestSize) ? i_len : (Hash::kDigestSize);
 		
-	    HMAC_Init_ex(&ctx, key_.data(), kKeySize, EVP_sha512(), NULL);
+		buffer = new unsigned char [buffer_len];
+		tmp = new unsigned char [o_len];
 		
-		HMAC_Update(&ctx, in, length);
-		HMAC_Final(&ctx, buffer, &len);
-		HMAC_CTX_cleanup(&ctx);
+		memcpy(buffer, i_key_.data(), Hash::kBlockSize);
+		memcpy(buffer + Hash::kBlockSize, in, length);
 		
-		// the buffer must be larger than the result
-		assert(NBYTES <= len);
+		
+		Hash::hash(buffer, i_len, buffer);
+		
+		memcpy(tmp, o_key_.data(), Hash::kBlockSize);
+		memcpy(tmp + Hash::kBlockSize, buffer, Hash::kDigestSize);
+
+		Hash::hash(tmp, Hash::kBlockSize + Hash::kDigestSize, buffer);
 		
 		std::memcpy(result.data(), buffer, NBYTES);
 		
 		delete [] buffer;
+		delete [] tmp;
 	}
 	
 	

@@ -27,7 +27,7 @@ namespace crypto
 		static void hash(const std::string &in, std::string &out);
 		static void hash(const std::string &in, const size_t &out_len, std::string &out);
 		static std::string hash(const std::string &in);
-		std::string hash(const std::string &in, const size_t &out_len);
+		static std::string hash(const std::string &in, const size_t &out_len);
 	};
 
 }

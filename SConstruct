@@ -9,12 +9,12 @@ except:
 
 
 if FindFile('config.scons', '.'):
-    SConscript('config.scons', exports='def_env')
+    SConscript('config.scons', exports='env')
 
 
 env.Append(CCFLAGS=['-Wall', '-march=native'])
-env.Append(CXXFLAGS=['-std=c++11'])
-env.Append(LIBS = ['crypto']);
+env.Append(CXXFLAGS=['-std=c++14'])
+env.Append(LIBS = ['crypto'])
 
 debug = ARGUMENTS.get('debug', 0)
 
@@ -30,4 +30,9 @@ test_objects = SConscript('tests/build.scons', exports='env', variant_dir='build
 Clean(objects, 'build')
 Clean(test_objects, 'build_test')
 
-env.Program('test_crypto',['main.cpp'] + objects + test_objects)
+env.Program('debug_crypto',['main.cpp'] + objects)
+
+test_env = env.Clone()
+test_env.Append(LIBS = ['boost_unit_test_framework'])
+
+test_env.Program('test_crypto', objects + test_objects)

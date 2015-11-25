@@ -6,6 +6,7 @@ config.scons
 *.o
 build
 bin
+debug_crypto
 test_crypto
 
 # MacOS

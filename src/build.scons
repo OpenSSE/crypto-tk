@@ -1,6 +1,6 @@
 Import('*')
 
-files = Glob('*.cpp')
-objs = env.Object(files)
+files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('*/*/*.cpp') + Glob('*/*/*/*.cpp')
+objs = env.Object(files, CPPPATH = ['.'])
 
 Return('objs')

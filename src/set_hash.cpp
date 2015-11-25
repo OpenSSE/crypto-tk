@@ -19,6 +19,7 @@ class SetHash::SetHashImpl
 public:
 
 	SetHashImpl();	
+	SetHashImpl(const SetHash::SetHashImpl& o) = default;	
 	SetHashImpl(const std::string &hex);
 	~SetHashImpl();
 
@@ -40,6 +41,14 @@ SetHash::SetHash() : set_hash_imp_(new SetHashImpl())
 }
 
 SetHash::SetHash(const std::string &hex) :  set_hash_imp_(new SetHashImpl(hex))
+{
+}
+
+SetHash::SetHash(const SetHash& o) : set_hash_imp_(new SetHashImpl(*o.set_hash_imp_))
+{
+}
+
+SetHash::SetHash(const SetHash&& o) : set_hash_imp_(std::move(o.set_hash_imp_))
 {
 }
 
@@ -67,6 +76,11 @@ std::ostream& operator<<(std::ostream& os, const SetHash& h)
 {
 	os << h.set_hash_imp_->hex();
 	return os;
+}
+
+bool SetHash::operator==(const SetHash& h)
+{
+	return hex() == h.hex();
 }
 
 /*

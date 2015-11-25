@@ -22,6 +22,8 @@ public:
 
 	SetHash();	
 	SetHash(const std::string &hex);	
+	SetHash(const SetHash& o);
+	SetHash(const SetHash&& o);
 	~SetHash();
 
 	void add_element(const std::string &in);
@@ -30,7 +32,7 @@ public:
 	std::string hex() const;
 	
 	friend std::ostream& operator<<(std::ostream& os, const SetHash& h);
-
+	bool operator==(const SetHash& h);
 private:	
 	class SetHashImpl; // not defined in the header
 	SetHashImpl *set_hash_imp_; // opaque pointer

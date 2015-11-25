@@ -26,9 +26,11 @@ public:
 	
 private:	
 	typedef jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, jbms::hash::blake2b, false> MSH;
-    MSH ecmh_;
+    static const MSH ecmh_;
    	MSH::State state_;
 };
+
+SetHash::SetHashImpl::MSH const SetHash::SetHashImpl::ecmh_{};
 
 SetHash::SetHash() : set_hash_imp_(new SetHashImpl())
 {
@@ -59,16 +61,10 @@ SetHash::SetHashImpl::~SetHashImpl()
 
 void SetHash::SetHashImpl::add_element(const std::string &in)
 {
-    // jbms::multiset_hash::add(ecmh_, state_, in);
-	jbms::array_view<void const> input;
-
     add(ecmh_, state_, in);
 }
 void SetHash::SetHashImpl::remove_element(const std::string &in)
 {
-	// set_hash_imp_->remove(in);
-	jbms::array_view<void const> input;
-	
     remove(ecmh_, state_, in);
 }
 

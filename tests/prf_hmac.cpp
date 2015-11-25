@@ -52,7 +52,7 @@ bool hmac_test_case_1() {
 	
 		return false;
 	}
-	cout << "HMAC Test case 1 succeeded!\n";
+	// cout << "HMAC Test case 1 succeeded!\n";
 	return true;	
 }
 
@@ -96,7 +96,7 @@ bool hmac_test_case_2() {
 	
 		return false;
 	}
-	cout << "HMAC Test case 2 succeeded!\n";
+	// cout << "HMAC Test case 2 succeeded!\n";
 	return true;	
 }
 
@@ -138,7 +138,7 @@ bool hmac_test_case_3() {
 	
 		return false;
 	}
-	cout << "HMAC Test case 3 succeeded!\n";
+	// cout << "HMAC Test case 3 succeeded!\n";
 	return true;	
 }
 
@@ -180,7 +180,7 @@ bool hmac_test_case_4() {
 	
 		return false;
 	}
-	cout << "HMAC Test case 4 succeeded!\n";
+	// cout << "HMAC Test case 4 succeeded!\n";
 	return true;	
 }
 

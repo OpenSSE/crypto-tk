@@ -35,4 +35,4 @@ env.Program('debug_crypto',['main.cpp'] + objects)
 test_env = env.Clone()
 test_env.Append(LIBS = ['boost_unit_test_framework'])
 
-test_env.Program('test_crypto', objects + test_objects)
+test_env.Program('test_crypto', ['tests.cpp'] + objects + test_objects)

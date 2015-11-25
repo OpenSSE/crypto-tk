@@ -47,7 +47,7 @@ bool sha_512_vector_1()
 		return false;
 	}
 	
-	cout << "SHA-512 Test case 1 succeeded!\n";
+	// cout << "SHA-512 Test case 1 succeeded!\n";
 	return true;
 }
 
@@ -85,7 +85,7 @@ bool sha_512_vector_2()
 		return false;
 	}
 	
-	cout << "SHA-512 Test case 2 succeeded!\n";
+	// cout << "SHA-512 Test case 2 succeeded!\n";
 	return true;
 }
 
@@ -123,7 +123,7 @@ bool sha_512_vector_3()
 		return false;
 	}
 	
-	cout << "SHA-512 Test case 3 succeeded!\n";
+	// cout << "SHA-512 Test case 3 succeeded!\n";
 	return true;
 }
 
@@ -161,7 +161,7 @@ bool sha_512_vector_4()
 		return false;
 	}
 	
-	cout << "SHA-512 Test case 4 succeeded!\n";
+	// cout << "SHA-512 Test case 4 succeeded!\n";
 	return true;
 }
 
@@ -199,6 +199,6 @@ bool sha_512_vector_5()
 		return false;
 	}
 	
-	cout << "SHA-512 Test case 5 succeeded!\n";
+	// cout << "SHA-512 Test case 5 succeeded!\n";
 	return true;
 }

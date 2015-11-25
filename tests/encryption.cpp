@@ -55,6 +55,6 @@ bool encryption_decryption_test()
 		cout << endl;
 		return false;
 	}
-	cout << "Encryption/decryption test succeeded!\n";
+	// cout << "Encryption/decryption test succeeded!\n";
 	return true;
 }

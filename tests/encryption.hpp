@@ -7,4 +7,4 @@
 *
 ********/	
 
-void encryption_decryption_test();
+bool encryption_decryption_test();

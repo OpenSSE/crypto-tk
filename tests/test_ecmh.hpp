@@ -1,3 +1,3 @@
 #pragma once
 
-void instantiate_ecmh();
+void test_generic_multiset_hash();

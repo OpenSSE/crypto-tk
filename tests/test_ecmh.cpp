@@ -1,11 +1,8 @@
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE ECMH
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
 #include "ecmh/hash/blake2b.hpp"
 
 #include <boost/test/unit_test.hpp>
-
 
 template <size_t N, class MSH>
 void test_generic_multiset_hash_with_size(MSH const &msh) {
@@ -135,15 +132,12 @@ void test_generic_multiset_hash_with_size(MSH const &msh) {
   }
 }
 
-void instantiate_ecmh()
-{
-  jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, jbms::hash::blake2b, false> ecmh;
-}
-
-BOOST_AUTO_TEST_CASE(test_ecmh_GLS254) {
+// BOOST_AUTO_TEST_SUITE(ECMH);
+void test_generic_multiset_hash() {
     jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, jbms::hash::blake2b, false> ecmh;
   
     test_generic_multiset_hash_with_size<10>(ecmh);
     test_generic_multiset_hash_with_size<100>(ecmh);
     test_generic_multiset_hash_with_size<150>(ecmh);
 }
+// BOOST_AUTO_TEST_SUITE_END()

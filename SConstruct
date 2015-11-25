@@ -30,7 +30,7 @@ test_objects = SConscript('tests/build.scons', exports='env', variant_dir='build
 Clean(objects, 'build')
 Clean(test_objects, 'build_test')
 
-debug = env.Program('debug_crypto',['main.cpp'] + objects)
+debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = ['src'])
 
 Default(debug)
 

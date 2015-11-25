@@ -132,7 +132,6 @@ void test_generic_multiset_hash_with_size(MSH const &msh) {
   }
 }
 
-// BOOST_AUTO_TEST_SUITE(ECMH);
 void test_generic_multiset_hash() {
     jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, jbms::hash::blake2b, false> ecmh;
   
@@ -140,4 +139,3 @@ void test_generic_multiset_hash() {
     test_generic_multiset_hash_with_size<100>(ecmh);
     test_generic_multiset_hash_with_size<150>(ecmh);
 }
-// BOOST_AUTO_TEST_SUITE_END()

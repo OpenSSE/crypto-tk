@@ -6,8 +6,9 @@ config.scons
 *.o
 build
 bin
+
 debug_crypto
-test_crypto
+check
 
 # MacOS
 .DS_Store

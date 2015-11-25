@@ -30,9 +30,11 @@ test_objects = SConscript('tests/build.scons', exports='env', variant_dir='build
 Clean(objects, 'build')
 Clean(test_objects, 'build_test')
 
-env.Program('debug_crypto',['main.cpp'] + objects)
+debug = env.Program('debug_crypto',['main.cpp'] + objects)
+
+Default(debug)
 
 test_env = env.Clone()
 test_env.Append(LIBS = ['boost_unit_test_framework'])
 
-test_env.Program('test_crypto', ['tests.cpp'] + objects + test_objects)
+test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects)

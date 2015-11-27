@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace sse
 {
@@ -24,6 +25,7 @@ public:
 	SetHash(const std::string &hex);	
 	SetHash(const SetHash& o);
 	SetHash(const SetHash&& o);
+	SetHash(const std::vector<std::string> &in_set);
 	~SetHash();
 
 	void add_element(const std::string &in);

@@ -6,6 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <iostream>
+#include <vector>
 
 template <size_t N, class MSH>
 void test_ecmh_with_size(MSH const &msh) {
@@ -232,7 +233,7 @@ void test_generic_multiset_hash_with_size() {
 
     // Identity
     {
-		SH a = I;
+		SH a;
 		
 		a.add_element(examples[0]);
 		a.add_element(examples[1]);
@@ -247,6 +248,19 @@ void test_generic_multiset_hash_with_size() {
 		REQUIRE_HEX_EQUAL_MH(a, c);
 		BOOST_REQUIRE(a == c);
     }
+	
+    // Batch add
+    {
+      SH a = SH(std::vector<std::string>(examples.begin(),examples.end()));
+	  
+      SH b;
+      for (auto &&e : examples)
+		  b.add_element(e);
+	  
+      REQUIRE_HEX_EQUAL_MH(a, b);
+      BOOST_REQUIRE(a == b);
+    }
+	
   }
 }
 

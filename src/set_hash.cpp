@@ -6,9 +6,6 @@
 #include "ecmh/multiset_hash/ECMH.hpp"
 #include "ecmh/array_view/array_view.hpp"
 
-#include <iostream>
-#include <iomanip>
-
 using namespace jbms::multiset_hash;
 
 namespace sse
@@ -47,6 +44,8 @@ public:
 	SetHashImpl(const MSH::State &s);	
 	SetHashImpl(const SetHash::SetHashImpl& o) = default;	
 	SetHashImpl(const std::string &hex);
+	SetHashImpl(const std::vector<std::string> &in_set);
+ 	template <class InputIterator> SetHashImpl(InputIterator first, InputIterator last);
 	~SetHashImpl();
 
 	void add_element(const std::string &in);
@@ -91,6 +90,10 @@ SetHash::SetHash(const SetHash& o) : set_hash_imp_(new SetHashImpl(o.set_hash_im
 }
 
 SetHash::SetHash(const SetHash&& o) : set_hash_imp_(std::move(o.set_hash_imp_))
+{
+}
+
+SetHash::SetHash(const std::vector<std::string> &in_set) : set_hash_imp_(new SetHashImpl(in_set))
 {
 }
 
@@ -173,6 +176,18 @@ SetHash::SetHashImpl::SetHashImpl(const MSH::State &s) : state_(s)
 SetHash::SetHashImpl::SetHashImpl(const std::string &hex)
 {
 	state_ = from_hex(ecmh(), hex);
+}
+
+SetHash::SetHashImpl::SetHashImpl(const std::vector<std::string> &in_set)
+{
+	state_ = initial_state(ecmh());
+    batch_add(ecmh(), state_, in_set);
+}
+
+template <class InputIterator> SetHash::SetHashImpl::SetHashImpl(InputIterator first, InputIterator last)
+{
+	state_ = initial_state(ecmh());
+    batch_add(ecmh(), state_, jbms::array_view<std::string>(first,last));	
 }
 
 SetHash::SetHashImpl::~SetHashImpl() 

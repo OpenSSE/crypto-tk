@@ -43,10 +43,11 @@
 
 #include "./blake2b-round.h"
 
-namespace jbms {
+namespace sse {
+namespace crypto {
 namespace hash {
 
-void blake2b::hash( unsigned char *out, const unsigned char *in, size_t inlen ) {
+void blake2b::hash(const unsigned char *in, size_t inlen, unsigned char *out) {
 #if defined(HAVE_SSSE3) && !defined(HAVE_XOP)
   const __m128i r16 = _mm_setr_epi8( 2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9 );
   const __m128i r24 = _mm_setr_epi8( 3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10 );
@@ -275,5 +276,6 @@ void blake2b::hash( unsigned char *out, const unsigned char *in, size_t inlen ) 
   STOREU(out + 48, xmm3);
 }
 
+}
 }
 }

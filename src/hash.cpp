@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include <openssl/sha.h>
-
 namespace sse
 {
 	
@@ -13,10 +11,7 @@ namespace crypto
 void Hash::hash(const unsigned char *in, const size_t &len, unsigned char *out)
 {
 	// memset(out,0x00, kDigestSize);
-	SHA512_CTX c;
-	SHA512_Init(&c);
-	SHA512_Update(&c, in, len);
-	SHA512_Final(out, &c);
+	hash_function::hash(in, len, out);
 }
 
 void Hash::hash(const unsigned char *in, const size_t &len, const size_t &out_len, unsigned char *out)

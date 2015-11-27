@@ -4,8 +4,6 @@
 
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
-#include "ecmh/hash/blake2b.hpp"
-#include "ecmh/hash/blake2s.hpp"
 #include "ecmh/array_view/array_view.hpp"
 
 using namespace jbms::multiset_hash;

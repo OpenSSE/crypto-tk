@@ -17,7 +17,7 @@ void assign_hash(Field const &F, Hash const &H, typename Field::Element &result,
   const size_t num_digests = div_ceil(F.num_bytes(), Hash::digest_bytes);
   uint8_t buf[num_digests * Hash::digest_bytes];
 
-  hash_expand(H, buf, num_digests, data);
+  hash::hash_expand(H, buf, num_digests, data);
   assign(F, result, jbms::little_endian(jbms::array_view<uint8_t>(buf, F.num_bytes())));
 }
 

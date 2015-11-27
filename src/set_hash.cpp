@@ -1,8 +1,11 @@
 #include "set_hash.hpp"
 
+#include "hash.hpp"
+
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
 #include "ecmh/hash/blake2b.hpp"
+#include "ecmh/hash/blake2s.hpp"
 #include "ecmh/array_view/array_view.hpp"
 
 using namespace jbms::multiset_hash;
@@ -13,6 +16,25 @@ namespace sse
 namespace crypto
 {
 
+	/*
+	 * HashWrapper
+	 * 
+	 * A wrapper around the Hash class to make it compatible with the ECMH code.
+	 *
+	 */
+	
+	class HashWrapper
+	{
+	public:
+	    constexpr static size_t digest_bytes = sse::crypto::Hash::kDigestSize;
+	    constexpr static size_t block_bytes = sse::crypto::Hash::kBlockSize;
+		
+	    static void hash(unsigned char *out, const unsigned char *in, size_t inlen)
+		{
+			sse::crypto::Hash::hash(in, inlen, out);
+		}
+		
+	};
 
 class SetHash::SetHashImpl
 {
@@ -25,7 +47,8 @@ public:
 	void remove_element(const std::string &in);
 	
 private:	
-	typedef jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, jbms::hash::blake2b, false> MSH;
+	// typedef jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, jbms::hash::blake2b, false> MSH;
+	typedef jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, sse::crypto::HashWrapper, false> MSH;
     MSH ecmh_;
    	MSH::State state_;
 };

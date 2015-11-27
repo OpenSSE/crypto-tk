@@ -134,7 +134,7 @@ public:
   friend void hash_element(MuHash const &h, openssl::bignum &result, array_view<void const> x) {
     fill(result,
          h.total_hash_bytes,
-         jbms::little_endian([&](uint8_t *buf) { hash_expand(h.hash(), buf, h.num_digests, x); }));
+         jbms::little_endian([&](uint8_t *buf) { hash::hash_expand(h.hash(), buf, h.num_digests, x); }));
     result.mask_bits(h.num_bits);
     modular_reduce(h, result);
 

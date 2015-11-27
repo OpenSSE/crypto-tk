@@ -1,17 +1,13 @@
-#include "src/prf.hpp"
+#include "src/random.hpp"
 
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
 #include "ecmh/hash/blake2b.hpp"
-
 #include <iostream>
 #include <iomanip>
 #include <string>
 
 using namespace std;
-
-typedef sse::crypto::Prf<16> Prf_16;
-typedef sse::crypto::Prf<64> Prf_64;
 
 int main( int argc, char* argv[] ) {
 	
@@ -26,7 +22,7 @@ int main( int argc, char* argv[] ) {
 	
 	constexpr size_t N = 100;
 	std::array<uint8_t, N>example;
-    jbms::openssl::rand_pseudo_bytes(example);
+	sse::crypto::random_bytes(example);
 	
     State a = I;
     State b = I;

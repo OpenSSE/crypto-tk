@@ -708,14 +708,14 @@ inline void pseudo_rand(bignum &r, int bits, int top, int bottom) {
   throw_last_error_if(BN_pseudo_rand(r.get(), bits, top, bottom) == 0);
 }
 
-// Post-condition: 0 <= r < range
-inline void rand_range(bignum &r, bignum const &range) {
-  throw_last_error_if(BN_rand_range(r.get(), range.get()) == 0);
-}
-// Same as rand_range, but not cryptographically secure
-inline void pseudo_rand_range(bignum &r, bignum const &range) {
-  throw_last_error_if(BN_pseudo_rand_range(r.get(), range.get()) == 0);
-}
+// // Post-condition: 0 <= r < range
+// inline void rand_range(bignum &r, bignum const &range) {
+//   throw_last_error_if(BN_rand_range(r.get(), range.get()) == 0);
+// }
+// // Same as rand_range, but not cryptographically secure
+// inline void pseudo_rand_range(bignum &r, bignum const &range) {
+//   throw_last_error_if(BN_pseudo_rand_range(r.get(), range.get()) == 0);
+// }
 
 
 }

@@ -14,7 +14,7 @@
 #include <boost/algorithm/hex.hpp>
 #include "ecmh/utility/logical.hpp"
 
-#include "ecmh/ctr_drbg.hpp"
+#include "random.hpp"
 
 namespace jbms {
 namespace binary_field {
@@ -204,7 +204,7 @@ inline BinaryPolynomial<Bits> operator|(BinaryPolynomial<Bits> const &a,
 
 template <size_t Bits>
 inline void assign_random(BinaryPolynomial<Bits> &result) {
-  ctr_drbg_generate(result.limbs);
+	sse::crypto::random_bytes(result.num_limbs*sizeof(limb_t), (unsigned char*)&result.limbs);
   result.limbs[result.num_limbs-1] &= result.last_limb_mask();
 }
 

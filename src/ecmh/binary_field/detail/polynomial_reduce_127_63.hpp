@@ -4,6 +4,7 @@
 #include "./polynomial_base.hpp"
 #include "./limb_ops.hpp"
 #include "./GF2.hpp"
+#include "ecmh/array_view/array_view.hpp"
 
 namespace jbms {
 namespace binary_field {

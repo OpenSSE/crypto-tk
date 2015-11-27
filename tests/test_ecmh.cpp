@@ -1,7 +1,7 @@
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
 #include "ecmh/hash/blake2b.hpp"
-
+#include "random.hpp"
 #include <boost/test/unit_test.hpp>
 
 template <size_t N, class MSH>
@@ -11,8 +11,8 @@ void test_generic_multiset_hash_with_size(MSH const &msh) {
     size_t num_examples = 3;
     std::vector<std::array<uint8_t, N>> examples(num_examples);
     for (auto &e : examples)
-      jbms::openssl::rand_pseudo_bytes(e);
-
+		sse::crypto::random_bytes(e);
+				
     using State = typename MSH::State;
 
     State I = initial_state(msh);

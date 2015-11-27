@@ -190,52 +190,53 @@ struct GF2m {
     a.set_bit((int)i, value);
   }
 
-  // uses OpenSSL random number generation
-  friend void pseudo_rand(GF2m const &F, Element &x) {
-    pseudo_rand(x, F.degree(), -1, 0);
-  }
-
-  friend void pseudo_rand_double(GF2m const &F, Element &x) {
-    pseudo_rand(x, F.degree()*2-1, -1, 0);
-  }
-
-
-  friend Element pseudo_rand_element(GF2m const &F) {
-    Element x;
-    pseudo_rand(F, x);
-    return x;
-  }
-
-  friend Element pseudo_rand_double_element(GF2m const &F) {
-    Element x;
-    pseudo_rand_double(F, x);
-    return x;
-  }
-
-
-  // uses OpenSSL random number generation
-  friend void rand(GF2m const &F, Element &x) {
-    rand(x, F.degree(), -1, 0);
-  }
-
-  friend void rand_double(GF2m const &F, Element &x) {
-    rand(x, F.degree()*2-1, -1, 0);
-  }
-
-
-  friend Element rand_element(GF2m const &F) {
-    Element x;
-    rand(F, x);
-    return x;
-  }
-
-  friend Element rand_double_element(GF2m const &F) {
-    Element x;
-    rand_double(F, x);
-    return x;
-  }
-
-  friend void assign_random(GF2m const &F, Element &x) { rand(F, x); }
+// 
+//   // uses OpenSSL random number generation
+//   friend void pseudo_rand(GF2m const &F, Element &x) {
+//     pseudo_rand(x, F.degree(), -1, 0);
+//   }
+//
+//   friend void pseudo_rand_double(GF2m const &F, Element &x) {
+//     pseudo_rand(x, F.degree()*2-1, -1, 0);
+//   }
+//
+//
+//   friend Element pseudo_rand_element(GF2m const &F) {
+//     Element x;
+//     pseudo_rand(F, x);
+//     return x;
+//   }
+//
+//   friend Element pseudo_rand_double_element(GF2m const &F) {
+//     Element x;
+//     pseudo_rand_double(F, x);
+//     return x;
+//   }
+//
+//
+//   // uses OpenSSL random number generation
+//   friend void rand(GF2m const &F, Element &x) {
+//     rand(x, F.degree(), -1, 0);
+//   }
+//
+//   friend void rand_double(GF2m const &F, Element &x) {
+//     rand(x, F.degree()*2-1, -1, 0);
+//   }
+//
+//
+//   friend Element rand_element(GF2m const &F) {
+//     Element x;
+//     rand(F, x);
+//     return x;
+//   }
+//
+//   friend Element rand_double_element(GF2m const &F) {
+//     Element x;
+//     rand_double(F, x);
+//     return x;
+//   }
+//
+//   friend void assign_random(GF2m const &F, Element &x) { rand(F, x); }
 
   friend void set_trace_zero(GF2m const &F, Element &x) {
     x.set_bit(F.first_trace_bit, x.is_bit_set(F.first_trace_bit) ^ trace(F, x));

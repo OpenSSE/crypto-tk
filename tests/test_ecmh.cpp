@@ -1,18 +1,21 @@
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
-#include "ecmh/hash/blake2b.hpp"
+#include "set_hash.hpp"
+#include "hash.hpp"
 #include "random.hpp"
 #include <boost/test/unit_test.hpp>
 
+#include <iostream>
+
 template <size_t N, class MSH>
-void test_generic_multiset_hash_with_size(MSH const &msh) {
+void test_ecmh_with_size(MSH const &msh) {
 
   for (int i = 0; i < 100; ++i) {
     size_t num_examples = 3;
     std::vector<std::array<uint8_t, N>> examples(num_examples);
     for (auto &e : examples)
 		sse::crypto::random_bytes(e);
-				
+
     using State = typename MSH::State;
 
     State I = initial_state(msh);
@@ -132,10 +135,142 @@ void test_generic_multiset_hash_with_size(MSH const &msh) {
   }
 }
 
-void test_generic_multiset_hash() {
-    jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, jbms::hash::blake2b, false> ecmh;
+template <size_t N>
+void test_generic_multiset_hash_with_size() {
+
+  for (int i = 0; i < 100; ++i) {
+    size_t num_examples = 3;
+    // std::vector<std::array<uint8_t, N>> examples(num_examples);
+    std::vector<std::string> examples(num_examples);
+    for (auto &e : examples){
+		e.resize(N);
+		sse::crypto::random_bytes(N,(unsigned char*) e.data());
+	}			
+    using SH = typename sse::crypto::SetHash;
+
+	const SH I;
+    // State I = initial_state(msh);
+
+#define REQUIRE_HEX_EQUAL_MH(a, b) BOOST_REQUIRE_EQUAL(a.hex(), b.hex())
+
+    // Hex
+	{
+		SH a = I;
+		SH b(SH(a.hex()));
+		BOOST_REQUIRE_EQUAL(a,b);
+		REQUIRE_HEX_EQUAL_MH(a, b);
+
+		a.add_element(examples[0]);
+		a.add_element(examples[1]);
+		a.remove_element(examples[2]);
+
+		b = SH(a.hex());
+		BOOST_REQUIRE_EQUAL(a,b);
+		REQUIRE_HEX_EQUAL_MH(a, b);
+    }
+
+    // Commutativity
+    {
+		SH a = I, b = I;
+		a.add_element(examples[0]);
+		a.add_element(examples[1]);
+
+		b.add_element(examples[1]);
+		b.add_element(examples[0]);
+
+		REQUIRE_HEX_EQUAL_MH(a, b);
+		BOOST_REQUIRE_EQUAL(a, b);
+		BOOST_REQUIRE_EQUAL(b, a);
+		BOOST_REQUIRE((b != I));
+		BOOST_REQUIRE((I != a));
+    }
+
+    // Associative
+	{
+		SH a = I, b = I, c = I, d = I;
+		a.add_element(examples[0]);
+		a.add_element(examples[1]);
+		b.add_element(examples[2]);
+
+		a.add_set(b);
+		
+		c.add_element(examples[0]);
+		d.add_element(examples[1]);
+		d.add_element(examples[2]);
+		
+		c.add_set(d);
+
+		REQUIRE_HEX_EQUAL_MH(a, c);
+		BOOST_REQUIRE(a == c);
+		BOOST_REQUIRE(c == a);
+	}
   
-    test_generic_multiset_hash_with_size<10>(ecmh);
-    test_generic_multiset_hash_with_size<100>(ecmh);
-    test_generic_multiset_hash_with_size<150>(ecmh);
+	// Inverse property
+	{
+		SH a = I;
+		a.add_element(examples[0]);
+		a.add_element(examples[1]);
+
+		// BOOST_REQUIRE(to_hex(msh, a) != to_hex(msh, I));
+		// BOOST_REQUIRE(!equal(msh, a, I));
+
+		BOOST_REQUIRE(a.hex() != I.hex());
+		BOOST_REQUIRE(a != I);
+		
+		SH b = a.invert_set();
+		
+		b.add_set(a);
+		REQUIRE_HEX_EQUAL_MH(b, I);
+		BOOST_REQUIRE(b == I);
+
+		SH c = a;
+		c.remove_element(examples[0]);
+		c.remove_element(examples[1]);
+		REQUIRE_HEX_EQUAL_MH(c, I);
+		BOOST_REQUIRE(c == I);
+	}
+
+    // Identity
+    {
+		SH a = I;
+		
+		a.add_element(examples[0]);
+		a.add_element(examples[1]);
+
+		SH b = a;
+		b.add_set(I);
+		REQUIRE_HEX_EQUAL_MH(a, b);
+		BOOST_REQUIRE(a == b);
+
+		SH c = a;
+		c.remove_set(I);
+		REQUIRE_HEX_EQUAL_MH(a, c);
+		BOOST_REQUIRE(a == c);
+    }
+  }
+}
+
+class TestHash
+{
+public:
+    constexpr static size_t digest_bytes = sse::crypto::Hash::kDigestSize;
+    constexpr static size_t block_bytes = sse::crypto::Hash::kBlockSize;
+	
+    static void hash(unsigned char *out, const unsigned char *in, size_t inlen)
+	{
+		sse::crypto::Hash::hash(in, inlen, out);
+	}
+	
+};
+
+void test_generic_multiset_hash() {
+	
+    jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,TestHash, false> ecmh;
+    test_ecmh_with_size<10>(ecmh);
+    test_ecmh_with_size<100>(ecmh);
+    test_ecmh_with_size<150>(ecmh);
+  
+    test_generic_multiset_hash_with_size<10>();
+    test_generic_multiset_hash_with_size<100>();
+    test_generic_multiset_hash_with_size<150>();
 }

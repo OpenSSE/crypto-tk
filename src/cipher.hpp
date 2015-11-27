@@ -26,12 +26,23 @@ public:
 
 	Cipher();
 	
+	// we should not be able to duplicate Cipher objects
+	Cipher(const Cipher& c) = delete;
+	Cipher(Cipher& c) = delete;
+	Cipher(const Cipher&& c) = delete;
+	Cipher(Cipher&& c) = delete;
+	
+	
 	Cipher(const std::array<uint8_t,kKeySize>& k);
 	
 	~Cipher();
 
 	void encrypt(const std::string &in, std::string &out);
 	void decrypt(const std::string &in, std::string &out);
+	
+	// Again, avoid any assignement of Cipher objects
+	Cipher& operator=(const Cipher& h) = delete;
+	Cipher& operator=(Cipher& h) = delete;
 	
 private:	
 	class CipherImpl; // not defined in the header

@@ -25,8 +25,12 @@ namespace crypto
 		
 	};
 
-	static /*thread_local*/ Drbg rng;
-
+#ifdef __MACH__
+	static Drbg rng;
+#else
+	static thread_local Drbg rng;
+#endif
+	
 	inline void random_bytes(const size_t &byte_count, unsigned char* out)
 	{
 	// #warning thread_local is not supported by Mac OS libc implementation

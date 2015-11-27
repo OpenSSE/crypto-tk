@@ -10,13 +10,33 @@ namespace sse
 namespace crypto
 {
 
+	class Drbg
+	{
+	public:
+		Drbg();
+		~Drbg();
+		
+		void reseed();
+		void next(const size_t &byte_count, unsigned char* out);
+		
+	private:	
+		class DrbgImpl; // not defined in the header
+		DrbgImpl *drdg_imp_; // opaque pointer
+		
+	};
 
-	void random_bytes(const size_t &byte_count, unsigned char* buffer);
+	static /*thread_local*/ Drbg rng;
+
+	inline void random_bytes(const size_t &byte_count, unsigned char* out)
+	{
+	// #warning thread_local is not supported by Mac OS libc implementation
+	   rng.next(byte_count, out);
+	}
 
 	template <typename T, size_t N>
-	void random_bytes(std::array<T,N> &buffer)
+	inline void random_bytes(std::array<T,N> &out)
 	{
-		random_bytes(buffer.size()*sizeof(T), (unsigned char*)buffer.data());
+		random_bytes(out.size()*sizeof(T), (unsigned char*)out.data());
 	}
 
 }

@@ -9,6 +9,7 @@ bin
 
 debug_crypto
 check
+library
 
 # MacOS
 .DS_Store

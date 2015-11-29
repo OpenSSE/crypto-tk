@@ -25,6 +25,17 @@ else:
 	env.Append(CCFLAGS = ['-O2'])
 
 
+
+def run_test(target, source, env):
+    app = str(source[0].abspath)
+    if os.spawnl(os.P_WAIT, app, app)==0:
+        return 0
+    else:
+        return 1
+
+bld = Builder(action = run_test)
+env.Append(BUILDERS = {'Test' :  bld})
+
 objects = SConscript('src/build.scons', exports='env', variant_dir='build', duplicate=0)
 test_objects = SConscript('tests/build.scons', exports='env', variant_dir='build_test', duplicate=0)
 
@@ -40,6 +51,10 @@ test_env.Append(LIBS = ['boost_unit_test_framework'])
 
 test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects)
 
+test_run = test_env.Test('test_run', test_prog)
+Depends(test_run, test_prog)
+
+env.Alias('check', [test_prog, test_run])
 
 
 library_build_prefix = 'library'
@@ -53,3 +68,4 @@ env.Clean(headers_lib,[library_build_prefix+'/include'])
 Alias('headers', [headers_lib])
 Alias('lib', [shared_lib, static_lib, headers_lib])
 
+Depends([shared_lib, static_lib, headers_lib], test_run)

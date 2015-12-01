@@ -2,6 +2,7 @@
 
 #include "hash/sha512.hpp"
 
+#include <cstddef>
 #include <string>
 
 

@@ -2,12 +2,12 @@
 
 #include "random.hpp"
 
+#include <cstring>
 #include <exception>
-
-#include <openssl/aes.h>
-
 #include <iostream>
 #include <iomanip>
+
+#include <openssl/aes.h>
 
 namespace sse
 {

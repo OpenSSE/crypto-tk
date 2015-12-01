@@ -1,10 +1,11 @@
 #include "random.hpp"
 
-#include <openssl/aes.h>
-
+#include <cstring>
 #include <algorithm>
 #include <array>
 #include <fstream>
+
+#include <openssl/aes.h>
 
 namespace sse
 {

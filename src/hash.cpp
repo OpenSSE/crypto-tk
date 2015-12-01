@@ -1,6 +1,7 @@
 #include "hash.hpp"
 
 #include <cassert>
+#include <cstring>
 
 namespace sse
 {

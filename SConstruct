@@ -11,7 +11,8 @@ except:
 if FindFile('config.scons', '.'):
     SConscript('config.scons', exports='env')
 
-
+env['CC'] = 'clang'
+env['CXX'] = 'clang++'
 env.Append(CCFLAGS=['-Wall', '-march=native'])
 env.Append(CXXFLAGS=['-std=c++14'])
 env.Append(LIBS = ['crypto'])

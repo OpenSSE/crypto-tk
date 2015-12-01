@@ -45,16 +45,6 @@ debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = ['src'])
 
 Default(debug)
 
-test_env = env.Clone()
-test_env.Append(LIBS = ['boost_unit_test_framework'])
-
-test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects)
-
-test_run = test_env.Test('test_run', test_prog)
-Depends(test_run, test_prog)
-
-env.Alias('check', [test_prog, test_run])
-
 
 library_build_prefix = 'library'
 shared_lib = env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects)
@@ -67,4 +57,32 @@ env.Clean(headers_lib,[library_build_prefix+'/include'])
 Alias('headers', [headers_lib])
 Alias('lib', [shared_lib, static_lib, headers_lib])
 
-Depends([shared_lib, static_lib, headers_lib], test_run)
+
+
+test_env = env.Clone()
+
+if not test_env.GetOption('clean'):
+    conf = Configure(test_env)
+    if conf.CheckLib('boost_unit_test_framework'):
+        print 'Found boost unit test framework'
+        
+        test_env.Append(LIBS = ['boost_unit_test_framework'])
+        
+        test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects)
+
+        test_run = test_env.Test('test_run', test_prog)
+        Depends(test_run, test_prog)
+
+        env.Alias('check', [test_prog, test_run])
+        
+        Depends([shared_lib, static_lib, headers_lib], test_run)
+        
+    else:
+        print 'boost unit test framework not found'
+        print 'Skipping checks. Be careful!'
+    test_env = conf.Finish()
+
+
+
+
+

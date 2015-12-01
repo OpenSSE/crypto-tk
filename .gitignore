@@ -3,6 +3,8 @@ config.scons
 
 # scons and build results
 .sconsign.dblite
+.sconf_temp
+config.log
 *.o
 build
 bin

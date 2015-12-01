@@ -50,7 +50,7 @@ inline std::pair<size_t,size_t> check_huge_page_allocation(void *ptr, size_t len
   std::string line;
 
   std::string field_prefix = "AnonHugePages:";
-  uintptr_t r_begin = 0, r_end = 0, r_begin_aligned, r_end_aligned;
+  uintptr_t r_begin = 0, r_end = 0, r_begin_aligned = 0, r_end_aligned = 0;
   size_t min_amount = 0, max_amount = 0;
 
   while (getline(ifs, line)) {

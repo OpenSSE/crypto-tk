@@ -12,7 +12,7 @@ template <class H>
 struct is_multiset_hash : std::false_type {};
 
 template <class H, JBMS_ENABLE_IF(is_multiset_hash<H>)>
-inline auto initial_state(H const &h) {
+inline typename H::State initial_state(H const &h) {
   typename H::State s;
   initialize(h, s);
   return s;
@@ -33,7 +33,7 @@ void batch_remove(H const &h, typename H::State &state, ElementRange const &elem
 }
 
 template <class H, JBMS_ENABLE_IF(is_multiset_hash<H>)>
-inline auto invert(H const &h, typename H::State const &state) {
+inline typename H::State invert(H const &h, typename H::State const &state) {
   typename H::State result;
   invert(h, result, state);
   return result;
@@ -57,7 +57,7 @@ void assign_from_hex(H const &h, typename H::State &x, Range const &s) {
 }
 
 template <class H, class Range, JBMS_ENABLE_IF_C(is_multiset_hash<H>::value && std::is_same<char,typename boost::range_value<Range>::type>::value)>
-auto from_hex(H const &h, Range const &s) {
+typename H::State from_hex(H const &h, Range const &s) {
   typename H::State x;
   assign_from_hex(h, x, s);
   return x;

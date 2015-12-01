@@ -14,16 +14,18 @@ struct endian_wrapper {
   Data &data;
   explicit endian_wrapper(Data &data) : data(data) {}
 
-  template <class AssignTo,
-            decltype(assign(std::declval<AssignTo &>(), std::declval<endian_wrapper>())) * = nullptr>
+  // template <class AssignTo,
+            // decltype(assign(std::declval<AssignTo &>(), std::declval<endian_wrapper>())) * = nullptr>
+  template <class AssignTo>
   explicit operator AssignTo() const {
     AssignTo result;
     assign(result, *this);
     return result;
   }
 
-  template <class AssignFrom,
-            decltype(assign(std::declval<endian_wrapper>(), std::declval<AssignFrom const &>())) * = nullptr>
+  // template <class AssignFrom,
+            // decltype(assign(std::declval<endian_wrapper>(), std::declval<AssignFrom const &>())) * = nullptr>
+  template <class AssignFrom>
   endian_wrapper const &operator=(AssignFrom const &x) const {
     assign(*this, x);
     return *this;

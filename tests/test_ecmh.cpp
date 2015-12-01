@@ -1,6 +1,6 @@
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
-#include "set_hash.hpp"
+#include "../src/set_hash.hpp"
 #include "hash.hpp"
 #include "random.hpp"
 #include <boost/test/unit_test.hpp>
@@ -147,17 +147,17 @@ void test_generic_multiset_hash_with_size() {
 		e.resize(N);
 		sse::crypto::random_bytes(N,(unsigned char*) e.data());
 	}			
-    using SH = typename sse::crypto::SetHash;
+  using sse::crypto::SetHash;
 
-	const SH I;
+	const SetHash I;
     // State I = initial_state(msh);
 
 #define REQUIRE_HEX_EQUAL_MH(a, b) BOOST_REQUIRE_EQUAL(a.hex(), b.hex())
 
     // Hex
 	{
-		SH a = I;
-		SH b(SH(a.hex()));
+		SetHash a = I;
+		SetHash b(SetHash(a.hex()));
 		BOOST_REQUIRE_EQUAL(a,b);
 		REQUIRE_HEX_EQUAL_MH(a, b);
 
@@ -165,14 +165,14 @@ void test_generic_multiset_hash_with_size() {
 		a.add_element(examples[1]);
 		a.remove_element(examples[2]);
 
-		b = SH(a.hex());
+		b = SetHash(a.hex());
 		BOOST_REQUIRE_EQUAL(a,b);
 		REQUIRE_HEX_EQUAL_MH(a, b);
     }
 
     // Commutativity
     {
-		SH a = I, b = I;
+		SetHash a = I, b = I;
 		a.add_element(examples[0]);
 		a.add_element(examples[1]);
 
@@ -188,7 +188,7 @@ void test_generic_multiset_hash_with_size() {
 
     // Associative
 	{
-		SH a = I, b = I, c = I, d = I;
+		SetHash a = I, b = I, c = I, d = I;
 		a.add_element(examples[0]);
 		a.add_element(examples[1]);
 		b.add_element(examples[2]);
@@ -208,7 +208,7 @@ void test_generic_multiset_hash_with_size() {
   
 	// Inverse property
 	{
-		SH a = I;
+		SetHash a = I;
 		a.add_element(examples[0]);
 		a.add_element(examples[1]);
 
@@ -218,13 +218,13 @@ void test_generic_multiset_hash_with_size() {
 		BOOST_REQUIRE(a.hex() != I.hex());
 		BOOST_REQUIRE(a != I);
 		
-		SH b = a.invert_set();
+		SetHash b = a.invert_set();
 		
 		b.add_set(a);
 		REQUIRE_HEX_EQUAL_MH(b, I);
 		BOOST_REQUIRE(b == I);
 
-		SH c = a;
+		SetHash c = a;
 		c.remove_element(examples[0]);
 		c.remove_element(examples[1]);
 		REQUIRE_HEX_EQUAL_MH(c, I);
@@ -233,17 +233,17 @@ void test_generic_multiset_hash_with_size() {
 
     // Identity
     {
-		SH a;
+		SetHash a;
 		
 		a.add_element(examples[0]);
 		a.add_element(examples[1]);
 
-		SH b = a;
+		SetHash b = a;
 		b.add_set(I);
 		REQUIRE_HEX_EQUAL_MH(a, b);
 		BOOST_REQUIRE(a == b);
 
-		SH c = a;
+		SetHash c = a;
 		c.remove_set(I);
 		REQUIRE_HEX_EQUAL_MH(a, c);
 		BOOST_REQUIRE(a == c);
@@ -251,9 +251,9 @@ void test_generic_multiset_hash_with_size() {
 	
     // Batch add
     {
-      SH a = SH(std::vector<std::string>(examples.begin(),examples.end()));
+      SetHash a = SetHash(std::vector<std::string>(examples.begin(),examples.end()));
 	  
-      SH b;
+      SetHash b;
       for (auto &&e : examples)
 		  b.add_element(e);
 	  

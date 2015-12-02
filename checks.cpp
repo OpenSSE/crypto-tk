@@ -25,7 +25,7 @@
 
 #include "tests/test_ecmh.hpp"
 #include "tests/hashing.hpp"
-#include "tests/prf_hmac.hpp"
+#include "tests/test_hmac.hpp"
 #include "tests/encryption.hpp"
 
 BOOST_AUTO_TEST_CASE(ecmh_GLS254) {

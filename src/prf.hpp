@@ -21,6 +21,7 @@
 #pragma once
 
 #include "random.hpp"
+#include "hmac.hpp"
 #include "hash.hpp"
 
 #include <cstdint>
@@ -29,8 +30,6 @@
 
 #include <string>
 #include <array>
-
-#include <openssl/hmac.h>
 
 namespace sse
 {
@@ -51,104 +50,60 @@ namespace crypto
 template <uint8_t NBYTES> class Prf
 {
 public:
-	static constexpr uint8_t kKeySize = Hash::kBlockSize;
+	typedef HMac<Hash> PrfBase;
+	static constexpr uint8_t kKeySize = PrfBase::kKeySize;
 		
-	Prf()
+	Prf() : base_()
 	{
-		random_bytes(kKeySize, key_.data());
-		gen_padded_keys(key_);
-	};
-	
-	Prf(const void* k)
-	{
-		std::memcpy(key_.data(),k,kKeySize);
-		gen_padded_keys(key_);
-	};
-
-	Prf(const void* k, const uint8_t &len)
-	{
-		assert(len <= kKeySize);
-		uint8_t l = (kKeySize < len) ? kKeySize : len;
-		
-		std::memset(key_.data(), 0x00, kKeySize);
-		std::memcpy(key_.data(),k,l);
-
-		gen_padded_keys(key_);
-	};
-	
-	Prf(const std::string& k)
-	{
-		uint8_t l = (kKeySize < k.size()) ? kKeySize : k.size();
-		
-		std::memset(key_.data(), 0x00, kKeySize);
-		std::memcpy(key_.data(),k.data(),l);
-
-		gen_padded_keys(key_);
 	}
 	
-	Prf(const std::string& k, const uint8_t &len)
+	Prf(const void* k) : base_(k)
 	{
-		uint8_t l = (kKeySize < len) ? kKeySize : len;
-		
-		std::memset(key_.data(), 0x00, kKeySize);
-		std::memcpy(key_.data(),k.data(),l);
+	}
 
-		gen_padded_keys(key_);
+	Prf(const void* k, const uint8_t &len) : base_(k, len)
+	{
 	}
 	
-	Prf(const std::array<uint8_t,kKeySize>& k) : key_(k)
+	Prf(const std::string& k) : base_(k)
+	{
+	}
+	
+	Prf(const std::string& k, const uint8_t &len) : base_(k, len)
+	{
+	}
+	
+	Prf(const std::array<uint8_t,kKeySize>& k) : base_(k)
 	{	
-		gen_padded_keys(k);
-	};
+	}
 
-	Prf(const Prf<NBYTES>& k) : key_(k.key_), o_key_(k.o_key_), i_key_(k.i_key_)
-	{	
-		
-	};
+	Prf(const Prf<NBYTES>& prf) : base_(prf.base_)
+	{		
+	}
 
 	// Destructor.
-	// Set the content of the key to zero before destruction: remove all traces of the key in memory.
-	~Prf() 
-	{ 
-		std::fill(key_.begin(), key_.end(), 0); 
-	}; 
+	~Prf() {}; 
 
 	const std::array<uint8_t,kKeySize>& key() const
 	{
-		return key_;
+		return base_.key();
 	};
 	
 	const uint8_t* key_data() const
 	{
-		return key_.data();
+		return base_.key_data();
 	};
 	
 	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;
 	
 private:
-	void gen_padded_keys(const std::array<uint8_t,kKeySize> &key);
 	
-	std::array<uint8_t,kKeySize> key_;
-	std::array<uint8_t,kKeySize> o_key_;
-	std::array<uint8_t,kKeySize> i_key_;
-
+	PrfBase base_;
 };
 
-template <uint8_t NBYTES> void Prf<NBYTES>::gen_padded_keys(const std::array<uint8_t,kKeySize> &key)
-{
-	memcpy(o_key_.data(), key.data(), kKeySize);
-	memcpy(i_key_.data(), key.data(), kKeySize);
-	
-	for(uint8_t i = 0; i < kKeySize; ++i)
-	{
-		o_key_[i] ^= 0x5c;
-		i_key_[i] ^= 0x36;
-	}
-}
-
 // PRF instantiation
-// For now, use OpenSSL's HMAC-512 implementation
+// For now, use HMAC-Hash where Hash is the hash function defined in hash.hpp
 template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in, const size_t &length) const
 {
 	static_assert(NBYTES != 0, "PRF output length invalid: length must be strictly larger than 0");
@@ -158,31 +113,9 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const uns
 	assert(NBYTES <= sse::crypto::Hash::kDigestSize);
 	
 	if(NBYTES <= sse::crypto::Hash::kDigestSize){
-		// only need one output bloc of HMAC.
+		// only need one output bloc of PrfBase.
 
-	    unsigned char* buffer, *tmp;
-		unsigned int i_len = Hash::kBlockSize + length;
-		unsigned int o_len = Hash::kBlockSize + Hash::kDigestSize;
-		unsigned int buffer_len = (i_len > Hash::kDigestSize) ? i_len : (Hash::kDigestSize);
-		
-		buffer = new unsigned char [buffer_len];
-		tmp = new unsigned char [o_len];
-		
-		memcpy(buffer, i_key_.data(), Hash::kBlockSize);
-		memcpy(buffer + Hash::kBlockSize, in, length);
-		
-		
-		Hash::hash(buffer, i_len, buffer);
-		
-		memcpy(tmp, o_key_.data(), Hash::kBlockSize);
-		memcpy(tmp + Hash::kBlockSize, buffer, Hash::kDigestSize);
-
-		Hash::hash(tmp, Hash::kBlockSize + Hash::kDigestSize, buffer);
-		
-		std::memcpy(result.data(), buffer, NBYTES);
-		
-		delete [] buffer;
-		delete [] tmp;
+		std::copy_n(base_.hmac(in).begin(), NBYTES, result.begin());
 	}
 	
 	

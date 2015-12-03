@@ -20,6 +20,7 @@
 
 #include "hashing.hpp"
 #include "../src/hash.hpp"
+#include "../src/hash/sha512.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -36,7 +37,9 @@ bool sha_512_test_vectors()
 bool sha_512_vector_1()
 {
 	string in = "abc";
-	string out = sse::crypto::Hash::hash(in);
+	string out;
+	out.resize(sse::crypto::hash::sha512::kDigestSize);
+	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31,
@@ -45,7 +48,7 @@ bool sha_512_vector_1()
 					0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e, 0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f
 				};
 												
-	if(out != string((char*)reference, sse::crypto::Hash::kDigestSize))
+	if(out != string((char*)reference, sse::crypto::hash::sha512::kDigestSize))
 	{
 		cout << "Test case 1 failed!\n";
 		cout << "Input (" << dec << in.length() << " bytes):\n";
@@ -74,7 +77,10 @@ bool sha_512_vector_1()
 bool sha_512_vector_2()
 {
 	string in = "";
-	string out = sse::crypto::Hash::hash(in);
+	string out;
+	
+	out.resize(sse::crypto::hash::sha512::kDigestSize);
+	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd, 0xf1, 0x54, 0x28, 0x50, 0xd6, 0x6d, 0x80, 0x07, 
@@ -83,7 +89,7 @@ bool sha_512_vector_2()
 					0x63, 0xb9, 0x31, 0xbd, 0x47, 0x41, 0x7a, 0x81, 0xa5, 0x38, 0x32, 0x7a, 0xf9, 0x27, 0xda, 0x3e
 				};
 												
-	if(out != string((char*)reference,sse::crypto::Hash::kDigestSize))
+	if(out != string((char*)reference,sse::crypto::hash::sha512::kDigestSize))
 	{
 		cout << "Test case 2 failed!\n";
 		cout << "Input (" << dec << in.length() << " bytes):\n";
@@ -112,7 +118,10 @@ bool sha_512_vector_2()
 bool sha_512_vector_3()
 {
 	string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-	string out = sse::crypto::Hash::hash(in);
+	string out;
+	
+	out.resize(sse::crypto::hash::sha512::kDigestSize);
+	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0x20, 0x4a, 0x8f, 0xc6, 0xdd, 0xa8, 0x2f, 0x0a, 0x0c, 0xed, 0x7b, 0xeb, 0x8e, 0x08, 0xa4, 0x16, 
@@ -121,7 +130,7 @@ bool sha_512_vector_3()
 					0x31, 0xad, 0x85, 0xc7, 0xa7, 0x1d, 0xd7, 0x03, 0x54, 0xec, 0x63, 0x12, 0x38, 0xca, 0x34, 0x45
 				};
 												
-	if(out != string((char*)reference,sse::crypto::Hash::kDigestSize))
+	if(out != string((char*)reference,sse::crypto::hash::sha512::kDigestSize))
 	{
 		cout << "Test case 3 failed!\n";
 		cout << "Input (" << dec << in.length() << " bytes):\n";
@@ -150,7 +159,10 @@ bool sha_512_vector_3()
 bool sha_512_vector_4()
 {
 	string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
-	string out = sse::crypto::Hash::hash(in);
+	string out;
+	
+	out.resize(sse::crypto::hash::sha512::kDigestSize);
+	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0x8e, 0x95, 0x9b, 0x75, 0xda, 0xe3, 0x13, 0xda, 0x8c, 0xf4, 0xf7, 0x28, 0x14, 0xfc, 0x14, 0x3f, 
@@ -159,7 +171,7 @@ bool sha_512_vector_4()
 					0xc7, 0xd3, 0x29, 0xee, 0xb6, 0xdd, 0x26, 0x54, 0x5e, 0x96, 0xe5, 0x5b, 0x87, 0x4b, 0xe9, 0x09
 				};
 												
-	if(out != string((char*)reference,sse::crypto::Hash::kDigestSize))
+	if(out != string((char*)reference,sse::crypto::hash::sha512::kDigestSize))
 	{
 		cout << "Test case 4 failed!\n";
 		cout << "Input (" << dec << in.length() << " bytes):\n";
@@ -188,7 +200,10 @@ bool sha_512_vector_4()
 bool sha_512_vector_5()
 {
 	string in(1e6, 'a');
-	string out = sse::crypto::Hash::hash(in);
+	string out;
+	
+	out.resize(sse::crypto::hash::sha512::kDigestSize);
+	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0xe7, 0x18, 0x48, 0x3d, 0x0c, 0xe7, 0x69, 0x64, 0x4e, 0x2e, 0x42, 0xc7, 0xbc, 0x15, 0xb4, 0x63, 
@@ -197,7 +212,7 @@ bool sha_512_vector_5()
 					0xeb, 0x00, 0x9c, 0x5c, 0x2c, 0x49, 0xaa, 0x2e, 0x4e, 0xad, 0xb2, 0x17, 0xad, 0x8c, 0xc0, 0x9b
 				};
 												
-	if(out != string((char*)reference,sse::crypto::Hash::kDigestSize))
+	if(out != string((char*)reference,sse::crypto::hash::sha512::kDigestSize))
 	{
 		cout << "Test case 5 failed!\n";
 		cout << "Input (" << dec << in.length() << " bytes):\n";

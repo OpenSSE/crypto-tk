@@ -68,27 +68,29 @@ static void sha512_update(const unsigned char *in, unsigned char *digest, const 
 	
 }
 
+#ifndef htonll
 #define htonll(x) ((((uint64_t)htonl(x)) << 32) + htonl((x) >> 32))
+#endif 
 
 void sha512::hash(const unsigned char *in, const size_t &len, unsigned char *digest)
-{		
-    
-	memcpy(digest,H,64);
+{
+	unsigned char dbuf[64];
+	memcpy(dbuf,H,64);
 	
 
 	size_t n_complete_blocks = len >> 7;
-	uint8_t rem = len &  ((1<<7) -1);
+	uint64_t rem = len &  ((1<<7) -1);
 
 
 	// first, hash the complete blocks
 	if(n_complete_blocks){
-		sha512_update(in, digest, n_complete_blocks);
+		sha512_update(in, dbuf, n_complete_blocks);
 	}
 		
 	uint8_t n_blocks = (rem < 112) ? 1 : 2;
 	
     unsigned char *buffer = new unsigned char [n_blocks*kBlockSize];
-	memcpy(buffer, in + (n_complete_blocks << 3),rem);
+	memcpy(buffer, in + (n_complete_blocks << 7),rem);
 	buffer[rem] = 0x80;
 
 	//write padding
@@ -99,15 +101,15 @@ void sha512::hash(const unsigned char *in, const size_t &len, unsigned char *dig
 	uint64_t bit_length = BYTESWAP64(len << 3);
 	memcpy(buffer + n_blocks*kBlockSize-8, &bit_length, 8);
 	
-	sha512_update(buffer, digest, n_blocks);
+	sha512_update(buffer, dbuf, n_blocks);
 		
 	for(size_t i = 0; i < (kDigestSize >> 3); ++i)
 	{
-		((uint64_t *)digest)[i] = BYTESWAP64(((uint64_t *)digest)[i]);
+		((uint64_t *)dbuf)[i] = BYTESWAP64(((uint64_t *)dbuf)[i]);
 	}
-		
 	
-	delete buffer;	
+	memcpy(digest, dbuf, 64);
+	delete [] buffer;
 }
 
 }

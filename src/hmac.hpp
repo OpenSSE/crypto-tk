@@ -21,7 +21,6 @@
 #pragma once
 
 #include "random.hpp"
-#include "hash.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -29,8 +28,6 @@
 
 #include <string>
 #include <array>
-
-#include <openssl/hmac.h>
 
 namespace sse
 {
@@ -156,23 +153,22 @@ template <class H> std::array<uint8_t, H::kDigestSize> HMac<H>::hmac(const unsig
 	
 
     unsigned char* buffer, *tmp;
-	unsigned int i_len = Hash::kBlockSize + length;
-	unsigned int o_len = Hash::kBlockSize + Hash::kDigestSize;
-	unsigned int buffer_len = (i_len > Hash::kDigestSize) ? i_len : (Hash::kDigestSize);
+	unsigned int i_len = H::kBlockSize + length;
+	unsigned int o_len = H::kBlockSize + H::kDigestSize;
+	unsigned int buffer_len = (i_len > H::kDigestSize) ? i_len : (H::kDigestSize);
 	
 	buffer = new unsigned char [buffer_len];
 	tmp = new unsigned char [o_len];
 	
-	memcpy(buffer, i_key_.data(), Hash::kBlockSize);
-	memcpy(buffer + Hash::kBlockSize, in, length);
-	
-	
-	Hash::hash(buffer, i_len, buffer);
-	
-	memcpy(tmp, o_key_.data(), Hash::kBlockSize);
-	memcpy(tmp + Hash::kBlockSize, buffer, Hash::kDigestSize);
+	memcpy(buffer, i_key_.data(), H::kBlockSize);
+	memcpy(buffer + H::kBlockSize, in, length);
 
-	Hash::hash(tmp, Hash::kBlockSize + Hash::kDigestSize, buffer);
+	H::hash(buffer, i_len, buffer);
+		
+	memcpy(tmp, o_key_.data(), H::kBlockSize);
+	memcpy(tmp + H::kBlockSize, buffer, H::kDigestSize);
+	
+	H::hash(tmp, H::kBlockSize + H::kDigestSize, buffer);
 	
 	std::memcpy(result.data(), buffer, H::kDigestSize);
 	

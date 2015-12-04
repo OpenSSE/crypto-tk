@@ -22,10 +22,16 @@
 #include <iomanip>
 #include <string>
 #include <array>
+#include <vector>
 #include <chrono>
 
-
+#include <cstring>
+#include <netinet/in.h>
 #include <openssl/sha.h>
+
+#include "../src/hash.hpp"
+#include "../src/hmac.hpp"
+
 
 using namespace std;
 
@@ -33,6 +39,8 @@ extern "C" void sha512_avx(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_rorx(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_sse4(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_base(const void* M, void* D, uint64_t L);
+
+#define htonll(x) ((((uint64_t)htonl(x)) << 32) + htonl((x) >> 32))
 
 #define BYTESWAP64(x) htonll(x)
 #define UL64(x) x##ULL
@@ -45,21 +53,20 @@ constexpr uint64_t H[8] = {	0x6a09e667f3bcc908LL, 0xbb67ae8584caa73bLL,
 
 static void sha512_update_acc(const unsigned char *in, unsigned char *digest, const uint64_t &block_len)
 {
-	sha512_base(in, (uint32_t*) digest, block_len);
-//
-// #ifdef __AVX2__
-// #warning AVX2
-//     sha512_rorx(in, (uint32_t*) digest, block_len);
-// #elif defined __AVX__
-// #warning AVX
-//     sha512_avx(in, (uint32_t*) digest, block_len);
-// #elif defined __SSE4_1__
-// #warning SSE4
-//     sha512_sse4(in, (uint32_t*) digest, block_len);
-// #else
-// 	#error Intel SHA-2 code is not supported on this architecture
-// #endif
-//
+
+#ifdef __AVX2__
+#warning AVX2
+    sha512_rorx(in, (uint32_t*) digest, block_len);
+#elif defined __AVX__
+#warning AVX
+    sha512_avx(in, (uint32_t*) digest, block_len);
+#elif defined __SSE4_1__
+#warning SSE4
+    sha512_sse4(in, (uint32_t*) digest, block_len);
+#else
+	#error Intel SHA-2 code is not supported on this architecture
+#endif
+
 }
 
 
@@ -68,8 +75,7 @@ constexpr size_t kDigestSize = 64;
 
 void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *digest)
 {
-    unsigned char dbuf[64];
-    memcpy(digest,H,64);
+	memcpy(digest,H,64);
 	
 
 	size_t n_complete_blocks = len >> 7;
@@ -80,38 +86,32 @@ void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *diges
 	if(n_complete_blocks){
 		sha512_update_acc(in, digest, n_complete_blocks);
 	}
+		
+	uint8_t n_blocks = (rem < 112) ? 1 : 2;
+	
+    unsigned char *buffer = new unsigned char [n_blocks*kBlockSize];
+	memcpy(buffer, in + (n_complete_blocks << 3),rem);
+	buffer[rem] = 0x80;
 
-	if(rem || (len == 0)){
-		uint8_t n_blocks = (rem < 112) ? 1 : 2;
-		
-	    unsigned char *buffer = new unsigned char [n_blocks*kBlockSize];
-		memcpy(buffer, in + (n_complete_blocks << 3),rem);
-		buffer[rem] = 0x80;
+	//write padding
+	memset(buffer+rem+1, 0x00, n_blocks*kBlockSize - rem - 1);
 	
-		//write padding
-		memset(buffer+rem+1, 0x00, n_blocks*kBlockSize - rem - 1);
-		
-		// copy the message length on 8 bytes
-		// we do not support messages with more than 2^64-1 bits
-		uint64_t bit_length = BYTESWAP64(len << 3);
-		memcpy(buffer + n_blocks*kBlockSize-8, &bit_length, 8);
-				
-		sha512_update_acc(buffer, digest, n_blocks);
-		
-		uint64_t *digest_64 = (uint64_t *)digest;
-		
-		for(size_t i = 0; i < kDigestSize; ++i)
-		{
-			digest_64[i] = BYTESWAP64(digest_64[i]);
-		}
-		
+	// copy the message length on 8 bytes
+	// we do not support messages with more than 2^64-1 bits
+	uint64_t bit_length = BYTESWAP64(len << 3);
+	memcpy(buffer + n_blocks*kBlockSize-8, &bit_length, 8);
 	
-		delete buffer;
+	sha512_update_acc(buffer, digest, n_blocks);
+		
+	for(size_t i = 0; i < (kDigestSize >> 3); ++i)
+	{
+		((uint64_t *)digest)[i] = BYTESWAP64(((uint64_t *)digest)[i]);
 	}
+	
+	delete [] buffer;
 }
-
+	
 using namespace std;
-
 
 void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *digest)
 {
@@ -131,7 +131,7 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 		SHA512_Update(&ctx, in, n_complete_blocks << 7);
 	}
 
-	if(rem || (len == 0)){
+	// if(rem || (len == 0)){
 		uint8_t n_blocks = (rem < 112) ? 1 : 2;
 		
 	    unsigned char *buffer = new unsigned char [n_blocks*kBlockSize];
@@ -159,42 +159,102 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 		
 	
 		delete buffer;
-	}
+	// }
 }
 
+void open_ssl_full(const unsigned char *in, const uint64_t &len, unsigned char *digest)
+{
+	SHA512_CTX ctx;
+	
+	SHA512_Init(&ctx);
+	SHA512_Update(&ctx, in, len);
+	SHA512_Final(digest, &ctx);
+	
+}
 
-int main( int argc, char* argv[] ) {
-	// string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
-	// string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+constexpr size_t kKeySize = kBlockSize;
+
+// std::array<uint8_t, kDigestSize> hmac_openssl(vector<uint8_t> k, const unsigned char* in, const size_t &length)
+// {
+// 	std::array<uint8_t, kDigestSize> result;
+//
+// 	std::array<uint8_t,kKeySize> key_;
+// 	std::array<uint8_t,kKeySize> o_key_;
+// 	std::array<uint8_t,kKeySize> i_key_;
+//
+// 	std::memset(key_.data(), 0x00, kKeySize);
+// 	std::memcpy(key_.data(),k.data(),k.size());
+//
+// 	memcpy(o_key_.data(), key_.data(), kKeySize);
+// 	memcpy(i_key_.data(), key_.data(), kKeySize);
+//
+// 	for(uint8_t i = 0; i < kKeySize; ++i)
+// 	{
+// 		o_key_[i] ^= 0x5c;
+// 		i_key_[i] ^= 0x36;
+// 	}
+//
+//     unsigned char* buffer, *tmp;
+// 	unsigned int i_len = kBlockSize + length;
+// 	unsigned int o_len = kBlockSize + kDigestSize;
+// 	unsigned int buffer_len = (i_len > kDigestSize) ? i_len : (kDigestSize);
+//
+// 	buffer = new unsigned char [buffer_len];
+// 	tmp = new unsigned char [o_len];
+//
+// 	memcpy(buffer, i_key_.data(), kBlockSize);
+// 	memcpy(buffer + kBlockSize, in, length);
+//
+//
+// 	open_ssl(buffer, i_len, buffer);
+//
+// 	memcpy(tmp, o_key_.data(), kBlockSize);
+// 	memcpy(tmp + kBlockSize, buffer, kDigestSize);
+//
+// 	open_ssl(tmp, kBlockSize + kDigestSize, buffer);
+//
+// 	std::memcpy(result.data(), buffer, kDigestSize);
+//
+// 	delete [] buffer;
+// 	delete [] tmp;
+//
+//
+// 	return result;
+//
+// }
+
+class HashOpenSSLFull
+{
+public:
+    constexpr static size_t kDigestSize = sse::crypto::Hash::kDigestSize;
+    constexpr static size_t kBlockSize = sse::crypto::Hash::kBlockSize;
 	
-	string in = "";
-	// string in(1e6, 'a');
+    static void hash(unsigned char *out, const unsigned char *in, size_t inlen)
+	{
+		open_ssl_full(in, inlen, out);
+	}
 	
+};
+
+class HashOpenSSL
+{
+public:
+    constexpr static size_t kDigestSize = sse::crypto::Hash::kDigestSize;
+    constexpr static size_t kBlockSize = sse::crypto::Hash::kBlockSize;
+	
+    static void hash(unsigned char *out, const unsigned char *in, size_t inlen)
+	{
+		open_ssl(in, inlen, out);
+	}
+	
+};
+
+
+void benchmarks()
+{
 	string out_openssl, out_acc;
 	out_openssl.resize(kDigestSize);
 	out_acc.resize(kDigestSize);
-
-
-	open_ssl((unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
-	hash_acc((unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
-
-	// unsigned char in_array[128] = {0x00};
-	// sha512_update_acc(in_array,(unsigned char*)out_acc.data(),1);
-	
-	cout << "OpenSSL: \n";
-	for(unsigned char c : out_openssl)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << endl;
-	cout << "Intel: \n";
-	for(unsigned char c : out_acc)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << dec << endl;
-	
-	// return 0;
 	
 	size_t time_ssl = 0, time_intel = 0;
 	size_t bench_count = 1e4;
@@ -228,7 +288,77 @@ int main( int argc, char* argv[] ) {
 	cout << endl;
 	cout << "OpenSSL: " << time_ssl << " ms\n";
 	cout << "Intel: " << time_intel << " ms\n";
+
+}
+
+int main( int argc, char* argv[] ) {
+	// string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
+	// string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+	
+	array<uint8_t,kKeySize> k;
+	k.fill(0x0b);
+	
+	string in = "Hi There";
+	// string in(1e6, 'a');
+	
+	sse::crypto::HMac<HashOpenSSLFull> hmac_full_ssl(k.data(),20);
+	sse::crypto::HMac<HashOpenSSL> hmac_ssl(k.data(),20);
+	sse::crypto::HMac<sse::crypto::hash::sha512> hmac_local(k.data(),20);
+	
+	auto result_full_ssl = hmac_full_ssl.hmac((unsigned char*)in.data(), in.length());
+	auto result_ssl = hmac_ssl.hmac((unsigned char*)in.data(), in.length());
+	auto result_local = hmac_local.hmac((unsigned char*)in.data(), in.length());
 	
 	
+	for(unsigned char c : result_full_ssl)
+	{
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+	}
+	cout << endl;
+	for(unsigned char c : result_ssl)
+	{
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+	}
+	cout << endl;
+	for(unsigned char c : result_local)
+	{
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+	}
+	cout << endl;
+	
+	
+	return 0;
+	
+	string out_openssl, out_acc;
+	out_openssl.resize(kDigestSize);
+	out_acc.resize(kDigestSize);
+	
+	for(size_t i = 1; i < 1e5; ++i)
+	{
+		string in(i,'a');
+	open_ssl_full((unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
+	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
+
+	if(out_openssl == out_acc)
+		continue;
+	// unsigned char in_array[128] = {0x00};
+	// sha512_update_acc(in_array,(unsigned char*)out_acc.data(),1);
+	
+	cout << "Not matching for length " << dec << i << endl;
+	
+	
+	cout << "OpenSSL: \n";
+	for(unsigned char c : out_openssl)
+	{
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+	}
+	cout << endl;
+	cout << "Intel: \n";
+	for(unsigned char c : out_acc)
+	{
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+	}
+	cout << dec << endl;
+	}
 	return 0;	
 }

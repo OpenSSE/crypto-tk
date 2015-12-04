@@ -24,6 +24,7 @@
 #include <cstring>
 
 #include <openssl/sha.h>
+#include <netinet/in.h>
 
 #include <iostream>
 #include <iomanip>
@@ -67,7 +68,7 @@ static void sha512_update(const unsigned char *in, unsigned char *digest, const 
 	
 }
 
-#define BYTESWAP64(x) htonll(x)
+#define htonll(x) ((((uint64_t)htonl(x)) << 32) + htonl((x) >> 32))
 
 void sha512::hash(const unsigned char *in, const size_t &len, unsigned char *digest)
 {		

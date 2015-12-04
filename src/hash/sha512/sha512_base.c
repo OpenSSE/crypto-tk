@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#include <stdio.h>
+
 #define UL64(x) x##ULL
 
 /*
@@ -38,6 +40,8 @@
         | ( (uint64_t) (b)[(i) + 6] <<  8 )       \
         | ( (uint64_t) (b)[(i) + 7]       );      \
 }
+
+
 #endif /* GET_UINT64_BE */
 
 #ifndef PUT_UINT64_BE
@@ -102,7 +106,7 @@ static const uint64_t K[80] =
 };
 
 // void mbedtls_sha512_process( mbedtls_sha512_context *ctx, const unsigned char data[128] )
-void mbedtls_sha512_process(const unsigned char *in, unsigned char *digest )
+void mbedtls_sha512_process(const unsigned char *in, uint64_t* digest )
 {
     int i;
     uint64_t temp1, temp2, W[80];
@@ -175,6 +179,6 @@ void sha512_base(const void* M, void* D, uint64_t L)
 {
 	for(uint64_t i = 0; i < L; i ++)
 	{
-		mbedtls_sha512_process(M+(i << 7), D);
+		mbedtls_sha512_process((M+(i << 7)), (uint64_t*)D);
 	}
 }

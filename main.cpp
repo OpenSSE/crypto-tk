@@ -32,7 +32,10 @@ using namespace std;
 extern "C" void sha512_avx(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_rorx(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_sse4(const void* M, void* D, uint64_t L);;
+extern "C" void sha512_base(const void* M, void* D, uint64_t L);
+
 #define BYTESWAP64(x) htonll(x)
+#define UL64(x) x##ULL
 
 constexpr uint64_t H[8] = {	0x6a09e667f3bcc908LL, 0xbb67ae8584caa73bLL,
     0x3c6ef372fe94f82bLL, 0xa54ff53a5f1d36f1LL,
@@ -42,19 +45,21 @@ constexpr uint64_t H[8] = {	0x6a09e667f3bcc908LL, 0xbb67ae8584caa73bLL,
 
 static void sha512_update_acc(const unsigned char *in, unsigned char *digest, const uint64_t &block_len)
 {
-#ifdef __AVX2__
-#warning AVX2
-    sha512_rorx(in, (uint32_t*) digest, block_len);
-#elif defined __AVX__
-#warning AVX
-    sha512_avx(in, (uint32_t*) digest, block_len);
-#elif defined __SSE4_1__
-#warning SSE4
-    sha512_sse4(in, (uint32_t*) digest, block_len);
-#else
-	#error Intel SHA-2 code is not supported on this architecture
-#endif
-
+	sha512_base(in, (uint32_t*) digest, block_len);
+//
+// #ifdef __AVX2__
+// #warning AVX2
+//     sha512_rorx(in, (uint32_t*) digest, block_len);
+// #elif defined __AVX__
+// #warning AVX
+//     sha512_avx(in, (uint32_t*) digest, block_len);
+// #elif defined __SSE4_1__
+// #warning SSE4
+//     sha512_sse4(in, (uint32_t*) digest, block_len);
+// #else
+// 	#error Intel SHA-2 code is not supported on this architecture
+// #endif
+//
 }
 
 
@@ -90,7 +95,7 @@ void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *diges
 		// we do not support messages with more than 2^64-1 bits
 		uint64_t bit_length = BYTESWAP64(len << 3);
 		memcpy(buffer + n_blocks*kBlockSize-8, &bit_length, 8);
-		
+				
 		sha512_update_acc(buffer, digest, n_blocks);
 		
 		uint64_t *digest_64 = (uint64_t *)digest;
@@ -140,7 +145,7 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 		// we do not support messages with more than 2^64-1 bits
 		uint64_t bit_length = BYTESWAP64(len << 3);
 		memcpy(buffer + n_blocks*kBlockSize-8, &bit_length, 8);
-		
+				
 		SHA512_Update(&ctx, buffer, n_blocks*kBlockSize);
 		
 		memcpy(digest, ctx.h, 64);
@@ -157,12 +162,13 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 	}
 }
 
+
 int main( int argc, char* argv[] ) {
 	// string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
 	// string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
 	
-	// string in = "";
-	string in(1e6, 'a');
+	string in = "";
+	// string in(1e6, 'a');
 	
 	string out_openssl, out_acc;
 	out_openssl.resize(kDigestSize);
@@ -171,6 +177,9 @@ int main( int argc, char* argv[] ) {
 
 	open_ssl((unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
 	hash_acc((unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
+
+	// unsigned char in_array[128] = {0x00};
+	// sha512_update_acc(in_array,(unsigned char*)out_acc.data(),1);
 	
 	cout << "OpenSSL: \n";
 	for(unsigned char c : out_openssl)
@@ -183,9 +192,9 @@ int main( int argc, char* argv[] ) {
 	{
         cout << hex << setw(2) << setfill('0') << (uint) c;
 	}
-	cout << endl;
+	cout << dec << endl;
 	
-	return 0;
+	// return 0;
 	
 	size_t time_ssl = 0, time_intel = 0;
 	size_t bench_count = 1e4;

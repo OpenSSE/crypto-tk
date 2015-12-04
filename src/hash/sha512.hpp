@@ -37,6 +37,7 @@ struct sha512
 		constexpr static size_t kBlockSize = 128;
 		
 		static void hash(const unsigned char *in, const size_t &len, unsigned char *out);
+		static void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *out);
 
 	};	
 

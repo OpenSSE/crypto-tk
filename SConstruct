@@ -14,6 +14,16 @@ if FindFile('config.scons', '.'):
 env.Append(CCFLAGS=['-Wall', '-march=native'])
 env.Append(CXXFLAGS=['-std=c++14'])
 env.Append(LIBS = ['crypto'])
+
+env['AS'] = ['yasm']
+env.Append(ASFLAGS = ['-D', 'LINUX'])
+
+if env['PLATFORM'] == 'darwin':
+    env.Append(ASFLAGS = ['-f', 'macho64'])
+else:
+    env.Append(ASFLAGS = ['-f', 'x64', '-f', 'elf64'])
+
+
 env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
 
 debug = ARGUMENTS.get('debug', 0)

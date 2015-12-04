@@ -1,7 +1,7 @@
 Import('*')
 
 files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('*/*/*.cpp') + Glob('*/*/*/*.cpp')
-files += Glob('hash/*/*.asm')
+files += Glob('hash/*/*.asm') + Glob('hash/*/*.c')
 objs = env.Object(files, CPPPATH = ['.'])
 
 Return('objs')

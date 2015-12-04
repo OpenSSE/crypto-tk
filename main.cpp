@@ -76,7 +76,7 @@ void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *diges
 		sha512_update_acc(in, digest, n_complete_blocks);
 	}
 
-	if(rem){
+	if(rem || (len == 0)){
 		uint8_t n_blocks = (rem < 112) ? 1 : 2;
 		
 	    unsigned char *buffer = new unsigned char [n_blocks*kBlockSize];
@@ -126,7 +126,7 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 		SHA512_Update(&ctx, in, n_complete_blocks << 7);
 	}
 
-	if(rem){
+	if(rem || (len == 0)){
 		uint8_t n_blocks = (rem < 112) ? 1 : 2;
 		
 	    unsigned char *buffer = new unsigned char [n_blocks*kBlockSize];
@@ -160,11 +160,33 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 int main( int argc, char* argv[] ) {
 	// string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
 	// string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-
+	
+	// string in = "";
+	string in(1e6, 'a');
+	
 	string out_openssl, out_acc;
 	out_openssl.resize(kDigestSize);
 	out_acc.resize(kDigestSize);
 
+
+	open_ssl((unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
+	hash_acc((unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
+	
+	cout << "OpenSSL: \n";
+	for(unsigned char c : out_openssl)
+	{
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+	}
+	cout << endl;
+	cout << "Intel: \n";
+	for(unsigned char c : out_acc)
+	{
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+	}
+	cout << endl;
+	
+	return 0;
+	
 	size_t time_ssl = 0, time_intel = 0;
 	size_t bench_count = 1e4;
 	size_t step = 1000;

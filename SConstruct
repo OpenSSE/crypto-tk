@@ -58,7 +58,7 @@ Default(debug)
 
 
 library_build_prefix = 'library'
-shared_lib = env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects)
+# shared_lib = env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 static_lib = env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 
 headers = Glob('src/*.h') + Glob('src/*.hpp') + Glob('src/hash/*.hpp')
@@ -69,7 +69,8 @@ headers_lib += [env.Install(library_build_prefix+'/include/sse/crypto/hash', has
 env.Clean(headers_lib,[library_build_prefix+'/include'])
 
 Alias('headers', headers_lib)
-Alias('lib', [shared_lib, static_lib] + headers_lib)
+# Alias('lib', [shared_lib, static_lib] + headers_lib)
+Alias('lib', [static_lib] + headers_lib)
 
 
 
@@ -89,7 +90,8 @@ if not test_env.GetOption('clean'):
 
         env.Alias('check', [test_prog, test_run])
         
-        Depends([shared_lib, static_lib, headers_lib], test_run)
+        # Depends([shared_lib, static_lib, headers_lib], test_run)
+        Depends([static_lib, headers_lib], test_run)
         
     else:
         print 'boost unit test framework not found'

@@ -72,7 +72,7 @@ hash_headers = Glob('src/hash/*.hpp')
 headers_lib = [env.Install(library_build_prefix+'/include/sse/crypto', headers)]
 headers_lib += [env.Install(library_build_prefix+'/include/sse/crypto/hash', hash_headers)]
 
-lib_env.Clean(headers_lib,[library_build_prefix+'/include'])
+env.Clean(headers_lib,[library_build_prefix+'/include'])
 
 Alias('headers', headers_lib)
 Alias('lib', [shared_lib, static_lib] + headers_lib)

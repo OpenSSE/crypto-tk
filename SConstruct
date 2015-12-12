@@ -94,7 +94,7 @@ if not test_env.GetOption('clean'):
         test_run = test_env.Test('test_run', test_prog)
         Depends(test_run, test_prog)
 
-        env.Alias('check', [test_prog, test_run])
+        test_env.Alias('check', [test_prog, test_run])
         
         # Depends([shared_lib, static_lib, headers_lib], test_run)
         Depends([static_lib, shared_lib, headers_lib], test_run)
@@ -104,6 +104,7 @@ if not test_env.GetOption('clean'):
         print 'Skipping checks. Be careful!'
     test_env = conf.Finish()
 
+test_env.Clean('check', ['check'] + objects)
 
 
 

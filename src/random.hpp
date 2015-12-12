@@ -21,6 +21,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 
 #include <cstdint>
 
@@ -63,5 +64,11 @@ namespace crypto
 		random_bytes(out.size()*sizeof(T), (unsigned char*)out.data());
 	}
 
+	inline std::string random_string(const size_t &length)
+	{
+		std::string s(length, 0x00);
+		random_bytes(length, (unsigned char*) s.data());
+		return s;
+	}
 }
 }

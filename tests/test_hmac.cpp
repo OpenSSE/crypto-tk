@@ -20,7 +20,7 @@
 
 #include "test_hmac.hpp"
 #include "../src/hmac.hpp"
-#include "../src/hash.hpp"
+#include "../src/hash/sha512.hpp"
 
 
 #include <iostream>

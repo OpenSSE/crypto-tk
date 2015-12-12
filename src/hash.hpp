@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "hash/sha512.hpp"
-
 #include <cstddef>
 #include <string>
 
@@ -36,16 +34,14 @@ namespace crypto
 	*
 	* Implementation of a hash function.
 	* 	
-	* Hash implements SHA-512
+	* Hash implements Blake2b
 	******/
 	
-	using hash_function = hash::sha512;
-
 	class Hash
 	{
 	public:
-		constexpr static size_t kDigestSize = hash_function::kDigestSize;;
-		constexpr static size_t kBlockSize = hash_function::kBlockSize;;
+		constexpr static size_t kDigestSize = 64;
+		constexpr static size_t kBlockSize = 128;
 	
 		static void hash(const unsigned char *in, const size_t &len, unsigned char *out);
 		static void hash(const unsigned char *in, const size_t &len, const size_t &out_len, unsigned char *out);

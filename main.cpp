@@ -31,7 +31,7 @@
 
 #include "../src/hash.hpp"
 #include "../src/hmac.hpp"
-
+#include "src/hash/sha512.hpp"
 
 using namespace std;
 

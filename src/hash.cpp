@@ -20,6 +20,9 @@
 
 #include "hash.hpp"
 
+#include "hash/sha512.hpp"
+#include "hash/blake2b/blake2b.hpp"
+
 #include <cassert>
 #include <cstring>
 
@@ -29,9 +32,13 @@ namespace sse
 namespace crypto
 {
 	
+using hash_function = hash::sha512;
+	
 void Hash::hash(const unsigned char *in, const size_t &len, unsigned char *out)
 {
 	// memset(out,0x00, kDigestSize);
+	static_assert(kDigestSize == hash_function::kDigestSize, "Declared digest size and hash_function digest size do not match");
+	static_assert(kBlockSize == hash_function::kBlockSize, "Declared block size and hash_function block size do not match");
 	hash_function::hash(in, len, out);
 }
 

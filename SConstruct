@@ -67,10 +67,8 @@ library_build_prefix = 'library'
 shared_lib = shared_lib_env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects);
 static_lib = env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 
-headers = Glob('src/*.h') + Glob('src/*.hpp') + Glob('src/hash/*.hpp')
-hash_headers = Glob('src/hash/*.hpp')
+headers = Glob('src/*.h') + Glob('src/*.hpp')
 headers_lib = [env.Install(library_build_prefix+'/include/sse/crypto', headers)]
-headers_lib += [env.Install(library_build_prefix+'/include/sse/crypto/hash', hash_headers)]
 
 env.Clean(headers_lib,[library_build_prefix+'/include'])
 

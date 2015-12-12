@@ -32,7 +32,7 @@ namespace sse
 namespace crypto
 {
 	
-using hash_function = hash::sha512;
+using hash_function = hash::blake2b;
 	
 void Hash::hash(const unsigned char *in, const size_t &len, unsigned char *out)
 {

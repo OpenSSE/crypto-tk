@@ -12,7 +12,7 @@ if FindFile('config.scons', '.'):
     SConscript('config.scons', exports='env')
     
 env.Append(CFLAGS=['-std=c99'])
-env.Append(CCFLAGS=['-Wall', '-march=native','-fPIC'])
+env.Append(CCFLAGS=['-Wall', '-march=native', '-maes', '-fPIC'])
 env.Append(CXXFLAGS=['-std=c++14'])
 env.Append(LIBS = ['crypto'])
 

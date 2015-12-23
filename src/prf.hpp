@@ -115,7 +115,7 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const uns
 	if(NBYTES <= sse::crypto::Hash::kDigestSize){
 		// only need one output bloc of PrfBase.
 
-		std::copy_n(base_.hmac(in).begin(), NBYTES, result.begin());
+        std::copy_n(base_.hmac(in, NBYTES).begin(), NBYTES, result.begin());
 	}
 	
 	

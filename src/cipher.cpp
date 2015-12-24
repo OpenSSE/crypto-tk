@@ -46,6 +46,7 @@ public:
 	CipherImpl();
 	
 	CipherImpl(const std::array<uint8_t,kKeySize>& k);
+	CipherImpl(const uint8_t* k);
 	
 	~CipherImpl();
 
@@ -72,6 +73,11 @@ Cipher::Cipher() : cipher_imp_(new CipherImpl())
 
 Cipher::Cipher(const std::array<uint8_t,kKeySize>& k) : cipher_imp_(new CipherImpl(k))
 {	
+}
+
+Cipher::Cipher(const uint8_t* k) : cipher_imp_(new CipherImpl(k))
+{
+	
 }
 
 Cipher::~Cipher() 
@@ -101,6 +107,12 @@ Cipher::CipherImpl::CipherImpl()
 Cipher::CipherImpl::CipherImpl(const std::array<uint8_t,kKeySize>& k)
 {	
 	gen_subkeys(k.data());
+	reset_iv();
+}
+
+Cipher::CipherImpl::CipherImpl(const uint8_t* k)
+{
+	gen_subkeys(k);
 	reset_iv();
 }
 

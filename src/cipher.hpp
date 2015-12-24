@@ -54,6 +54,7 @@ public:
 	
 	
 	Cipher(const std::array<uint8_t,kKeySize>& k);
+	Cipher(const uint8_t* k);
 	
 	~Cipher();
 

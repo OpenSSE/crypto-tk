@@ -96,7 +96,7 @@ public:
 	
 	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;
-	
+	void prf(const unsigned char* in, const size_t &length, unsigned char* out) const;
 private:
 	
 	PrfBase base_;
@@ -132,7 +132,7 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std
 // Convienience function to return the PRF result in a raw array
 template <uint8_t NBYTES> void Prf<NBYTES>::prf(const unsigned char* in, const size_t &length, unsigned char* out) const
 {
-	return prf(base_.hmac(in, length, out));
+	base_.hmac(in, length, out);
 }
 
 } // namespace crypto

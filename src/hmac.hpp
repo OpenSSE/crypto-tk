@@ -120,6 +120,7 @@ public:
 		return key_.data();
 	};
 	
+	void hmac(const unsigned char* in, const size_t &length, unsigned char* out) const;
 	std::array<uint8_t, H::kDigestSize> hmac(const unsigned char* in, const size_t &length) const;
 	std::array<uint8_t, H::kDigestSize> hmac(const std::string &s) const;
 	
@@ -146,12 +147,8 @@ template <class H> void HMac<H>::gen_padded_keys(const std::array<uint8_t,kKeySi
 
 // HMac instantiation
 // For now, use OpenSSL's HMAC-512 implementation
-template <class H> std::array<uint8_t, H::kDigestSize> HMac<H>::hmac(const unsigned char* in, const size_t &length) const
+template <class H> void HMac<H>::hmac(const unsigned char* in, const size_t &length, unsigned char* out) const
 {
-	std::array<uint8_t, H::kDigestSize> result;
-	
-	
-
     unsigned char* buffer, *tmp;
 	unsigned int i_len = H::kBlockSize + length;
 	unsigned int o_len = H::kBlockSize + H::kDigestSize;
@@ -170,11 +167,17 @@ template <class H> std::array<uint8_t, H::kDigestSize> HMac<H>::hmac(const unsig
 	
 	H::hash(tmp, H::kBlockSize + H::kDigestSize, buffer);
 	
-	std::memcpy(result.data(), buffer, H::kDigestSize);
+	std::memcpy(out, buffer, H::kDigestSize);
 	
 	delete [] buffer;
 	delete [] tmp;
+}
 
+template <class H> std::array<uint8_t, H::kDigestSize> HMac<H>::hmac(const unsigned char* in, const size_t &length) const
+{
+	std::array<uint8_t, H::kDigestSize> result;
+	
+	hmac(in, length, result.data());
 	
 	return result;
 }

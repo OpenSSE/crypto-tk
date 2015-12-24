@@ -115,7 +115,7 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const uns
 	if(NBYTES <= sse::crypto::Hash::kDigestSize){
 		// only need one output bloc of PrfBase.
 
-        std::copy_n(base_.hmac(in, NBYTES).begin(), NBYTES, result.begin());
+        std::copy_n(base_.hmac(in, length).begin(), NBYTES, result.begin());
 	}
 	
 	
@@ -126,6 +126,13 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const uns
 template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::string &s) const
 {
 	return prf((unsigned char*)s.data() , s.length());
+}
+
+
+// Convienience function to return the PRF result in a raw array
+template <uint8_t NBYTES> void Prf<NBYTES>::prf(const unsigned char* in, const size_t &length, unsigned char* out) const
+{
+	return prf(base_.hmac(in, length, out));
 }
 
 } // namespace crypto

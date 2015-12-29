@@ -30,7 +30,7 @@ To build the library, just enter in your terminal
 
 ### Compiler
 
-`libsse_crypto` needs a C++14 compatible compiler. It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3 and on Mac OS X.10 using clang 7.0.0
+`libsse_crypto` needs a compiler supporting C++14. It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3 and on Mac OS X.10 using clang 7.0.0
 
 
 ## Contributors
@@ -40,6 +40,8 @@ It is directly available from its [GitHub repo](https://github.com/jbms/ecmh). T
 
 The implementation of the Blake2 hash functions has been written by [Samuel Neves](https://eden.dei.uc.pt/~sneves/).
 
+SHA512 implementations are from Intel (x86 optimized assembly, using SSE4, AVX or AVX2) and ARM (C implementation from [mbed TLS](https://tls.mbed.org))).
+
 Unless otherwise stated, the rest of the code has been written by [Raphael Bost](http://people.irisa.fr/Raphael.Bost/).
 
 ## Licensing
@@ -47,6 +49,10 @@ Unless otherwise stated, the rest of the code has been written by [Raphael Bost]
 Even if it is not explicitly stated, the ECMH code by Jeremy Maitin-Shepard (*i.e.* the the `src/ecmh` directory) must be considered as licensed under GPL (personal communications with Jeremy).
 
 Blake2 implementations have been dedicated to the public domain (*cf.* [CC0 Public Domain Dedication](http://creativecommons.org/publicdomain/zero/1.0/)).
+
+Intel's assembly code for SHA512 is covered by the Intel Open Software License (*cf.* `open_software_license.txt`).
+
+mbed TLS is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 
 Unless otherwise stated, the rest of the code is licensed under the [GNU Affero General Public License v3](http://www.gnu.org/licenses/agpl.html).
 

@@ -144,7 +144,7 @@ void Cipher::CipherImpl::reset_iv()
 
 void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
-	if(remaining_block_count_ < len/16){
+	if(remaining_block_count_ < ((len/16)+1)){
 		// throw an exception
 		throw std::runtime_error("Too many blocks were encrypted with the same key. Encrypting using this key is now insecure.");
 	}
@@ -169,7 +169,7 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
 	memset(ecount, 0x00, AES_BLOCK_SIZE);
 	
 	// decrement the block counter
-	remaining_block_count_ -= len/16;
+	remaining_block_count_ -= (len/16 +1);
 }
 
 void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)

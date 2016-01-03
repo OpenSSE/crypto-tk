@@ -109,7 +109,7 @@ SetHash::SetHash(const SetHash& o) : set_hash_imp_(new SetHashImpl(o.set_hash_im
 {
 }
 
-SetHash::SetHash(const SetHash&& o) : set_hash_imp_(std::move(o.set_hash_imp_))
+SetHash::SetHash(const SetHash&& o) : set_hash_imp_(new SetHashImpl(o.set_hash_imp_->hex()))
 {
 }
 

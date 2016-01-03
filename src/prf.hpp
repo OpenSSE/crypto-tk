@@ -139,10 +139,8 @@ template <uint8_t NBYTES> void Prf<NBYTES>::prf(const unsigned char* in, const s
 
 template <uint8_t NBYTES> std::string Prf<NBYTES>::prf_string(const std::string &s) const
 {
-	std::string result;
-	result.reserve(NBYTES);
-	
-	prf((unsigned char*)s.data() , s.length(), (unsigned char*)result.data());
+	std::array<uint8_t, NBYTES> tmp = prf(s);
+	std::string result(tmp.begin(), tmp.end());
 	
 	return result;
 }

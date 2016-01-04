@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
 
 #include "ecmh/utility/is_byte.hpp"
 #include "ecmh/utility/assign_endian.hpp"

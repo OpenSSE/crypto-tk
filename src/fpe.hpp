@@ -56,7 +56,12 @@ public:
 	~Fpe();
 
 	void encrypt(const std::string &in, std::string &out);
+	std::string encrypt(const std::string &in);
+	uint32_t encrypt(const uint32_t &in);
+
 	void decrypt(const std::string &in, std::string &out);
+	std::string decrypt(const std::string &in);
+	uint32_t decrypt(const uint32_t &in);
 	
 	// Again, avoid any assignement of Cipher objects
 	Fpe& operator=(const Fpe& h) = delete;

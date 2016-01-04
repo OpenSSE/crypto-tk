@@ -76,9 +76,37 @@ void Fpe::encrypt(const std::string &in, std::string &out)
 {
 	fpe_imp_->encrypt(in, out);
 }
+std::string Fpe::encrypt(const std::string &in)
+{
+	std::string out;
+	fpe_imp_->encrypt(in, out);
+	return out;
+}
+
+uint32_t Fpe::encrypt(const uint32_t &in)
+{
+	uint32_t out;
+	fpe_imp_->encrypt((unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
+	return out;
+}
+
+
 void Fpe::decrypt(const std::string &in, std::string &out)
 {
 	fpe_imp_->decrypt(in, out);
+}
+std::string Fpe::decrypt(const std::string &in)
+{
+	std::string out;
+	fpe_imp_->decrypt(in, out);
+	return out;
+}
+
+uint32_t Fpe::decrypt(const uint32_t &in)
+{
+	uint32_t out;
+	fpe_imp_->decrypt((unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
+	return out;
 }
 	
 Fpe::FpeImpl::FpeImpl()
@@ -112,8 +140,11 @@ void Fpe::FpeImpl::encrypt(const unsigned char* in, const size_t &len, unsigned 
 void Fpe::FpeImpl::encrypt(const std::string &in, std::string &out)
 {
 	unsigned int len = in.size();
-	out.resize(len);
-	encrypt((unsigned char*)in.data(), len, (unsigned char*)out.data());
+    unsigned char *data = new unsigned char[len];
+
+	encrypt((unsigned char*)in.data(), len, data);
+	out = std::string((char *)data, len);
+    delete data;
 }
 
 void Fpe::FpeImpl::decrypt(const unsigned char* in, const size_t &len,  unsigned char* out)
@@ -130,8 +161,12 @@ void Fpe::FpeImpl::decrypt(const unsigned char* in, const size_t &len,  unsigned
 void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
 {
 	unsigned int len = in.size();
-	out.resize(len);
-	decrypt((unsigned char*)in.data(), len, (unsigned char*)out.data());
+    unsigned char *data = new unsigned char[len];
+	
+	decrypt((unsigned char*)in.data(), len, data);
+    
+	out = std::string((char *)data, len);
+    delete data;
 }
 
 	

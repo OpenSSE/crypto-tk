@@ -23,6 +23,7 @@
 #include "random.hpp"
 
 #include <cstring>
+#include <cassert>
 #include <exception>
 #include <iostream>
 #include <iomanip>
@@ -175,8 +176,11 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
 void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)
 {
 	unsigned int len = in.size();
-	out.resize(len+kIVSize);
-	encrypt((unsigned char*)in.data(), len, (unsigned char*)out.data());
+    unsigned char *data = new unsigned char[len+kIVSize];
+
+	encrypt((unsigned char*)in.data(), len, data);
+    out = std::string((char *)data, len+kIVSize);
+    delete data;
 }
 
 void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, unsigned char* out)
@@ -184,6 +188,7 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
     unsigned char ecount[AES_BLOCK_SIZE];
     unsigned char dec_iv[AES_BLOCK_SIZE];
     memset(ecount, 0x00, AES_BLOCK_SIZE);
+    memset(dec_iv, 0x00, AES_BLOCK_SIZE);
 	
 	unsigned int num = 0;
 	
@@ -193,7 +198,7 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
 	memcpy(dec_iv+AES_BLOCK_SIZE-kIVSize, in, kIVSize); // copy iv first
 	
 	// now append the ciphertext
-    AES_ctr128_encrypt(in+kIVSize, out, len, &aes_enc_key_, dec_iv, ecount, &num);
+  	AES_ctr128_encrypt(in+kIVSize, out, len-kIVSize, &aes_enc_key_, dec_iv, ecount, &num);
 	
 	// erase ecount to avoid (partial) recovery of the last block
 	memset(ecount, 0x00, AES_BLOCK_SIZE);
@@ -202,8 +207,13 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
 void Cipher::CipherImpl::decrypt(const std::string &in, std::string &out)
 {
 	unsigned int len = in.size();
-	out.resize(len-kIVSize);
-	decrypt((unsigned char*)in.data(), len, (unsigned char*)out.data());
+    assert(len > kIVSize);
+
+    unsigned char *data = new unsigned char[len-kIVSize];
+	decrypt((unsigned char*)in.data(), len, data);
+
+    out = std::string((char *)data, len-kIVSize);
+    delete data;
 }
 	
 

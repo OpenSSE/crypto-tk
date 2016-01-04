@@ -95,7 +95,7 @@ if not test_env.GetOption('clean'):
         test_env.Alias('check', [test_prog, test_run])
         
         # Depends([shared_lib, static_lib, headers_lib], test_run)
-        Depends([static_lib, shared_lib, headers_lib], test_run)
+        # Depends([static_lib, shared_lib, headers_lib], test_run)
         
     else:
         print 'boost unit test framework not found'

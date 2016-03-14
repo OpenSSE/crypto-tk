@@ -33,6 +33,8 @@
 #include "../src/hmac.hpp"
 #include "src/hash/sha512.hpp"
 
+#include "src/tdp.hpp"
+
 using namespace std;
 
 extern "C" void sha512_avx(const void* M, void* D, uint64_t L);;
@@ -273,7 +275,8 @@ void benchmarks()
 
 }
 
-int main( int argc, char* argv[] ) {
+void test_hash()
+{
 	// string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
 	// string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
 	
@@ -327,7 +330,7 @@ int main( int argc, char* argv[] ) {
 	cout << "\n\n";
 	
 	
-	return 0;
+	return;
 	
 	string out_openssl, out_acc;
 	out_openssl.resize(kDigestSize);
@@ -360,5 +363,16 @@ int main( int argc, char* argv[] ) {
 	}
 	cout << dec << endl;
 	}
-	return 0;	
+}
+
+void tdp()
+{
+    sse::crypto::TdpInverse tdp;
+    
+    cout << tdp.private_key() << endl;
+}
+
+int main( int argc, char* argv[] ) {
+    tdp();
+    return 0;
 }

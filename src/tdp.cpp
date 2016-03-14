@@ -79,14 +79,17 @@ TdpInverse::TdpInverseImpl::TdpInverseImpl() : rsa_key(NULL)
 
 TdpInverse::TdpInverseImpl::TdpInverseImpl(const std::string& sk) : rsa_key(NULL)
 {
-    int ret;
-
     // create a BIO from the std::string
     BIO *mem;
     mem = BIO_new_mem_buf(((void*)sk.data()), (int)sk.length());
 
+    EVP_PKEY* evpkey;
+    evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
+    assert(evpkey != NULL);
+    
     // read the key from the BIO
-    rsa_key = RSA_new();
+    rsa_key = EVP_PKEY_get1_RSA(evpkey);
+    assert(rsa_key != NULL);
 
     
     // close and destroy the BIO
@@ -127,23 +130,24 @@ std::string TdpInverse::TdpInverseImpl::private_key() const
 }
 
     
-    TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl())
-    {
-    }
+TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl())
+{
+}
 
-    TdpInverse::TdpInverse(const std::string& sk) : tdp_inv_imp_(new TdpInverseImpl(sk))
-    {
-    }
-    
-    TdpInverse::~TdpInverse()
-    {
-        delete tdp_inv_imp_;
-        tdp_inv_imp_ = NULL;
-    }
-    
-    std::string TdpInverse::private_key() const
-    {
-        return tdp_inv_imp_->private_key();
-    }
+TdpInverse::TdpInverse(const std::string& sk) : tdp_inv_imp_(new TdpInverseImpl(sk))
+{
+}
+
+TdpInverse::~TdpInverse()
+{
+    delete tdp_inv_imp_;
+    tdp_inv_imp_ = NULL;
+}
+
+std::string TdpInverse::private_key() const
+{
+    return tdp_inv_imp_->private_key();
+}
+
 }
 }

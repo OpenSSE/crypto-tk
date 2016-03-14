@@ -370,6 +370,12 @@ void tdp()
     sse::crypto::TdpInverse tdp;
     
     cout << tdp.private_key() << endl;
+    
+    sse::crypto::TdpInverse tdp2(tdp.private_key());
+    
+    cout << "\n\nSecond private key \n\n" << endl;
+    cout << tdp2.private_key() << endl;
+
 }
 
 int main( int argc, char* argv[] ) {

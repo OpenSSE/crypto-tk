@@ -40,32 +40,126 @@ namespace crypto
 {
 	
 #define RSA_MODULUS_SIZE 3072
-#define PASSPHRASE "sophos"
     
-class TdpInverse::TdpInverseImpl
+class TdpImpl
+{
+public:
+    TdpImpl();
+    TdpImpl(const std::string& sk);
+    
+    ~TdpImpl();
+    
+    
+    RSA* get_rsa_key() const;
+    void set_rsa_key(RSA* k);
+    uint rsa_size() const;
+    
+    std::string public_key() const;
+    void eval(const std::string &in, std::string &out) const;
+
+private:
+    RSA *rsa_key_;
+    
+};
+
+class TdpInverseImpl : public TdpImpl
 {
 public:
     TdpInverseImpl();
     TdpInverseImpl(const std::string& sk);
     
-    ~TdpInverseImpl();
-    
     std::string private_key() const;
-    
-    void eval(const std::string &in, std::string &out) const;
     void invert(const std::string &in, std::string &out) const;
-
-private:
-    RSA *rsa_key;
-
 };
 
-TdpInverse::TdpInverseImpl::TdpInverseImpl() : rsa_key(NULL)
+TdpImpl::TdpImpl() : rsa_key_(NULL)
+{
+    
+}
+TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
+{
+    // create a BIO from the std::string
+    BIO *mem;
+    mem = BIO_new_mem_buf(((void*)pk.data()), (int)pk.length());
+    
+    // read the key from the BIO
+    rsa_key_ = PEM_read_bio_RSAPublicKey(mem,NULL,NULL,NULL);
+    assert(rsa_key_ != NULL);
+    
+    
+    // close and destroy the BIO
+    BIO_set_close(mem, BIO_NOCLOSE); // So BIO_free() leaves BUF_MEM alone
+    BIO_free(mem);
+}
+    
+inline RSA* TdpImpl::get_rsa_key() const
+{
+    return rsa_key_;
+}
+    
+inline void TdpImpl::set_rsa_key(RSA* k)
+{
+    assert(k != NULL);
+
+    rsa_key_ = k;
+}
+
+inline uint TdpImpl::rsa_size() const
+{
+    return ((uint) RSA_size(get_rsa_key()));
+}
+
+TdpImpl::~TdpImpl()
+{
+    RSA_free(rsa_key_);
+}
+
+std::string TdpImpl::public_key() const
+{
+    int ret;
+    
+    // initialize a buffer
+    BIO *bio = BIO_new(BIO_s_mem());
+    
+    // write the key to the buffer
+    ret = PEM_write_bio_RSAPublicKey(bio, rsa_key_);
+    assert(ret == 1);
+    
+    // put the buffer in a std::string
+    size_t len = BIO_ctrl_pending(bio);
+    void *buf = malloc(len);
+    
+    int read_bytes = BIO_read(bio, buf, (int)len);
+    assert(read_bytes >= 0);
+    
+    std::string v(reinterpret_cast<const char*>(buf), len);
+    
+    BIO_free_all(bio);
+    free(buf);
+    
+    return v;
+}
+
+void TdpImpl::eval(const std::string &in, std::string &out) const
+{
+    int ret;
+    assert(in.size() == RSA_size(rsa_key_));
+    unsigned char rsa_out[RSA_size(rsa_key_)];
+    
+    ret = RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key_, RSA_NO_PADDING);
+    
+    
+    
+    out = std::string((char*)rsa_out,RSA_size(rsa_key_));
+}
+
+
+TdpInverseImpl::TdpInverseImpl()
 {
     int ret;
     
     // initialize the key
-    rsa_key = RSA_new();
+    set_rsa_key(RSA_new());
     
     // generate a new random key
     
@@ -75,13 +169,13 @@ TdpInverse::TdpInverseImpl::TdpInverseImpl() : rsa_key(NULL)
     ret = BN_set_word(bne, e);
     assert(ret == 1);
     
-    ret = RSA_generate_key_ex(rsa_key, RSA_MODULUS_SIZE, bne, NULL);
+    ret = RSA_generate_key_ex(get_rsa_key(), RSA_MODULUS_SIZE, bne, NULL);
     assert(ret == 1);
     
     BN_free(bne);
 }
 
-TdpInverse::TdpInverseImpl::TdpInverseImpl(const std::string& sk) : rsa_key(NULL)
+TdpInverseImpl::TdpInverseImpl(const std::string& sk)
 {
     // create a BIO from the std::string
     BIO *mem;
@@ -92,33 +186,26 @@ TdpInverse::TdpInverseImpl::TdpInverseImpl(const std::string& sk) : rsa_key(NULL
     assert(evpkey != NULL);
     
     // read the key from the BIO
-    rsa_key = EVP_PKEY_get1_RSA(evpkey);
-    assert(rsa_key != NULL);
+    set_rsa_key( EVP_PKEY_get1_RSA(evpkey));
 
     
     // close and destroy the BIO
     BIO_set_close(mem, BIO_NOCLOSE); // So BIO_free() leaves BUF_MEM alone
     BIO_free(mem);
 }
-    
-    
-TdpInverse::TdpInverseImpl::~TdpInverseImpl()
-{
-    RSA_free(rsa_key);
-}
 
-std::string TdpInverse::TdpInverseImpl::private_key() const
+std::string TdpInverseImpl::private_key() const
 {
     int ret;
     
     // create an EVP encapsulation
     EVP_PKEY* evpkey = EVP_PKEY_new();
-    ret = EVP_PKEY_set1_RSA(evpkey, rsa_key);
+    ret = EVP_PKEY_set1_RSA(evpkey, get_rsa_key());
     assert(ret == 1);
-
+    
     // initialize a buffer
     BIO *bio = BIO_new(BIO_s_mem());
-
+    
     // write the key to the buffer
     ret = PEM_write_bio_PKCS8PrivateKey(bio, evpkey, NULL, NULL, 0, NULL, NULL);
     assert(ret == 1);
@@ -130,35 +217,58 @@ std::string TdpInverse::TdpInverseImpl::private_key() const
     int read_bytes = BIO_read(bio, buf, (int)len);
     assert(read_bytes >= 0);
     
-    return std::string(reinterpret_cast<const char*>(buf), len);
+    
+    std::string v(reinterpret_cast<const char*>(buf), len);
+    
+    EVP_PKEY_free(evpkey);
+    BIO_free_all(bio);
+    free(buf);
+    
+    return v;
 }
 
-void TdpInverse::TdpInverseImpl::eval(const std::string &in, std::string &out) const
-{
-    int ret;
-//    std::cout << "RSA size:" << std::dec << RSA_size(rsa_key) << std::endl;
-    assert(in.size() == RSA_size(rsa_key));
-    unsigned char rsa_out[RSA_size(rsa_key)];
- 
-    ret = RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key, RSA_NO_PADDING);
-    
-    
-    
-    out = std::string((char*)rsa_out,RSA_size(rsa_key));
-}
 
-void TdpInverse::TdpInverseImpl::invert(const std::string &in, std::string &out) const
+void TdpInverseImpl::invert(const std::string &in, std::string &out) const
 {
     int ret;
-    unsigned char rsa_out[RSA_size(rsa_key)];
-    assert(in.size() == RSA_size(rsa_key));
+    unsigned char rsa_out[rsa_size()];
+    assert(in.size() == rsa_size());
  
-    ret = RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key, RSA_NO_PADDING);
+    ret = RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, get_rsa_key(), RSA_NO_PADDING);
     
     
     out = std::string((char*)rsa_out,ret);
-//    out = std::string((char*)rsa_out,RSA_size(rsa_key));
 }
+
+Tdp::Tdp(const std::string& sk) : tdp_imp_(new TdpImpl(sk))
+{
+}
+
+Tdp::~Tdp()
+{
+    delete tdp_imp_;
+    tdp_imp_ = NULL;
+}
+
+std::string Tdp::public_key() const
+{
+    return tdp_imp_->public_key();
+}
+    
+
+void Tdp::eval(const std::string &in, std::string &out) const
+{
+    tdp_imp_->eval(in, out);
+}
+
+std::string Tdp::eval(const std::string &in) const
+{
+    std::string out;
+    tdp_imp_->eval(in, out);
+    
+    return out;
+}
+    
 
 TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl())
 {
@@ -174,11 +284,16 @@ TdpInverse::~TdpInverse()
     tdp_inv_imp_ = NULL;
 }
 
+std::string TdpInverse::public_key() const
+{
+    return tdp_inv_imp_->public_key();
+}
+
 std::string TdpInverse::private_key() const
 {
     return tdp_inv_imp_->private_key();
 }
-
+    
 void TdpInverse::eval(const std::string &in, std::string &out) const
 {
     tdp_inv_imp_->eval(in, out);
@@ -190,6 +305,11 @@ std::string TdpInverse::eval(const std::string &in) const
     tdp_inv_imp_->eval(in, out);
     
     return out;
+}
+
+void TdpInverse::invert(const std::string &in, std::string &out) const
+{
+    tdp_inv_imp_->invert(in, out);
 }
 
 std::string TdpInverse::invert(const std::string &in) const

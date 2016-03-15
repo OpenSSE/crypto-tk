@@ -31,6 +31,9 @@ namespace sse
 namespace crypto
 {
 
+class TdpImpl; // not defined in the header
+class TdpInverseImpl; // not defined in the header
+
 /*****
 * Tdp class
 *
@@ -38,34 +41,31 @@ namespace crypto
 * 	
 * Trapdoor permutations are implemented using RSA.
 ******/
-//
-//class Tdp{
-//public:
-//	// static constexpr uint16_t kPKeySize = 384; // only N,
-//	static constexpr uint16_t kMessageSpaceSize = 384;
-//	
-//	Tdp(const std::string& pk);
-//	
-//	virtual ~Tdp();
-//
-//	void apply(const std::string &in, std::string &out);
-//	std::string apply(const std::string &in);
-//	
-//private:	
-//	class TdpImpl; // not defined in the header
-//	TdpImpl *tdp_imp_; // opaque pointer
-//
-//};
+
+class Tdp{
+public:
+	Tdp(const std::string& pk);
+	
+	virtual ~Tdp();
+
+    std::string public_key() const;
+
+    void eval(const std::string &in, std::string &out) const;
+	std::string eval(const std::string &in) const;
+	
+private:
+	TdpImpl *tdp_imp_; // opaque pointer
+
+};
 	
 class TdpInverse {
-public:
-	static constexpr uint16_t kMessageSpaceSize = 384;
-    
+public:    
     TdpInverse();
 	TdpInverse(const std::string& sk);
 	
 	~TdpInverse();
 
+    std::string public_key() const;
     std::string private_key() const;
 
 	void eval(const std::string &in, std::string &out) const;
@@ -75,7 +75,6 @@ public:
 	std::string invert(const std::string &in) const;
 	
 private:	
-	class TdpInverseImpl; // not defined in the header
 	TdpInverseImpl *tdp_inv_imp_; // opaque pointer
 
 };

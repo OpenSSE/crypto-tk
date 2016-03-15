@@ -369,7 +369,7 @@ void tdp()
 {
     sse::crypto::TdpInverse tdp;
     
-//    cout << tdp.private_key() << endl;
+    cout << tdp.private_key() << endl;
     
 //    sse::crypto::TdpInverse tdp2(tdp.private_key());
     
@@ -377,7 +377,12 @@ void tdp()
 //    cout << tdp2.private_key() << endl;
 
     
+//    std::string in(10, 0xf0);
     std::string in(384, 0xf0);
+    for (uint i = 0; i < 384; i++) {
+        in[i]=i+1;
+//        in[i]=0xf0;
+    }
     
     cout << "Original input:\n" << endl;
     for(unsigned char c : in)

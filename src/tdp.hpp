@@ -50,6 +50,8 @@ public:
 
     std::string public_key() const;
 
+    std::string sample() const;
+    
     void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;
 	
@@ -68,7 +70,9 @@ public:
     std::string public_key() const;
     std::string private_key() const;
 
-	void eval(const std::string &in, std::string &out) const;
+    std::string sample() const;
+
+    void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;
 
 	void invert(const std::string &in, std::string &out) const;

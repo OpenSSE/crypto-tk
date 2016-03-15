@@ -44,6 +44,8 @@ namespace crypto
 class TdpImpl
 {
 public:
+    static constexpr uint kMessageSpaceSize = RSA_MODULUS_SIZE/8;
+    
     TdpImpl();
     TdpImpl(const std::string& sk);
     
@@ -57,6 +59,7 @@ public:
     std::string public_key() const;
     void eval(const std::string &in, std::string &out) const;
 
+    std::string sample() const;
 private:
     RSA *rsa_key_;
     
@@ -151,6 +154,28 @@ void TdpImpl::eval(const std::string &in, std::string &out) const
     
     
     out = std::string((char*)rsa_out,RSA_size(rsa_key_));
+}
+
+std::string TdpImpl::sample() const
+{
+    // I don't really trust OpenSSL PRNG, but this is the simplest way
+    int ret;
+    BIGNUM *rnd;
+    
+    rnd = BN_new();
+    
+    ret = BN_rand_range(rnd, rsa_key_->n);
+    assert(ret == 1);
+    
+    unsigned char *buf = new unsigned char[BN_num_bytes(rnd)];
+    BN_bn2bin(rnd, buf);
+    
+    std::string v(reinterpret_cast<const char*>(buf), BN_num_bytes(rnd));
+    
+    BN_free(rnd);
+    delete [] buf;
+    
+    return v;
 }
 
 
@@ -255,6 +280,10 @@ std::string Tdp::public_key() const
     return tdp_imp_->public_key();
 }
     
+std::string Tdp::sample() const
+{
+    return tdp_imp_->sample();
+}
 
 void Tdp::eval(const std::string &in, std::string &out) const
 {
@@ -293,7 +322,12 @@ std::string TdpInverse::private_key() const
 {
     return tdp_inv_imp_->private_key();
 }
-    
+
+std::string TdpInverse::sample() const
+{
+    return tdp_inv_imp_->sample();
+}
+
 void TdpInverse::eval(const std::string &in, std::string &out) const
 {
     tdp_inv_imp_->eval(in, out);

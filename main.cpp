@@ -378,11 +378,13 @@ void tdp()
 
     
 //    std::string in(10, 0xf0);
-    std::string in(384, 0xf0);
-    for (uint i = 0; i < 384; i++) {
-        in[i]=i+1;
+//    std::string in(384, 0xf0);
+//    for (uint i = 0; i < 384; i++) {
+//        in[i]=i+1;
 //        in[i]=0xf0;
-    }
+//    }
+  
+    std::string in = tdp.sample();
     
     cout << "Original input:\n" << endl;
     for(unsigned char c : in)

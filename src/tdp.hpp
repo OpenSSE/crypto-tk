@@ -68,11 +68,11 @@ public:
 
     std::string private_key() const;
 
-	void apply(const std::string &in, std::string &out);
-	std::string apply(const std::string &in);
+	void eval(const std::string &in, std::string &out) const;
+	std::string eval(const std::string &in) const;
 
-	void invert(const std::string &in, std::string &out);
-	std::string invert(const std::string &in);
+	void invert(const std::string &in, std::string &out) const;
+	std::string invert(const std::string &in) const;
 	
 private:	
 	class TdpInverseImpl; // not defined in the header

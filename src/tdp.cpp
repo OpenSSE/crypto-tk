@@ -1,4 +1,4 @@
-//
+
 // libsse_crypto - An abstraction layer for high level cryptographic features.
 // Copyright (C) 2015-2016 Raphael Bost
 //
@@ -51,6 +51,10 @@ public:
     ~TdpInverseImpl();
     
     std::string private_key() const;
+    
+    void eval(const std::string &in, std::string &out) const;
+    void invert(const std::string &in, std::string &out) const;
+
 private:
     RSA *rsa_key;
 
@@ -129,7 +133,33 @@ std::string TdpInverse::TdpInverseImpl::private_key() const
     return std::string(reinterpret_cast<const char*>(buf), len);
 }
 
+void TdpInverse::TdpInverseImpl::eval(const std::string &in, std::string &out) const
+{
+    int ret;
+//    std::cout << "RSA size:" << std::dec << RSA_size(rsa_key) << std::endl;
+    assert(in.size() == RSA_size(rsa_key));
+    unsigned char rsa_out[RSA_size(rsa_key)];
+ 
+    ret = RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key, RSA_NO_PADDING);
     
+    
+    
+    out = std::string((char*)rsa_out,RSA_size(rsa_key));
+}
+
+void TdpInverse::TdpInverseImpl::invert(const std::string &in, std::string &out) const
+{
+    int ret;
+    unsigned char rsa_out[RSA_size(rsa_key)];
+    assert(in.size() == RSA_size(rsa_key));
+ 
+    ret = RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key, RSA_NO_PADDING);
+    
+    
+    out = std::string((char*)rsa_out,ret);
+//    out = std::string((char*)rsa_out,RSA_size(rsa_key));
+}
+
 TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl())
 {
 }
@@ -147,6 +177,27 @@ TdpInverse::~TdpInverse()
 std::string TdpInverse::private_key() const
 {
     return tdp_inv_imp_->private_key();
+}
+
+void TdpInverse::eval(const std::string &in, std::string &out) const
+{
+    tdp_inv_imp_->eval(in, out);
+}
+
+std::string TdpInverse::eval(const std::string &in) const
+{
+    std::string out;
+    tdp_inv_imp_->eval(in, out);
+    
+    return out;
+}
+
+std::string TdpInverse::invert(const std::string &in) const
+{
+    std::string out;
+    tdp_inv_imp_->invert(in, out);
+    
+    return out;
 }
 
 }

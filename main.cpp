@@ -369,13 +369,39 @@ void tdp()
 {
     sse::crypto::TdpInverse tdp;
     
-    cout << tdp.private_key() << endl;
+//    cout << tdp.private_key() << endl;
     
-    sse::crypto::TdpInverse tdp2(tdp.private_key());
+//    sse::crypto::TdpInverse tdp2(tdp.private_key());
     
-    cout << "\n\nSecond private key \n\n" << endl;
-    cout << tdp2.private_key() << endl;
+//    cout << "\n\nSecond private key \n\n" << endl;
+//    cout << tdp2.private_key() << endl;
 
+    
+    std::string in(384, 0xf0);
+    
+    cout << "Original input:\n" << endl;
+    for(unsigned char c : in)
+    {
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+    }
+
+    std::string out = tdp.eval(in);
+    
+    cout << "\n\nOutput:\n" << endl;
+    for(unsigned char c : out)
+    {
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+    }
+    
+    std::string dec = tdp.invert(out);
+    
+    cout << "\n\nDecrypted input:\n" << endl;
+    for(unsigned char c : dec)
+    {
+        cout << hex << setw(2) << setfill('0') << (uint) c;
+    }
+    
+    cout << endl;
 }
 
 int main( int argc, char* argv[] ) {

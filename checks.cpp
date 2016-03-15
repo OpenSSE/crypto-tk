@@ -28,6 +28,7 @@
 #include "tests/test_hmac.hpp"
 #include "tests/encryption.hpp"
 #include "tests/test_fpe.hpp"
+#include "tests/test_tdp.hpp"
 
 BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
 	test_generic_multiset_hash();
@@ -53,5 +54,10 @@ BOOST_AUTO_TEST_CASE(encryption) {
 }
 
 BOOST_AUTO_TEST_CASE(fpe) {
-	fpe_correctness_test();
+    fpe_correctness_test();
+}
+
+BOOST_AUTO_TEST_CASE(tdp) {
+    tdp_correctness_test();
+    tdp_functional_test();
 }

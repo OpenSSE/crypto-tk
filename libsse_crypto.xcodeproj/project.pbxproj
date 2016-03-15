@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		318C729B1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729C1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729D1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
@@ -187,6 +188,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		315D453A1C98909A00590A01 /* test_tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_tdp.cpp; sourceTree = "<group>"; };
+		315D453B1C98909A00590A01 /* test_tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_tdp.hpp; sourceTree = "<group>"; };
 		318C72991C9730140040AEE7 /* tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tdp.cpp; sourceTree = "<group>"; };
 		318C729A1C9730140040AEE7 /* tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp.hpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -558,6 +561,8 @@
 				6CC2D46B1C3185D700334ADD /* test_fpe.hpp */,
 				6CC2D46C1C3185D700334ADD /* test_hmac.cpp */,
 				6CC2D46D1C3185D700334ADD /* test_hmac.hpp */,
+				315D453A1C98909A00590A01 /* test_tdp.cpp */,
+				315D453B1C98909A00590A01 /* test_tdp.hpp */,
 			);
 			path = tests;
 			sourceTree = "<group>";
@@ -798,6 +803,7 @@
 				6CC2D4881C31889B00334ADD /* random.cpp in Sources */,
 				6CC2D48F1C318B1B00334ADD /* test_ecmh.cpp in Sources */,
 				6CC2D4981C318DFE00334ADD /* blake2b.cpp in Sources */,
+				315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */,
 				6CC2D4931C318B3B00334ADD /* sha512_base.c in Sources */,
 				318C729B1C9730140040AEE7 /* tdp.cpp in Sources */,
 				6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */,

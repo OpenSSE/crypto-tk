@@ -145,13 +145,10 @@ std::string TdpImpl::public_key() const
 
 void TdpImpl::eval(const std::string &in, std::string &out) const
 {
-    int ret;
     assert(in.size() == RSA_size(rsa_key_));
     unsigned char rsa_out[RSA_size(rsa_key_)];
     
-    ret = RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key_, RSA_NO_PADDING);
-    
-    
+    RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key_, RSA_NO_PADDING);
     
     out = std::string((char*)rsa_out,RSA_size(rsa_key_));
 }

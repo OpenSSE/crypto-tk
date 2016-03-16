@@ -146,7 +146,7 @@ void Fpe::FpeImpl::encrypt(const std::string &in, std::string &out)
 
 	encrypt((unsigned char*)in.data(), (unsigned int)len, data);
 	out = std::string((char *)data, len);
-    delete data;
+    delete [] data;
 }
 
 void Fpe::FpeImpl::decrypt(const unsigned char* in, const unsigned int &len,  unsigned char* out)
@@ -169,7 +169,7 @@ void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
 	decrypt((unsigned char*)in.data(), (unsigned int)len, data);
     
 	out = std::string((char *)data, len);
-    delete data;
+    delete [] data;
 }
 
 	

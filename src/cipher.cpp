@@ -181,7 +181,7 @@ void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)
 
 	encrypt((unsigned char*)in.data(), len, data);
     out = std::string((char *)data, len+kIVSize);
-    delete data;
+    delete [] data;
 }
 
 void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, unsigned char* out)
@@ -214,7 +214,7 @@ void Cipher::CipherImpl::decrypt(const std::string &in, std::string &out)
 	decrypt((unsigned char*)in.data(), len, data);
 
     out = std::string((char *)data, len-kIVSize);
-    delete data;
+    delete [] data;
 }
 	
 

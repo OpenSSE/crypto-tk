@@ -59,13 +59,13 @@ static void sha512_update_acc(const unsigned char *in, unsigned char *digest, co
 {
 
 #ifdef __AVX2__
-#warning AVX2
+#pragma message "Use AVX2"
     sha512_rorx(in, (uint32_t*) digest, block_len);
 #elif defined __AVX__
-#warning AVX
+#pragma message "Use AVX"
     sha512_avx(in, (uint32_t*) digest, block_len);
 #elif defined __SSE4_1__
-#warning SSE4
+#pragma message "Use SSE4"
     sha512_sse4(in, (uint32_t*) digest, block_len);
 #else
 	#error Intel SHA-2 code is not supported on this architecture

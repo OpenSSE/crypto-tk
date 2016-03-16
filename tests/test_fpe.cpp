@@ -1,6 +1,6 @@
 //
 // libsse_crypto - An abstraction layer for high level cryptographic features.
-// Copyright (C) 2015 Raphael Bost
+// Copyright (C) 2015-2016 Raphael Bost
 //
 // This file is part of libsse_crypto.
 //

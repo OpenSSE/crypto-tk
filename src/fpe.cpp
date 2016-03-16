@@ -23,7 +23,6 @@
 #include "random.hpp"
 
 #include <cstring>
-#include <cassert>
 #include <exception>
 #include <iostream>
 #include <iomanip>
@@ -141,7 +140,12 @@ void Fpe::FpeImpl::encrypt(const unsigned char* in, const unsigned int &len, uns
 void Fpe::FpeImpl::encrypt(const std::string &in, std::string &out)
 {
 	size_t len = in.size();
-    assert(len < UINT_MAX);
+
+    if(len > UINT_MAX)
+    {
+        throw std::runtime_error("The maximum input length of Format Preserving Encryption is UINT_MAX");
+    }
+
     unsigned char *data = new unsigned char[len];
 
 	encrypt((unsigned char*)in.data(), (unsigned int)len, data);
@@ -163,7 +167,12 @@ void Fpe::FpeImpl::decrypt(const unsigned char* in, const unsigned int &len,  un
 void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
 {
 	size_t len = in.size();
-    assert(len < UINT_MAX);
+
+    if(len > UINT_MAX)
+    {
+        throw std::runtime_error("The maximum input length of Format Preserving Encryption is UINT_MAX");
+    }
+    
     unsigned char *data = new unsigned char[len];
 	
 	decrypt((unsigned char*)in.data(), (unsigned int)len, data);

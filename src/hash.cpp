@@ -23,7 +23,6 @@
 #include "hash/sha512.hpp"
 #include "hash/blake2b/blake2b.hpp"
 
-#include <cassert>
 #include <cstring>
 
 namespace sse
@@ -44,7 +43,11 @@ void Hash::hash(const unsigned char *in, const size_t &len, unsigned char *out)
 
 void Hash::hash(const unsigned char *in, const size_t &len, const size_t &out_len, unsigned char *out)
 {
-	assert(out_len <= kDigestSize);
+    if(out_len > kDigestSize)
+    {
+        throw std::runtime_error("Invalid output length: out_len > kDigestSize");
+    }
+
 	unsigned char digest[kDigestSize];
 
 	hash(in, len, digest);

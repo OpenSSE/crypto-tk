@@ -23,7 +23,6 @@
 #include "random.hpp"
 
 #include <cstring>
-#include <cassert>
 #include <exception>
 #include <iostream>
 #include <iomanip>
@@ -145,7 +144,9 @@ void Cipher::CipherImpl::reset_iv()
 
 void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
-    assert(len > 0);
+    if (len == 0) {
+        throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
+    }
 	if(remaining_block_count_ < ((len/16)+1)){
 		// throw an exception
 		throw std::runtime_error("Too many blocks were encrypted with the same key. Encrypting using this key is now insecure.");
@@ -208,7 +209,10 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
 void Cipher::CipherImpl::decrypt(const std::string &in, std::string &out)
 {
 	size_t len = in.size();
-    assert(len > kIVSize);
+
+    if (len <= kIVSize) {
+        throw std::runtime_error("The minimum number of bytes to decrypt is 1. The minimum length for a decryption input is kIVSize+1");
+    }
 
     unsigned char *data = new unsigned char[len-kIVSize];
 	decrypt((unsigned char*)in.data(), len, data);

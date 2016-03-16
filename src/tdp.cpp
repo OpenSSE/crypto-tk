@@ -23,7 +23,6 @@
 #include "random.hpp"
 
 #include <cstring>
-#include <cassert>
 #include <exception>
 #include <iostream>
 #include <iomanip>
@@ -87,8 +86,11 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
     
     // read the key from the BIO
     rsa_key_ = PEM_read_bio_RSAPublicKey(mem,NULL,NULL,NULL);
-    assert(rsa_key_ != NULL);
-    
+
+    if(rsa_key_ == NULL)
+    {
+        throw std::runtime_error("Error when initializing the RSA key from public key.");
+    }
     
     // close and destroy the BIO
     BIO_set_close(mem, BIO_NOCLOSE); // So BIO_free() leaves BUF_MEM alone
@@ -102,7 +104,10 @@ inline RSA* TdpImpl::get_rsa_key() const
     
 inline void TdpImpl::set_rsa_key(RSA* k)
 {
-    assert(k != NULL);
+    if(k == NULL)
+    {
+        throw std::runtime_error("Invalid input: k == NULL.");
+    }
 
     rsa_key_ = k;
 }
@@ -126,15 +131,24 @@ std::string TdpImpl::public_key() const
     
     // write the key to the buffer
     ret = PEM_write_bio_RSAPublicKey(bio, rsa_key_);
-    assert(ret == 1);
+
+    if(ret != 1)
+    {
+        throw std::runtime_error("Error when serializing the RSA public key.");
+    }
     
+
     // put the buffer in a std::string
     size_t len = BIO_ctrl_pending(bio);
     void *buf = malloc(len);
     
     int read_bytes = BIO_read(bio, buf, (int)len);
-    assert(read_bytes >= 0);
     
+    if(read_bytes == 0)
+    {
+        throw std::runtime_error("Error when reading BIO.");
+    }
+
     std::string v(reinterpret_cast<const char*>(buf), len);
     
     BIO_free_all(bio);
@@ -145,7 +159,11 @@ std::string TdpImpl::public_key() const
 
 void TdpImpl::eval(const std::string &in, std::string &out) const
 {
-    assert(in.size() == RSA_size(rsa_key_));
+    if(in.size() != rsa_size())
+    {
+        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+    }
+
     unsigned char rsa_out[RSA_size(rsa_key_)];
     
     RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, rsa_key_, RSA_NO_PADDING);
@@ -162,7 +180,10 @@ std::string TdpImpl::sample() const
     rnd = BN_new();
     
     ret = BN_rand_range(rnd, rsa_key_->n);
-    assert(ret == 1);
+    if(ret != 1)
+    {
+        throw std::runtime_error("Invalid random number generation.");
+    }
     
     unsigned char *buf = new unsigned char[BN_num_bytes(rnd)];
     BN_bn2bin(rnd, buf);
@@ -189,10 +210,16 @@ TdpInverseImpl::TdpInverseImpl()
     BIGNUM *bne = NULL;
     bne = BN_new();
     ret = BN_set_word(bne, e);
-    assert(ret == 1);
+    if(ret != 1)
+    {
+        throw std::runtime_error("Invalid BIGNUM initialization.");
+    }
     
     ret = RSA_generate_key_ex(get_rsa_key(), RSA_MODULUS_SIZE, bne, NULL);
-    assert(ret == 1);
+    if(ret != 1)
+    {
+        throw std::runtime_error("Invalid RSA key generation.");
+    }
     
     BN_free(bne);
 }
@@ -205,8 +232,12 @@ TdpInverseImpl::TdpInverseImpl(const std::string& sk)
 
     EVP_PKEY* evpkey;
     evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
-    assert(evpkey != NULL);
-    
+
+    if(evpkey == NULL)
+    {
+        throw std::runtime_error("Error when reading the RSA private key.");
+    }
+
     // read the key from the BIO
     set_rsa_key( EVP_PKEY_get1_RSA(evpkey));
 
@@ -223,21 +254,30 @@ std::string TdpInverseImpl::private_key() const
     // create an EVP encapsulation
     EVP_PKEY* evpkey = EVP_PKEY_new();
     ret = EVP_PKEY_set1_RSA(evpkey, get_rsa_key());
-    assert(ret == 1);
+    if(ret != 1)
+    {
+        throw std::runtime_error("Invalid EVP initialization.");
+    }
     
     // initialize a buffer
     BIO *bio = BIO_new(BIO_s_mem());
     
     // write the key to the buffer
     ret = PEM_write_bio_PKCS8PrivateKey(bio, evpkey, NULL, NULL, 0, NULL, NULL);
-    assert(ret == 1);
+    if(ret != 1)
+    {
+        throw std::runtime_error("Failure when writing private KEY.");
+    }
     
     // put the buffer in a std::string
     size_t len = BIO_ctrl_pending(bio);
     void *buf = malloc(len);
     
     int read_bytes = BIO_read(bio, buf, (int)len);
-    assert(read_bytes >= 0);
+    if(read_bytes == 0)
+    {
+        throw std::runtime_error("Error when reading BIO.");
+    }
     
     
     std::string v(reinterpret_cast<const char*>(buf), len);
@@ -254,7 +294,11 @@ void TdpInverseImpl::invert(const std::string &in, std::string &out) const
 {
     int ret;
     unsigned char rsa_out[rsa_size()];
-    assert(in.size() == rsa_size());
+
+    if(in.size() != rsa_size())
+    {
+        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+    }
  
     ret = RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, get_rsa_key(), RSA_NO_PADDING);
     

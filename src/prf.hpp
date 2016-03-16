@@ -26,7 +26,6 @@
 
 #include <cstdint>
 #include <cstring>
-#include <cassert>
 
 #include <string>
 #include <array>
@@ -112,8 +111,12 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const uns
 
 	std::array<uint8_t, NBYTES> result;
 	
-	assert(NBYTES <= sse::crypto::Hash::kDigestSize);
-	
+    if(NBYTES > sse::crypto::Hash::kDigestSize)
+    {
+        throw std::runtime_error("Invalid output length: NBYTES > Hash::kDigestSize");
+    }
+
+    
 	if(NBYTES <= sse::crypto::Hash::kDigestSize){
 		// only need one output bloc of PrfBase.
 

@@ -24,7 +24,6 @@
 
 #include <cstdint>
 #include <cstring>
-#include <cassert>
 
 #include <string>
 #include <array>
@@ -62,7 +61,11 @@ public:
 
 	HMac(const void* k, const uint8_t &len)
 	{
-		assert(len <= kKeySize);
+        if(len > kKeySize)
+        {
+            throw std::runtime_error("Invalid key length: len > kKeySize");
+        }
+
 		uint8_t l = (kKeySize < len) ? kKeySize : len;
 		
 		std::memset(key_.data(), 0x00, kKeySize);

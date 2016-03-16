@@ -150,9 +150,9 @@ template <class H> void HMac<H>::gen_padded_keys(const std::array<uint8_t,kKeySi
 template <class H> void HMac<H>::hmac(const unsigned char* in, const size_t &length, unsigned char* out) const
 {
     unsigned char* buffer, *tmp;
-	unsigned int i_len = H::kBlockSize + length;
-	unsigned int o_len = H::kBlockSize + H::kDigestSize;
-	unsigned int buffer_len = (i_len > H::kDigestSize) ? i_len : (H::kDigestSize);
+	size_t i_len = H::kBlockSize + length;
+	size_t o_len = H::kBlockSize + H::kDigestSize;
+	size_t buffer_len = (i_len > H::kDigestSize) ? i_len : (H::kDigestSize);
 	
 	buffer = new unsigned char [buffer_len];
 	tmp = new unsigned char [o_len];

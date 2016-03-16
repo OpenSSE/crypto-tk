@@ -523,6 +523,10 @@ int cipher_aez_core(aez_ctx_t *ctx, block t, int d, const char *src, unsigned by
     } else if (frag_bytes) {
         frag0 = one_zero_pad(load(src + initial_bytes), 16-frag_bytes);
         x = aes4(vxor(frag0, I4),     J, I, L, x);
+        frag1 = _mm_set1_epi32(0x00);
+    } else {
+        frag0 = _mm_set1_epi32(0x00);
+        frag1 = _mm_set1_epi32(0x00);
     }
     
     /* Calculate s and final block values (y xor'd to final1 later) */

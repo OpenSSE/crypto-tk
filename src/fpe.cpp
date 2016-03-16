@@ -23,6 +23,7 @@
 #include "random.hpp"
 
 #include <cstring>
+#include <cassert>
 #include <exception>
 #include <iostream>
 #include <iomanip>
@@ -45,9 +46,9 @@ public:
 	
 	// ~FpeImpl();
 
-	void encrypt(const unsigned char* in, const size_t &len, unsigned char* out);
+	void encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out);
 	void encrypt(const std::string &in, std::string &out);
-	void decrypt(const unsigned char* in, const size_t &len, unsigned char* out);
+	void decrypt(const unsigned char* in, const unsigned int &len, unsigned char* out);
 	void decrypt(const std::string &in, std::string &out);
 
 
@@ -126,7 +127,7 @@ void Fpe::FpeImpl::setup(const unsigned char* k)
 	aez_setup(k, 48, &aez_ctx_);
 }
 	
-void Fpe::FpeImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
+void Fpe::FpeImpl::encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out)
 {
 	char iv[16] = {0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00, 
@@ -139,15 +140,16 @@ void Fpe::FpeImpl::encrypt(const unsigned char* in, const size_t &len, unsigned 
 
 void Fpe::FpeImpl::encrypt(const std::string &in, std::string &out)
 {
-	unsigned int len = in.size();
+	size_t len = in.size();
+    assert(len < UINT_MAX);
     unsigned char *data = new unsigned char[len];
 
-	encrypt((unsigned char*)in.data(), len, data);
+	encrypt((unsigned char*)in.data(), (unsigned int)len, data);
 	out = std::string((char *)data, len);
     delete data;
 }
 
-void Fpe::FpeImpl::decrypt(const unsigned char* in, const size_t &len,  unsigned char* out)
+void Fpe::FpeImpl::decrypt(const unsigned char* in, const unsigned int &len,  unsigned char* out)
 {
 	char iv[16] = {0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00, 
@@ -160,10 +162,11 @@ void Fpe::FpeImpl::decrypt(const unsigned char* in, const size_t &len,  unsigned
 
 void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
 {
-	unsigned int len = in.size();
+	size_t len = in.size();
+    assert(len < UINT_MAX);
     unsigned char *data = new unsigned char[len];
 	
-	decrypt((unsigned char*)in.data(), len, data);
+	decrypt((unsigned char*)in.data(), (unsigned int)len, data);
     
 	out = std::string((char *)data, len);
     delete data;

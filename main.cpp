@@ -42,7 +42,9 @@ extern "C" void sha512_rorx(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_sse4(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_base(const void* M, void* D, uint64_t L);
 
+#ifndef htonll
 #define htonll(x) ((((uint64_t)htonl(x)) << 32) + htonl((x) >> 32))
+#endif
 
 #define BYTESWAP64(x) htonll(x)
 #define UL64(x) x##ULL
@@ -129,9 +131,6 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 	SHA512_CTX ctx;
 	
 	SHA512_Init(&ctx);
-	
-    unsigned char dbuf[64];
-    // memcpy(digest,H,64);
 	
 
 	size_t n_complete_blocks = len >> 7;
@@ -331,7 +330,8 @@ void test_hash()
 	
 	
 	return;
-	
+
+    /*
 	string out_openssl, out_acc;
 	out_openssl.resize(kDigestSize);
 	out_acc.resize(kDigestSize);
@@ -363,6 +363,7 @@ void test_hash()
 	}
 	cout << dec << endl;
 	}
+    */
 }
 
 void tdp()

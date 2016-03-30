@@ -306,6 +306,17 @@ void TdpInverseImpl::invert(const std::string &in, std::string &out) const
     out = std::string((char*)rsa_out,ret);
 }
 
+constexpr size_t Tdp::message_size() noexcept
+{
+    return TdpImpl::kMessageSpaceSize;
+}
+ 
+constexpr size_t TdpInverse::message_size() noexcept
+{
+    return Tdp::message_size();
+}
+
+
 Tdp::Tdp(const std::string& sk) : tdp_imp_(new TdpImpl(sk))
 {
 }

@@ -44,6 +44,8 @@ class TdpInverseImpl; // not defined in the header
 
 class Tdp{
 public:
+    static constexpr size_t message_size() noexcept;
+
 	Tdp(const std::string& pk);
 	
 	virtual ~Tdp();
@@ -62,6 +64,8 @@ private:
 	
 class TdpInverse {
 public:    
+    static constexpr size_t message_size() noexcept;
+
     TdpInverse();
 	TdpInverse(const std::string& sk);
 	

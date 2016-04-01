@@ -38,12 +38,15 @@ namespace sse
 namespace crypto
 {
 	
-#define RSA_MODULUS_SIZE 3072
     
+static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize, "Constants kMessageSize of Tdp and TdpInverse do not match");
+
+#define RSA_MODULUS_SIZE TdpInverse::kMessageSize/8
+
 class TdpImpl
 {
 public:
-    static constexpr uint kMessageSpaceSize = RSA_MODULUS_SIZE/8;
+    static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
     
     TdpImpl();
     TdpImpl(const std::string& sk);
@@ -57,8 +60,10 @@ public:
     
     std::string public_key() const;
     void eval(const std::string &in, std::string &out) const;
+    std::array<uint8_t, kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in) const;
 
     std::string sample() const;
+    std::array<uint8_t, kMessageSpaceSize> sample_array() const;
 private:
     RSA *rsa_key_;
     
@@ -72,6 +77,7 @@ public:
     
     std::string private_key() const;
     void invert(const std::string &in, std::string &out) const;
+    std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const;
 };
 
 TdpImpl::TdpImpl() : rsa_key_(NULL)
@@ -171,6 +177,15 @@ void TdpImpl::eval(const std::string &in, std::string &out) const
     out = std::string((char*)rsa_out,RSA_size(rsa_key_));
 }
 
+std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::eval(const std::array<uint8_t, kMessageSpaceSize> &in) const
+{
+    std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
+
+    RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), out.data(), rsa_key_, RSA_NO_PADDING);
+    
+    return out;
+}
+
 std::string TdpImpl::sample() const
 {
     // I don't really trust OpenSSL PRNG, but this is the simplest way
@@ -194,6 +209,27 @@ std::string TdpImpl::sample() const
     delete [] buf;
     
     return v;
+}
+
+std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
+{
+    // I don't really trust OpenSSL PRNG, but this is the simplest way
+    int ret;
+    BIGNUM *rnd;
+    std::array<uint8_t, kMessageSpaceSize> out;
+    
+    rnd = BN_new();
+    
+    ret = BN_rand_range(rnd, rsa_key_->n);
+    if(ret != 1)
+    {
+        throw std::runtime_error("Invalid random number generation.");
+    }
+    
+    BN_bn2bin(rnd, out.data());
+    BN_free(rnd);
+    
+    return out;
 }
 
 
@@ -306,14 +342,13 @@ void TdpInverseImpl::invert(const std::string &in, std::string &out) const
     out = std::string((char*)rsa_out,ret);
 }
 
-constexpr size_t Tdp::message_size() noexcept
+std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std::array<uint8_t, kMessageSpaceSize> &in) const
 {
-    return TdpImpl::kMessageSpaceSize;
-}
- 
-constexpr size_t TdpInverse::message_size() noexcept
-{
-    return Tdp::message_size();
+    std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
+    
+    RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), out.data(), get_rsa_key(), RSA_NO_PADDING);
+    
+    return out;
 }
 
 
@@ -337,6 +372,11 @@ std::string Tdp::sample() const
     return tdp_imp_->sample();
 }
 
+std::array<uint8_t, Tdp::kMessageSize> Tdp::sample_array() const
+{
+    return tdp_imp_->sample_array();
+}
+
 void Tdp::eval(const std::string &in, std::string &out) const
 {
     tdp_imp_->eval(in, out);
@@ -349,7 +389,12 @@ std::string Tdp::eval(const std::string &in) const
     
     return out;
 }
-    
+
+std::array<uint8_t, Tdp::kMessageSize> Tdp::eval(const std::array<uint8_t, kMessageSize> &in) const
+{
+    return tdp_imp_->eval(in);
+}
+
 
 TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl())
 {
@@ -380,6 +425,11 @@ std::string TdpInverse::sample() const
     return tdp_inv_imp_->sample();
 }
 
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::sample_array() const
+{
+    return tdp_inv_imp_->sample_array();
+}
+    
 void TdpInverse::eval(const std::string &in, std::string &out) const
 {
     tdp_inv_imp_->eval(in, out);
@@ -391,6 +441,11 @@ std::string TdpInverse::eval(const std::string &in) const
     tdp_inv_imp_->eval(in, out);
     
     return out;
+}
+
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::eval(const std::array<uint8_t, kMessageSize> &in) const
+{
+    return tdp_inv_imp_->eval(in);
 }
 
 void TdpInverse::invert(const std::string &in, std::string &out) const
@@ -406,5 +461,11 @@ std::string TdpInverse::invert(const std::string &in) const
     return out;
 }
 
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert(const std::array<uint8_t, kMessageSize> &in) const
+{
+    return tdp_inv_imp_->invert(in);
+}
+    
+   
 }
 }

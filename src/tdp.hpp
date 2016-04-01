@@ -44,7 +44,7 @@ class TdpInverseImpl; // not defined in the header
 
 class Tdp{
 public:
-    static constexpr size_t message_size() noexcept;
+    static constexpr size_t kMessageSize = 384;
 
 	Tdp(const std::string& pk);
 	
@@ -53,9 +53,11 @@ public:
     std::string public_key() const;
 
     std::string sample() const;
+    std::array<uint8_t, kMessageSize> sample_array() const;
     
     void eval(const std::string &in, std::string &out) const;
-	std::string eval(const std::string &in) const;
+	std::string eval(const std::string &in) const;    
+    std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
 	
 private:
 	TdpImpl *tdp_imp_; // opaque pointer
@@ -64,7 +66,7 @@ private:
 	
 class TdpInverse {
 public:    
-    static constexpr size_t message_size() noexcept;
+    static constexpr size_t kMessageSize = 384;
 
     TdpInverse();
 	TdpInverse(const std::string& sk);
@@ -75,13 +77,16 @@ public:
     std::string private_key() const;
 
     std::string sample() const;
+    std::array<uint8_t, kMessageSize> sample_array() const;
 
     void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;
+    std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
 
 	void invert(const std::string &in, std::string &out) const;
 	std::string invert(const std::string &in) const;
-	
+    std::array<uint8_t, kMessageSize> invert(const std::array<uint8_t, kMessageSize> &in) const;
+
 private:	
 	TdpInverseImpl *tdp_inv_imp_; // opaque pointer
 

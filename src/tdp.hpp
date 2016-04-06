@@ -69,7 +69,8 @@ public:
     static constexpr size_t kMessageSize = 384;
 
     TdpInverse();
-	TdpInverse(const std::string& sk);
+    TdpInverse(const std::string& sk);
+    TdpInverse(const TdpInverse& tdp);
 	
 	~TdpInverse();
 

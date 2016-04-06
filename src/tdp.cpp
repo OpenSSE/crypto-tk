@@ -64,7 +64,8 @@ public:
 
     std::string sample() const;
     std::array<uint8_t, kMessageSpaceSize> sample_array() const;
-private:
+
+protected:
     RSA *rsa_key_;
     
 };
@@ -74,6 +75,7 @@ class TdpInverseImpl : public TdpImpl
 public:
     TdpInverseImpl();
     TdpInverseImpl(const std::string& sk);
+    TdpInverseImpl(const TdpInverseImpl& tdp);
     
     std::string private_key() const;
     void invert(const std::string &in, std::string &out) const;
@@ -283,6 +285,11 @@ TdpInverseImpl::TdpInverseImpl(const std::string& sk)
     BIO_free(mem);
 }
 
+TdpInverseImpl::TdpInverseImpl(const TdpInverseImpl& tdp)
+{
+    set_rsa_key(RSAPrivateKey_dup(tdp.rsa_key_));
+}
+    
 std::string TdpInverseImpl::private_key() const
 {
     int ret;
@@ -401,6 +408,10 @@ TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl())
 }
 
 TdpInverse::TdpInverse(const std::string& sk) : tdp_inv_imp_(new TdpInverseImpl(sk))
+{
+}
+
+TdpInverse::TdpInverse(const TdpInverse& tdp) : tdp_inv_imp_(new TdpInverseImpl(tdp.private_key()))
 {
 }
 

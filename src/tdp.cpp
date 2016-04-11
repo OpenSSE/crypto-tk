@@ -42,14 +42,14 @@ namespace crypto
 static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize, "Constants kMessageSize of Tdp and TdpInverse do not match");
 
 #define RSA_MODULUS_SIZE TdpInverse::kMessageSize*8
-
+#define RSA_PK RSA_3
+    
 class TdpImpl
 {
 public:
     static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
     
-    TdpImpl();
-    TdpImpl(const std::string& sk);
+    TdpImpl(const std::string& pk);
     
     ~TdpImpl();
     
@@ -59,6 +59,7 @@ public:
     uint rsa_size() const;
     
     std::string public_key() const;
+    
     void eval(const std::string &in, std::string &out) const;
     std::array<uint8_t, kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in) const;
 
@@ -66,6 +67,8 @@ public:
     std::array<uint8_t, kMessageSpaceSize> sample_array() const;
 
 protected:
+    TdpImpl();
+
     RSA *rsa_key_;
     
 };
@@ -80,6 +83,23 @@ public:
     std::string private_key() const;
     void invert(const std::string &in, std::string &out) const;
     std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const;
+};
+
+class TdpMultPoolImpl : public TdpImpl
+{
+public:
+    TdpMultPoolImpl(const std::string& sk, const uint8_t size);
+    
+    ~TdpMultPoolImpl();
+    
+    std::array<uint8_t, TdpImpl::kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const;
+    void eval(const std::string &in, std::string &out, const uint8_t order) const;
+
+    uint8_t maximum_order() const;
+    uint8_t pool_size() const;
+private:
+    RSA **keys_;
+    uint8_t keys_count_;
 };
 
 TdpImpl::TdpImpl() : rsa_key_(NULL)
@@ -244,7 +264,7 @@ TdpInverseImpl::TdpInverseImpl()
     
     // generate a new random key
     
-    unsigned long e = RSA_3;
+    unsigned long e = RSA_PK;
     BIGNUM *bne = NULL;
     bne = BN_new();
     ret = BN_set_word(bne, e);
@@ -358,6 +378,77 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
     return out;
 }
 
+TdpMultPoolImpl::TdpMultPoolImpl(const std::string& sk, const uint8_t size)
+: TdpImpl(sk), keys_count_(size-1)
+{
+    if (size == 0) {
+        throw std::invalid_argument("Invalid Multiple TDP pool input size. Pool size should be > 0.");
+    }
+    
+    keys_ = new RSA* [keys_count_];
+    
+    keys_[0] = RSAPublicKey_dup(get_rsa_key());
+    BN_mul_word(keys_[0]->e, RSA_PK);
+
+    for (uint8_t i = 1; i < keys_count_; i++) {
+        
+        keys_[i] = RSAPublicKey_dup(keys_[i-1]);
+        BN_mul_word(keys_[i]->e, RSA_PK);
+    }
+    
+}
+
+TdpMultPoolImpl::~TdpMultPoolImpl()
+{
+    for (uint8_t i = 0; i < keys_count_; i++) {
+        RSA_free(keys_[i]);
+    }
+    delete [] keys_;
+}
+
+std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpMultPoolImpl::eval(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const
+{
+    std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
+
+    if (order == 1) {
+        // regular eval
+        RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), out.data(), get_rsa_key(), RSA_NO_PADDING);
+
+    }else if(order <= maximum_order()){
+        // get the right RSA context, i.e. the one in keys_[order-1]
+        RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), out.data(), keys_[order-2], RSA_NO_PADDING);
+    }else{
+        throw std::invalid_argument("Invalid order for this TDP pool. The input order must be less than the maximum order supported by the pool, and strictly positive.");
+    }
+    
+    return out;
+}
+
+
+void TdpMultPoolImpl::eval(const std::string &in, std::string &out, const uint8_t order) const
+{
+    if(in.size() != rsa_size())
+    {
+        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+    }
+    
+    std::array<uint8_t, kMessageSpaceSize> a_in, a_out;
+    std::copy(in.begin(), in.end(), a_in.begin());
+    a_out = eval(a_in, order);
+    
+    out = std::string(a_out.begin(), a_out.end());
+    
+}
+
+uint8_t TdpMultPoolImpl::maximum_order() const
+{
+    return keys_count_+1;
+}
+uint8_t TdpMultPoolImpl::pool_size() const
+{
+    return keys_count_+1;
+}
+
 
 Tdp::Tdp(const std::string& sk) : tdp_imp_(new TdpImpl(sk))
 {
@@ -401,7 +492,6 @@ std::array<uint8_t, Tdp::kMessageSize> Tdp::eval(const std::array<uint8_t, kMess
 {
     return tdp_imp_->eval(in);
 }
-
 
 TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl())
 {
@@ -477,6 +567,57 @@ std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert(const std::arra
     return tdp_inv_imp_->invert(in);
 }
     
-   
+TdpMultPool::TdpMultPool(const std::string& pk, const uint8_t size) : tdp_pool_imp_(new TdpMultPoolImpl(pk, size))
+{
+}
+
+TdpMultPool::~TdpMultPool()
+{
+    delete tdp_pool_imp_;
+    tdp_pool_imp_ = NULL;
+}
+
+std::string TdpMultPool::public_key() const
+{
+    return tdp_pool_imp_->public_key();
+}
+
+std::string TdpMultPool::sample() const
+{
+    return tdp_pool_imp_->sample();
+}
+
+std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::sample_array() const
+{
+    return tdp_pool_imp_->sample_array();
+}
+
+void TdpMultPool::eval(const std::string &in, std::string &out, uint8_t order) const
+{
+    tdp_pool_imp_->eval(in, out, order);
+}
+
+std::string TdpMultPool::eval(const std::string &in, uint8_t order) const
+{
+    std::string out;
+    tdp_pool_imp_->eval(in, out, order);
+    
+    return out;
+}
+
+std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(const std::array<uint8_t, kMessageSize> &in, uint8_t order) const
+{
+    return tdp_pool_imp_->eval(in, order);
+}
+    
+uint8_t TdpMultPool::maximum_order() const
+{
+    return tdp_pool_imp_->maximum_order();
+}
+uint8_t TdpMultPool::pool_size() const
+{
+    return tdp_pool_imp_->pool_size();
+}
+
 }
 }

@@ -33,6 +33,7 @@ namespace crypto
 
 class TdpImpl; // not defined in the header
 class TdpInverseImpl; // not defined in the header
+class TdpMultPoolImpl; // not defined in the header
 
 /*****
 * Tdp class
@@ -58,7 +59,7 @@ public:
     void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;    
     std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
-	
+    
 private:
 	TdpImpl *tdp_imp_; // opaque pointer
 
@@ -92,6 +93,32 @@ private:
 	TdpInverseImpl *tdp_inv_imp_; // opaque pointer
 
 };
+
+    class TdpMultPool{
+    public:
+        static constexpr size_t kMessageSize = 384;
+        
+        TdpMultPool(const std::string& pk, const uint8_t size);
+        
+        virtual ~TdpMultPool();
+        
+        std::string public_key() const;
+        
+        std::string sample() const;
+        std::array<uint8_t, kMessageSize> sample_array() const;
+        
+        void eval(const std::string &in, std::string &out, uint8_t order) const;
+        std::string eval(const std::string &in, uint8_t order) const;
+        std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in, uint8_t order) const;
+        
+        uint8_t maximum_order() const;
+        uint8_t pool_size() const;
+
+    private:
+        TdpMultPoolImpl *tdp_pool_imp_; // opaque pointer
+        
+    };
+    
 
 }
 }

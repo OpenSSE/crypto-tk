@@ -22,3 +22,4 @@
 
 void tdp_correctness_test();
 void tdp_functional_test();
+void tdp_mult_eval_test();

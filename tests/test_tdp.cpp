@@ -28,6 +28,7 @@
 using namespace std;
 
 #define TEST_COUNT 10
+#define POOL_COUNT 20
 
 void tdp_correctness_test()
 {
@@ -72,5 +73,30 @@ void tdp_functional_test()
         
         
         BOOST_CHECK(sample == v);
+    }
+}
+
+
+void tdp_mult_eval_test()
+{
+    for (size_t i = 0; i < TEST_COUNT; i++) {
+        sse::crypto::TdpInverse tdp_inv;
+        
+        string pk = tdp_inv.public_key();
+        
+        sse::crypto::TdpMultPool pool(pk, POOL_COUNT);
+        sse::crypto::Tdp tdp(pk);
+        
+        
+        string sample = pool.sample();
+        string v1, v2;
+        v2 = sample;
+        for (size_t j = 1; j < pool.maximum_order(); j++) {
+            v1 = pool.eval(sample, j);
+            v2 = tdp_inv.eval(v2);
+
+            BOOST_CHECK(v1 == v2);
+        }
+        
     }
 }

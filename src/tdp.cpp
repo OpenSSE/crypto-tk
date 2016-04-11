@@ -610,10 +610,29 @@ std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(const std::array<uint8_
     return tdp_pool_imp_->eval(in, order);
 }
     
+void TdpMultPool::eval(const std::string &in, std::string &out) const
+{
+    static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in, out);
+}
+
+std::string TdpMultPool::eval(const std::string &in) const
+{
+    std::string out;
+    static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in, out);
+    
+    return out;
+}
+
+std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(const std::array<uint8_t, kMessageSize> &in) const
+{
+    return static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in);
+}
+
 uint8_t TdpMultPool::maximum_order() const
 {
     return tdp_pool_imp_->maximum_order();
 }
+    
 uint8_t TdpMultPool::pool_size() const
 {
     return tdp_pool_imp_->pool_size();

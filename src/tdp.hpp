@@ -106,7 +106,11 @@ private:
         
         std::string sample() const;
         std::array<uint8_t, kMessageSize> sample_array() const;
-        
+
+        void eval(const std::string &in, std::string &out) const;
+        std::string eval(const std::string &in) const;
+        std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
+
         void eval(const std::string &in, std::string &out, uint8_t order) const;
         std::string eval(const std::string &in, uint8_t order) const;
         std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in, uint8_t order) const;

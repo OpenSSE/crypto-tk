@@ -70,7 +70,7 @@ private:
 	
 class TdpInverse {
 public:    
-    static constexpr size_t kMessageSize = 384;
+    static constexpr size_t kMessageSize = Tdp::kMessageSize;
 
     TdpInverse();
     TdpInverse(const std::string& sk);
@@ -106,7 +106,7 @@ private:
 
 class TdpMultPool{
 public:
-    static constexpr size_t kMessageSize = 384;
+    static constexpr size_t kMessageSize = Tdp::kMessageSize;
     
     TdpMultPool(const std::string& pk, const uint8_t size);
     

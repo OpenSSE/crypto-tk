@@ -412,7 +412,42 @@ void tdp()
     cout << endl;
 }
 
+void bench_mult_invert_tdp()
+{
+    for (size_t i = 1; i < 100; i++) {
+        sse::crypto::TdpInverse tdp_inv;
+        
+        string pk = tdp_inv.public_key();
+        
+        sse::crypto::Tdp tdp(pk);
+        size_t mult_count = i;
+        
+        string sample = tdp_inv.sample();
+        string goal, v;
+        
+        auto begin_mult = std::chrono::high_resolution_clock::now();
+        goal = tdp_inv.invert_mult(sample, mult_count);
+        auto end_mult = std::chrono::high_resolution_clock::now();
+        
+        std::chrono::duration<double, std::milli> time_mult = end_mult - begin_mult;
+        std::cout << "Mult " << mult_count << ": " << time_mult.count() << " ms" << std::endl;
+
+        
+        v = sample;
+        auto begin_iter = std::chrono::high_resolution_clock::now();
+
+        for (size_t j = 0; j < mult_count; j++) {
+            v = tdp_inv.invert(v);
+        }
+        auto end_iter = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double, std::milli> time_iter = end_iter - begin_iter;
+        std::cout << "Iter " << mult_count << ": " << time_iter.count() << " ms" << std::endl;
+        std::cout << std::endl;
+    }
+
+}
 int main( int argc, char* argv[] ) {
-    tdp();
+    bench_mult_invert_tdp();
     return 0;
 }

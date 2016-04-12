@@ -54,7 +54,7 @@ public:
     
     TdpImpl(const std::string& pk);
     
-    ~TdpImpl();
+    virtual ~TdpImpl();
     
     
     RSA* get_rsa_key() const;
@@ -86,13 +86,17 @@ public:
     TdpInverseImpl();
     TdpInverseImpl(const std::string& sk);
     TdpInverseImpl(const TdpInverseImpl& tdp);
-    
+    ~TdpInverseImpl();
+
     std::string private_key() const;
     void invert(const std::string &in, std::string &out) const;
     std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const;
 
     std::array<uint8_t, kMessageSpaceSize> invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const;
     void invert_mult(const std::string &in, std::string &out, uint32_t order) const;
+    
+private:
+    BIGNUM *phi_, *p_1_, *q_1_;
 };
 
 class TdpMultPoolImpl : public TdpImpl
@@ -345,6 +349,14 @@ TdpInverseImpl::TdpInverseImpl()
         throw std::runtime_error("Invalid RSA key generation.");
     }
     
+    // initialize the useful variables
+    phi_ = BN_new();
+    p_1_ = BN_dup(get_rsa_key()->p);
+    q_1_ = BN_dup(get_rsa_key()->q);
+    BN_sub_word(p_1_, 1);
+    BN_sub_word(q_1_, 1);
+    BN_mul(phi_, p_1_, q_1_, bn_ctx_);
+
     BN_free(bne);
 }
 
@@ -369,13 +381,36 @@ TdpInverseImpl::TdpInverseImpl(const std::string& sk)
     // close and destroy the BIO
     BIO_set_close(mem, BIO_NOCLOSE); // So BIO_free() leaves BUF_MEM alone
     BIO_free(mem);
+    
+    // initialize the useful variables
+    phi_ = BN_new();
+    p_1_ = BN_dup(get_rsa_key()->p);
+    q_1_ = BN_dup(get_rsa_key()->q);
+    BN_sub_word(p_1_, 1);
+    BN_sub_word(q_1_, 1);
+    BN_mul(phi_, p_1_, q_1_, bn_ctx_);
 }
 
 TdpInverseImpl::TdpInverseImpl(const TdpInverseImpl& tdp)
 {
     set_rsa_key(RSAPrivateKey_dup(tdp.rsa_key_));
+
+    // initialize the useful variables
+    phi_ = BN_new();
+    p_1_ = BN_dup(get_rsa_key()->p);
+    q_1_ = BN_dup(get_rsa_key()->q);
+    BN_sub_word(p_1_, 1);
+    BN_sub_word(q_1_, 1);
+    BN_mul(phi_, p_1_, q_1_, bn_ctx_);
 }
     
+TdpInverseImpl::~TdpInverseImpl()
+{
+    BN_free(phi_);
+    BN_free(p_1_);
+    BN_free(q_1_);
+}
+
 std::string TdpInverseImpl::private_key() const
 {
     int ret;
@@ -444,101 +479,45 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
     return out;
 }
 
-    std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const
-    {
-        std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
-        
-        int ret;
-        
-        if(in.size() != rsa_size())
-        {
-            throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
-        }
-        RSA* tmp_key = RSAPrivateKey_dup(get_rsa_key());
-        
-        BIGNUM *phi = BN_new();
-        BIGNUM *p_1 = BN_dup(tmp_key->p);
-        BN_sub_word(p_1, 1);
-        BIGNUM *q_1 = BN_dup(tmp_key->q);
-        BN_sub_word(q_1, 1);
-        BN_mul(phi, p_1, q_1, bn_ctx_);
-        
-        BIGNUM *bn_order = BN_new();
-        BN_set_word(bn_order, order);
-        BIGNUM *d = BN_dup(tmp_key->d);
-        BIGNUM *d_o = BN_new();
-
-        //    BN_mod_mul(tmp_key->d, d, bn_order, phi, bn_ctx_);
-        BN_mod_exp(d_o, tmp_key->d, bn_order, phi, bn_ctx_);
-//        BN_exp(d_o, d, bn_order, bn_ctx_);
-//        BN_mod(d_o_mod, d_o, phi, bn_ctx_);
-        
-        BN_swap(tmp_key->d, d_o);
-
-        RSA_blinding_off(tmp_key);
-        BN_mod(tmp_key->dmp1, tmp_key->d, p_1, bn_ctx_);
-        BN_mod(tmp_key->dmq1, tmp_key->d, q_1, bn_ctx_);
-        BN_mod_inverse(tmp_key->iqmp, tmp_key->q, tmp_key->p, bn_ctx_);
-
-        ret = RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), out.data(), tmp_key, RSA_NO_PADDING);
-        
-        RSA_free(tmp_key);
-        BN_free(phi);
-        BN_free(p_1);
-        BN_free(q_1);
-        BN_free(bn_order);
-        BN_free(d);
-        BN_free(d_o);
-        
-        return out;
-    }
+std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const
+{
+    std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
     
-//
-//std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const
-//{
-//    std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
-//    
-//    int ret;
-//    
-//    if(in.size() != rsa_size())
-//    {
-//        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
-//    }
-//    RSA* tmp_key = RSAPrivateKey_dup(get_rsa_key());
-//    
-//    BIGNUM *phi = BN_dup(tmp_key->p);
-//    BN_sub_word(phi, 1);
-//    BIGNUM *q_1 = BN_dup(tmp_key->q);
-//    BN_sub_word(q_1, 1);
-//    BN_mul(phi, phi, q_1, bn_ctx_);
-//    
-//    BIGNUM *bn_order = BN_new();
-//    BN_set_word(bn_order, order);
-//    BIGNUM *d = BN_dup(tmp_key->d);
-//    BIGNUM *d_o = BN_new();
-//    
-////    BN_mod_mul(tmp_key->d, d, bn_order, phi, bn_ctx_);
-////    BN_mod_exp(d_o, d, bn_order, phi, bn_ctx_);
-//        BN_exp(d_o, d, bn_order, bn_ctx_);
-//
-//    BIGNUM *x, *y;
-//    x = BN_bin2bn(in.data(), in.size(), NULL);
-//    y = BN_new();
-//    
-//    BN_mod_exp(y, x, d_o, rsa_key_->n, bn_ctx_);
-//    
-//    BN_bn2bin(y, out.data());
-////    ret = RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), out.data(), tmp_key, RSA_NO_PADDING);
-//    
-//    RSA_free(tmp_key);
-//    BN_free(phi);
-//    BN_free(q_1);
-//    BN_free(bn_order);
-//    BN_free(d);
-//
-//    return out;
-//}
+    
+    if(in.size() != rsa_size())
+    {
+        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+    }
+    RSA* tmp_key = RSAPrivateKey_dup(get_rsa_key());
 
+    tmp_key->d = BN_new();
+    
+    BIGNUM *bn_order = BN_new();
+    BN_set_word(bn_order, order);
+
+    BN_mod_exp(tmp_key->d, get_rsa_key()->d, bn_order, phi_, bn_ctx_);
+
+    RSA_blinding_off(tmp_key);
+    
+    // setting these do not improve computation performances
+    // it actually seems to reduce them ...
+    
+//    BN_mod(tmp_key->dmp1, tmp_key->d, p_1_, bn_ctx_);
+//    BN_mod(tmp_key->dmq1, tmp_key->d, q_1_, bn_ctx_);
+//    BN_mod_inverse(tmp_key->iqmp, tmp_key->q, tmp_key->p, bn_ctx_);
+    tmp_key->dmp1 = NULL;
+    tmp_key->dmq1 = NULL;
+    tmp_key->iqmp = NULL;
+    
+    RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), out.data(), tmp_key, RSA_NO_PADDING);
+    
+
+    RSA_free(tmp_key);
+    BN_free(bn_order);
+    
+    return out;
+}
+    
 void TdpInverseImpl::invert_mult(const std::string &in, std::string &out, uint32_t order) const
 {
     std::array<uint8_t, kMessageSpaceSize> in_array;

@@ -56,6 +56,9 @@ public:
     std::string sample() const;
     std::array<uint8_t, kMessageSize> sample_array() const;
     
+    std::string generate(const std::string& key, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
+
     void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;    
     std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
@@ -80,6 +83,9 @@ public:
 
     std::string sample() const;
     std::array<uint8_t, kMessageSize> sample_array() const;
+
+    std::string generate(const std::string& key, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
 
     void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;
@@ -106,6 +112,8 @@ private:
         
         std::string sample() const;
         std::array<uint8_t, kMessageSize> sample_array() const;
+        std::string generate(const std::string& key, const std::string& seed) const;
+        std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
 
         void eval(const std::string &in, std::string &out) const;
         std::string eval(const std::string &in) const;

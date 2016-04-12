@@ -47,7 +47,7 @@ namespace crypto
  * with different output lenght
 ******/
 
-template <uint8_t NBYTES> class Prf
+template <uint16_t NBYTES> class Prf
 {
 public:
 	typedef HMac<Hash> PrfBase;
@@ -105,7 +105,7 @@ private:
 
 // PRF instantiation
 // For now, use HMAC-Hash where Hash is the hash function defined in hash.hpp
-template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in, const size_t &length) const
+template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in, const size_t &length) const
 {
 	static_assert(NBYTES != 0, "PRF output length invalid: length must be strictly larger than 0");
 
@@ -128,7 +128,7 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const uns
 }
 
 // Convienience function to run the PRF over a C++ string
-template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::string &s) const
+template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::string &s) const
 {
 	return prf((unsigned char*)s.data() , s.length());
 }
@@ -141,7 +141,7 @@ template <uint8_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std
 //}
 
 
-template <uint8_t NBYTES> std::string Prf<NBYTES>::prf_string(const std::string &s) const
+template <uint16_t NBYTES> std::string Prf<NBYTES>::prf_string(const std::string &s) const
 {
 	std::array<uint8_t, NBYTES> tmp = prf(s);
 	std::string result(tmp.begin(), tmp.end());

@@ -91,45 +91,49 @@ public:
 	std::string eval(const std::string &in) const;
     std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
 
-	void invert(const std::string &in, std::string &out) const;
-	std::string invert(const std::string &in) const;
+    void invert(const std::string &in, std::string &out) const;
+    std::string invert(const std::string &in) const;
     std::array<uint8_t, kMessageSize> invert(const std::array<uint8_t, kMessageSize> &in) const;
-
-private:	
+    
+    void invert_mult(const std::string &in, std::string &out, uint32_t order) const;
+    std::string invert_mult(const std::string &in, uint32_t order) const;
+    std::array<uint8_t, kMessageSize> invert_mult(const std::array<uint8_t, kMessageSize> &in, uint32_t order) const;
+    
+private:
 	TdpInverseImpl *tdp_inv_imp_; // opaque pointer
 
 };
 
-    class TdpMultPool{
-    public:
-        static constexpr size_t kMessageSize = 384;
-        
-        TdpMultPool(const std::string& pk, const uint8_t size);
-        
-        virtual ~TdpMultPool();
-        
-        std::string public_key() const;
-        
-        std::string sample() const;
-        std::array<uint8_t, kMessageSize> sample_array() const;
-        std::string generate(const std::string& key, const std::string& seed) const;
-        std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
+class TdpMultPool{
+public:
+    static constexpr size_t kMessageSize = 384;
+    
+    TdpMultPool(const std::string& pk, const uint8_t size);
+    
+    virtual ~TdpMultPool();
+    
+    std::string public_key() const;
+    
+    std::string sample() const;
+    std::array<uint8_t, kMessageSize> sample_array() const;
+    std::string generate(const std::string& key, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
 
-        void eval(const std::string &in, std::string &out) const;
-        std::string eval(const std::string &in) const;
-        std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
+    void eval(const std::string &in, std::string &out) const;
+    std::string eval(const std::string &in) const;
+    std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in) const;
 
-        void eval(const std::string &in, std::string &out, uint8_t order) const;
-        std::string eval(const std::string &in, uint8_t order) const;
-        std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in, uint8_t order) const;
-        
-        uint8_t maximum_order() const;
-        uint8_t pool_size() const;
+    void eval(const std::string &in, std::string &out, uint8_t order) const;
+    std::string eval(const std::string &in, uint8_t order) const;
+    std::array<uint8_t, kMessageSize> eval(const std::array<uint8_t, kMessageSize> &in, uint8_t order) const;
+    
+    uint8_t maximum_order() const;
+    uint8_t pool_size() const;
 
-    private:
-        TdpMultPoolImpl *tdp_pool_imp_; // opaque pointer
-        
-    };
+private:
+    TdpMultPoolImpl *tdp_pool_imp_; // opaque pointer
+    
+};
     
 
 }

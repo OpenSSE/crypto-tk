@@ -61,4 +61,5 @@ BOOST_AUTO_TEST_CASE(tdp) {
     tdp_correctness_test();
     tdp_functional_test();
     tdp_mult_eval_test();
+    tdp_mult_inv_test();
 }

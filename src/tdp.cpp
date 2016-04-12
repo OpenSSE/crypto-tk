@@ -225,27 +225,9 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::eval(const std::array<u
 
 std::string TdpImpl::sample() const
 {
-    // I don't really trust OpenSSL PRNG, but this is the simplest way
-    int ret;
-    BIGNUM *rnd;
+    std::array<uint8_t, TdpImpl::kMessageSpaceSize> tmp = sample_array();
     
-    rnd = BN_new();
-    
-    ret = BN_rand_range(rnd, rsa_key_->n);
-    if(ret != 1)
-    {
-        throw std::runtime_error("Invalid random number generation.");
-    }
-    
-    unsigned char *buf = new unsigned char[BN_num_bytes(rnd)];
-    BN_bn2bin(rnd, buf);
-    
-    std::string v(reinterpret_cast<const char*>(buf), BN_num_bytes(rnd));
-    
-    BN_free(rnd);
-    delete [] buf;
-    
-    return v;
+    return std::string(tmp.begin(), tmp.end());
 }
 
 std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
@@ -254,7 +236,8 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
     int ret;
     BIGNUM *rnd;
     std::array<uint8_t, kMessageSpaceSize> out;
-    
+    std::fill(out.begin(), out.end(), 0);
+
     rnd = BN_new();
     
     ret = BN_rand_range(rnd, rsa_key_->n);
@@ -262,8 +245,9 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
     {
         throw std::runtime_error("Invalid random number generation.");
     }
+    size_t offset = kMessageSpaceSize - BN_num_bytes(rnd);
     
-    BN_bn2bin(rnd, out.data());
+    BN_bn2bin(rnd, out.data()+offset);
     BN_free(rnd);
     
     return out;
@@ -271,31 +255,9 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
 
 std::string TdpImpl::generate(const std::string& key, const std::string& seed) const
 {
-    // Generate a pseudo random string of length kStatisticalSecurity/8 + kMessageSpaceSize bytes
-    constexpr uint16_t rnd_length = kStatisticalSecurity/8 + kMessageSpaceSize;
-    Prf<rnd_length> prg(key);
+    std::array<uint8_t, TdpImpl::kMessageSpaceSize> tmp = generate_array(key, seed);
     
-    std::array<uint8_t, rnd_length> rnd = prg.prf(seed);
-    
-    BIGNUM *rnd_bn, *rnd_mod;
-    
-    rnd_bn = BN_bin2bn(rnd.data(), rnd_length, NULL);
-    
-    // now, take rnd_bn mod N
-    rnd_mod = BN_new();
-    
-    BN_mod(rnd_mod, rnd_bn, rsa_key_->n, bn_ctx_);
-    
-    unsigned char *buf = new unsigned char[BN_num_bytes(rnd_mod)];
-    BN_bn2bin(rnd_mod, buf);
-    
-    std::string v(reinterpret_cast<const char*>(buf), BN_num_bytes(rnd_mod));
-    
-    delete [] buf;
-    BN_free(rnd_bn);
-    BN_free(rnd_mod);
-    
-    return v;
+    return std::string(tmp.begin(), tmp.end());
 }
 
 std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::generate_array(const std::string& key, const std::string& seed) const
@@ -317,7 +279,10 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::generate_array(const st
     
     
     std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
-    BN_bn2bin(rnd_mod, out.data());
+    std::fill(out.begin(), out.end(), 0);
+    size_t offset = kMessageSpaceSize - BN_num_bytes(rnd_mod);
+    
+    BN_bn2bin(rnd_mod, out.data()+offset);
 
     BN_free(rnd_bn);
     BN_free(rnd_mod);

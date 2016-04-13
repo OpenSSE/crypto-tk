@@ -29,7 +29,7 @@ using namespace std;
 
 #define TEST_COUNT 10
 #define POOL_COUNT 20
-#define INV_MULT_COUNT 1000
+#define INV_MULT_COUNT 200
 
 void tdp_correctness_test()
 {

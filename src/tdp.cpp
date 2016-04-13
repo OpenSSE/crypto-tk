@@ -98,7 +98,6 @@ public:
     
 private:
     BIGNUM *phi_, *p_1_, *q_1_;
-    BN_CTX *inv_ctx_;
 };
 
 class TdpMultPoolImpl : public TdpImpl
@@ -310,12 +309,7 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::generate_array(const st
 }
 
 TdpInverseImpl::TdpInverseImpl()
-    : inv_ctx_(BN_CTX_new())
 {
-    if (inv_ctx_ == NULL) {
-        throw std::runtime_error("Invalid BN_CTX initialization.");
-    }
-    
     int ret;
     
     // initialize the key
@@ -350,12 +344,7 @@ TdpInverseImpl::TdpInverseImpl()
 }
 
 TdpInverseImpl::TdpInverseImpl(const std::string& sk)
-    : inv_ctx_(BN_CTX_new())
 {
-    if (inv_ctx_ == NULL) {
-        throw std::runtime_error("Invalid BN_CTX initialization.");
-    }
-
     // create a BIO from the std::string
     BIO *mem;
     mem = BIO_new_mem_buf(((void*)sk.data()), (int)sk.length());
@@ -400,7 +389,6 @@ TdpInverseImpl::TdpInverseImpl(const TdpInverseImpl& tdp)
     
 TdpInverseImpl::~TdpInverseImpl()
 {
-    BN_CTX_free(inv_ctx_);
     BN_free(phi_);
     BN_free(p_1_);
     BN_free(q_1_);
@@ -525,11 +513,10 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
 //        RSA* tmp_key = RSAPrivateKey_dup(get_rsa_key());
         
 //        tmp_key->d = BN_new();
-        BN_CTX_start(inv_ctx_);
         
-        BIGNUM *bn_order = BN_CTX_get(inv_ctx_);
-        BIGNUM *d_p = BN_CTX_get(inv_ctx_);
-        BIGNUM *d_q = BN_CTX_get(inv_ctx_);
+        BIGNUM *bn_order = BN_new();
+        BIGNUM *d_p = BN_new();
+        BIGNUM *d_q = BN_new();
         BN_set_word(bn_order, order);
         
         BN_mod_exp(d_p, get_rsa_key()->d, bn_order, p_1_, bn_ctx_);
@@ -537,13 +524,13 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         
 //        RSA_blinding_off(tmp_key);
         
-        BIGNUM *x = BN_CTX_get(inv_ctx_);
+        BIGNUM *x = BN_new();
         BN_bin2bn(in.data(), (unsigned int)in.size(), x);
         
-        BIGNUM *y_p = BN_CTX_get(inv_ctx_);
-        BIGNUM *y_q = BN_CTX_get(inv_ctx_);
-        BIGNUM *h = BN_CTX_get(inv_ctx_);
-        BIGNUM *y = BN_CTX_get(inv_ctx_);
+        BIGNUM *y_p = BN_new();
+        BIGNUM *y_q = BN_new();
+        BIGNUM *h = BN_new();
+        BIGNUM *y = BN_new();
         
         BN_mod_exp(y_p,x,d_p, get_rsa_key()->p, bn_ctx_);
         BN_mod_exp(y_q,x,d_q, get_rsa_key()->q, bn_ctx_);
@@ -557,8 +544,13 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         BN_bn2bin(y, out.data());
         
         BN_free(bn_order);
-        BN_CTX_end(inv_ctx_);
-
+        BN_free(d_p);
+        BN_free(d_q);
+        BN_free(y_p);
+        BN_free(y_q);
+        BN_free(h);
+        BN_free(y);
+        
         return out;
     }
 

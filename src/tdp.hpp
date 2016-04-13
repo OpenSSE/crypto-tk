@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "prf.hpp"
+
 #include <cstdint>
 
 #include <array>
@@ -46,6 +48,8 @@ class TdpMultPoolImpl; // not defined in the header
 class Tdp{
 public:
     static constexpr size_t kMessageSize = 384;
+    static constexpr unsigned int kStatisticalSecurity = 64;
+    static constexpr size_t kRSAPrgSize = kMessageSize + kStatisticalSecurity;
 
 	Tdp(const std::string& pk);
 	
@@ -58,6 +62,8 @@ public:
     
     std::string generate(const std::string& key, const std::string& seed) const;
     std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
+    std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
 
     void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;    
@@ -86,6 +92,8 @@ public:
 
     std::string generate(const std::string& key, const std::string& seed) const;
     std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
+    std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
 
     void eval(const std::string &in, std::string &out) const;
 	std::string eval(const std::string &in) const;
@@ -118,6 +126,8 @@ public:
     std::array<uint8_t, kMessageSize> sample_array() const;
     std::string generate(const std::string& key, const std::string& seed) const;
     std::array<uint8_t, kMessageSize> generate_array(const std::string& key, const std::string& seed) const;
+    std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
 
     void eval(const std::string &in, std::string &out) const;
     std::string eval(const std::string &in) const;

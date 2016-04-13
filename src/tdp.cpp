@@ -77,8 +77,6 @@ protected:
     TdpImpl();
 
     RSA *rsa_key_;
-    BN_CTX *bn_ctx_;
-
 };
 
 class TdpInverseImpl : public TdpImpl
@@ -117,19 +115,11 @@ private:
     uint8_t keys_count_;
 };
 
-TdpImpl::TdpImpl() : rsa_key_(NULL), bn_ctx_(BN_CTX_new())
+TdpImpl::TdpImpl() : rsa_key_(NULL)
 {
-    if (bn_ctx_ == NULL) {
-        throw std::runtime_error("Invalid BN_CTX initialization.");
-    }
-
 }
-TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL), bn_ctx_(BN_CTX_new())
+TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
 {
-    if (bn_ctx_ == NULL) {
-        throw std::runtime_error("Invalid BN_CTX initialization.");
-    }
-
     // create a BIO from the std::string
     BIO *mem;
     mem = BIO_new_mem_buf(((void*)pk.data()), (int)pk.length());
@@ -171,7 +161,6 @@ inline uint TdpImpl::rsa_size() const
 TdpImpl::~TdpImpl()
 {
     RSA_free(rsa_key_);
-    BN_CTX_free(bn_ctx_);
 }
 
 std::string TdpImpl::public_key() const
@@ -273,13 +262,14 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
         std::array<uint8_t, Tdp::kRSAPrgSize> rnd = prg.prf(seed);
         
         BIGNUM *rnd_bn, *rnd_mod;
+        BN_CTX *ctx = BN_CTX_new();
         
         rnd_bn = BN_bin2bn(rnd.data(), Tdp::kRSAPrgSize, NULL);
         
         // now, take rnd_bn mod N
         rnd_mod = BN_new();
         
-        BN_mod(rnd_mod, rnd_bn, rsa_key_->n, bn_ctx_);
+        BN_mod(rnd_mod, rnd_bn, rsa_key_->n, ctx);
         
         
         std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
@@ -290,6 +280,7 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
         
         BN_free(rnd_bn);
         BN_free(rnd_mod);
+        BN_CTX_free(ctx);
         
         return out;
     }
@@ -338,8 +329,12 @@ TdpInverseImpl::TdpInverseImpl()
     q_1_ = BN_dup(get_rsa_key()->q);
     BN_sub_word(p_1_, 1);
     BN_sub_word(q_1_, 1);
-    BN_mul(phi_, p_1_, q_1_, bn_ctx_);
+    
+    BN_CTX* ctx = BN_CTX_new();
 
+    BN_mul(phi_, p_1_, q_1_, ctx);
+
+    BN_CTX_free(ctx);
     BN_free(bne);
 }
 
@@ -371,7 +366,10 @@ TdpInverseImpl::TdpInverseImpl(const std::string& sk)
     q_1_ = BN_dup(get_rsa_key()->q);
     BN_sub_word(p_1_, 1);
     BN_sub_word(q_1_, 1);
-    BN_mul(phi_, p_1_, q_1_, bn_ctx_);
+    
+    BN_CTX* ctx = BN_CTX_new();
+    BN_mul(phi_, p_1_, q_1_, ctx);
+    BN_CTX_free(ctx);
 }
 
 TdpInverseImpl::TdpInverseImpl(const TdpInverseImpl& tdp)
@@ -384,7 +382,12 @@ TdpInverseImpl::TdpInverseImpl(const TdpInverseImpl& tdp)
     q_1_ = BN_dup(get_rsa_key()->q);
     BN_sub_word(p_1_, 1);
     BN_sub_word(q_1_, 1);
-    BN_mul(phi_, p_1_, q_1_, bn_ctx_);
+
+    BN_CTX* ctx = BN_CTX_new();
+
+    BN_mul(phi_, p_1_, q_1_, ctx);
+    
+    BN_CTX_free(ctx);
 }
     
 TdpInverseImpl::~TdpInverseImpl()
@@ -503,6 +506,10 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
 
     std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const
     {
+        if (order == 0) {
+            return in;
+        }
+        
         std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
         
         
@@ -510,17 +517,15 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         {
             throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
         }
-//        RSA* tmp_key = RSAPrivateKey_dup(get_rsa_key());
         
-//        tmp_key->d = BN_new();
-        
+        BN_CTX* ctx = BN_CTX_new();
         BIGNUM *bn_order = BN_new();
         BIGNUM *d_p = BN_new();
         BIGNUM *d_q = BN_new();
         BN_set_word(bn_order, order);
         
-        BN_mod_exp(d_p, get_rsa_key()->d, bn_order, p_1_, bn_ctx_);
-        BN_mod_exp(d_q, get_rsa_key()->d, bn_order, q_1_, bn_ctx_);
+        BN_mod_exp(d_p, get_rsa_key()->d, bn_order, p_1_, ctx);
+        BN_mod_exp(d_q, get_rsa_key()->d, bn_order, q_1_, ctx);
         
 //        RSA_blinding_off(tmp_key);
         
@@ -532,13 +537,13 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         BIGNUM *h = BN_new();
         BIGNUM *y = BN_new();
         
-        BN_mod_exp(y_p,x,d_p, get_rsa_key()->p, bn_ctx_);
-        BN_mod_exp(y_q,x,d_q, get_rsa_key()->q, bn_ctx_);
+        BN_mod_exp(y_p,x,d_p, get_rsa_key()->p, ctx);
+        BN_mod_exp(y_q,x,d_q, get_rsa_key()->q, ctx);
         
-        BN_mod_sub(h, y_p, y_q, get_rsa_key()->p, bn_ctx_);
-        BN_mod_mul(h, h, get_rsa_key()->iqmp, get_rsa_key()->p, bn_ctx_);
+        BN_mod_sub(h, y_p, y_q, get_rsa_key()->p, ctx);
+        BN_mod_mul(h, h, get_rsa_key()->iqmp, get_rsa_key()->p, ctx);
         
-        BN_mul(y, h, get_rsa_key()->q, bn_ctx_);
+        BN_mul(y, h, get_rsa_key()->q, ctx);
         BN_add(y, y, y_q);
         
         BN_bn2bin(y, out.data());
@@ -550,6 +555,7 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         BN_free(y_q);
         BN_free(h);
         BN_free(y);
+        BN_CTX_free(ctx);
         
         return out;
     }

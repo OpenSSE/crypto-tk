@@ -113,11 +113,26 @@ template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const un
 	
     if(NBYTES > sse::crypto::Hash::kDigestSize)
     {
-        throw std::runtime_error("Invalid output length: NBYTES > Hash::kDigestSize");
-    }
-
-    
-	if(NBYTES <= sse::crypto::Hash::kDigestSize){
+        unsigned char* tmp = new unsigned char[length+1]();
+        memcpy(tmp, in, length);
+        
+        uint16_t pos = 0;
+        uint8_t i = 0;
+        for (; pos < NBYTES; pos += Hash::kDigestSize, i++) {
+//            for (; pos + Hash::kDigestSize < NBYTES; pos += Hash::kDigestSize, i++) {
+            // use a counter mode
+            tmp[length] = i;
+            
+            // fill res
+            if (NBYTES-pos >= Hash::kDigestSize) {
+                base_.hmac(tmp, length+1, result.data()+pos);
+            }else{
+                std::copy_n(base_.hmac(tmp, length+1).begin(), NBYTES-pos, result.begin()+pos);
+            }
+        }
+        
+//        throw std::runtime_error("Invalid output length: NBYTES > Hash::kDigestSize");
+    }else if(NBYTES <= sse::crypto::Hash::kDigestSize){
 		// only need one output bloc of PrfBase.
 
         std::copy_n(base_.hmac(in, length).begin(), NBYTES, result.begin());

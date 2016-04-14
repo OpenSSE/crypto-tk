@@ -24,3 +24,4 @@ void tdp_correctness_test();
 void tdp_functional_test();
 void tdp_mult_eval_test();
 void tdp_mult_inv_test();
+void tdp_full_mult_inv_test();

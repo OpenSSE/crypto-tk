@@ -475,13 +475,14 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
 //        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
 //    }
 //    RSA* tmp_key = RSAPrivateKey_dup(get_rsa_key());
+//            BN_CTX* ctx = BN_CTX_new();
 //
 //    tmp_key->d = BN_new();
 //    
 //    BIGNUM *bn_order = BN_new();
 //    BN_set_word(bn_order, order);
 //
-//    BN_mod_exp(tmp_key->d, get_rsa_key()->d, bn_order, phi_, bn_ctx_);
+//    BN_mod_exp(tmp_key->d, get_rsa_key()->d, bn_order, phi_, ctx);
 //
 //    RSA_blinding_off(tmp_key);
 //    
@@ -500,6 +501,7 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
 //
 //    RSA_free(tmp_key);
 //    BN_free(bn_order);
+//    BN_CTX_free(ctx);
 //    
 //    return out;
 //}
@@ -527,8 +529,6 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         BN_mod_exp(d_p, get_rsa_key()->d, bn_order, p_1_, ctx);
         BN_mod_exp(d_q, get_rsa_key()->d, bn_order, q_1_, ctx);
         
-//        RSA_blinding_off(tmp_key);
-        
         BIGNUM *x = BN_new();
         BN_bin2bn(in.data(), (unsigned int)in.size(), x);
         
@@ -546,7 +546,12 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         BN_mul(y, h, get_rsa_key()->q, ctx);
         BN_add(y, y, y_q);
         
-        BN_bn2bin(y, out.data());
+        
+        // bn2bin returns a BIG endian array, so be careful ...
+        size_t pos = kMessageSpaceSize - BN_num_bytes(y);
+        // set the leading bytes to 0
+        std::fill(out.begin(), out.begin()+pos, 0);
+        BN_bn2bin(y, out.data()+pos);
         
         BN_free(bn_order);
         BN_free(d_p);
@@ -555,10 +560,49 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
         BN_free(y_q);
         BN_free(h);
         BN_free(y);
+        BN_free(x);
         BN_CTX_free(ctx);
         
         return out;
     }
+
+//    std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const
+//    {
+//        if (order == 0) {
+//            return in;
+//        }
+//        
+//        std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
+//        
+//        
+//        if(in.size() != rsa_size())
+//        {
+//            throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+//        }
+//        
+//        BN_CTX* ctx = BN_CTX_new();
+//        BIGNUM *bn_order = BN_new();
+//        BIGNUM *d = BN_new();
+//        BN_set_word(bn_order, order);
+//        
+//        BN_mod_exp(d, get_rsa_key()->d, bn_order, phi_, ctx);
+//        
+//        BIGNUM *x = BN_new();
+//        BN_bin2bn(in.data(), (unsigned int)in.size(), x);
+//        
+//        BIGNUM *y = BN_new();
+//        
+//        BN_mod_exp(y,x,d, get_rsa_key()->n, ctx);
+//        
+//        BN_bn2bin(y, out.data());
+//        
+//        BN_free(bn_order);
+//        BN_free(y);
+//        BN_free(x);
+//        BN_CTX_free(ctx);
+//        
+//        return out;
+//    }
 
 void TdpInverseImpl::invert_mult(const std::string &in, std::string &out, uint32_t order) const
 {

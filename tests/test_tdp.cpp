@@ -29,7 +29,7 @@ using namespace std;
 
 #define TEST_COUNT 10
 #define POOL_COUNT 20
-#define INV_MULT_COUNT 200
+#define INV_MULT_COUNT 1000
 
 void tdp_correctness_test()
 {
@@ -124,4 +124,43 @@ void tdp_mult_inv_test()
         BOOST_CHECK(goal == v);
         
     }
+}
+
+void tdp_full_mult_inv_test()
+{
+        sse::crypto::TdpInverse tdp_inv;
+        
+        string pk = tdp_inv.public_key();
+        
+        sse::crypto::Tdp tdp(pk);
+        
+        
+        string sample = tdp_inv.sample();
+        string v1, v2;
+        
+//        goal = tdp_inv.invert_mult(sample, INV_MULT_COUNT);
+    
+        v2 = sample;
+        for (uint32_t j = 0; j < INV_MULT_COUNT; j++) {
+            v2 = tdp_inv.invert(v2);
+            v1 = tdp_inv.invert_mult(sample, j+1);
+            BOOST_CHECK(v1 == v2);
+            
+            if (v1 != v2) {
+                std::cout << j+1 << std::endl;
+                for(unsigned char c : v1)
+                {
+                    cout << hex << setw(2) << setfill('0') << (uint) c;
+                }
+                cout << "\n\n";
+                for(unsigned char c : v2)
+                {
+                    cout << hex << setw(2) << setfill('0') << (uint) c;
+                }
+                cout << "\n==================";
+                cout << "\n\n";
+
+            }
+        }
+    
 }

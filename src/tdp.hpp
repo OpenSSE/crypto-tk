@@ -47,7 +47,7 @@ class TdpMultPoolImpl; // not defined in the header
 
 class Tdp{
 public:
-    static constexpr size_t kMessageSize = 384;
+    static constexpr size_t kMessageSize = 256;
     static constexpr unsigned int kStatisticalSecurity = 64;
     static constexpr size_t kRSAPrgSize = kMessageSize + kStatisticalSecurity;
 

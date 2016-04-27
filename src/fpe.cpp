@@ -22,6 +22,8 @@
 #include "aez/aez.h"
 #include "random.hpp"
 
+#include <limits.h>
+
 #include <cstring>
 #include <exception>
 #include <iostream>

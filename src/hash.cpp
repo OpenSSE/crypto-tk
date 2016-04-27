@@ -25,6 +25,8 @@
 
 #include <cstring>
 
+#include <stdexcept>
+
 namespace sse
 {
 	

@@ -124,7 +124,7 @@ template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const un
             tmp[length] = i;
             
             // fill res
-            if (NBYTES-pos >= Hash::kDigestSize) {
+            if ((size_t)(NBYTES-pos) >= Hash::kDigestSize) {
                 base_.hmac(tmp, length+1, result.data()+pos);
             }else{
                 std::copy_n(base_.hmac(tmp, length+1).begin(), NBYTES-pos, result.begin()+pos);

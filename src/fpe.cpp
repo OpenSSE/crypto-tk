@@ -87,16 +87,24 @@ std::string Fpe::encrypt(const std::string &in)
 
 uint32_t Fpe::encrypt(const uint32_t &in)
 {
-	uint32_t out;
-	fpe_imp_->encrypt((unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
-	return out;
+    uint32_t out;
+    fpe_imp_->encrypt((unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
+    return out;
 }
 
+uint64_t Fpe::encrypt_64(const uint64_t &in)
+{
+    uint64_t out;
+    fpe_imp_->encrypt((unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
+    return out;
+}
+    
 
 void Fpe::decrypt(const std::string &in, std::string &out)
 {
 	fpe_imp_->decrypt(in, out);
 }
+
 std::string Fpe::decrypt(const std::string &in)
 {
 	std::string out;
@@ -110,7 +118,14 @@ uint32_t Fpe::decrypt(const uint32_t &in)
 	fpe_imp_->decrypt((unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
 	return out;
 }
-	
+
+uint64_t Fpe::decrypt_64(const uint64_t &in)
+{
+    uint64_t out;
+    fpe_imp_->decrypt((unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
+    return out;
+}
+
 Fpe::FpeImpl::FpeImpl()
 {
 	unsigned char k[kKeySize];

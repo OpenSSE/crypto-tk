@@ -58,11 +58,13 @@ public:
 	void encrypt(const std::string &in, std::string &out);
 	std::string encrypt(const std::string &in);
 	uint32_t encrypt(const uint32_t &in);
+    uint64_t encrypt_64(const uint64_t &in);
 
 	void decrypt(const std::string &in, std::string &out);
 	std::string decrypt(const std::string &in);
 	uint32_t decrypt(const uint32_t &in);
-	
+    uint64_t decrypt_64(const uint64_t &in);
+
 	// Again, avoid any assignement of Cipher objects
 	Fpe& operator=(const Fpe& h) = delete;
 	Fpe& operator=(Fpe& h) = delete;

@@ -21,6 +21,9 @@ env.Append(ASFLAGS = ['-D', 'LINUX'])
 
 if env['PLATFORM'] == 'darwin':
     env.Append(ASFLAGS = ['-f', 'macho64'])
+    # Add the OpenSSL include path from Homebrew
+    env.Append(CPPPATH=['/usr/local/opt/openssl/include'])
+    env.Append(LIBPATH=['/usr/local/opt/openssl/lib'])
 else:
     env.Append(ASFLAGS = ['-f', 'x64', '-f', 'elf64'])
 
@@ -61,7 +64,7 @@ shared_lib_env = env.Clone();
 
 if env['PLATFORM'] == 'darwin':
     # We have to add '@rpath' to the library install name
-    shared_lib_env.Append(LINKFLAGS = ['-install_name', '@rpath/libsse_crypto.dylib'])
+    shared_lib_env.Append(LINKFLAGS = ['-install_name', '@rpath/libsse_crypto.dylib'])    
     
 library_build_prefix = 'library'
 shared_lib = shared_lib_env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects);

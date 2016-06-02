@@ -176,7 +176,7 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 		
 		// memcpy(digest, dbuf, 64);
 	
-		delete buffer;
+		delete [] buffer;
 	// }
 }
 

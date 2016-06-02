@@ -131,9 +131,9 @@
 		6CC2D5151C31945000334ADD /* print.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43E1C3185D700334ADD /* print.hpp */; };
 		6CC2D5161C31945000334ADD /* print_fwd.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43F1C3185D700334ADD /* print_fwd.hpp */; };
 		6CC2D5171C31945000334ADD /* static_repeat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4401C3185D700334ADD /* static_repeat.hpp */; };
-		6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; settings = {ASSET_TAGS = (); }; };
-		6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; settings = {ASSET_TAGS = (); }; };
-		6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; settings = {ASSET_TAGS = (); }; };
+		6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
+		6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
+		6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
 		6CF4160B1CB4FF1D00C448D4 /* utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CF416071CB4FF1D00C448D4 /* utils.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -918,8 +918,12 @@
 				HEADER_SEARCH_PATHS = (
 					src,
 					/usr/local/include,
+					/usr/local/opt/openssl/include,
 				);
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					/usr/local/opt/openssl/lib,
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -962,8 +966,12 @@
 				HEADER_SEARCH_PATHS = (
 					src,
 					/usr/local/include,
+					/usr/local/opt/openssl/include,
 				);
-				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					/usr/local/opt/openssl/lib,
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
 					"-maes",

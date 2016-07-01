@@ -93,12 +93,12 @@ namespace sse
             return out;
         }
 
-        void Prg::derive(const size_t offset, const size_t len, std::string &out) const
+        void Prg::derive(const uint32_t offset, const size_t len, std::string &out) const
         {
             prg_imp_->derive(offset, len, out);
         }
         
-        std::string Prg::derive(const size_t offset, const size_t len) const
+        std::string Prg::derive(const uint32_t offset, const size_t len) const
         {
             std::string out;
             

@@ -7,14 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		311934B11D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
+		311934B21D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
+		311934B31D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
+		311934B41D26B2360031804B /* block_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 311934B01D26B2360031804B /* block_hash.hpp */; };
+		311934B51D27172A0031804B /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
 		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		316F0D3F1D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D401D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D411D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D421D25600700F87904 /* prg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 316F0D3E1D25600700F87904 /* prg.hpp */; };
-		316F0D451D2565CB00F87904 /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
-		316F0D461D2565CB00F87904 /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
-		316F0D471D2565CB00F87904 /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
 		316F0D481D2565CB00F87904 /* test_prg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 316F0D441D2565CB00F87904 /* test_prg.hpp */; };
 		318C729B1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729C1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
@@ -200,6 +202,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		311934AF1D26B2360031804B /* block_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_hash.cpp; sourceTree = "<group>"; };
+		311934B01D26B2360031804B /* block_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = block_hash.hpp; sourceTree = "<group>"; };
 		315D453A1C98909A00590A01 /* test_tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_tdp.cpp; sourceTree = "<group>"; };
 		315D453B1C98909A00590A01 /* test_tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_tdp.hpp; sourceTree = "<group>"; };
 		316F0D3D1D25600700F87904 /* prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prg.cpp; sourceTree = "<group>"; };
@@ -378,6 +382,8 @@
 				318C729A1C9730140040AEE7 /* tdp.hpp */,
 				316F0D3D1D25600700F87904 /* prg.cpp */,
 				316F0D3E1D25600700F87904 /* prg.hpp */,
+				311934AF1D26B2360031804B /* block_hash.cpp */,
+				311934B01D26B2360031804B /* block_hash.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -642,6 +648,7 @@
 				6CC2D4E21C31941500334ADD /* blake2s-load-sse41.h in Headers */,
 				6CC2D4FA1C31942F00334ADD /* GF2m.hpp in Headers */,
 				6CC2D4EE1C31942700334ADD /* GLS254.hpp in Headers */,
+				311934B41D26B2360031804B /* block_hash.hpp in Headers */,
 				316F0D481D2565CB00F87904 /* test_prg.hpp in Headers */,
 				6CC2D4F41C31942F00334ADD /* compute_linear_operation_table.hpp in Headers */,
 				6CC2D5141C31945000334ADD /* logical.hpp in Headers */,
@@ -822,6 +829,7 @@
 				6CC2D48D1C318B1B00334ADD /* encryption.cpp in Sources */,
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
 				6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */,
+				311934B11D26B2360031804B /* block_hash.cpp in Sources */,
 				6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */,
 				6CC2D4961C318B4100334ADD /* sha512_sse4.asm in Sources */,
@@ -836,7 +844,7 @@
 				6CC2D4931C318B3B00334ADD /* sha512_base.c in Sources */,
 				318C729B1C9730140040AEE7 /* tdp.cpp in Sources */,
 				6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */,
-				316F0D451D2565CB00F87904 /* test_prg.cpp in Sources */,
+				311934B51D27172A0031804B /* test_prg.cpp in Sources */,
 				6CC2D4871C31889B00334ADD /* hash.cpp in Sources */,
 				6CC2D48A1C3188A000334ADD /* aez.c in Sources */,
 				6CC2D4911C318B1B00334ADD /* test_hmac.cpp in Sources */,
@@ -855,6 +863,7 @@
 				6CC2D49E1C318F2500334ADD /* set_hash.cpp in Sources */,
 				316F0D401D25600700F87904 /* prg.cpp in Sources */,
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
+				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
 				6CC2D4B81C318F2E00334ADD /* main.cpp in Sources */,
 				6CC2D4A01C318F2500334ADD /* sha512_sse4.asm in Sources */,
 				6CC2D4A11C318F2500334ADD /* sha512_avx2_rorx.asm in Sources */,
@@ -866,7 +875,6 @@
 				6CC2D4A91C318F2500334ADD /* hash.cpp in Sources */,
 				6CC2D4AA1C318F2500334ADD /* aez.c in Sources */,
 				318C729C1C9730140040AEE7 /* tdp.cpp in Sources */,
-				316F0D461D2565CB00F87904 /* test_prg.cpp in Sources */,
 				6CC2D4AC1C318F2500334ADD /* fpe.cpp in Sources */,
 				6CC2D4AD1C318F2500334ADD /* blake2s.cpp in Sources */,
 				6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */,
@@ -884,10 +892,10 @@
 				6CC2D4E51C31941500334ADD /* blake2s.cpp in Sources */,
 				6CC2D4D21C3193FA00334ADD /* aez.c in Sources */,
 				6CC2D4C81C3193E500334ADD /* fpe.cpp in Sources */,
+				311934B31D26B2360031804B /* block_hash.cpp in Sources */,
 				6CC2D4D81C31940B00334ADD /* sha512_base.c in Sources */,
 				6CC2D4F71C31942F00334ADD /* GF2_127_63.cpp in Sources */,
 				6CC2D4CA1C3193E900334ADD /* hash.cpp in Sources */,
-				316F0D471D2565CB00F87904 /* test_prg.cpp in Sources */,
 				6CC2D4C61C3193E200334ADD /* cipher.cpp in Sources */,
 				6CC2D4D91C31940B00334ADD /* sha512_sse4.asm in Sources */,
 				6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */,

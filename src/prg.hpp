@@ -61,8 +61,8 @@ namespace sse
             void derive(const size_t len, std::string &out) const;
             std::string derive(const size_t len) const;
 
-            void derive(const size_t offset, const size_t len, std::string &out) const;
-            std::string derive(const size_t offset, const size_t len) const;
+            void derive(const uint32_t offset, const size_t len, std::string &out) const;
+            std::string derive(const uint32_t offset, const size_t len) const;
 
             // Again, avoid any assignement of Cipher objects
             Prg& operator=(const Prg& h) = delete;

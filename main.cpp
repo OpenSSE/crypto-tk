@@ -34,6 +34,8 @@
 #include "src/hash/sha512.hpp"
 
 #include "src/tdp.hpp"
+#include "src/block_hash.hpp"
+
 
 using namespace std;
 
@@ -447,7 +449,43 @@ void bench_mult_invert_tdp()
     }
 
 }
+
+
+void bench_hash_block()
+{
+    size_t N_sample = 1e7;
+    
+    sse::crypto::BlockHash::hash(std::string(0x00,16));
+
+    std::chrono::duration<double, std::nano> bh_time;
+    for (size_t i = 0; i < N_sample; i++) {
+        size_t in[4] = {i, 2*i, 3*i ,4*i};
+        unsigned char out[16];
+        
+        auto begin_t = std::chrono::high_resolution_clock::now();
+        sse::crypto::BlockHash::hash((unsigned char*)in, out);
+        auto end_t = std::chrono::high_resolution_clock::now();
+        
+        bh_time += end_t - begin_t;
+    }
+
+    std::chrono::duration<double, std::nano> hash_time;
+    for (size_t i = 0; i < N_sample; i++) {
+        size_t in[4] = {i, 2*i, 3*i ,4*i};
+        std::string in_string((char *)in, 16);
+        
+        auto begin_t = std::chrono::high_resolution_clock::now();
+        std::string out = sse::crypto::Hash::hash(in_string);
+        auto end_t = std::chrono::high_resolution_clock::now();
+        
+        hash_time += end_t - begin_t;
+    }
+
+    std::cout << "Block Hash: " << bh_time.count() << std::endl;
+    std::cout << "Regular Hash: " << hash_time.count() << std::endl;
+}
+
 int main( int argc, char* argv[] ) {
-    bench_mult_invert_tdp();
+    bench_hash_block();
     return 0;
 }

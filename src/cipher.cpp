@@ -182,6 +182,10 @@ void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)
 
 	encrypt((unsigned char*)in.data(), len, data);
     out = std::string((char *)data, len+kIVSize);
+
+    // erase the buffer
+    memset(data, 0, len+kIVSize);
+    
     delete [] data;
 }
 

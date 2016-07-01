@@ -29,6 +29,7 @@
 #include "tests/encryption.hpp"
 #include "tests/test_fpe.hpp"
 #include "tests/test_tdp.hpp"
+#include "tests/test_prg.hpp"
 
 BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
 	test_generic_multiset_hash();
@@ -63,4 +64,8 @@ BOOST_AUTO_TEST_CASE(tdp) {
     tdp_mult_eval_test();
     tdp_mult_inv_test();
     tdp_full_mult_inv_test();
+}
+
+BOOST_AUTO_TEST_CASE(prg) {
+    test_prg();
 }

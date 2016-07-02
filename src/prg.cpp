@@ -22,8 +22,11 @@
 #include "prg.hpp"
 
 #include <openssl/aes.h>
+#include <openssl/modes.h>
+
 
 #include <iostream>
+#include <iomanip>
 
 #define PUTU32(ct, st) { \
     (ct)[0] = (uint8_t)((st) >> 24); (ct)[1] = (uint8_t)((st) >> 16); \
@@ -37,26 +40,36 @@ namespace sse
     
     namespace crypto
     {
-        
+        extern "C" {
+            int aesni_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
+            int aesni_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
+            
+            void aesni_ecb_encrypt(const unsigned char *in, unsigned char *out, size_t length, const AES_KEY *key, int enc);
+
+            void aesni_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
+        }
+
         class Prg::PrgImpl
         {
         public:
             
             PrgImpl() = delete;
             
-            PrgImpl(const std::array<uint8_t,kKeySize>& k);
-            PrgImpl(const uint8_t* k);
+            inline PrgImpl(const std::array<uint8_t,kKeySize>& k);
+            inline PrgImpl(const uint8_t* k);
             
-            ~PrgImpl();
+            inline ~PrgImpl();
             
-            void derive(const size_t len, std::string &out) const;
-            void derive(const size_t len, unsigned char* out) const;
+            inline void derive(const size_t len, std::string &out) const;
+            inline void derive(const size_t len, unsigned char* out) const;
             
-            void derive(const uint32_t offset, const size_t len, unsigned char* out) const;
-            void derive(const uint32_t offset, const size_t len, std::string &out) const;
+            inline void derive(const uint32_t offset, const size_t len, unsigned char* out) const;
+            inline void derive(const uint32_t offset, const size_t len, std::string &out) const;
             
-            void gen_subkeys(const unsigned char *userKey);
+            inline void gen_subkeys(const unsigned char *userKey);
 
+            
+            inline static void derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out);
             
             static constexpr uint8_t kBlockSize = AES_BLOCK_SIZE;
 
@@ -107,7 +120,75 @@ namespace sse
             return out;
         }
         
+        void Prg::derive(const uint8_t* k, const size_t len, std::string &out)
+        {
+            unsigned char *data = new unsigned char[len];
+            
+            Prg::PrgImpl::derive(k, 0, len, data);
+            out = std::string((char *)data, len);
+            
+            // erase the buffer
+            memset(data, 0, len);
+            
+            delete [] data;
+        }
         
+        void Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const size_t len, std::string &out)
+        {
+            unsigned char *data = new unsigned char[len];
+            
+            Prg::PrgImpl::derive(k.data(), 0, len, data);
+            out = std::string((char *)data, len);
+            
+            // erase the buffer
+            memset(data, 0, len);
+            
+            delete [] data;
+        }
+        
+        std::string Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const size_t len)
+        {
+            unsigned char *data = new unsigned char[len];
+            
+            Prg::PrgImpl::derive(k.data(), 0, len, data);
+            std::string out = std::string((char *)data, len);
+            
+            // erase the buffer
+            memset(data, 0, len);
+            
+            delete [] data;
+            return out;
+        }
+        
+        void Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const uint32_t offset, const size_t len, std::string &out)
+        {
+            unsigned char *data = new unsigned char[len];
+            
+            Prg::PrgImpl::derive(k.data(), offset, len, data);
+            out = std::string((char *)data, len);
+            
+            // erase the buffer
+            memset(data, 0, len);
+            
+            delete [] data;
+        }
+
+        std::string Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const uint32_t offset, const size_t len)
+        {
+            unsigned char *data = new unsigned char[len];
+            
+            Prg::PrgImpl::derive(k.data(), offset, len, data);
+            std::string out = std::string((char *)data, len);
+            
+            // erase the buffer
+            memset(data, 0, len);
+            
+            delete [] data;
+            return out;
+        }
+
+        
+
         // Prg implementation
         
         Prg::PrgImpl::PrgImpl(const std::array<uint8_t,kKeySize>& k)
@@ -129,7 +210,11 @@ namespace sse
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))
         void Prg::PrgImpl::gen_subkeys(const unsigned char *userKey)
         {
+#if __AES__
+            if (aesni_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
+#else
             if (AES_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
+#endif
             {
                 // throw an exception
                 throw std::runtime_error("Unable to init AES subkeys");
@@ -142,52 +227,86 @@ namespace sse
                 throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
             }
             
-            unsigned char enc_iv[AES_BLOCK_SIZE];
-            unsigned char ecount[AES_BLOCK_SIZE];
-            memset(ecount, 0x00, AES_BLOCK_SIZE);
+            size_t block_len = len/AES_BLOCK_SIZE;
             
-            unsigned int num = 0;
+            if (len%AES_BLOCK_SIZE != 0) {
+                block_len++;
+            }
             
-            memset(enc_iv, 0, AES_BLOCK_SIZE);
+            unsigned char in[block_len*AES_BLOCK_SIZE];
+            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
+            
+            for (size_t i = 1; i < block_len; i++) {
+                ((size_t*)in)[2*i] = i;
+            }
+            
+            std::cout << std::endl;
+            
             memset(out, 0, len);
             
-            AES_ctr128_encrypt(out, out, len, &aes_enc_key_, enc_iv, ecount, &num);
+            for (size_t i = 0; i < block_len-1; i++) {
+#if __AES__
+                aesni_encrypt(in+i*AES_BLOCK_SIZE, out+i*AES_BLOCK_SIZE, &aes_enc_key_);
+#else
+                AES_encrypt(in+i*AES_BLOCK_SIZE, out+i*AES_BLOCK_SIZE, &aes_enc_key_);
+#endif
+            }
             
-            // erase ecount to avoid (partial) recovery of the last block
-            memset(ecount, 0x00, AES_BLOCK_SIZE);
-    
-        
+            if (len%AES_BLOCK_SIZE == 0) {
+#if __AES__
+                aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, out+(block_len-1)*AES_BLOCK_SIZE, &aes_enc_key_);
+#else
+                AES_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, out+(block_len-1)*AES_BLOCK_SIZE, &aes_enc_key_);
+#endif
+            }else{
+                unsigned char tmp[AES_BLOCK_SIZE];
+#if __AES__
+                aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, tmp, &aes_enc_key_);
+#else
+                AES_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, tmp, &aes_enc_key_);
+#endif
+               memcpy(out+(block_len-1)*AES_BLOCK_SIZE, tmp, len%AES_BLOCK_SIZE);
+                memset(tmp, 0x00, AES_BLOCK_SIZE);
+            }
+            
         }
-
         
+
         void Prg::PrgImpl::derive(const uint32_t offset, const size_t len, unsigned char* out) const
         {
             if (len == 0) {
                 throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
             }
             
-            uint32_t block_offset = offset/AES_BLOCK_SIZE;
-            
-            unsigned char enc_iv[AES_BLOCK_SIZE];
-            unsigned char ecount[AES_BLOCK_SIZE];
-            memset(ecount, 0x00, AES_BLOCK_SIZE);
-            
             uint32_t extra_len = (offset % AES_BLOCK_SIZE);
+            uint32_t block_offset = offset/AES_BLOCK_SIZE;
+            size_t max_block_index = (len+offset)/AES_BLOCK_SIZE;
             
-            unsigned char *tmp = new unsigned char[len+extra_len];
+            if ((len+offset)%AES_BLOCK_SIZE != 0) {
+                max_block_index++;
+            }
+            
+            size_t block_len = max_block_index - block_offset;
 
-            unsigned int num = 0;
             
-            memset(enc_iv, 0, AES_BLOCK_SIZE);
-            memset(tmp, 0, len+extra_len);
+            unsigned char in[block_len*AES_BLOCK_SIZE];
+            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
             
-            PUTU32(enc_iv + 12, block_offset);
+            unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
 
-
-            AES_ctr128_encrypt(tmp, tmp, len+extra_len, &aes_enc_key_, enc_iv, ecount, &num);
+            for (size_t i = block_offset; i < max_block_index; i++) {
+                ((size_t*)in)[2*(i-block_offset)] = i;
+            }
             
-            // erase ecount to avoid (partial) recovery of the last block
-            memset(ecount, 0x00, AES_BLOCK_SIZE);
+            memset(out, 0, len);
+            
+            for (size_t i = 0; i < block_len; i++) {
+#if __AES__
+                aesni_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key_);
+#else
+                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key_);
+#endif
+            }
             
             memcpy(out, tmp+extra_len, len);
             memset(tmp, 0x00, len+extra_len);
@@ -217,6 +336,82 @@ namespace sse
             memset(data, 0, len);
             
             delete [] data;
+        }
+        
+        
+        void Prg::PrgImpl::derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out)
+        {
+            if (len == 0) {
+                throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
+            }
+
+            AES_KEY aes_enc_key;
+#if __AES__
+            if (aesni_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+#else
+            if (AES_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+#endif
+            {
+                // throw an exception
+                throw std::runtime_error("Unable to init AES subkeys");
+            }
+
+            uint32_t extra_len = (offset % AES_BLOCK_SIZE);
+            uint32_t block_offset = offset/AES_BLOCK_SIZE;
+            size_t max_block_index = (len+offset)/AES_BLOCK_SIZE;
+            
+            if ((len+offset)%AES_BLOCK_SIZE != 0) {
+                max_block_index++;
+            }
+            
+            size_t block_len = max_block_index - block_offset;
+            
+            
+            unsigned char in[block_len*AES_BLOCK_SIZE];
+            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
+            
+            unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
+            
+            for (size_t i = block_offset; i < max_block_index; i++) {
+                ((size_t*)in)[2*(i-block_offset)] = i;
+            }
+            
+            memset(out, 0, len);
+            
+//            for (size_t i = 0; i < block_len; i++) {
+//#if __AES__
+//                aesni_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
+//                
+////                std::cout << "NI: \t\t";
+////                for(size_t j = 0; j <  AES_BLOCK_SIZE; j++)
+////                {
+////                    std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint) *(tmp+i*AES_BLOCK_SIZE+j);
+////                }
+////
+////                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
+////                
+////                std::cout << "\nNo NI: \t\t";
+////
+////                for(size_t j = 0; j <  AES_BLOCK_SIZE; j++)
+////                {
+////                    std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint) *(tmp+i*AES_BLOCK_SIZE+j);
+////                }
+////                std::cout << std::endl;
+//                
+//#else
+//                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
+//#endif
+//            }
+
+#if __AES__
+            aesni_ecb_encrypt(in, tmp, block_len*AES_BLOCK_SIZE, &aes_enc_key, AES_ENCRYPT);
+#else
+            for (size_t i = 0; i < block_len; i++) {
+                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
+            }
+#endif
+            memcpy(out, tmp+extra_len, len);
+            memset(tmp, 0x00, len+extra_len);
         }
 
     }

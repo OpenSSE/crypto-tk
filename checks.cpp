@@ -30,6 +30,7 @@
 #include "tests/test_fpe.hpp"
 #include "tests/test_tdp.hpp"
 #include "tests/test_prg.hpp"
+#include "tests/test_block_hash.hpp"
 
 BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
 	test_generic_multiset_hash();
@@ -66,6 +67,12 @@ BOOST_AUTO_TEST_CASE(tdp) {
     tdp_full_mult_inv_test();
 }
 
+BOOST_AUTO_TEST_CASE(block_hash) {
+    test_block_hash();
+}
+
 BOOST_AUTO_TEST_CASE(prg) {
     test_prg();
+    test_prg_consistency();
+    
 }

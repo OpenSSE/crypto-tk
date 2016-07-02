@@ -23,6 +23,9 @@
 #include <array>
 #include <openssl/aes.h>
 
+#include <iostream>
+#include <iomanip>
+
 namespace sse
 {
     
@@ -54,7 +57,12 @@ namespace sse
         };
         
         AES_KEY *BlockHash::BlockHashImpl::enc_key__ = NULL;
-        std::array<uint8_t, AES_BLOCK_SIZE> BlockHash::BlockHashImpl::iv__ = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+        
+//        std::array<uint8_t, AES_BLOCK_SIZE> BlockHash::BlockHashImpl::iv__ = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+        
+        // chosing this IV allows us to rely on the NIST's test vectors in the unit tests
+        std::array<uint8_t, AES_BLOCK_SIZE> BlockHash::BlockHashImpl::iv__ = {{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}};
+        
         
         const AES_KEY* BlockHash::BlockHashImpl::get_key()
         {
@@ -62,13 +70,16 @@ namespace sse
             if (enc_key__ == NULL) {
                 enc_key__ = new AES_KEY;
                 
+#if __AES__
+                if (aesni_set_encrypt_key(iv__.data(), 128, enc_key__) != 0)
+#else
                 if (AES_set_encrypt_key(iv__.data(), 128, enc_key__) != 0)
+#endif
                 {
                     // throw an exception
                     throw std::runtime_error("Unable to init AES subkeys");
                 }
             }
-            
             return enc_key__;
         }
 
@@ -78,11 +89,19 @@ namespace sse
         {
 #if __AES__
             aesni_encrypt(in, out, get_key());
+            
+//            std::cout << "NI: \t\t";
+//            for(size_t j = 0; j <  AES_BLOCK_SIZE; j++)
+//            {
+//                std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint) *(out+j);
+//            }
+//            std::cout << std::endl;
+
 #else
-            AES_ecb_encrypt(in, out, get_key(), AES_ENCRYPT);
+            AES_encrypt(in, out, get_key());
 #endif
             for (size_t i = 0; i < AES_BLOCK_SIZE; i++) {
-                (*out) ^= iv__[i];
+                out[i] ^= in[i];
             }
         }
     

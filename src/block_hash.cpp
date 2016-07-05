@@ -34,13 +34,15 @@ namespace sse
     namespace crypto
     {
         
+#if __AES__
+#warning AES
         extern "C" {
             int aesni_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
             int aesni_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
             
             void aesni_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
         }
-
+#endif
         class BlockHash::BlockHashImpl
         {
         public:

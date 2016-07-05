@@ -1,6 +1,6 @@
 before_script:
   - apt-get update -qq && apt-get install -y -qq libssl-dev libboost-test-dev scons yasm
-  - wget http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz; tar xvf boost_1_60_0.tar.gz ; mv boost_1_60_0/boost src/.
+  - wget http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz; tar xf boost_1_60_0.tar.gz ; mv boost_1_60_0/boost src/.
  
 stages:
   - build

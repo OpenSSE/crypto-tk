@@ -8,7 +8,7 @@ def smart_concat(l1, l2):
     else:
         return l1 + l2
 
-files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('*/*/*.cpp') + Glob('*/*/*/*.cpp') + Glob('*/*.c')
+files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('*/*/*.cpp') + Glob('hash/*/*/*.cpp') + Glob('*/*.c')
 files += Glob('hash/*/*.asm') + Glob('hash/*/*.c')
 objs = env.Object(files, CPPPATH = smart_concat(['.'], env.get('CPPPATH')))
 

@@ -1,0 +1,11 @@
+before_script:
+  - apt-get update -qq && apt-get install -y -qq libssl-dev libboost-test1.58-dev libboost-dev scons
+  
+ 
+stages:
+	- build
+  
+crypto:
+	stage: build
+	script:
+		- scons

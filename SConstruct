@@ -90,33 +90,40 @@ Clean('lib', 'library')
 # Alias('lib', [lib_install] + headers_lib)
 
 
+test_prog_ci = env.Program('check_ci', ['checks.cpp'] + objects + test_objects)
 
-test_env = env.Clone()
+test_run_ci = env.Test('test_run', test_prog_ci)
+Depends(test_run_ci, test_prog_ci)
 
-if not test_env.GetOption('clean'):
-    conf = Configure(test_env)
-    if conf.CheckLib('boost_unit_test_framework'):
-        print 'Found boost unit test framework'
-        
-        test_env.Append(LIBS = ['boost_unit_test_framework'])
-        
-        test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects)
-
-        test_run = test_env.Test('test_run', test_prog)
-        Depends(test_run, test_prog)
-
-        test_env.Alias('check', [test_prog, test_run])
-        
-        # Depends([shared_lib, static_lib, headers_lib], test_run)
-        # Depends([static_lib, shared_lib, headers_lib], test_run)
-        
-    else:
-        print 'boost unit test framework not found'
-        print 'Skipping checks. Be careful!'
-    test_env = conf.Finish()
-
-test_env.Clean('check', ['check'] + objects)
+env.Alias('check_ci', [test_prog_ci, test_run_ci])
 
 
-
+# test_env = env.Clone()
+#
+# if not test_env.GetOption('clean'):
+#     conf = Configure(test_env)
+#     if conf.CheckLib('boost_unit_test_framework'):
+#         print 'Found boost unit test framework'
+#
+#         test_env.Append(LIBS = ['boost_unit_test_framework'])
+#
+#         test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects)
+#
+#         test_run = test_env.Test('test_run', test_prog)
+#         Depends(test_run, test_prog)
+#
+#         test_env.Alias('check', [test_prog, test_run])
+#
+#         # Depends([shared_lib, static_lib, headers_lib], test_run)
+#         # Depends([static_lib, shared_lib, headers_lib], test_run)
+#
+#     else:
+#         print 'boost unit test framework not found'
+#         print 'Skipping checks. Be careful!'
+#     test_env = conf.Finish()
+#
+# test_env.Clean('check', ['check'] + objects)
+#
+#
+#
 

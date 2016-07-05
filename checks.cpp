@@ -21,7 +21,8 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE CRYPTO
 
-#include <boost/test/unit_test.hpp>
+// #include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "tests/test_ecmh.hpp"
 #include "tests/hashing.hpp"

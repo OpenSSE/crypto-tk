@@ -242,9 +242,7 @@ namespace sse
             for (size_t i = 1; i < block_len; i++) {
                 ((size_t*)in)[2*i] = i;
             }
-            
-            std::cout << std::endl;
-            
+                        
             memset(out, 0, len);
             
             for (size_t i = 0; i < block_len-1; i++) {

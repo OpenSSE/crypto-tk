@@ -90,9 +90,13 @@ Clean('lib', 'library')
 # Alias('lib', [lib_install] + headers_lib)
 
 
-test_prog_ci = env.Program('check_ci', ['checks.cpp'] + objects + test_objects, CPPPATH = smart_concat(['src'], env.get('CPPPATH')))
+check_obj_ci = env.Object(source = 'checks.cpp', target = 'check_ci.o', CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
+                                CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
+test_prog_ci = env.Program('check_ci', check_obj_ci + objects + test_objects, 
+                                CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
+                                CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
 
-test_run_ci = env.Test('test_run', test_prog_ci)
+test_run_ci = env.Test('test_run_ci', test_prog_ci)
 Depends(test_run_ci, test_prog_ci)
 
 env.Alias('check_ci', [test_prog_ci, test_run_ci])

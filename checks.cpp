@@ -21,8 +21,11 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE CRYPTO
 
-// #include <boost/test/unit_test.hpp>
+#ifdef UNIT_TEST_SINGLE_HEADER
 #include <boost/test/included/unit_test.hpp>
+#else
+#include <boost/test/unit_test.hpp>
+#endif 
 
 #include "tests/test_ecmh.hpp"
 #include "tests/hashing.hpp"
@@ -75,5 +78,4 @@ BOOST_AUTO_TEST_CASE(block_hash) {
 BOOST_AUTO_TEST_CASE(prg) {
     test_prg();
     test_prg_consistency();
-    
 }

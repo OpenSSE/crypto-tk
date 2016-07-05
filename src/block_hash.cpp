@@ -20,6 +20,8 @@
 
 #include "block_hash.hpp"
 
+#include <cstring>
+
 #include <array>
 #include <openssl/aes.h>
 

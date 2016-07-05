@@ -455,7 +455,7 @@ void bench_hash_block()
 {
     size_t N_sample = 1e7;
     
-    sse::crypto::BlockHash::hash(std::string(0x00,16));
+    sse::crypto::BlockHash::hash(std::string(16, 0x00));
 
     std::chrono::duration<double, std::nano> bh_time;
     for (size_t i = 0; i < N_sample; i++) {

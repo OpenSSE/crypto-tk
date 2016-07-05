@@ -1,5 +1,6 @@
 import os
 
+from smart_concat import *  
 env = Environment()
 
 try:
@@ -46,6 +47,14 @@ def run_test(target, source, env):
     else:
         return 1
 
+# def smart_concat(l1, l2):
+#     if l1 == None:
+#         return l2
+#     elif l2 == None:
+#         return l1
+#     else:
+#         return l1 + l2
+
 bld = Builder(action = run_test)
 env.Append(BUILDERS = {'Test' :  bld})
 
@@ -55,7 +64,7 @@ test_objects = SConscript('tests/build.scons', exports='env', variant_dir='build
 Clean(objects, 'build')
 Clean(test_objects, 'build_test')
 
-debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = ['src'] +  env.get('CPPPATH'))
+debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = smart_concat(['src'], env.get('CPPPATH')))
 
 Default(debug)
 

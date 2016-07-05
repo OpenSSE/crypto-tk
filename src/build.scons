@@ -1,7 +1,9 @@
 Import('*')
 
+from smart_concat import *  
+
 files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('*/*/*.cpp') + Glob('*/*/*/*.cpp') + Glob('*/*.c')
 files += Glob('hash/*/*.asm') + Glob('hash/*/*.c')
-objs = env.Object(files, CPPPATH =  ['.'] + env.get('CPPPATH'))
+objs = env.Object(files, CPPPATH = smart_concat(['.'], env.get('CPPPATH')))
 
 Return('objs')

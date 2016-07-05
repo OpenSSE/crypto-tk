@@ -42,7 +42,7 @@ namespace sse
     
     namespace crypto
     {
-#if __AES__
+#if AESNI_OPENSSL_UNDO
         extern "C" {
             int aesni_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
             int aesni_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
@@ -213,7 +213,7 @@ namespace sse
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))
         void Prg::PrgImpl::gen_subkeys(const unsigned char *userKey)
         {
-#if __AES__
+#if AESNI_OPENSSL_UNDO
             if (aesni_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
 #else
             if (AES_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
@@ -248,7 +248,7 @@ namespace sse
             memset(out, 0, len);
             
             for (size_t i = 0; i < block_len-1; i++) {
-#if __AES__
+#if AESNI_OPENSSL_UNDO
                 aesni_encrypt(in+i*AES_BLOCK_SIZE, out+i*AES_BLOCK_SIZE, &aes_enc_key_);
 #else
                 AES_encrypt(in+i*AES_BLOCK_SIZE, out+i*AES_BLOCK_SIZE, &aes_enc_key_);
@@ -256,14 +256,14 @@ namespace sse
             }
             
             if (len%AES_BLOCK_SIZE == 0) {
-#if __AES__
+#if AESNI_OPENSSL_UNDO
                 aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, out+(block_len-1)*AES_BLOCK_SIZE, &aes_enc_key_);
 #else
                 AES_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, out+(block_len-1)*AES_BLOCK_SIZE, &aes_enc_key_);
 #endif
             }else{
                 unsigned char tmp[AES_BLOCK_SIZE];
-#if __AES__
+#if AESNI_OPENSSL_UNDO
                 aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, tmp, &aes_enc_key_);
 #else
                 AES_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, tmp, &aes_enc_key_);
@@ -304,7 +304,7 @@ namespace sse
             memset(out, 0, len);
             
             for (size_t i = 0; i < block_len; i++) {
-#if __AES__
+#if AESNI_OPENSSL_UNDO
                 aesni_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key_);
 #else
                 AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key_);
@@ -349,7 +349,7 @@ namespace sse
             }
 
             AES_KEY aes_enc_key;
-#if __AES__
+#if AESNI_OPENSSL_UNDO
             if (aesni_set_encrypt_key(k, 128, &aes_enc_key) != 0)
 #else
             if (AES_set_encrypt_key(k, 128, &aes_enc_key) != 0)
@@ -382,7 +382,7 @@ namespace sse
             memset(out, 0, len);
             
 //            for (size_t i = 0; i < block_len; i++) {
-//#if __AES__
+//#if AESNI_OPENSSL_UNDO
 //                aesni_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
 //                
 ////                std::cout << "NI: \t\t";
@@ -406,7 +406,7 @@ namespace sse
 //#endif
 //            }
 
-#if __AES__
+#if AESNI_OPENSSL_UNDO
             aesni_ecb_encrypt(in, tmp, block_len*AES_BLOCK_SIZE, &aes_enc_key, AES_ENCRYPT);
 #else
             for (size_t i = 0; i < block_len; i++) {

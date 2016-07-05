@@ -34,8 +34,8 @@ namespace sse
     namespace crypto
     {
         
-#if __AES__
-#warning AES
+#if AESNI_OPENSSL_UNDO
+#warning Using OpenSSL undocumented code. You might have to use your own recompile libcrypto
         extern "C" {
             int aesni_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
             int aesni_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
@@ -74,7 +74,7 @@ namespace sse
             if (enc_key__ == NULL) {
                 enc_key__ = new AES_KEY;
                 
-#if __AES__
+#if AESNI_OPENSSL_UNDO
                 if (aesni_set_encrypt_key(iv__.data(), 128, enc_key__) != 0)
 #else
                 if (AES_set_encrypt_key(iv__.data(), 128, enc_key__) != 0)
@@ -91,7 +91,7 @@ namespace sse
     
         void BlockHash::BlockHashImpl::hash(const unsigned char *in,  unsigned char *out)
         {
-#if __AES__
+#if AESNI_OPENSSL_UNDO
             aesni_encrypt(in, out, get_key());
             
 //            std::cout << "NI: \t\t";

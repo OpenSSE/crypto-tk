@@ -3,9 +3,9 @@ before_script:
   
  
 stages:
-	- build
+  - build
   
 crypto:
-	stage: build
-	script:
-		- scons
+  stage: build
+  script:
+  - scons

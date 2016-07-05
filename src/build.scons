@@ -2,6 +2,6 @@ Import('*')
 
 files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('*/*/*.cpp') + Glob('*/*/*/*.cpp') + Glob('*/*.c')
 files += Glob('hash/*/*.asm') + Glob('hash/*/*.c')
-objs = env.Object(files, CPPPATH = env['CPPPATH'] + ['.'])
+objs = env.Object(files, CPPPATH = env.get('CPPPATH') + ['.'])
 
 Return('objs')

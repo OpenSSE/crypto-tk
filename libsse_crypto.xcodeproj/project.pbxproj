@@ -17,7 +17,7 @@
 		316F0D3F1D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D401D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D411D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
-		316F0D421D25600700F87904 /* prg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 316F0D3E1D25600700F87904 /* prg.hpp */; };
+		316F0D421D25600700F87904 /* prg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 316F0D3E1D25600700F87904 /* prg.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		316F0D481D2565CB00F87904 /* test_prg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 316F0D441D2565CB00F87904 /* test_prg.hpp */; };
 		318C729B1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729C1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };

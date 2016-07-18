@@ -149,6 +149,11 @@ namespace sse
             delete [] data;
         }
         
+        void Prg::derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out)
+        {
+            Prg::PrgImpl::derive(k, offset, len, out);
+        }
+
         std::string Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const size_t len)
         {
             unsigned char *data = new unsigned char[len];

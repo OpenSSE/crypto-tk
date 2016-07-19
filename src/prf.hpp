@@ -96,6 +96,9 @@ public:
 	
 	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;
+    
+    
+    template <size_t L>  std::array<uint8_t, NBYTES> prf(const std::array<uint8_t, L> &in) const;
 //	void prf(const unsigned char* in, const size_t &length, unsigned char* out) const;
 	std::string prf_string(const std::string &s) const;
 private:
@@ -148,6 +151,12 @@ template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const st
 	return prf((unsigned char*)s.data() , s.length());
 }
 
+template <uint16_t NBYTES>
+template<size_t L>
+    std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::array<uint8_t, L> &in) const
+{
+    return prf((unsigned char*)in.data() , L);
+}
 
 // Convienience function to return the PRF result in a raw array
 //template <uint8_t NBYTES> void Prf<NBYTES>::prf(const unsigned char* in, const size_t &length, unsigned char* out) const

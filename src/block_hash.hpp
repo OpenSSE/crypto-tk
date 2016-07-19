@@ -43,7 +43,7 @@ namespace sse
         class BlockHash
         {
         public:
-            constexpr static size_t kBlockSize = 128;
+            constexpr static size_t kBlockSize = 16;
             
             static void hash(const unsigned char *in, unsigned char *out);
             static void hash(const unsigned char *in, const size_t out_len, unsigned char *out);

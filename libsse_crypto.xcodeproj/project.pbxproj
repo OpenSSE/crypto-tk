@@ -10,7 +10,7 @@
 		311934B11D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
 		311934B21D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
 		311934B31D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
-		311934B41D26B2360031804B /* block_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 311934B01D26B2360031804B /* block_hash.hpp */; };
+		311934B41D26B2360031804B /* block_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 311934B01D26B2360031804B /* block_hash.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		311934B51D27172A0031804B /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
 		311934B81D27F1F00031804B /* test_block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934B61D27F1F00031804B /* test_block_hash.cpp */; };
 		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
@@ -629,6 +629,7 @@
 				6CC2D4CF1C3193E900334ADD /* random.hpp in Headers */,
 				6CF4160B1CB4FF1D00C448D4 /* utils.hpp in Headers */,
 				316F0D421D25600700F87904 /* prg.hpp in Headers */,
+				311934B41D26B2360031804B /* block_hash.hpp in Headers */,
 				6CC2D50B1C31944A00334ADD /* bn.hpp in Headers */,
 				6CC2D5111C31945000334ADD /* enable_if.hpp in Headers */,
 				6CC2D4E41C31941500334ADD /* blake2s-round.h in Headers */,
@@ -653,7 +654,6 @@
 				6CC2D4E21C31941500334ADD /* blake2s-load-sse41.h in Headers */,
 				6CC2D4FA1C31942F00334ADD /* GF2m.hpp in Headers */,
 				6CC2D4EE1C31942700334ADD /* GLS254.hpp in Headers */,
-				311934B41D26B2360031804B /* block_hash.hpp in Headers */,
 				316F0D481D2565CB00F87904 /* test_prg.hpp in Headers */,
 				6CC2D4F41C31942F00334ADD /* compute_linear_operation_table.hpp in Headers */,
 				6CC2D5141C31945000334ADD /* logical.hpp in Headers */,

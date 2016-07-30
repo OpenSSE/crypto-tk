@@ -37,9 +37,9 @@ if int(debug):
 else:
 	env.Append(CCFLAGS = ['-O2'])
 
-aes_ni = ARGUMENTS.get('aesni', 0)
-if int(aes_ni):
-    env.Append(CCFLAGS = ['-D', 'AESNI_OPENSSL_UNDO'])
+no_aes_ni = ARGUMENTS.get('no_aesni', 0)
+if int(no_aes_ni):
+    env.Append(CCFLAGS = ['-D', 'NO_AESNI'])
 
 
 def run_test(target, source, env):

@@ -19,6 +19,10 @@
 		316F0D411D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D421D25600700F87904 /* prg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 316F0D3E1D25600700F87904 /* prg.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		316F0D481D2565CB00F87904 /* test_prg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 316F0D441D2565CB00F87904 /* test_prg.hpp */; };
+		3185168E1D4BF45700A44AD7 /* aesni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3185168C1D4BF45700A44AD7 /* aesni.cpp */; };
+		3185168F1D4BF45700A44AD7 /* aesni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3185168C1D4BF45700A44AD7 /* aesni.cpp */; };
+		318516901D4BF45700A44AD7 /* aesni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3185168C1D4BF45700A44AD7 /* aesni.cpp */; };
+		318516911D4BF45700A44AD7 /* aesni.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3185168D1D4BF45700A44AD7 /* aesni.hpp */; };
 		318C729B1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729C1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729D1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
@@ -213,6 +217,8 @@
 		316F0D3E1D25600700F87904 /* prg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = prg.hpp; sourceTree = "<group>"; };
 		316F0D431D2565CB00F87904 /* test_prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_prg.cpp; sourceTree = "<group>"; };
 		316F0D441D2565CB00F87904 /* test_prg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_prg.hpp; sourceTree = "<group>"; };
+		3185168C1D4BF45700A44AD7 /* aesni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aesni.cpp; sourceTree = "<group>"; };
+		3185168D1D4BF45700A44AD7 /* aesni.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = aesni.hpp; sourceTree = "<group>"; };
 		318C72991C9730140040AEE7 /* tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tdp.cpp; sourceTree = "<group>"; };
 		318C729A1C9730140040AEE7 /* tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp.hpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -346,6 +352,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		318516851D4BF3D700A44AD7 /* aesni */ = {
+			isa = PBXGroup;
+			children = (
+				3185168C1D4BF45700A44AD7 /* aesni.cpp */,
+				3185168D1D4BF45700A44AD7 /* aesni.hpp */,
+			);
+			path = aesni;
+			sourceTree = "<group>";
+		};
 		6CC2D3F01C31843D00334ADD = {
 			isa = PBXGroup;
 			children = (
@@ -365,6 +380,7 @@
 			children = (
 				6CC2D4001C3185D700334ADD /* aez */,
 				6CC2D4031C3185D700334ADD /* build.scons */,
+				318516851D4BF3D700A44AD7 /* aesni */,
 				6CF416061CB4FF1C00C448D4 /* utils.cpp */,
 				6CF416071CB4FF1D00C448D4 /* utils.hpp */,
 				6CC2D4041C3185D700334ADD /* cipher.cpp */,
@@ -677,6 +693,7 @@
 				6CC2D50E1C31944A00334ADD /* thread_safety.hpp in Headers */,
 				6CC2D5091C31944100334ADD /* MuHash.hpp in Headers */,
 				6CC2D4DA1C31941000334ADD /* blake2-config.h in Headers */,
+				318516911D4BF45700A44AD7 /* aesni.hpp in Headers */,
 				6CC2D4F01C31942700334ADD /* sw.hpp in Headers */,
 				6CC2D5021C31943300334ADD /* limb_ops.hpp in Headers */,
 				6CC2D5001C31943300334ADD /* GF2.hpp in Headers */,
@@ -833,6 +850,7 @@
 			files = (
 				6CC2D48D1C318B1B00334ADD /* encryption.cpp in Sources */,
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
+				3185168E1D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */,
 				311934B11D26B2360031804B /* block_hash.cpp in Sources */,
 				6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */,
@@ -871,6 +889,7 @@
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
 				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
 				6CC2D4B81C318F2E00334ADD /* main.cpp in Sources */,
+				3185168F1D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4A01C318F2500334ADD /* sha512_sse4.asm in Sources */,
 				6CC2D4A11C318F2500334ADD /* sha512_avx2_rorx.asm in Sources */,
 				6CC2D4A21C318F2500334ADD /* GLS254.cpp in Sources */,
@@ -903,6 +922,7 @@
 				6CC2D4F71C31942F00334ADD /* GF2_127_63.cpp in Sources */,
 				6CC2D4CA1C3193E900334ADD /* hash.cpp in Sources */,
 				6CC2D4C61C3193E200334ADD /* cipher.cpp in Sources */,
+				318516901D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4D91C31940B00334ADD /* sha512_sse4.asm in Sources */,
 				6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */,
 				6CC2D4ED1C31942700334ADD /* GLS254.cpp in Sources */,
@@ -967,6 +987,7 @@
 				OTHER_CFLAGS = (
 					"-maes",
 					"-msse4",
+					"-DAESNI_OPENSSL_UNDO",
 				);
 				OTHER_LDFLAGS = "-lcrypto";
 			};
@@ -1014,6 +1035,7 @@
 				OTHER_CFLAGS = (
 					"-maes",
 					"-msse4",
+					"-DAESNI_OPENSSL_UNDO",
 				);
 				OTHER_LDFLAGS = "-lcrypto";
 			};

@@ -20,6 +20,8 @@
 
 #include "block_hash.hpp"
 
+#include "aesni/aesni.hpp"
+
 #include <cstring>
 
 #include <array>
@@ -33,16 +35,6 @@ namespace sse
     
     namespace crypto
     {
-        
-#if AESNI_OPENSSL_UNDO
-#warning Using OpenSSL undocumented code. You might have to use your own recompile libcrypto
-        extern "C" {
-            int aesni_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
-            int aesni_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
-            
-            void aesni_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
-        }
-#endif
         class BlockHash::BlockHashImpl
         {
         public:
@@ -53,36 +45,42 @@ namespace sse
             static inline std::string hash(const std::string &in);
             static inline std::string hash(const std::string &in, const size_t out_len);
             
+#if USE_AESNI
+            typedef aes_subkeys_type key_type;
+#else
+            typedef AES_KEY key_type;
+#endif
+            
         private:
-            static AES_KEY *enc_key__;
+            static key_type *enc_key__;
+          
             static std::array<uint8_t, AES_BLOCK_SIZE> iv__;
             
-            inline const static AES_KEY* get_key();
+            inline const static key_type* get_key();
         };
         
-        AES_KEY *BlockHash::BlockHashImpl::enc_key__ = NULL;
-        
-//        std::array<uint8_t, AES_BLOCK_SIZE> BlockHash::BlockHashImpl::iv__ = {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
-        
+        BlockHash::BlockHashImpl::key_type *BlockHash::BlockHashImpl::enc_key__ = NULL;
+
         // chosing this IV allows us to rely on the NIST's test vectors in the unit tests
         std::array<uint8_t, AES_BLOCK_SIZE> BlockHash::BlockHashImpl::iv__ = {{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}};
         
         
-        const AES_KEY* BlockHash::BlockHashImpl::get_key()
+        const BlockHash::BlockHashImpl::key_type* BlockHash::BlockHashImpl::get_key()
         {
             
             if (enc_key__ == NULL) {
-                enc_key__ = new AES_KEY;
-                
-#if AESNI_OPENSSL_UNDO
-                if (aesni_set_encrypt_key(iv__.data(), 128, enc_key__) != 0)
+#if USE_AESNI
+                enc_key__ = new aes_subkeys_type(aesni_derive_subkeys(iv__));
 #else
+                
+                enc_key__ = new AES_KEY;
+
                 if (AES_set_encrypt_key(iv__.data(), 128, enc_key__) != 0)
-#endif
                 {
                     // throw an exception
                     throw std::runtime_error("Unable to init AES subkeys");
                 }
+#endif
             }
             return enc_key__;
         }
@@ -91,19 +89,14 @@ namespace sse
     
         void BlockHash::BlockHashImpl::hash(const unsigned char *in,  unsigned char *out)
         {
-#if AESNI_OPENSSL_UNDO
-            aesni_encrypt(in, out, get_key());
             
-//            std::cout << "NI: \t\t";
-//            for(size_t j = 0; j <  AES_BLOCK_SIZE; j++)
-//            {
-//                std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint) *(out+j);
-//            }
-//            std::cout << std::endl;
-
+#if USE_AESNI
+            aesni_encrypt(in, *get_key(), out);
+            //            pipeline_encrypt1(in, iv__.data(), out);
 #else
             AES_encrypt(in, out, get_key());
 #endif
+            
             for (size_t i = 0; i < AES_BLOCK_SIZE; i++) {
                 out[i] ^= in[i];
             }

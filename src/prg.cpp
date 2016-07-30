@@ -20,6 +20,7 @@
 
 
 #include "prg.hpp"
+#include "aesni/aesni.hpp"
 
 #include <openssl/aes.h>
 #include <openssl/modes.h>
@@ -42,20 +43,16 @@ namespace sse
     
     namespace crypto
     {
-#if AESNI_OPENSSL_UNDO
-        extern "C" {
-            int aesni_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
-            int aesni_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
-            
-            void aesni_ecb_encrypt(const unsigned char *in, unsigned char *out, size_t length, const AES_KEY *key, int enc);
-
-            void aesni_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
-        }
-#endif
         class Prg::PrgImpl
         {
         public:
+#if USE_AESNI
+            typedef aes_subkeys_type key_type;
+#else
+            typedef AES_KEY key_type;
+#endif
             
+
             PrgImpl() = delete;
             
             inline PrgImpl(const std::array<uint8_t,kKeySize>& k);
@@ -77,7 +74,10 @@ namespace sse
             static constexpr uint8_t kBlockSize = AES_BLOCK_SIZE;
 
         private:
-            AES_KEY aes_enc_key_;
+            
+            key_type aes_enc_key_;
+
+
         };
         
         
@@ -218,15 +218,15 @@ namespace sse
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))
         void Prg::PrgImpl::gen_subkeys(const unsigned char *userKey)
         {
-#if AESNI_OPENSSL_UNDO
-            if (aesni_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
+#if USE_AESNI
+            aes_enc_key_ = aesni_derive_subkeys(userKey);
 #else
             if (AES_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
-#endif
             {
                 // throw an exception
                 throw std::runtime_error("Unable to init AES subkeys");
             }
+#endif
         }
 
         void Prg::PrgImpl::derive(const size_t len, unsigned char* out) const
@@ -251,23 +251,23 @@ namespace sse
             memset(out, 0, len);
             
             for (size_t i = 0; i < block_len-1; i++) {
-#if AESNI_OPENSSL_UNDO
-                aesni_encrypt(in+i*AES_BLOCK_SIZE, out+i*AES_BLOCK_SIZE, &aes_enc_key_);
+#if USE_AESNI
+                aesni_encrypt(in+i*AES_BLOCK_SIZE, aes_enc_key_, out+i*AES_BLOCK_SIZE);
 #else
                 AES_encrypt(in+i*AES_BLOCK_SIZE, out+i*AES_BLOCK_SIZE, &aes_enc_key_);
 #endif
             }
             
             if (len%AES_BLOCK_SIZE == 0) {
-#if AESNI_OPENSSL_UNDO
-                aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, out+(block_len-1)*AES_BLOCK_SIZE, &aes_enc_key_);
+#if USE_AESNI
+                aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, aes_enc_key_, out+(block_len-1)*AES_BLOCK_SIZE);
 #else
                 AES_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, out+(block_len-1)*AES_BLOCK_SIZE, &aes_enc_key_);
 #endif
             }else{
                 unsigned char tmp[AES_BLOCK_SIZE];
-#if AESNI_OPENSSL_UNDO
-                aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, tmp, &aes_enc_key_);
+#if USE_AESNI
+                aesni_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, aes_enc_key_, tmp);
 #else
                 AES_encrypt(in+(block_len-1)*AES_BLOCK_SIZE, tmp, &aes_enc_key_);
 #endif
@@ -307,8 +307,8 @@ namespace sse
             memset(out, 0, len);
             
             for (size_t i = 0; i < block_len; i++) {
-#if AESNI_OPENSSL_UNDO
-                aesni_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key_);
+#if USE_AESNI
+                aesni_encrypt(in+i*AES_BLOCK_SIZE, aes_enc_key_, tmp+i*AES_BLOCK_SIZE);
 #else
                 AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key_);
 #endif
@@ -345,21 +345,89 @@ namespace sse
         }
         
         
+/*
+    void Prg::PrgImpl::derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out)
+        {
+            if (len == 0) {
+                throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
+            }
+            
+
+            AES_KEY aes_enc_key;
+            if (len != 32) {
+
+    #if AESNI_OPENSSL_UNDO
+                if (aesni_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+    #else
+                if (AES_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+    #endif
+                {
+                    // throw an exception
+                    throw std::runtime_error("Unable to init AES subkeys");
+                }
+            }
+            
+            uint32_t extra_len = (offset % AES_BLOCK_SIZE);
+            uint32_t block_offset = offset/AES_BLOCK_SIZE;
+            size_t max_block_index = (len+offset)/AES_BLOCK_SIZE;
+            
+            if ((len+offset)%AES_BLOCK_SIZE != 0) {
+                max_block_index++;
+            }
+            
+            size_t block_count = max_block_index - block_offset;
+            
+            
+            unsigned char in[block_count*AES_BLOCK_SIZE];
+            memset(in, 0x00, block_count*AES_BLOCK_SIZE);
+            
+            unsigned char *tmp = new unsigned char[block_count*AES_BLOCK_SIZE];
+            
+            for (size_t i = block_offset; i < max_block_index; i++) {
+                ((size_t*)in)[2*(i-block_offset)] = i;
+            }
+            
+            memset(out, 0, len);
+            
+            if (len != 32) {
+
+#if AESNI_OPENSSL_UNDO
+            aesni_ecb_encrypt(in, tmp, block_count*AES_BLOCK_SIZE, &aes_enc_key, AES_ENCRYPT);
+#else
+            for (size_t i = 0; i < block_count; i++) {
+                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
+            }
+#endif
+            }else{
+                pipeline_encrypt2(tmp, k, out);
+//                pipeline_encrypt2_bad(tmp, k, out);
+            }
+            memcpy(out, tmp+extra_len, len);
+            memset(tmp, 0x00, len+extra_len);
+        }
+
+    }
+ */
         void Prg::PrgImpl::derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out)
         {
             if (len == 0) {
                 throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
             }
-
-            AES_KEY aes_enc_key;
-#if AESNI_OPENSSL_UNDO
-            if (aesni_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+            
+            
+            key_type aes_enc_key;
+            
+            if (len != 32) {
+#if USE_AESNI
+                aes_enc_key = aesni_derive_subkeys(k);
 #else
-            if (AES_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+                    if (AES_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+                    {
+                        // throw an exception
+                        throw std::runtime_error("Unable to init AES subkeys");
+                    }
 #endif
-            {
-                // throw an exception
-                throw std::runtime_error("Unable to init AES subkeys");
+
             }
 
             uint32_t extra_len = (offset % AES_BLOCK_SIZE);
@@ -370,13 +438,13 @@ namespace sse
                 max_block_index++;
             }
             
-            size_t block_len = max_block_index - block_offset;
+            size_t block_count = max_block_index - block_offset;
             
             
-            unsigned char in[block_len*AES_BLOCK_SIZE];
-            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
+            unsigned char in[block_count*AES_BLOCK_SIZE];
+            memset(in, 0x00, block_count*AES_BLOCK_SIZE);
             
-            unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
+            unsigned char *tmp = new unsigned char[block_count*AES_BLOCK_SIZE];
             
             for (size_t i = block_offset; i < max_block_index; i++) {
                 ((size_t*)in)[2*(i-block_offset)] = i;
@@ -384,41 +452,26 @@ namespace sse
             
             memset(out, 0, len);
             
-//            for (size_t i = 0; i < block_len; i++) {
-//#if AESNI_OPENSSL_UNDO
-//                aesni_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
-//                
-////                std::cout << "NI: \t\t";
-////                for(size_t j = 0; j <  AES_BLOCK_SIZE; j++)
-////                {
-////                    std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint) *(tmp+i*AES_BLOCK_SIZE+j);
-////                }
-////
-////                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
-////                
-////                std::cout << "\nNo NI: \t\t";
-////
-////                for(size_t j = 0; j <  AES_BLOCK_SIZE; j++)
-////                {
-////                    std::cout << std::hex << std::setw(2) << std::setfill('0') << (uint) *(tmp+i*AES_BLOCK_SIZE+j);
-////                }
-////                std::cout << std::endl;
-//                
-//#else
-//                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
-//#endif
-//            }
-
-#if AESNI_OPENSSL_UNDO
-            aesni_ecb_encrypt(in, tmp, block_len*AES_BLOCK_SIZE, &aes_enc_key, AES_ENCRYPT);
+#if USE_AESNI
+            if (len != 32) {
+                for (size_t i = 0; i < block_count; i++) {
+                    aesni_encrypt(in+i*AES_BLOCK_SIZE, aes_enc_key, tmp+i*AES_BLOCK_SIZE);
+                }
+            }else{
+                pipeline_encrypt2(tmp, k, out);
+//                encrypt2(tmp, aes_enc_key, out);
+//                                pipeline_encrypt2_bad(tmp, k, out);
+            }
 #else
-            for (size_t i = 0; i < block_len; i++) {
+            for (size_t i = 0; i < block_count; i++) {
                 AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
             }
 #endif
+
             memcpy(out, tmp+extra_len, len);
             memset(tmp, 0x00, len+extra_len);
         }
-
+        
     }
+
 }

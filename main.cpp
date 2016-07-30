@@ -35,6 +35,9 @@
 
 #include "src/tdp.hpp"
 #include "src/block_hash.hpp"
+#include "src/prg.hpp"
+
+#include "src/aesni/aesni.hpp"
 
 
 using namespace std;
@@ -485,7 +488,27 @@ void bench_hash_block()
     std::cout << "Regular Hash: " << hash_time.count() << std::endl;
 }
 
+void bench_prg()
+{
+    size_t N_sample = 1e7;
+    
+    std::array<uint8_t,16> key = {{0x00}};
+    std::array<uint8_t,32> out;
+    
+    std::chrono::duration<double, std::nano> prg_time;
+    auto begin_t = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < N_sample; i++) {
+        sse::crypto::Prg::derive(key, 0, out);
+        std::copy(out.begin(), out.begin()+16, key.begin());
+    }
+    auto end_t = std::chrono::high_resolution_clock::now();
+    prg_time = end_t - begin_t;
+    
+    std::cout << "Prg time: " << prg_time.count() << std::endl;
+    std::cout << "Cycles: " << (double)sse::crypto::tick_counter/N_sample << std::endl;
+}
+
 int main( int argc, char* argv[] ) {
-    bench_hash_block();
+    bench_prg();
     return 0;
 }

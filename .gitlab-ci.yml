@@ -14,4 +14,5 @@ crypto:
 check:
   stage: test
   script:
-  - scons check_ci
+  - scons check_ci  
+  - scons check_ci no_aesni=1

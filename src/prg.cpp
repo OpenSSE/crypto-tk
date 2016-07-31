@@ -468,7 +468,7 @@ namespace sse
                     aesni_encrypt(in+i*AES_BLOCK_SIZE, aes_enc_key, tmp+i*AES_BLOCK_SIZE);
                 }
             }else{
-                pipeline_encrypt2(tmp, k, out);
+                aesni_ctr_encrypt2(0, k, out);
 //                encrypt2(tmp, aes_enc_key, out);
 //                                pipeline_encrypt2_bad(tmp, k, out);
             }

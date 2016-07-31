@@ -64,13 +64,35 @@ namespace sse
         
 
         void aesni_encrypt(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
-
         void aesni_encrypt2(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_encrypt3(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_encrypt4(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_encrypt5(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_encrypt6(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_encrypt7(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_encrypt8(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        
+
+        void aesni_ctr_encrypt1(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_ctr_encrypt2(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_ctr_encrypt3(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_ctr_encrypt4(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_ctr_encrypt5(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_ctr_encrypt6(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_ctr_encrypt7(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_ctr_encrypt8(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
+
+        void aesni_ctr_encrypt1(const uint64_t iv, const uint8_t* key, uint8_t *out);
+        void aesni_ctr_encrypt2(const uint64_t iv, const uint8_t* key, uint8_t *out);
+        void aesni_ctr_encrypt3(const uint64_t iv, const uint8_t* key, uint8_t *out);
+        void aesni_ctr_encrypt4(const uint64_t iv, const uint8_t* key, uint8_t *out);
+        void aesni_ctr_encrypt5(const uint64_t iv, const uint8_t* key, uint8_t *out);
+        void aesni_ctr_encrypt6(const uint64_t iv, const uint8_t* key, uint8_t *out);
+        void aesni_ctr_encrypt7(const uint64_t iv, const uint8_t* key, uint8_t *out);
+        void aesni_ctr_encrypt8(const uint64_t iv, const uint8_t* key, uint8_t *out);
         
         
-        void pipeline_encrypt1(const uint8_t* in, const uint8_t* key, uint8_t *out);
-        void pipeline_encrypt2(const uint8_t* in, const uint8_t* key, uint8_t *out);
-        void pipeline_encrypt2_bad(const uint8_t* in, const uint8_t* key, uint8_t *out);
+        aes_subkeys_type ctr_exp_encrypt8(const uint64_t iv, const uint8_t* key, uint8_t *out);
 
     }
 }

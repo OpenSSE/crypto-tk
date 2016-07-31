@@ -36,40 +36,40 @@
 #include "tests/test_prg.hpp"
 #include "tests/test_block_hash.hpp"
 
-//BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
-//	test_generic_multiset_hash();
-//}
-//
-//BOOST_AUTO_TEST_CASE(sha_512) {
-//	BOOST_REQUIRE(sha_512_vector_1());
-//	BOOST_REQUIRE(sha_512_vector_2());
-//	BOOST_REQUIRE(sha_512_vector_3());
-//	BOOST_REQUIRE(sha_512_vector_4());
-//	BOOST_REQUIRE(sha_512_vector_5());
-//}
-//
-//BOOST_AUTO_TEST_CASE(hmac_sha_512) {
-//	BOOST_REQUIRE(hmac_test_case_1());
-//	BOOST_REQUIRE(hmac_test_case_2());
-//	BOOST_REQUIRE(hmac_test_case_3());
-//	BOOST_REQUIRE(hmac_test_case_4());
-//}
-//
-//BOOST_AUTO_TEST_CASE(encryption) {
-//	BOOST_REQUIRE(encryption_decryption_test());
-//}
-//
-//BOOST_AUTO_TEST_CASE(fpe) {
-//    fpe_correctness_test();
-//}
-//
-//BOOST_AUTO_TEST_CASE(tdp) {
-//    tdp_correctness_test();
-//    tdp_functional_test();
-//    tdp_mult_eval_test();
-//    tdp_mult_inv_test();
-//    tdp_full_mult_inv_test();
-//}
+BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
+	test_generic_multiset_hash();
+}
+
+BOOST_AUTO_TEST_CASE(sha_512) {
+	BOOST_REQUIRE(sha_512_vector_1());
+	BOOST_REQUIRE(sha_512_vector_2());
+	BOOST_REQUIRE(sha_512_vector_3());
+	BOOST_REQUIRE(sha_512_vector_4());
+	BOOST_REQUIRE(sha_512_vector_5());
+}
+
+BOOST_AUTO_TEST_CASE(hmac_sha_512) {
+	BOOST_REQUIRE(hmac_test_case_1());
+	BOOST_REQUIRE(hmac_test_case_2());
+	BOOST_REQUIRE(hmac_test_case_3());
+	BOOST_REQUIRE(hmac_test_case_4());
+}
+
+BOOST_AUTO_TEST_CASE(encryption) {
+	BOOST_REQUIRE(encryption_decryption_test());
+}
+
+BOOST_AUTO_TEST_CASE(fpe) {
+    fpe_correctness_test();
+}
+
+BOOST_AUTO_TEST_CASE(tdp) {
+    tdp_correctness_test();
+    tdp_functional_test();
+    tdp_mult_eval_test();
+    tdp_mult_inv_test();
+    tdp_full_mult_inv_test();
+}
 
 BOOST_AUTO_TEST_CASE(block_hash) {
     test_block_hash();

@@ -212,7 +212,11 @@ namespace sse
         Prg::PrgImpl::~PrgImpl()
         {
             // erase subkeys
+#if USE_AESNI
+            std::fill(aes_enc_key_.begin(), aes_enc_key_.end(), 0x00);
+#else
             memset(&aes_enc_key_, 0x00, sizeof(AES_KEY));
+#endif
         }
 
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))

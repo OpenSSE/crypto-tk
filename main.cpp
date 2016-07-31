@@ -493,7 +493,7 @@ void bench_prg()
     size_t N_sample = 1e7;
     
     std::array<uint8_t,16> key = {{0x00}};
-    std::array<uint8_t,32> out;
+    std::array<uint8_t,16*8> out;
     
     std::chrono::duration<double, std::nano> prg_time;
     auto begin_t = std::chrono::high_resolution_clock::now();
@@ -505,7 +505,7 @@ void bench_prg()
     prg_time = end_t - begin_t;
     
     std::cout << "Prg time: " << prg_time.count() << std::endl;
-    std::cout << "Cycles: " << (double)sse::crypto::tick_counter/N_sample << std::endl;
+//    std::cout << "Cycles: " << (double)sse::crypto::tick_counter/N_sample << std::endl;
 }
 
 int main( int argc, char* argv[] ) {

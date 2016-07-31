@@ -21,21 +21,21 @@
 
 #include "aesni.hpp"
 
-namespace sse
-{
-    
-    namespace crypto
-    {
-        
-        extern __inline__ uint64_t rdtsc(void) {
-            uint64_t a, d;
-            __asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
-            return (d<<32) | a;
-        }
-        
-        uint64_t tick_counter = 0;
-    }
-}
+//namespace sse
+//{
+//    
+//    namespace crypto
+//    {
+//        
+//        extern __inline__ uint64_t rdtsc(void) {
+//            uint64_t a, d;
+//            __asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
+//            return (d<<32) | a;
+//        }
+//        
+//        uint64_t tick_counter = 0;
+//    }
+//}
 
 #if USE_AESNI
 
@@ -43,6 +43,7 @@ namespace sse
 
 #include <iostream>
 #include <iomanip>
+#include <exception>
 #include <cstring>
 
 namespace sse
@@ -123,7 +124,7 @@ K = _mm_xor_si128(K,I);
             __m128i state = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
             
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
@@ -162,7 +163,7 @@ K = _mm_xor_si128(K,I);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             state = _mm_aesenclast_si128(state, SK);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -193,7 +194,7 @@ S2 = _mm_aesenclast_si128(S2, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_2(SK, state1, state2);
@@ -229,7 +230,7 @@ S2 = _mm_aesenclast_si128(S2, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_2(SK, state1, state2);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -266,7 +267,7 @@ S3 = _mm_aesenclast_si128(S3, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_3(SK, state1, state2, state3);
@@ -302,7 +303,7 @@ S3 = _mm_aesenclast_si128(S3, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_3(SK, state1, state2, state3);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -343,7 +344,7 @@ S4 = _mm_aesenclast_si128(S4, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_4(SK, state1, state2, state3, state4);
@@ -379,7 +380,7 @@ S4 = _mm_aesenclast_si128(S4, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_4(SK, state1, state2, state3, state4);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -425,7 +426,7 @@ S5 = _mm_aesenclast_si128(S5, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_5(SK, state1, state2, state3, state4, state5);
@@ -461,7 +462,7 @@ S5 = _mm_aesenclast_si128(S5, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_5(SK, state1, state2, state3, state4, state5);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -512,7 +513,7 @@ S6 = _mm_aesenclast_si128(S6, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_6(SK, state1, state2, state3, state4, state5, state6);
@@ -548,7 +549,7 @@ S6 = _mm_aesenclast_si128(S6, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_6(SK, state1, state2, state3, state4, state5, state6);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -605,7 +606,7 @@ S7 = _mm_aesenclast_si128(S7, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_7(SK, state1, state2, state3, state4, state5, state6, state7);
@@ -641,7 +642,7 @@ S7 = _mm_aesenclast_si128(S7, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_7(SK, state1, state2, state3, state4, state5, state6, state7);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -704,7 +705,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
@@ -740,7 +741,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
 
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -756,13 +757,13 @@ S8 = _mm_aesenclast_si128(S8, K);
 
         }
         
-        void aesni_ctr_encrypt1(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr1(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state = _mm_set_epi64x(0x00, iv);
             
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
@@ -801,7 +802,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             state = _mm_aesenclast_si128(state, SK);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -819,7 +820,7 @@ S1 = _mm_aesenc_si128(S1, K);
 KEYEXP_128(K, I, 0x36); \
 S1 = _mm_aesenclast_si128(S1, K);
 
-        void aesni_ctr_encrypt1(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr1(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -833,7 +834,7 @@ S1 = _mm_aesenclast_si128(S1, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             state1 = _mm_xor_si128(state1, K);
@@ -849,7 +850,7 @@ S1 = _mm_aesenclast_si128(S1, K);
             EXP_ENCRYPT_ROUND_1(K, I, state1, 0x1b);
             EXP_ENCRYPT_ROUND_1_LAST(K, I, state1);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -868,7 +869,7 @@ KEYEXP_128(K, I, 0x36); \
 S1 = _mm_aesenclast_si128(S1, K); \
 S2 = _mm_aesenclast_si128(S2, K);
         
-        void aesni_ctr_encrypt2(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr2(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state1 = _mm_set_epi64x(0x00, iv);
@@ -877,7 +878,7 @@ S2 = _mm_aesenclast_si128(S2, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_2(SK, state1, state2);
@@ -913,7 +914,7 @@ S2 = _mm_aesenclast_si128(S2, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_2(SK, state1, state2);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -923,7 +924,7 @@ S2 = _mm_aesenclast_si128(S2, K);
             
         }
 
-        void aesni_ctr_encrypt2(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr2(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -938,7 +939,7 @@ S2 = _mm_aesenclast_si128(S2, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_2(K, state1, state2);
@@ -954,7 +955,7 @@ S2 = _mm_aesenclast_si128(S2, K);
             EXP_ENCRYPT_ROUND_2(K, I, state1, state2, 0x1b);
             EXP_ENCRYPT_ROUND_2_LAST(K, I, state1, state2);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -979,7 +980,7 @@ S1 = _mm_aesenclast_si128(S1, K); \
 S2 = _mm_aesenclast_si128(S2, K); \
 S3 = _mm_aesenclast_si128(S3, K);
 
-        void aesni_ctr_encrypt3(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr3(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state1 = _mm_set_epi64x(0x00, iv);
@@ -989,7 +990,7 @@ S3 = _mm_aesenclast_si128(S3, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_3(SK, state1, state2, state3);
@@ -1023,9 +1024,9 @@ S3 = _mm_aesenclast_si128(S3, K);
             ENCRYPT_ROUND_3(SK, state1, state2, state3);
             
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
-            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            ENCRYPT_ROUND_LAST_3(SK, state1, state2, state3);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -1036,7 +1037,7 @@ S3 = _mm_aesenclast_si128(S3, K);
             
         }
 
-        void aesni_ctr_encrypt3(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr3(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -1052,7 +1053,7 @@ S3 = _mm_aesenclast_si128(S3, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_3(K, state1, state2, state3);
@@ -1068,7 +1069,7 @@ S3 = _mm_aesenclast_si128(S3, K);
             EXP_ENCRYPT_ROUND_3(K, I, state1, state2, state3, 0x1b);
             EXP_ENCRYPT_ROUND_3_LAST(K, I, state1, state2, state3);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -1094,7 +1095,7 @@ S2 = _mm_aesenclast_si128(S2, K); \
 S3 = _mm_aesenclast_si128(S3, K); \
 S4 = _mm_aesenclast_si128(S4, K);
 
-        void aesni_ctr_encrypt4(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr4(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state1 = _mm_set_epi64x(0x00, iv);
@@ -1105,7 +1106,7 @@ S4 = _mm_aesenclast_si128(S4, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_4(SK, state1, state2, state3, state4);
@@ -1141,7 +1142,7 @@ S4 = _mm_aesenclast_si128(S4, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_4(SK, state1, state2, state3, state4);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -1153,7 +1154,7 @@ S4 = _mm_aesenclast_si128(S4, K);
             
         }
 
-        void aesni_ctr_encrypt4(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr4(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -1170,7 +1171,7 @@ S4 = _mm_aesenclast_si128(S4, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_4(K, state1, state2, state3, state4);
@@ -1186,7 +1187,7 @@ S4 = _mm_aesenclast_si128(S4, K);
             EXP_ENCRYPT_ROUND_4(K, I, state1, state2, state3, state4, 0x1b);
             EXP_ENCRYPT_ROUND_4_LAST(K, I, state1, state2, state3, state4);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -1214,7 +1215,7 @@ S3 = _mm_aesenclast_si128(S3, K); \
 S4 = _mm_aesenclast_si128(S4, K); \
 S5 = _mm_aesenclast_si128(S5, K); 
         
-        void aesni_ctr_encrypt5(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr5(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state1 = _mm_set_epi64x(0x00, iv);
@@ -1226,7 +1227,7 @@ S5 = _mm_aesenclast_si128(S5, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_5(SK, state1, state2, state3, state4, state5);
@@ -1262,7 +1263,7 @@ S5 = _mm_aesenclast_si128(S5, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_5(SK, state1, state2, state3, state4, state5);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -1275,7 +1276,7 @@ S5 = _mm_aesenclast_si128(S5, K);
             
         }
 
-        void aesni_ctr_encrypt5(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr5(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -1293,7 +1294,7 @@ S5 = _mm_aesenclast_si128(S5, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_5(K, state1, state2, state3, state4, state5);
@@ -1309,7 +1310,7 @@ S5 = _mm_aesenclast_si128(S5, K);
             EXP_ENCRYPT_ROUND_5(K, I, state1, state2, state3, state4, state5, 0x1b);
             EXP_ENCRYPT_ROUND_5_LAST(K, I, state1, state2, state3, state4, state5);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -1342,7 +1343,7 @@ S4 = _mm_aesenclast_si128(S4, K); \
 S5 = _mm_aesenclast_si128(S5, K); \
 S6 = _mm_aesenclast_si128(S6, K); 
         
-        void aesni_ctr_encrypt6(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr6(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state1 = _mm_set_epi64x(0x00, iv);
@@ -1355,7 +1356,7 @@ S6 = _mm_aesenclast_si128(S6, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_6(SK, state1, state2, state3, state4, state5, state6);
@@ -1391,7 +1392,7 @@ S6 = _mm_aesenclast_si128(S6, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_6(SK, state1, state2, state3, state4, state5, state6);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -1405,7 +1406,7 @@ S6 = _mm_aesenclast_si128(S6, K);
             
         }
 
-        void aesni_ctr_encrypt6(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr6(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -1424,7 +1425,7 @@ S6 = _mm_aesenclast_si128(S6, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_6(K, state1, state2, state3, state4, state5, state6);
@@ -1440,7 +1441,7 @@ S6 = _mm_aesenclast_si128(S6, K);
             EXP_ENCRYPT_ROUND_6(K, I, state1, state2, state3, state4, state5, state6, 0x1b);
             EXP_ENCRYPT_ROUND_6_LAST(K, I, state1, state2, state3, state4, state5, state6);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -1475,7 +1476,7 @@ S5 = _mm_aesenclast_si128(S5, K); \
 S6 = _mm_aesenclast_si128(S6, K); \
 S7 = _mm_aesenclast_si128(S7, K); 
         
-        void aesni_ctr_encrypt7(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr7(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state1 = _mm_set_epi64x(0x00, iv);
@@ -1489,7 +1490,7 @@ S7 = _mm_aesenclast_si128(S7, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_7(SK, state1, state2, state3, state4, state5, state6, state7);
@@ -1525,7 +1526,7 @@ S7 = _mm_aesenclast_si128(S7, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_7(SK, state1, state2, state3, state4, state5, state6, state7);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -1540,7 +1541,7 @@ S7 = _mm_aesenclast_si128(S7, K);
             
         }
 
-        void aesni_ctr_encrypt7(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr7(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -1560,7 +1561,7 @@ S7 = _mm_aesenclast_si128(S7, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_7(K, state1, state2, state3, state4, state5, state6, state7);
@@ -1576,7 +1577,7 @@ S7 = _mm_aesenclast_si128(S7, K);
             EXP_ENCRYPT_ROUND_7(K, I, state1, state2, state3, state4, state5, state6, state7, 0x1b);
             EXP_ENCRYPT_ROUND_7_LAST(K, I, state1, state2, state3, state4, state5, state6, state7);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -1613,7 +1614,7 @@ S6 = _mm_aesenclast_si128(S6, K); \
 S7 = _mm_aesenclast_si128(S7, K); \
 S8 = _mm_aesenclast_si128(S8, K);
         
-        void aesni_ctr_encrypt8(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_ctr8(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state1 = _mm_set_epi64x(0x00, iv);
@@ -1628,7 +1629,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             // load the first subkey
             __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
@@ -1664,7 +1665,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
             ENCRYPT_ROUND_LAST_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             SK = _mm_set_epi64x(0x00, 0x00);
@@ -1680,7 +1681,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             
         }
 
-        void aesni_ctr_encrypt8(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        void aesni_ctr8(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             __m128i K, I, mask, R;
             
@@ -1701,7 +1702,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_8(K, state1, state2, state3, state4, state5, state6, state7, state8);
@@ -1717,7 +1718,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             EXP_ENCRYPT_ROUND_8(K, I, state1, state2, state3, state4, state5, state6, state7, state8, 0x1b);
             EXP_ENCRYPT_ROUND_8_LAST(K, I, state1, state2, state3, state4, state5, state6, state7, state8);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -1734,7 +1735,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             
         }
 
-        aes_subkeys_type ctr_exp_encrypt8(const uint64_t iv, const uint8_t* key, uint8_t *out)
+        aes_subkeys_type aesni_ctr_exp8(const uint64_t iv, const uint8_t* key, uint8_t *out)
         {
             aes_subkeys_type subkeys;
 
@@ -1757,7 +1758,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             
             // ROUND 0
             
-            uint64_t now =  rdtsc();
+//            uint64_t now =  rdtsc();
             
             // XOR it to the state
             XOR_KEY_8(K, state1, state2, state3, state4, state5, state6, state7, state8);
@@ -1784,7 +1785,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             EXP_ENCRYPT_ROUND_8_LAST(K, I, state1, state2, state3, state4, state5, state6, state7, state8);
             _mm_storeu_si128(reinterpret_cast<__m128i*>(subkeys.data())+10, K);
             
-            tick_counter += rdtsc() - now;
+//            tick_counter += rdtsc() - now;
             
             // cleanup
             K = _mm_set_epi64x(0x00, 0x00);
@@ -1801,6 +1802,94 @@ S8 = _mm_aesenclast_si128(S8, K);
             
             return subkeys;
         }
+        
+        
+        
+        void aesni_ctr(const uint64_t N, const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            uint64_t i = 0;
+            
+            while (i+8 <= N) { // at least 8 blocks to generate
+                aesni_ctr8(i+iv, subkeys, out + (i*kBlockSize));
+                i+=8;
+            }
+            
+            switch (N-i) {
+                case 0:
+                    break;
+                case 1:
+                    aesni_ctr1(i+iv, subkeys, out + (i*kBlockSize));
+                    break;
+                case 2:
+                    aesni_ctr2(i+iv, subkeys, out + (i*kBlockSize));
+                    break;
+                case 3:
+                    aesni_ctr3(i+iv, subkeys, out + (i*kBlockSize));
+                    break;
+                case 4:
+                    aesni_ctr4(i+iv, subkeys, out + (i*kBlockSize));
+                    break;
+                case 5:
+                    aesni_ctr5(i+iv, subkeys, out + (i*kBlockSize));
+                    break;
+                case 6:
+                    aesni_ctr6(i+iv, subkeys, out + (i*kBlockSize));
+                    break;
+                case 7:
+                    aesni_ctr7(i+iv, subkeys, out + (i*kBlockSize));
+                    break;
+                    
+                default:
+                    throw std::out_of_range("N-i > 7");
+                    break;
+            }
+            
+        }
+
+        void aesni_ctr(const uint64_t N, const uint64_t iv, const uint8_t* key, uint8_t *out)
+        {
+            if(N >= 8)
+            {
+                aes_subkeys_type subkeys = aesni_ctr_exp8(iv, key, out);
+                
+                if (N > 0) {
+                    aesni_ctr(N-8, iv+8, subkeys, out+8*kBlockSize);
+                }
+                
+                std::fill(subkeys.begin(), subkeys.end(), 0x00);
+            }else{
+                switch (N) {
+                    case 0:
+                        break;
+                    case 1:
+                        aesni_ctr1(iv, key, out);
+                        break;
+                    case 2:
+                        aesni_ctr2(iv, key, out);
+                        break;
+                    case 3:
+                        aesni_ctr3(iv, key, out);
+                        break;
+                    case 4:
+                        aesni_ctr4(iv, key, out);
+                        break;
+                    case 5:
+                        aesni_ctr5(iv, key, out);
+                        break;
+                    case 6:
+                        aesni_ctr6(iv, key, out);
+                        break;
+                    case 7:
+                        aesni_ctr7(iv, key, out);
+                        break;
+                        
+                    default:
+                        throw std::out_of_range("N > 7");
+                        break;
+                }
+            }
+        }
+
 }
 
 }

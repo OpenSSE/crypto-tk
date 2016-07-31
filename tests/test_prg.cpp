@@ -67,12 +67,16 @@ void test_prg()
         
         sse::crypto::Prg prg(k);
         
-        std::string out1, out2;
+        std::string out1, out2, out3, out4;
         
         out1 = prg.derive(33);
         out2 = prg.derive(17,16);
- 
+        out3 = prg.derive(32);
+        out4 = prg.derive(16,16);
+        
         BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+17));
+        BOOST_CHECK(std::equal(out3.begin(), out3.end(), out1.begin()));
+        BOOST_CHECK(std::equal(out2.begin(), out2.end()-1, out4.begin()+1));
     }
 }
 

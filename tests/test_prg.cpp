@@ -32,9 +32,9 @@
 
 void test_prg()
 {
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
-        std::array<uint8_t,sse::crypto::Prg::kKeySize> k{};
         
         sse::crypto::random_bytes(k);
         
@@ -50,8 +50,6 @@ void test_prg()
     }
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
-        std::array<uint8_t,sse::crypto::Prg::kKeySize> k{};
-        
         sse::crypto::random_bytes(k);
         
         sse::crypto::Prg prg(k);
@@ -64,8 +62,6 @@ void test_prg()
         BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+15));
     }
     for (size_t i = 0; i < TEST_COUNT; i++) {
-        
-        std::array<uint8_t,sse::crypto::Prg::kKeySize> k{};
         
         sse::crypto::random_bytes(k);
         
@@ -83,9 +79,9 @@ void test_prg()
 
 void test_prg_consistency()
 {
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+    
     for (size_t i = 0; i < TEST_COUNT; i++) {
-        
-        std::array<uint8_t,sse::crypto::Prg::kKeySize> k{};
         
         sse::crypto::random_bytes(k);
         
@@ -99,9 +95,7 @@ void test_prg_consistency()
         BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
     for (size_t i = 0; i < TEST_COUNT; i++) {
-        
-        std::array<uint8_t,sse::crypto::Prg::kKeySize> k{};
-        
+                
         sse::crypto::random_bytes(k);
         
         sse::crypto::Prg prg(k);

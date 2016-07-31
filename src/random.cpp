@@ -107,6 +107,7 @@ void Drbg::DrbgImpl::reseed()
 	delete [] key_buf;
 	
 	remaining_bytes_ = kReseedBytesCount;
+    memset(iv_, 0x00, AES_BLOCK_SIZE);
 }	
 	
 void Drbg::DrbgImpl::fill()

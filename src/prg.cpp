@@ -241,7 +241,7 @@ namespace sse
                 block_len++;
             }
             
-            unsigned char in[block_len*AES_BLOCK_SIZE];
+            unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
             memset(in, 0x00, block_len*AES_BLOCK_SIZE);
             
             for (size_t i = 1; i < block_len; i++) {
@@ -275,6 +275,8 @@ namespace sse
                 memset(tmp, 0x00, AES_BLOCK_SIZE);
             }
             
+            delete [] in;
+            
         }
         
 
@@ -295,7 +297,7 @@ namespace sse
             size_t block_len = max_block_index - block_offset;
 
             
-            unsigned char in[block_len*AES_BLOCK_SIZE];
+            unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
             memset(in, 0x00, block_len*AES_BLOCK_SIZE);
             
             unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
@@ -316,6 +318,9 @@ namespace sse
             
             memcpy(out, tmp+extra_len, len);
             memset(tmp, 0x00, len+extra_len);
+            
+            delete [] tmp;
+            delete [] in;
         }
 
         void Prg::PrgImpl::derive(const size_t len, std::string &out) const
@@ -441,10 +446,11 @@ namespace sse
             size_t block_count = max_block_index - block_offset;
             
             
-            unsigned char in[block_count*AES_BLOCK_SIZE];
+            unsigned char *in = new unsigned char[block_count*AES_BLOCK_SIZE];
+            unsigned char *tmp = new unsigned char[block_count*AES_BLOCK_SIZE];
+
             memset(in, 0x00, block_count*AES_BLOCK_SIZE);
             
-            unsigned char *tmp = new unsigned char[block_count*AES_BLOCK_SIZE];
             
             for (size_t i = block_offset; i < max_block_index; i++) {
                 ((size_t*)in)[2*(i-block_offset)] = i;
@@ -470,6 +476,9 @@ namespace sse
 
             memcpy(out, tmp+extra_len, len);
             memset(tmp, 0x00, len+extra_len);
+            
+            delete [] tmp;
+            delete [] in;
         }
         
     }

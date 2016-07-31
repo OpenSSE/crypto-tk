@@ -4,15 +4,15 @@ before_script:
  
 stages:
   - build
-  - test
+  # - test
   
 crypto:
   stage: build
   script:
   - scons
-
-check:
-  stage: test
-  script:
   - scons check_ci  
   - scons check_ci no_aesni=1
+  
+# check:
+#   stage: test
+#   script:

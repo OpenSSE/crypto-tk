@@ -49,12 +49,12 @@ namespace sse
     
     namespace crypto
     {
-        constexpr uint8_t kNround = 10;
-        constexpr uint8_t kBlockSize = 16;
+        constexpr uint8_t kNAESRound = 10;
+        constexpr uint8_t kAESBlockSize = 16;
 
 
-        typedef std::array<uint8_t, kBlockSize> aes_key_type;
-        typedef std::array<uint8_t, (kNround+1)*kBlockSize> aes_subkeys_type;
+        typedef std::array<uint8_t, kAESBlockSize> aes_key_type;
+        typedef std::array<uint8_t, (kNAESRound+1)*kAESBlockSize> aes_subkeys_type;
 
         aes_subkeys_type aesni_derive_subkeys(const uint8_t* key);
         inline aes_subkeys_type aesni_derive_subkeys(const aes_key_type& key)

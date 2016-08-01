@@ -1810,7 +1810,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             uint64_t i = 0;
             
             while (i+8 <= N) { // at least 8 blocks to generate
-                aesni_ctr8(i+iv, subkeys, out + (i*kBlockSize));
+                aesni_ctr8(i+iv, subkeys, out + (i*kAESBlockSize));
                 i+=8;
             }
             
@@ -1818,25 +1818,25 @@ S8 = _mm_aesenclast_si128(S8, K);
                 case 0:
                     break;
                 case 1:
-                    aesni_ctr1(i+iv, subkeys, out + (i*kBlockSize));
+                    aesni_ctr1(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 2:
-                    aesni_ctr2(i+iv, subkeys, out + (i*kBlockSize));
+                    aesni_ctr2(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 3:
-                    aesni_ctr3(i+iv, subkeys, out + (i*kBlockSize));
+                    aesni_ctr3(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 4:
-                    aesni_ctr4(i+iv, subkeys, out + (i*kBlockSize));
+                    aesni_ctr4(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 5:
-                    aesni_ctr5(i+iv, subkeys, out + (i*kBlockSize));
+                    aesni_ctr5(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 6:
-                    aesni_ctr6(i+iv, subkeys, out + (i*kBlockSize));
+                    aesni_ctr6(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 7:
-                    aesni_ctr7(i+iv, subkeys, out + (i*kBlockSize));
+                    aesni_ctr7(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                     
                 default:
@@ -1853,7 +1853,7 @@ S8 = _mm_aesenclast_si128(S8, K);
                 aes_subkeys_type subkeys = aesni_ctr_exp8(iv, key, out);
                 
                 if (N > 0) {
-                    aesni_ctr(N-8, iv+8, subkeys, out+8*kBlockSize);
+                    aesni_ctr(N-8, iv+8, subkeys, out+8*kAESBlockSize);
                 }
                 
                 std::fill(subkeys.begin(), subkeys.end(), 0x00);

@@ -20,6 +20,8 @@
 
 #include "random.hpp"
 
+#include "aesni/aesni.hpp"
+
 #include <cstring>
 #include <algorithm>
 #include <array>
@@ -36,6 +38,13 @@ namespace crypto
 class Drbg::DrbgImpl
 {
 public:
+#if USE_AESNI
+    typedef aes_subkeys_type key_type;
+#else
+    typedef AES_KEY key_type;
+#endif
+    
+
 	DrbgImpl();
 	~DrbgImpl();
 	
@@ -44,9 +53,17 @@ public:
 	void next(const size_t &byte_count, unsigned char* out);
 
 private:
-	AES_KEY aes_key_;
-    std::array<unsigned char,1024> buffer_;
+    static constexpr uint64_t kBlockCount = 64;
+    
+	key_type aes_key_;
+    std::array<unsigned char,16*kBlockCount> buffer_;
+    
+#if USE_AESNI
+    uint64_t iv_;
+#else
     unsigned char iv_[AES_BLOCK_SIZE];
+#endif
+    
     size_t buffer_pos_;
     size_t remaining_bytes_;
 	
@@ -95,11 +112,17 @@ void Drbg::DrbgImpl::reseed()
 	urandom.read((char*) key_buf,16);
 	urandom.close();
 
+#if USE_AESNI
+    aes_key_ = aesni_derive_subkeys(key_buf);
+    iv_ = 0;
+#else
 	if (AES_set_encrypt_key(key_buf, 128, &aes_key_) != 0)
 	{
 		// throw an exception
 		throw std::runtime_error("Unable to init AES subkeys");
 	}
+    memset(iv_, 0x00, AES_BLOCK_SIZE);
+#endif
 
 
 	// erase the key buffer
@@ -107,8 +130,7 @@ void Drbg::DrbgImpl::reseed()
 	delete [] key_buf;
 	
 	remaining_bytes_ = kReseedBytesCount;
-    memset(iv_, 0x00, AES_BLOCK_SIZE);
-}	
+}
 	
 void Drbg::DrbgImpl::fill()
 {
@@ -119,13 +141,19 @@ void Drbg::DrbgImpl::fill()
 	
 	remaining_bytes_ -= buffer_.size();
 	
+	
+#if USE_AESNI
+    aesni_ctr(kBlockCount, iv_, aes_key_, buffer_.data());
+    iv_ += kBlockCount;
+#else
     unsigned char ecount[AES_BLOCK_SIZE];
     // memset(ecount, 0x00, AES_BLOCK_SIZE);
-	
-	unsigned int num = 0;
-	
+    
+    unsigned int num = 0;
+
     AES_ctr128_encrypt(buffer_.data(), buffer_.data(), buffer_.size(), &aes_key_, iv_, ecount, &num);
-    buffer_pos_ = 0;	
+#endif
+    buffer_pos_ = 0;
 }
 	
 void Drbg::DrbgImpl::next(const size_t &byte_count, unsigned char* out)

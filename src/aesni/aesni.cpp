@@ -798,6 +798,688 @@ S8 = _mm_aesenclast_si128(S8, K);
             }
             
         }
+        
+        void aesni_encrypt_xor1(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            
+            __m128i old_state = state;
+
+            //            uint64_t now =  rdtsc();
+            
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            // XOR it to the state
+            state = _mm_xor_si128(state, SK);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            state = _mm_aesenc_si128(state, SK);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            state = _mm_aesenclast_si128(state, SK);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            state = _mm_xor_si128(state, old_state);
+
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state);
+            
+        }
+        
+        void aesni_encrypt_xor2(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            __m128i state2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+1);
+            
+            __m128i old_state1 = state1;
+            __m128i old_state2 = state2;
+
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            //            uint64_t now =  rdtsc();
+            
+            // XOR it to the state
+            XOR_KEY_2(SK, state1, state2);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            ENCRYPT_ROUND_2(SK, state1, state2);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            ENCRYPT_ROUND_LAST_2(SK, state1, state2);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            state1 = _mm_xor_si128(state1, old_state1);
+            state2 = _mm_xor_si128(state2, old_state2);
+
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state1 = _mm_set_epi64x(0x00, 0x00);
+            old_state2 = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state1);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+1, state2);
+            
+        }
+        
+        void aesni_encrypt_xor3(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            __m128i state2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+1);
+            __m128i state3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+2);
+            
+            __m128i old_state1 = state1;
+            __m128i old_state2 = state2;
+            __m128i old_state3 = state3;
+
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            //            uint64_t now =  rdtsc();
+            
+            // XOR it to the state
+            XOR_KEY_3(SK, state1, state2, state3);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            ENCRYPT_ROUND_3(SK, state1, state2, state3);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            state1 = _mm_xor_si128(state1, old_state1);
+            state2 = _mm_xor_si128(state2, old_state2);
+            state3 = _mm_xor_si128(state3, old_state3);
+
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state1 = _mm_set_epi64x(0x00, 0x00);
+            old_state2 = _mm_set_epi64x(0x00, 0x00);
+            old_state3 = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state1);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+1, state2);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+2, state3);
+            
+        }
+        
+        
+        void aesni_encrypt_xor4(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            __m128i state2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+1);
+            __m128i state3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+2);
+            __m128i state4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+3);
+            
+            __m128i old_state1 = state1;
+            __m128i old_state2 = state2;
+            __m128i old_state3 = state3;
+            __m128i old_state4 = state4;
+
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            //            uint64_t now =  rdtsc();
+            
+            // XOR it to the state
+            XOR_KEY_4(SK, state1, state2, state3, state4);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            ENCRYPT_ROUND_4(SK, state1, state2, state3, state4);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            ENCRYPT_ROUND_LAST_4(SK, state1, state2, state3, state4);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            
+            state1 = _mm_xor_si128(state1, old_state1);
+            state2 = _mm_xor_si128(state2, old_state2);
+            state3 = _mm_xor_si128(state3, old_state3);
+            state4 = _mm_xor_si128(state4, old_state4);
+
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state1 = _mm_set_epi64x(0x00, 0x00);
+            old_state2 = _mm_set_epi64x(0x00, 0x00);
+            old_state3 = _mm_set_epi64x(0x00, 0x00);
+            old_state4 = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state1);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+1, state2);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+2, state3);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+3, state4);
+            
+        }
+        
+        
+        void aesni_encrypt_xor5(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            __m128i state2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+1);
+            __m128i state3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+2);
+            __m128i state4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+3);
+            __m128i state5 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+4);
+            
+            __m128i old_state1 = state1;
+            __m128i old_state2 = state2;
+            __m128i old_state3 = state3;
+            __m128i old_state4 = state4;
+            __m128i old_state5 = state5;
+
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            //            uint64_t now =  rdtsc();
+            
+            // XOR it to the state
+            XOR_KEY_5(SK, state1, state2, state3, state4, state5);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            ENCRYPT_ROUND_5(SK, state1, state2, state3, state4, state5);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            ENCRYPT_ROUND_LAST_5(SK, state1, state2, state3, state4, state5);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            state1 = _mm_xor_si128(state1, old_state1);
+            state2 = _mm_xor_si128(state2, old_state2);
+            state3 = _mm_xor_si128(state3, old_state3);
+            state4 = _mm_xor_si128(state4, old_state4);
+            state5 = _mm_xor_si128(state5, old_state5);
+
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state1 = _mm_set_epi64x(0x00, 0x00);
+            old_state2 = _mm_set_epi64x(0x00, 0x00);
+            old_state3 = _mm_set_epi64x(0x00, 0x00);
+            old_state4 = _mm_set_epi64x(0x00, 0x00);
+            old_state5 = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state1);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+1, state2);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+2, state3);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+3, state4);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+4, state5);
+            
+        }
+        
+        
+        void aesni_encrypt_xor6(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            __m128i state2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+1);
+            __m128i state3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+2);
+            __m128i state4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+3);
+            __m128i state5 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+4);
+            __m128i state6 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+5);
+            
+            __m128i old_state1 = state1;
+            __m128i old_state2 = state2;
+            __m128i old_state3 = state3;
+            __m128i old_state4 = state4;
+            __m128i old_state5 = state5;
+            __m128i old_state6 = state6;
+            
+
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            //            uint64_t now =  rdtsc();
+            
+            // XOR it to the state
+            XOR_KEY_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            ENCRYPT_ROUND_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            ENCRYPT_ROUND_LAST_6(SK, state1, state2, state3, state4, state5, state6);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            state1 = _mm_xor_si128(state1, old_state1);
+            state2 = _mm_xor_si128(state2, old_state2);
+            state3 = _mm_xor_si128(state3, old_state3);
+            state4 = _mm_xor_si128(state4, old_state4);
+            state5 = _mm_xor_si128(state5, old_state5);
+            state6 = _mm_xor_si128(state6, old_state6);
+
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state1 = _mm_set_epi64x(0x00, 0x00);
+            old_state2 = _mm_set_epi64x(0x00, 0x00);
+            old_state3 = _mm_set_epi64x(0x00, 0x00);
+            old_state4 = _mm_set_epi64x(0x00, 0x00);
+            old_state5 = _mm_set_epi64x(0x00, 0x00);
+            old_state6 = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state1);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+1, state2);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+2, state3);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+3, state4);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+4, state5);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+5, state6);
+            
+        }
+        
+        
+        void aesni_encrypt_xor7(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            __m128i state2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+1);
+            __m128i state3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+2);
+            __m128i state4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+3);
+            __m128i state5 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+4);
+            __m128i state6 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+5);
+            __m128i state7 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+6);
+            
+            __m128i old_state1 = state1;
+            __m128i old_state2 = state2;
+            __m128i old_state3 = state3;
+            __m128i old_state4 = state4;
+            __m128i old_state5 = state5;
+            __m128i old_state6 = state6;
+            __m128i old_state7 = state7;
+            
+
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            //            uint64_t now =  rdtsc();
+            
+            // XOR it to the state
+            XOR_KEY_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            ENCRYPT_ROUND_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            ENCRYPT_ROUND_LAST_7(SK, state1, state2, state3, state4, state5, state6, state7);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            
+            state1 = _mm_xor_si128(state1, old_state1);
+            state2 = _mm_xor_si128(state2, old_state2);
+            state3 = _mm_xor_si128(state3, old_state3);
+            state4 = _mm_xor_si128(state4, old_state4);
+            state5 = _mm_xor_si128(state5, old_state5);
+            state6 = _mm_xor_si128(state6, old_state6);
+            state7 = _mm_xor_si128(state7, old_state7);
+
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state1 = _mm_set_epi64x(0x00, 0x00);
+            old_state2 = _mm_set_epi64x(0x00, 0x00);
+            old_state3 = _mm_set_epi64x(0x00, 0x00);
+            old_state4 = _mm_set_epi64x(0x00, 0x00);
+            old_state5 = _mm_set_epi64x(0x00, 0x00);
+            old_state6 = _mm_set_epi64x(0x00, 0x00);
+            old_state7 = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state1);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+1, state2);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+2, state3);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+3, state4);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+4, state5);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+5, state6);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+6, state7);
+            
+        }
+        
+
+        void aesni_encrypt_xor8(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            // load the input
+            __m128i state1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
+            __m128i state2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+1);
+            __m128i state3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+2);
+            __m128i state4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+3);
+            __m128i state5 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+4);
+            __m128i state6 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+5);
+            __m128i state7 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+6);
+            __m128i state8 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in)+7);
+            
+            __m128i old_state1 = state1;
+            __m128i old_state2 = state2;
+            __m128i old_state3 = state3;
+            __m128i old_state4 = state4;
+            __m128i old_state5 = state5;
+            __m128i old_state6 = state6;
+            __m128i old_state7 = state7;
+            __m128i old_state8 = state8;
+            
+            
+            // load the first subkey
+            __m128i SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data()));
+            
+            //            uint64_t now =  rdtsc();
+            
+            // XOR it to the state
+            XOR_KEY_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            // load the next subkeys and call the magical aesenc instruction
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+1);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+2);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+3);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+4);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+5);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+6);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+7);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+8);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
+            ENCRYPT_ROUND_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
+            ENCRYPT_ROUND_LAST_8(SK, state1, state2, state3, state4, state5, state6, state7, state8);
+            
+            //            tick_counter += rdtsc() - now;
+            
+            // cleanup
+            SK = _mm_set_epi64x(0x00, 0x00);
+            
+            state1 = _mm_xor_si128(state1, old_state1);
+            state2 = _mm_xor_si128(state2, old_state2);
+            state3 = _mm_xor_si128(state3, old_state3);
+            state4 = _mm_xor_si128(state4, old_state4);
+            state5 = _mm_xor_si128(state5, old_state5);
+            state6 = _mm_xor_si128(state6, old_state6);
+            state7 = _mm_xor_si128(state7, old_state7);
+            state8 = _mm_xor_si128(state8, old_state8);
+            
+            // clean up the old_state registers: they could contain sensitive information
+            
+            old_state1 = _mm_set_epi64x(0x00, 0x00);
+            old_state2 = _mm_set_epi64x(0x00, 0x00);
+            old_state3 = _mm_set_epi64x(0x00, 0x00);
+            old_state4 = _mm_set_epi64x(0x00, 0x00);
+            old_state5 = _mm_set_epi64x(0x00, 0x00);
+            old_state6 = _mm_set_epi64x(0x00, 0x00);
+            old_state7 = _mm_set_epi64x(0x00, 0x00);
+            old_state8 = _mm_set_epi64x(0x00, 0x00);
+
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out), state1);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+1, state2);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+2, state3);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+3, state4);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+4, state5);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+5, state6);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+6, state7);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out)+7, state8);
+            
+        }
+        
+
+
+        void aesni_encrypt_xor(const uint8_t* in, const uint64_t len, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            uint64_t i = 0;
+            
+            while (i+8 <= len) { // at least 8 blocks to generate
+                aesni_encrypt_xor8(in+i, subkeys, out + (i*kAESBlockSize));
+                i+=8;
+            }
+			
+            
+            switch (len-i) {
+                case 0:
+                    break;
+                case 1:
+                    aesni_encrypt_xor1(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 2:
+                    aesni_encrypt_xor2(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 3:
+                    aesni_encrypt_xor3(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 4:
+                    aesni_encrypt_xor4(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 5:
+                    aesni_encrypt_xor5(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 6:
+                    aesni_encrypt_xor6(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 7:
+                    aesni_encrypt_xor7(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                    
+                default:
+                    throw std::out_of_range("len-i > 7");
+                    break;
+            }
+            
+        }
 
         void aesni_ctr1(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {

@@ -92,18 +92,18 @@ namespace sse
         void BlockHash::BlockHashImpl::hash(const unsigned char *in,  unsigned char *out)
         {
             
+#if USE_AESNI
+            aesni_encrypt_xor1(in, *get_key(), out);
+#else
             unsigned char *internal_out = out;
             
             if (in == out) {
                 // the pointers are equal, we have to alloc some temporary memory
                 internal_out = new unsigned char [AES_BLOCK_SIZE];
             }
+            
 
-#if USE_AESNI
-            aesni_encrypt1(in, *get_key(), internal_out);
-#else
             AES_encrypt(in, internal_out, get_key());
-#endif
             
             for (size_t i = 0; i < AES_BLOCK_SIZE; i++) {
                 out[i] = internal_out[i] ^ in[i];
@@ -112,7 +112,7 @@ namespace sse
             if (in == out) {
                 delete []  internal_out;
             }
-
+#endif            
         }
     
         
@@ -123,20 +123,21 @@ namespace sse
                 throw std::invalid_argument("Invalid in_len: in_len%16 != 0");
             }
             
-            unsigned char *internal_out = out;
             
+#if USE_AESNI
+            aesni_encrypt_xor(in, in_len/AES_BLOCK_SIZE, *get_key(), out);
+#else
+            unsigned char *internal_out = out;
+
             if (in == out) {
                 // the pointers are equal, we have to alloc some temporary memory
                 internal_out = new unsigned char [in_len];
             }
             
-#if USE_AESNI
-            aesni_encrypt(in, in_len/AES_BLOCK_SIZE, *get_key(), internal_out);
-#else
+
             for (uint64_t i = 0; i < in_len/AES_BLOCK_SIZE; i++) {
                 AES_encrypt(in + i*AES_BLOCK_SIZE, internal_out + i*AES_BLOCK_SIZE, get_key());
             }
-#endif
             
             for (size_t i = 0; i < in_len; i++) {
                 out[i] = internal_out[i] ^ in[i];
@@ -145,6 +146,8 @@ namespace sse
             if (in == out) {
                 delete []  internal_out;
             }
+#endif
+
         }
 
         

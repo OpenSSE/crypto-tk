@@ -118,7 +118,7 @@ K = _mm_xor_si128(K,I);
             return subkeys;
         }
 
-        void aesni_encrypt(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
+        void aesni_encrypt1(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
             __m128i state = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in));
@@ -757,6 +757,48 @@ S8 = _mm_aesenclast_si128(S8, K);
 
         }
         
+ 
+        void aesni_encrypt(const uint8_t* in, const uint64_t len, const aes_subkeys_type &subkeys, uint8_t *out)
+        {
+            uint64_t i = 0;
+            
+            while (i+8 <= len) { // at least 8 blocks to generate
+                aesni_encrypt8(in+i, subkeys, out + (i*kAESBlockSize));
+                i+=8;
+            }
+            
+            switch (len-i) {
+                case 0:
+                    break;
+                case 1:
+                    aesni_encrypt1(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 2:
+                    aesni_encrypt2(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 3:
+                    aesni_encrypt3(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 4:
+                    aesni_encrypt4(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 5:
+                    aesni_encrypt5(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 6:
+                    aesni_encrypt6(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                case 7:
+                    aesni_encrypt7(in+i, subkeys, out + (i*kAESBlockSize));
+                    break;
+                    
+                default:
+                    throw std::out_of_range("len-i > 7");
+                    break;
+            }
+            
+        }
+
         void aesni_ctr1(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out)
         {
             // load the input
@@ -1852,7 +1894,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             {
                 aes_subkeys_type subkeys = aesni_ctr_exp8(iv, key, out);
                 
-                if (N > 0) {
+                if (N > 8) {
                     aesni_ctr(N-8, iv+8, subkeys, out+8*kAESBlockSize);
                 }
                 

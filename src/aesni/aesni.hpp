@@ -63,7 +63,7 @@ namespace sse
         }
         
 
-        void aesni_encrypt(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
+        void aesni_encrypt1(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
         void aesni_encrypt2(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
         void aesni_encrypt3(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
         void aesni_encrypt4(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
@@ -71,7 +71,8 @@ namespace sse
         void aesni_encrypt6(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
         void aesni_encrypt7(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
         void aesni_encrypt8(const uint8_t* in, const aes_subkeys_type &subkeys, uint8_t *out);
-        
+        void aesni_encrypt(const uint8_t* in, const uint64_t len, const aes_subkeys_type &subkeys, uint8_t *out);
+
 
         void aesni_ctr1(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);
         void aesni_ctr2(const uint64_t iv, const aes_subkeys_type &subkeys, uint8_t *out);

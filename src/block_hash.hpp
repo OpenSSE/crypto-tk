@@ -51,7 +51,9 @@ namespace sse
             static void hash(const std::string &in, const size_t out_len, std::string &out);
             static std::string hash(const std::string &in);
             static std::string hash(const std::string &in, const size_t out_len);
-            
+
+            static void mult_hash(const unsigned char *in, uint64_t in_len, unsigned char *out);
+
         private:
             class BlockHashImpl; // not defined in the header
             BlockHashImpl *bh_imp_; // opaque pointer

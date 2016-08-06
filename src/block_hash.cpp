@@ -45,6 +45,8 @@ namespace sse
             static inline std::string hash(const std::string &in);
             static inline std::string hash(const std::string &in, const size_t out_len);
             
+            static inline void mult_hash(const unsigned char *in, uint64_t in_len, unsigned char *out);
+
 #if USE_AESNI
             typedef aes_subkeys_type key_type;
 #else
@@ -90,19 +92,61 @@ namespace sse
         void BlockHash::BlockHashImpl::hash(const unsigned char *in,  unsigned char *out)
         {
             
+            unsigned char *internal_out = out;
+            
+            if (in == out) {
+                // the pointers are equal, we have to alloc some temporary memory
+                internal_out = new unsigned char [AES_BLOCK_SIZE];
+            }
+
 #if USE_AESNI
-            aesni_encrypt(in, *get_key(), out);
-            //            pipeline_encrypt1(in, iv__.data(), out);
+            aesni_encrypt1(in, *get_key(), internal_out);
 #else
-            AES_encrypt(in, out, get_key());
+            AES_encrypt(in, internal_out, get_key());
 #endif
             
             for (size_t i = 0; i < AES_BLOCK_SIZE; i++) {
-                out[i] ^= in[i];
+                out[i] = internal_out[i] ^ in[i];
             }
+            
+            if (in == out) {
+                delete []  internal_out;
+            }
+
         }
     
         
+        
+        void BlockHash::BlockHashImpl::mult_hash(const unsigned char *in, uint64_t in_len,  unsigned char *out)
+        {
+            if (in_len % AES_BLOCK_SIZE !=0) {
+                throw std::invalid_argument("Invalid in_len: in_len%16 != 0");
+            }
+            
+            unsigned char *internal_out = out;
+            
+            if (in == out) {
+                // the pointers are equal, we have to alloc some temporary memory
+                internal_out = new unsigned char [in_len];
+            }
+            
+#if USE_AESNI
+            aesni_encrypt(in, in_len/AES_BLOCK_SIZE, *get_key(), internal_out);
+#else
+            for (uint64_t i = 0; i < in_len/AES_BLOCK_SIZE; i++) {
+                AES_encrypt(in + i*AES_BLOCK_SIZE, internal_out + i*AES_BLOCK_SIZE, get_key());
+            }
+#endif
+            
+            for (size_t i = 0; i < in_len; i++) {
+                out[i] = internal_out[i] ^ in[i];
+            }
+            
+            if (in == out) {
+                delete []  internal_out;
+            }
+        }
+
         
         void BlockHash::hash(const unsigned char *in,  unsigned char *out)
         {
@@ -168,6 +212,11 @@ namespace sse
             return out;
         }
         
+        void BlockHash::mult_hash(const unsigned char *in, uint64_t in_len, unsigned char *out)
+        {
+            BlockHash::BlockHashImpl::mult_hash(in, in_len, out);
+        }
+
 
     }
 }

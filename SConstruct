@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 env = Environment()
 
@@ -10,7 +10,19 @@ except:
 
 if FindFile('config.scons', '.'):
     SConscript('config.scons', exports='env')
-    
+
+def print_cmd_line(s, targets, sources, env):
+    """s       is the original command line string
+       targets is the list of target nodes
+       sources is the list of source nodes
+       env     is the environment"""
+    cmd = s.split(' ', 1)[0]
+    in_str = "%s "% (' and '.join([str(x) for x in sources]))
+    out_str = "=> %s\n"% (' and '.join([str(x) for x in targets]))
+    sys.stdout.write(cmd + "\t " + in_str + " " + out_str)
+
+env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
+
 env.Append(CFLAGS=['-std=c99'])
 env.Append(CCFLAGS=['-march=native', '-fPIC'])
 env.Append(CCFLAGS=['-Wall', '-Weffc++', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat=2', '-Wmissing-declarations', '-Wmissing-include-dirs', '-Woverloaded-virtual', '-Wredundant-decls', '-Wshadow', '-Wsign-promo', '-Wstrict-overflow=5', '-Wnon-virtual-dtor', '-Wdeprecated'])

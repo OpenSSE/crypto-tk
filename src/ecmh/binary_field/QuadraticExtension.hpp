@@ -29,7 +29,7 @@ template <class BaseElement>
 struct QuadraticU {
   BaseElement value;
   QuadraticU() = default;
-  explicit QuadraticU(BaseElement const &value) : value(value) {}
+  explicit QuadraticU(BaseElement const &v) : value(v) {}
 };
 
 // Represents an element (value, value)
@@ -37,7 +37,7 @@ template <class BaseElement>
 struct QuadraticUp1 {
   BaseElement value;
   QuadraticUp1() = default;
-  explicit QuadraticUp1(BaseElement const &value) : value(value) {}
+  explicit QuadraticUp1(BaseElement const &v) : value(v) {}
 };
 
 
@@ -162,7 +162,7 @@ struct QuadraticExtension {
                                                      std::is_same<ElementT,DoubleElement>::value>;
 
   QuadraticExtension() = default;
-  QuadraticExtension(BaseField base_field_) : base_field_(base_field_) {}
+  QuadraticExtension(BaseField base_field) : base_field_(base_field) {}
   constexpr BaseField const &base_field() const { return base_field_; }
 
   template <class ElementT, JBMS_ENABLE_IF(is_element_or_double<ElementT>)>

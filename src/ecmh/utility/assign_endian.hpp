@@ -12,7 +12,7 @@ struct endian_wrapper {
   using order_type = std::integral_constant<boost::endian::order,order_>;
   constexpr static boost::endian::order order = order_;
   Data &data;
-  explicit endian_wrapper(Data &data) : data(data) {}
+  explicit endian_wrapper(Data &d) : data(d) {}
 
   // template <class AssignTo,
             // decltype(assign(std::declval<AssignTo &>(), std::declval<endian_wrapper>())) * = nullptr>

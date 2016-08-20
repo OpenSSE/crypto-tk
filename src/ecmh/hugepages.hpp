@@ -22,8 +22,8 @@ namespace hugepages_detail {
 struct munmap_deleter {
   void *base_address;
   size_t len;
-  munmap_deleter(void *base_address, size_t len)
-    : base_address(base_address), len(len)
+  munmap_deleter(void *b_a, size_t l)
+    : base_address(b_a), len(l)
   {}
   void operator()(void *ptr) const { ::munmap(base_address, len); }
 };

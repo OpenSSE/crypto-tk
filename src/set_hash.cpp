@@ -62,11 +62,9 @@ public:
 
 	SetHashImpl();	
 	SetHashImpl(const MSH::State &s);	
-	SetHashImpl(const SetHash::SetHashImpl& o) = default;	
 	SetHashImpl(const std::string &hex);
 	SetHashImpl(const std::vector<std::string> &in_set);
  	template <class InputIterator> SetHashImpl(InputIterator first, InputIterator last);
-	~SetHashImpl();
 
 	void add_element(const std::string &in);
 	void add_set(const SetHashImpl *h);
@@ -208,10 +206,6 @@ template <class InputIterator> SetHash::SetHashImpl::SetHashImpl(InputIterator f
 {
 	state_ = initial_state(ecmh());
     batch_add(ecmh(), state_, jbms::array_view<std::string>(first,last));	
-}
-
-SetHash::SetHashImpl::~SetHashImpl() 
-{ 
 }
 
 void SetHash::SetHashImpl::add_element(const std::string &in)

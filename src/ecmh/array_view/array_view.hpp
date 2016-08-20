@@ -98,8 +98,8 @@ public:
     : begin_((value_type *)first), end_(array_view_detail::advance_pointer(first, size))
   {}
 
-  constexpr array_view(T *begin_, T *end_)
-    : begin_((value_type *)begin_), end_((value_type *)end_)
+  constexpr array_view(T *begin, T *end)
+    : begin_((value_type *)begin), end_((value_type *)end)
   {}
 
   array_view(array_view const &) = default;

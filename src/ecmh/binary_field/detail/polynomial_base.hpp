@@ -248,9 +248,9 @@ void assign(endian_wrapper<Dest,boost::endian::order::big> dest,
   // reverse order of limbs
   std::reverse_copy(&x.limbs[0], &x.limbs[x.num_limbs], &temp.limbs[0]);
   for (auto &limb : temp.limbs) {
-    auto temp = boost::endian::native_to_big(limb[1]);
+    auto tmp = boost::endian::native_to_big(limb[1]);
     limb[1] = boost::endian::native_to_big(limb[0]);
-    limb[0] = temp;
+    limb[0] = tmp;
   }
   std::copy_n(((uint8_t *)&temp.limbs[temp.num_limbs]) - temp.num_bytes, dest.data.size(), dest.data.data());
 }

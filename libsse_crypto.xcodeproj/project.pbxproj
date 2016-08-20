@@ -990,6 +990,22 @@
 					"-DAESNI_OPENSSL_UNDO",
 				);
 				OTHER_LDFLAGS = "-lcrypto";
+				WARNING_CFLAGS = (
+					"-Wcast-qual",
+					"-Wshadow",
+					"-Wdeprecated",
+					"-Weffc++",
+					"-Wdisabled-optimization",
+					"-Wnon-virtual-dtor",
+					"-Wstrict-overflow=5",
+					"-Wformat=2",
+					"-Wmissing-declarations",
+					"-Wmissing-include-dirs",
+					"-Woverloaded-virtual",
+					"-Wredundant-decls",
+					"-Wshadow",
+					"-Wsign-promo",
+				);
 			};
 			name = Debug;
 		};
@@ -1038,6 +1054,22 @@
 					"-DAESNI_OPENSSL_UNDO",
 				);
 				OTHER_LDFLAGS = "-lcrypto";
+				WARNING_CFLAGS = (
+					"-Wcast-qual",
+					"-Wshadow",
+					"-Wdeprecated",
+					"-Weffc++",
+					"-Wdisabled-optimization",
+					"-Wnon-virtual-dtor",
+					"-Wstrict-overflow=5",
+					"-Wformat=2",
+					"-Wmissing-declarations",
+					"-Wmissing-include-dirs",
+					"-Woverloaded-virtual",
+					"-Wredundant-decls",
+					"-Wshadow",
+					"-Wsign-promo",
+				);
 			};
 			name = Release;
 		};

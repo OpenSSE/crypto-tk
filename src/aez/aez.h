@@ -37,11 +37,11 @@ typedef struct {
 
 
 void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx);
-void aez_encrypt(aez_ctx_t *ctx, char *n, unsigned nbytes,
-                 char *ad, unsigned adbytes, unsigned abytes,
+void aez_encrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+                 const char *ad, unsigned adbytes, unsigned abytes,
                  const char *src, unsigned bytes, char *dst);
-int aez_decrypt(aez_ctx_t *ctx, char *n, unsigned nbytes,
-                 char *ad, unsigned adbytes, unsigned abytes,
+int aez_decrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+                 const char *ad, unsigned adbytes, unsigned abytes,
                  const char *src, unsigned bytes, char *dst);
 
 #ifdef __cplusplus

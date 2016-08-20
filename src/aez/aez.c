@@ -99,8 +99,8 @@ static __m128i aes4(__m128i in, __m128i a, __m128i b, __m128i c, __m128i d) {
     return _mm_aesenc_si128 (in,d);
 }
 
-static __m128i loadu(const void *p) { return _mm_loadu_si128((__m128i*)p); }
-static void storeu(const void *p, __m128i x) {_mm_storeu_si128((__m128i*)p,x);}
+static __m128i loadu(const void *p) { return _mm_loadu_si128((const __m128i*)p); }
+static void storeu(void *p, __m128i x) {_mm_storeu_si128((__m128i *)p,x);}
 
 #define load loadu      /* Intel with AES-NI has fast unaligned loads/stores */
 #define store storeu
@@ -210,7 +210,7 @@ static block zero_pad(block x, unsigned zero_bytes) {
 }
 
 static block one_zero_pad(block x, unsigned one_zero_bytes) {
-    block *p = (block*)(pad + one_zero_bytes);
+    const block *p = (const block*)(pad + one_zero_bytes);
     return vor(vand(x, loadu(p)), loadu(p+1));
 }
 
@@ -247,7 +247,7 @@ void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx) {
 /* ------------------------------------------------------------------------- */
 
 /* !! Warning !! Only handles nbytes <= 16 and abytes <= 16 */
-block aez_hash(aez_ctx_t *ctx, char *n, unsigned nbytes, char *ad,
+block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char *ad,
                unsigned adbytes, unsigned abytes) {
     block o0, o1, o2, o3, o4, o5, o6, o7, sum, offset, tmp;
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0];
@@ -514,7 +514,7 @@ int cipher_aez_core(aez_ctx_t *ctx, block t, int d, const char *src, unsigned by
     initial_bytes = bytes - frag_bytes - 32;
     
     /* Compute x and store intermediate results */
-    x = pass_one(ctx, (block*)src, initial_bytes, (block*)dst);
+    x = pass_one(ctx, (const block*)src, initial_bytes, (block*)dst);
     if (frag_bytes >= 16) {
         frag0 = load(src + initial_bytes);
         frag1 = one_zero_pad(load(src + initial_bytes + 16), 32-frag_bytes);
@@ -658,8 +658,8 @@ int cipher_aez_tiny(aez_ctx_t *ctx, block t, int d, const char *src, unsigned by
 
 /* ------------------------------------------------------------------------- */
 
-void aez_encrypt(aez_ctx_t *ctx, char *n, unsigned nbytes,
-                 char *ad, unsigned adbytes, unsigned abytes,
+void aez_encrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+                 const char *ad, unsigned adbytes, unsigned abytes,
                  const char *src, unsigned bytes, char *dst) {
     
     block t = aez_hash(ctx, n, nbytes, ad, adbytes, abytes);
@@ -675,8 +675,8 @@ void aez_encrypt(aez_ctx_t *ctx, char *n, unsigned nbytes,
 
 /* ------------------------------------------------------------------------- */
 
-int aez_decrypt(aez_ctx_t *ctx, char *n, unsigned nbytes,
-                char *ad, unsigned adbytes, unsigned abytes,
+int aez_decrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+                const char *ad, unsigned adbytes, unsigned abytes,
                 const char *src, unsigned bytes, char *dst) {
     
     block t;
@@ -876,10 +876,10 @@ int crypto_aead_encrypt(
     aez_ctx_t ctx;
     (void)nsec;
     if (clen) *clen = mlen+16;
-    aez_setup((unsigned char *)k, 48, &ctx);
-    aez_encrypt(&ctx, (char *)npub, 12,
-                 (char *)ad, (unsigned)adlen, 16,
-                 (char *)m, (unsigned)mlen, (char *)c);
+    aez_setup((const unsigned char *)k, 48, &ctx);
+    aez_encrypt(&ctx, (const char *)npub, 12,
+                 (const char *)ad, (unsigned)adlen, 16,
+                 (const char *)m, (unsigned)mlen, (char *)c);
     return 0;
 }
 
@@ -895,8 +895,8 @@ int crypto_aead_decrypt(
     aez_ctx_t ctx;
     (void)nsec;
     if (mlen) *mlen = clen-16;
-    aez_setup((unsigned char *)k, 48, &ctx);
-    return aez_decrypt(&ctx, (char *)npub, 12,
-                 (char *)ad, (unsigned)adlen, 16,
-                 (char *)c, (unsigned)clen, (char *)m);
+    aez_setup((const unsigned char *)k, 48, &ctx);
+    return aez_decrypt(&ctx, (const char *)npub, 12,
+                 (const char *)ad, (unsigned)adlen, 16,
+                 (const char *)c, (unsigned)clen, (char *)m);
 }

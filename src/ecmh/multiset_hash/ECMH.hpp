@@ -45,14 +45,14 @@ public:
 
   ECMH() = default;
 
-  explicit ECMH(Curve const &curve_)
-    : curve_(curve_) {}
+  explicit ECMH(Curve const &curve)
+    : curve_(curve) {}
 
-  explicit ECMH(Curve const &curve_, Hash const &hash_)
-    : curve_(curve_), hash_(hash_) {}
+  explicit ECMH(Curve const &curve, Hash const &hash)
+    : curve_(curve), hash_(hash) {}
 
-  explicit ECMH(Curve const &curve_, Encoder const &encoder_, Hash const &hash_)
-    : curve_(curve_), encoder_(encoder_), hash_(hash_)
+  explicit ECMH(Curve const &curve, Encoder const &encoder, Hash const &hash)
+    : curve_(curve), encoder_(encoder), hash_(hash)
   {}
 
   Curve const &curve() const { return curve_; }

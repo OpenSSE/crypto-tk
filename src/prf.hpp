@@ -148,14 +148,14 @@ template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const un
 // Convienience function to run the PRF over a C++ string
 template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::string &s) const
 {
-	return prf((unsigned char*)s.data() , s.length());
+	return prf((const unsigned char*)s.data() , s.length());
 }
 
 template <uint16_t NBYTES>
 template<size_t L>
     std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::array<uint8_t, L> &in) const
 {
-    return prf((unsigned char*)in.data() , L);
+    return prf((const unsigned char*)in.data() , L);
 }
 
 // Convienience function to return the PRF result in a raw array

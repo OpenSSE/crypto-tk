@@ -214,7 +214,7 @@ static block one_zero_pad(block x, unsigned one_zero_bytes) {
     return vor(vand(x, loadu(p)), loadu(p+1));
 }
 
-block zero_set_byte(char val, unsigned idx) {
+static block zero_set_byte(char val, unsigned idx) {
     block tmp = zero; ((char *)&tmp)[idx] = val; return tmp;
 }
 
@@ -247,7 +247,7 @@ void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx) {
 /* ------------------------------------------------------------------------- */
 
 /* !! Warning !! Only handles nbytes <= 16 and abytes <= 16 */
-block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char *ad,
+static block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char *ad,
                unsigned adbytes, unsigned abytes) {
     block o0, o1, o2, o3, o4, o5, o6, o7, sum, offset, tmp;
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0];
@@ -327,7 +327,7 @@ block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char *ad,
 
 /* ------------------------------------------------------------------------- */
 
-block pass_one(aez_ctx_t *ctx, const block *src, unsigned bytes, block *dst) {
+static block pass_one(aez_ctx_t *ctx, const block *src, unsigned bytes, block *dst) {
     block o0, o1, o2, o3, o4, o5, o6, o7, offset, tmp, sum=zero;
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0];
     block Ifordoubling = double_block(bswap16(ctx->I[2]));  /* I8 */
@@ -396,7 +396,7 @@ block pass_one(aez_ctx_t *ctx, const block *src, unsigned bytes, block *dst) {
 
 /* ------------------------------------------------------------------------- */
 
-block pass_two(aez_ctx_t *ctx, block s, unsigned bytes, block *dst) {
+static block pass_two(aez_ctx_t *ctx, block s, unsigned bytes, block *dst) {
     block o0, o1, o2, o3, o4, o5, o6, o7, sum=zero, offset;
     block fs[8], tmp[8];
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0];
@@ -504,7 +504,7 @@ block pass_two(aez_ctx_t *ctx, block s, unsigned bytes, block *dst) {
 
 /* ------------------------------------------------------------------------- */
 
-int cipher_aez_core(aez_ctx_t *ctx, block t, int d, const char *src, unsigned bytes, unsigned abytes, char *dst) {
+static int cipher_aez_core(aez_ctx_t *ctx, block t, int d, const char *src, unsigned bytes, unsigned abytes, char *dst) {
     block s, x, y, frag0, frag1, final0, final1;
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0], I4=ctx->I[2];
     unsigned i, frag_bytes, initial_bytes;
@@ -570,7 +570,7 @@ int cipher_aez_core(aez_ctx_t *ctx, block t, int d, const char *src, unsigned by
 
 /* ------------------------------------------------------------------------- */
 
-int cipher_aez_tiny(aez_ctx_t *ctx, block t, int d, const char *src, unsigned bytes, unsigned abytes, char *dst) {
+static int cipher_aez_tiny(aez_ctx_t *ctx, block t, int d, const char *src, unsigned bytes, unsigned abytes, char *dst) {
     block l, r, tmp, one, rcon, buf[2], mask_10, mask_ff;
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0], t_orig = t;
     unsigned rnds, i;
@@ -861,42 +861,42 @@ static int blake2b(void *out, size_t outlen,
     return 0;
 }
 
-/* ------------------------------------------------------------------------- */
-/* aez mapping for CAESAR competition                                        */
-
-int crypto_aead_encrypt(
-    unsigned char *c,unsigned long long *clen,
-    const unsigned char *m,unsigned long long mlen,
-    const unsigned char *ad,unsigned long long adlen,
-    const unsigned char *nsec,
-    const unsigned char *npub,
-    const unsigned char *k
-)
-{
-    aez_ctx_t ctx;
-    (void)nsec;
-    if (clen) *clen = mlen+16;
-    aez_setup((const unsigned char *)k, 48, &ctx);
-    aez_encrypt(&ctx, (const char *)npub, 12,
-                 (const char *)ad, (unsigned)adlen, 16,
-                 (const char *)m, (unsigned)mlen, (char *)c);
-    return 0;
-}
-
-int crypto_aead_decrypt(
-    unsigned char *m,unsigned long long *mlen,
-    unsigned char *nsec,
-    const unsigned char *c,unsigned long long clen,
-    const unsigned char *ad,unsigned long long adlen,
-    const unsigned char *npub,
-    const unsigned char *k
-)
-{
-    aez_ctx_t ctx;
-    (void)nsec;
-    if (mlen) *mlen = clen-16;
-    aez_setup((const unsigned char *)k, 48, &ctx);
-    return aez_decrypt(&ctx, (const char *)npub, 12,
-                 (const char *)ad, (unsigned)adlen, 16,
-                 (const char *)c, (unsigned)clen, (char *)m);
-}
+///* ------------------------------------------------------------------------- */
+///* aez mapping for CAESAR competition                                        */
+//
+//static int crypto_aead_encrypt(
+//    unsigned char *c,unsigned long long *clen,
+//    const unsigned char *m,unsigned long long mlen,
+//    const unsigned char *ad,unsigned long long adlen,
+//    const unsigned char *nsec,
+//    const unsigned char *npub,
+//    const unsigned char *k
+//)
+//{
+//    aez_ctx_t ctx;
+//    (void)nsec;
+//    if (clen) *clen = mlen+16;
+//    aez_setup((const unsigned char *)k, 48, &ctx);
+//    aez_encrypt(&ctx, (const char *)npub, 12,
+//                 (const char *)ad, (unsigned)adlen, 16,
+//                 (const char *)m, (unsigned)mlen, (char *)c);
+//    return 0;
+//}
+//
+//static int crypto_aead_decrypt(
+//    unsigned char *m,unsigned long long *mlen,
+//    unsigned char *nsec,
+//    const unsigned char *c,unsigned long long clen,
+//    const unsigned char *ad,unsigned long long adlen,
+//    const unsigned char *npub,
+//    const unsigned char *k
+//)
+//{
+//    aez_ctx_t ctx;
+//    (void)nsec;
+//    if (mlen) *mlen = clen-16;
+//    aez_setup((const unsigned char *)k, 48, &ctx);
+//    return aez_decrypt(&ctx, (const char *)npub, 12,
+//                 (const char *)ad, (unsigned)adlen, 16,
+//                 (const char *)c, (unsigned)clen, (char *)m);
+//}

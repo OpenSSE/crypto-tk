@@ -124,7 +124,7 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
 {
     // create a BIO from the std::string
     BIO *mem;
-    mem = BIO_new_mem_buf(((void*)pk.data()), (int)pk.length());
+    mem = BIO_new_mem_buf(((const void*)pk.data()), (int)pk.length());
     
     // read the key from the BIO
     rsa_key_ = PEM_read_bio_RSAPublicKey(mem,NULL,NULL,NULL);
@@ -135,7 +135,10 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
     }
     
     // close and destroy the BIO
-    BIO_set_close(mem, BIO_NOCLOSE); // So BIO_free() leaves BUF_MEM alone
+    if(BIO_set_close(mem, BIO_NOCLOSE) != 1) // So BIO_free() leaves BUF_MEM alone
+    {
+        // always returns 1 ...
+    }
     BIO_free(mem);
 }
     
@@ -210,7 +213,8 @@ void TdpImpl::eval(const std::string &in, std::string &out) const
 {
     std::array<uint8_t, kMessageSpaceSize> in_array;
     
-    std::copy(in.begin(), in.end(), in_array.begin());
+    
+    memcpy(in_array.data(), in.data(), kMessageSpaceSize);
     
     auto out_array = eval(in_array);
     
@@ -373,7 +377,7 @@ TdpInverseImpl::TdpInverseImpl(const std::string& sk)
 {
     // create a BIO from the std::string
     BIO *mem;
-    mem = BIO_new_mem_buf(((void*)sk.data()), (int)sk.length());
+    mem = BIO_new_mem_buf(((const void*)sk.data()), (int)sk.length());
 
     EVP_PKEY* evpkey;
     evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
@@ -388,7 +392,11 @@ TdpInverseImpl::TdpInverseImpl(const std::string& sk)
 
     
     // close and destroy the BIO
-    BIO_set_close(mem, BIO_NOCLOSE); // So BIO_free() leaves BUF_MEM alone
+    if(BIO_set_close(mem, BIO_NOCLOSE) != 1) // So BIO_free() leaves BUF_MEM alone
+    {
+        // always returns 1 ...
+    }
+    
     BIO_free(mem);
     
     // initialize the useful variables
@@ -481,7 +489,7 @@ void TdpInverseImpl::invert(const std::string &in, std::string &out) const
         throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
     }
  
-    ret = RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), rsa_out, get_rsa_key(), RSA_NO_PADDING);
+    ret = RSA_private_decrypt((int)in.size(), (const unsigned char*)in.data(), rsa_out, get_rsa_key(), RSA_NO_PADDING);
     
     
     out = std::string((char*)rsa_out,ret);
@@ -491,7 +499,7 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
 {
     std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
     
-    RSA_private_decrypt((int)in.size(), (unsigned char*)in.data(), out.data(), get_rsa_key(), RSA_NO_PADDING);
+    RSA_private_decrypt((int)in.size(), (const unsigned char*)in.data(), out.data(), get_rsa_key(), RSA_NO_PADDING);
     
     return out;
 }
@@ -560,7 +568,7 @@ void TdpInverseImpl::invert_mult(const std::string &in, std::string &out, uint32
 {
     std::array<uint8_t, kMessageSpaceSize> in_array;
     
-    std::copy(in.begin(), in.end(), in_array.begin());
+    memcpy(in_array.data(), in.data(), kMessageSpaceSize);
     
     auto out_array = invert_mult(in_array, order);
     
@@ -614,11 +622,11 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpMultPoolImpl::eval(const std:
 
     if (order == 1) {
         // regular eval
-        RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), out.data(), get_rsa_key(), RSA_NO_PADDING);
+        RSA_public_encrypt((int)in.size(), (const unsigned char*)in.data(), out.data(), get_rsa_key(), RSA_NO_PADDING);
 
     }else if(order <= maximum_order()){
         // get the right RSA context, i.e. the one in keys_[order-1]
-        RSA_public_encrypt((int)in.size(), (unsigned char*)in.data(), out.data(), keys_[order-2], RSA_NO_PADDING);
+        RSA_public_encrypt((int)in.size(), (const unsigned char*)in.data(), out.data(), keys_[order-2], RSA_NO_PADDING);
     }else{
         throw std::invalid_argument("Invalid order for this TDP pool. The input order must be less than the maximum order supported by the pool, and strictly positive.");
     }
@@ -635,7 +643,8 @@ void TdpMultPoolImpl::eval(const std::string &in, std::string &out, const uint8_
     }
     
     std::array<uint8_t, kMessageSpaceSize> a_in, a_out;
-    std::copy(in.begin(), in.end(), a_in.begin());
+    memcpy(a_in.data(), in.data(), kMessageSpaceSize);
+
     a_out = eval(a_in, order);
     
     out = std::string(a_out.begin(), a_out.end());

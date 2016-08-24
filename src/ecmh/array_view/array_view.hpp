@@ -75,7 +75,10 @@ template <class T>
 class array_view  {
   using base_type_ = typename array_view_detail::base_type<T>::type;
 public:
-  using value_type = std::remove_const_t<base_type_>;
+    // this was in the original version of JBMS's code
+//  using value_type = std::remove_const_t<base_type_>;
+    // was raising warnings with -Wcast-qual so we changed it to
+  using value_type = base_type_;
   using reference = base_type_ &;
   using const_reference = reference;
   using pointer = base_type_ *;

@@ -258,13 +258,13 @@ static void benchmarks()
 			string in(1e5, rand());
 		
 			auto begin_ssl = std::chrono::high_resolution_clock::now();
-			open_ssl((unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
+			open_ssl((const unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
 			auto end_ssl = std::chrono::high_resolution_clock::now();
 		
 			time_ssl += std::chrono::duration_cast<std::chrono::nanoseconds>(end_ssl-begin_ssl).count();
 		
 			auto begin_intel = std::chrono::high_resolution_clock::now();
-			hash_acc((unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
+			hash_acc((const unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
 			auto end_intel = std::chrono::high_resolution_clock::now();
 		
 			time_intel += std::chrono::duration_cast<std::chrono::nanoseconds>(end_intel-begin_intel).count();
@@ -279,7 +279,7 @@ static void benchmarks()
 
 }
 
-void test_hash()
+static void test_hash()
 {
 	// string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
 	// string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
@@ -296,19 +296,19 @@ void test_hash()
 	sse::crypto::HMac<sse::crypto::hash::sha512> hmac_lib(k.data(),20);
 	
 	cout << "====== FULL SSL ======\n";
-	auto result_full_ssl = hmac_full_ssl.hmac((unsigned char*)in.data(), in.length());
+	auto result_full_ssl = hmac_full_ssl.hmac((const unsigned char*)in.data(), in.length());
 	cout << "\n\n";
 
 	cout << "====== HOME SSL ======\n";
-	auto result_ssl = hmac_ssl.hmac((unsigned char*)in.data(), in.length());
+	auto result_ssl = hmac_ssl.hmac((const unsigned char*)in.data(), in.length());
 	cout << "\n\n";
 
 	cout << "====== LOCAL ======\n";
-	auto result_local = hmac_local.hmac((unsigned char*)in.data(), in.length());
+	auto result_local = hmac_local.hmac((const unsigned char*)in.data(), in.length());
 	cout << "\n\n";
 	
 	cout << "====== LIB ======\n";
-	auto result_lib = hmac_local.hmac((unsigned char*)in.data(), in.length());
+	auto result_lib = hmac_local.hmac((const unsigned char*)in.data(), in.length());
 	cout << "\n\n";
 	
 	

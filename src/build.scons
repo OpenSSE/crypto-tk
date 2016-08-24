@@ -8,8 +8,17 @@ def smart_concat(l1, l2):
     else:
         return l1 + l2
 
-files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('*/*/*.cpp') + Glob('hash/*/*/*.cpp') + Glob('*/*.c')
+files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('hash/*/*/*.cpp') + Glob('hash/*/*.cpp') + Glob('*/*.c') # + Glob('*/*/*.cpp')
 files += Glob('hash/*/*.asm') + Glob('hash/*/*.c')
 objs = env.Object(files, CPPPATH = smart_concat(['.'], env.get('CPPPATH')))
+
+ecmh_files = ['ecmh/binary_field/GF2_127_63.cpp', 'ecmh/binary_elliptic_curve/GLS254.cpp']
+
+
+# -Weffc++ generates a lot of warnings due to boost
+# disable it for the set hashing code
+env.Append(CXXFLAGS=['-Wno-effc++'])
+
+objs += env.Object(ecmh_files, CPPPATH = smart_concat(['.'], env.get('CPPPATH')))
 
 Return('objs')

@@ -303,8 +303,8 @@ public:
   FE const &z() const { return z_; }
 
   LambdaProjectivePoint() = default;
-  LambdaProjectivePoint(FE const &x, FE const &m, FE const &z)
-    : LambdaAffinePoint<Curve>(x,m), z_(z)
+  LambdaProjectivePoint(FE const &x_in, FE const &m_in, FE const &z)
+    : LambdaAffinePoint<Curve>(x_in,m_in), z_(z)
   {}
 
   explicit LambdaProjectivePoint(Curve const &curve, AffinePoint<Curve> const &P) {

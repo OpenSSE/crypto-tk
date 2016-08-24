@@ -58,14 +58,24 @@ void Hash::hash(const unsigned char *in, const size_t &len, const size_t &out_le
 
 void Hash::hash(const std::string &in, std::string &out)
 {
-	out.resize(kDigestSize);
-	hash((unsigned char*)in.data(),in.length(),(unsigned char*)out.data());
+    unsigned char tmp_out [kDigestSize];
+	hash((const unsigned char*)in.data(),in.length(),tmp_out);
+    
+    out = std::string((char *)tmp_out, kDigestSize);
 }
 
 void Hash::hash(const std::string &in, const size_t &out_len, std::string &out)
 {
-	out.resize(out_len);
-	hash((unsigned char*)in.data(), in.length(), out_len, (unsigned char*)out.data());
+    if(out_len > kDigestSize)
+    {
+        throw std::runtime_error("Invalid output length: out_len > kDigestSize");
+    }
+
+    unsigned char tmp_out [kDigestSize];
+
+    hash((const unsigned char*)in.data(),in.length(),tmp_out);
+    
+    out = std::string((char *)tmp_out, out_len);
 }
 
 std::string Hash::hash(const std::string &in)

@@ -200,11 +200,13 @@ namespace sse
         // Prg implementation
         
         Prg::PrgImpl::PrgImpl(const std::array<uint8_t,kKeySize>& k)
+        : aes_enc_key_{}
         {
             gen_subkeys(k.data());
         }
         
         Prg::PrgImpl::PrgImpl(const uint8_t* k)
+        : aes_enc_key_{}
         {
             gen_subkeys(k);
         }

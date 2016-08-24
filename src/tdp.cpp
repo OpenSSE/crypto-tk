@@ -52,6 +52,7 @@ public:
     static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
     
     TdpImpl(const std::string& pk);
+    TdpImpl(const TdpImpl& tdp);
     
     virtual ~TdpImpl();
     
@@ -102,7 +103,8 @@ class TdpMultPoolImpl : public TdpImpl
 {
 public:
     TdpMultPoolImpl(const std::string& sk, const uint8_t size);
-    
+    TdpMultPoolImpl(const TdpMultPoolImpl& pool_impl);
+
     ~TdpMultPoolImpl();
     
     std::array<uint8_t, TdpImpl::kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const;
@@ -137,6 +139,12 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
     BIO_free(mem);
 }
     
+TdpImpl::TdpImpl(const TdpImpl& tdp)
+{
+    set_rsa_key(RSAPrivateKey_dup(tdp.rsa_key_));
+}
+    
+
 inline RSA* TdpImpl::get_rsa_key() const
 {
     return rsa_key_;
@@ -580,6 +588,18 @@ TdpMultPoolImpl::TdpMultPoolImpl(const std::string& sk, const uint8_t size)
     
 }
 
+TdpMultPoolImpl::TdpMultPoolImpl(const TdpMultPoolImpl& pool_impl)
+: TdpImpl(pool_impl), keys_count_(pool_impl.keys_count_)
+{
+    keys_ = new RSA* [keys_count_];
+    
+    for (uint8_t i = 0; i < keys_count_; i++) {
+        
+        keys_[i] = RSAPublicKey_dup(pool_impl.keys_[i]);
+    }
+
+}
+    
 TdpMultPoolImpl::~TdpMultPoolImpl()
 {
     for (uint8_t i = 0; i < keys_count_; i++) {
@@ -636,12 +656,25 @@ Tdp::Tdp(const std::string& sk) : tdp_imp_(new TdpImpl(sk))
 {
 }
 
+Tdp::Tdp(const Tdp& t) : tdp_imp_(new TdpImpl(*t.tdp_imp_))
+{
+        
+}
+
 Tdp::~Tdp()
 {
     delete tdp_imp_;
     tdp_imp_ = NULL;
 }
 
+Tdp& Tdp::operator=(const Tdp& t)
+{
+    delete tdp_imp_;
+    tdp_imp_ = new TdpImpl(*t.tdp_imp_);
+    
+    return *this;
+}
+    
 std::string Tdp::public_key() const
 {
     return tdp_imp_->public_key();
@@ -703,6 +736,14 @@ TdpInverse::TdpInverse(const std::string& sk) : tdp_inv_imp_(new TdpInverseImpl(
 
 TdpInverse::TdpInverse(const TdpInverse& tdp) : tdp_inv_imp_(new TdpInverseImpl(tdp.private_key()))
 {
+}
+
+TdpInverse& TdpInverse::operator=(const TdpInverse& t)
+{
+    delete tdp_inv_imp_;
+    tdp_inv_imp_ = new TdpInverseImpl(*t.tdp_inv_imp_);
+    
+    return *this;
 }
 
 TdpInverse::~TdpInverse()
@@ -806,6 +847,21 @@ std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert_mult(const std:
 TdpMultPool::TdpMultPool(const std::string& pk, const uint8_t size) : tdp_pool_imp_(new TdpMultPoolImpl(pk, size))
 {
 }
+    
+TdpMultPool::TdpMultPool(const TdpMultPool& pool) :
+    tdp_pool_imp_(new TdpMultPoolImpl(*pool.tdp_pool_imp_))
+{
+        
+}
+
+TdpMultPool& TdpMultPool::operator=(const TdpMultPool& t)
+{
+    delete tdp_pool_imp_;
+    tdp_pool_imp_ = new TdpMultPoolImpl(*t.tdp_pool_imp_);
+    
+    return *this;
+}
+
 
 TdpMultPool::~TdpMultPool()
 {

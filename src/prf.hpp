@@ -77,7 +77,7 @@ public:
 	{	
 	}
 
-	Prf(const Prf<NBYTES>& prf) : base_(prf.base_)
+	Prf(const Prf<NBYTES>& p) : base_(p.base_)
 	{		
 	}
 

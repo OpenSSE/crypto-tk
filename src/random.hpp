@@ -37,6 +37,9 @@ namespace crypto
 		Drbg();
 		~Drbg();
 		
+        Drbg(const Drbg&) = delete;
+        Drbg& operator=(const Drbg&) = delete;
+        
 		void reseed();
 		void next(const size_t &byte_count, unsigned char* out);
 		
@@ -66,9 +69,10 @@ namespace crypto
 
 	inline std::string random_string(const size_t &length)
 	{
-		std::string s(length, 0x00);
-		random_bytes(length, (unsigned char*) s.data());
-		return s;
+        uint8_t buffer [length];
+		random_bytes(length, buffer);
+        
+        return std::string((char *)buffer, length);
 	}
 }
 }

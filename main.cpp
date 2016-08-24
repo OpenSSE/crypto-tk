@@ -82,7 +82,7 @@ static void sha512_update_acc(const unsigned char *in, unsigned char *digest, co
 constexpr size_t kBlockSize = 128;
 constexpr size_t kDigestSize = 64;
 
-void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *digest)
+static void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *digest)
 {
 	unsigned char dbuf[64];
 	memcpy(dbuf,H,64);
@@ -131,7 +131,7 @@ void hash_acc(const unsigned char *in, const uint64_t &len, unsigned char *diges
 	
 using namespace std;
 
-void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *digest)
+static void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *digest)
 {
 	SHA512_CTX ctx;
 	
@@ -185,7 +185,7 @@ void open_ssl(const unsigned char *in, const uint64_t &len, unsigned char *diges
 	// }
 }
 
-void open_ssl_full(const unsigned char *in, const uint64_t &len, unsigned char *digest)
+static void open_ssl_full(const unsigned char *in, const uint64_t &len, unsigned char *digest)
 {
 	SHA512_CTX ctx;
 	
@@ -238,7 +238,7 @@ public:
 };
 
 
-void benchmarks()
+static void benchmarks()
 {
 	string out_openssl, out_acc;
 	out_openssl.resize(kDigestSize);
@@ -371,7 +371,7 @@ void test_hash()
     */
 }
 
-void tdp()
+static void tdp()
 {
     sse::crypto::TdpInverse tdp;
     
@@ -417,7 +417,7 @@ void tdp()
     cout << endl;
 }
 
-void bench_mult_invert_tdp()
+static void bench_mult_invert_tdp()
 {
     for (size_t i = 1; i < 100; i++) {
         sse::crypto::TdpInverse tdp_inv;
@@ -454,7 +454,7 @@ void bench_mult_invert_tdp()
 }
 
 
-void bench_hash_block()
+static void bench_hash_block()
 {
     size_t N_sample = 1e7;
     
@@ -488,7 +488,7 @@ void bench_hash_block()
     std::cout << "Regular Hash: " << hash_time.count() << std::endl;
 }
 
-void bench_prg()
+static void bench_prg()
 {
     size_t N_sample = 1e7;
     

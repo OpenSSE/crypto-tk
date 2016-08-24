@@ -94,6 +94,7 @@ void Drbg::next(const size_t &byte_count, unsigned char* out)
 
 
 Drbg::DrbgImpl::DrbgImpl()
+    : aes_key_{}, buffer_{}, iv_{}, buffer_pos_(0), remaining_bytes_(0)
 {
 	reseed();
 	fill();

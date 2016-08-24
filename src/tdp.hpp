@@ -52,7 +52,10 @@ public:
     static constexpr size_t kRSAPrgSize = kMessageSize + kStatisticalSecurity;
 
 	Tdp(const std::string& pk);
-	
+
+    Tdp(const Tdp &t);
+    Tdp& operator=(const Tdp& t);
+
 	virtual ~Tdp();
 
     std::string public_key() const;
@@ -81,7 +84,10 @@ public:
     TdpInverse();
     TdpInverse(const std::string& sk);
     TdpInverse(const TdpInverse& tdp);
-	
+    
+    TdpInverse& operator=(const TdpInverse& t);
+
+    
 	~TdpInverse();
 
     std::string public_key() const;
@@ -117,7 +123,10 @@ public:
     static constexpr size_t kMessageSize = Tdp::kMessageSize;
     
     TdpMultPool(const std::string& pk, const uint8_t size);
+    TdpMultPool(const TdpMultPool& pool);
     
+    TdpMultPool& operator=(const TdpMultPool& t);
+
     virtual ~TdpMultPool();
     
     std::string public_key() const;

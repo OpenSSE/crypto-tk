@@ -59,7 +59,8 @@ public:
 		gen_padded_keys(key_);
 	};
 
-	HMac(const void* k, const uint8_t &len)
+    HMac(const void* k, const uint8_t &len) :
+    key_{}, o_key_{}, i_key_{}
 	{
         if(len > kKeySize)
         {

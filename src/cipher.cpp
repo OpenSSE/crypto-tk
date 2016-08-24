@@ -97,6 +97,7 @@ void Cipher::decrypt(const std::string &in, std::string &out)
 // Cipher implementation
 
 Cipher::CipherImpl::CipherImpl()
+    : aes_enc_key_{}, remaining_block_count_(0)
 {
 	unsigned char k[kKeySize];
 	random_bytes(kKeySize, k);
@@ -105,12 +106,14 @@ Cipher::CipherImpl::CipherImpl()
 }
 
 Cipher::CipherImpl::CipherImpl(const std::array<uint8_t,kKeySize>& k)
+    : aes_enc_key_{}, remaining_block_count_(0)
 {	
 	gen_subkeys(k.data());
 	reset_iv();
 }
 
 Cipher::CipherImpl::CipherImpl(const uint8_t* k)
+    : aes_enc_key_{}, remaining_block_count_(0)
 {
 	gen_subkeys(k);
 	reset_iv();
@@ -180,7 +183,7 @@ void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)
 	size_t len = in.size();
     unsigned char *data = new unsigned char[len+kIVSize];
 
-	encrypt((unsigned char*)in.data(), len, data);
+	encrypt((const unsigned char*)in.data(), len, data);
     out = std::string((char *)data, len+kIVSize);
 
     // erase the buffer
@@ -219,7 +222,7 @@ void Cipher::CipherImpl::decrypt(const std::string &in, std::string &out)
     }
 
     unsigned char *data = new unsigned char[len-kIVSize];
-	decrypt((unsigned char*)in.data(), len, data);
+	decrypt((const unsigned char*)in.data(), len, data);
 
     out = std::string((char *)data, len-kIVSize);
     delete [] data;

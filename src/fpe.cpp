@@ -88,14 +88,14 @@ std::string Fpe::encrypt(const std::string &in)
 uint32_t Fpe::encrypt(const uint32_t &in)
 {
     uint32_t out;
-    fpe_imp_->encrypt((unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
+    fpe_imp_->encrypt((const unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
     return out;
 }
 
 uint64_t Fpe::encrypt_64(const uint64_t &in)
 {
     uint64_t out;
-    fpe_imp_->encrypt((unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
+    fpe_imp_->encrypt((const unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
     return out;
 }
     
@@ -115,18 +115,19 @@ std::string Fpe::decrypt(const std::string &in)
 uint32_t Fpe::decrypt(const uint32_t &in)
 {
 	uint32_t out;
-	fpe_imp_->decrypt((unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
+	fpe_imp_->decrypt((const unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
 	return out;
 }
 
 uint64_t Fpe::decrypt_64(const uint64_t &in)
 {
     uint64_t out;
-    fpe_imp_->decrypt((unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
+    fpe_imp_->decrypt((const unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
     return out;
 }
 
 Fpe::FpeImpl::FpeImpl()
+    : aez_ctx_{}
 {
 	unsigned char k[kKeySize];
 	random_bytes(kKeySize, k);
@@ -134,8 +135,9 @@ Fpe::FpeImpl::FpeImpl()
 }
 
 Fpe::FpeImpl::FpeImpl(const std::array<uint8_t,kKeySize>& k)
-{	
-	setup((unsigned char*)k.data());
+    : aez_ctx_{}
+{
+	setup((const unsigned char*)k.data());
 }
 
 void Fpe::FpeImpl::setup(const unsigned char* k)
@@ -151,7 +153,7 @@ void Fpe::FpeImpl::encrypt(const unsigned char* in, const unsigned int &len, uns
 							0x00, 0x00, 0x00, 0x00};
 	aez_encrypt(&aez_ctx_, iv, 16,
 	                 NULL, 0, 0,
-	                 (char *)in, len, (char *)out);
+	                 (const char *)in, len, (char *)out);
 }
 
 void Fpe::FpeImpl::encrypt(const std::string &in, std::string &out)
@@ -165,7 +167,7 @@ void Fpe::FpeImpl::encrypt(const std::string &in, std::string &out)
 
     unsigned char *data = new unsigned char[len];
 
-	encrypt((unsigned char*)in.data(), (unsigned int)len, data);
+	encrypt((const unsigned char*)in.data(), (unsigned int)len, data);
 	out = std::string((char *)data, len);
     delete [] data;
 }
@@ -178,7 +180,7 @@ void Fpe::FpeImpl::decrypt(const unsigned char* in, const unsigned int &len,  un
 							0x00, 0x00, 0x00, 0x00};
 	aez_decrypt(&aez_ctx_, iv, 16,
 	                 NULL, 0, 0,
-	                 (char *)in, len, (char *)out);
+	                 (const char *)in, len, (char *)out);
 }
 
 void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
@@ -192,9 +194,9 @@ void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
     
     unsigned char *data = new unsigned char[len];
 	
-	decrypt((unsigned char*)in.data(), (unsigned int)len, data);
+	decrypt((const unsigned char*)in.data(), (unsigned int)len, data);
     
-	out = std::string((char *)data, len);
+	out = std::string((const char *)data, len);
     delete [] data;
 }
 

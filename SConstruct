@@ -25,8 +25,13 @@ env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 
 env.Append(CFLAGS=['-std=c99'])
 env.Append(CCFLAGS=['-march=native', '-fPIC'])
-env.Append(CCFLAGS=['-Wall', '-Weffc++', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat=2', '-Wmissing-declarations', '-Wmissing-include-dirs', '-Woverloaded-virtual', '-Wredundant-decls', '-Wshadow', '-Wsign-promo', '-Wstrict-overflow=5', '-Wnon-virtual-dtor', '-Wdeprecated'])
 env.Append(CXXFLAGS=['-std=c++14'])
+
+# warnings
+env.Append(CCFLAGS=['-Wall', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat=2', '-Wmissing-declarations', '-Wmissing-include-dirs', '-Wredundant-decls', '-Wshadow', '-Wstrict-overflow=5', '-Wdeprecated', '-Wno-unused-function'])
+env.Append(CXXFLAGS=['-Weffc++','-Woverloaded-virtual',  '-Wsign-promo', '-Wstrict-overflow=5'])
+
+
 env.Append(LIBS = ['crypto'])
 
 env['AS'] = ['yasm']

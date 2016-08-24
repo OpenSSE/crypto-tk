@@ -129,7 +129,7 @@ public:
 	std::array<uint8_t, H::kDigestSize> hmac(const std::string &s) const;
 	
 private:
-	void gen_padded_keys(const std::array<uint8_t,kKeySize> &key);
+	void gen_padded_keys(const std::array<uint8_t,kKeySize> &in_key);
 	
 	std::array<uint8_t,kKeySize> key_;
 	std::array<uint8_t,kKeySize> o_key_;
@@ -137,10 +137,10 @@ private:
 
 };
 
-template <class H> void HMac<H>::gen_padded_keys(const std::array<uint8_t,kKeySize> &key)
+template <class H> void HMac<H>::gen_padded_keys(const std::array<uint8_t,kKeySize> &in_key)
 {
-	memcpy(o_key_.data(), key.data(), kKeySize);
-	memcpy(i_key_.data(), key.data(), kKeySize);
+	memcpy(o_key_.data(), in_key.data(), kKeySize);
+	memcpy(i_key_.data(), in_key.data(), kKeySize);
 	
 	for(uint8_t i = 0; i < kKeySize; ++i)
 	{

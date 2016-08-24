@@ -124,7 +124,14 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
 {
     // create a BIO from the std::string
     BIO *mem;
-    mem = BIO_new_mem_buf(((const void*)pk.data()), (int)pk.length());
+
+    // Some old implementation OpenSSL declares BIO_new_mem_buf( void *, int)
+    // instead BIO_new_mem_buf( const void *, int)
+    // silence the warning
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
+    mem = BIO_new_mem_buf(((void*)pk.data()), (int)pk.length());
+#pragma GCC diagnostic pop
     
     // read the key from the BIO
     rsa_key_ = PEM_read_bio_RSAPublicKey(mem,NULL,NULL,NULL);
@@ -377,7 +384,15 @@ TdpInverseImpl::TdpInverseImpl(const std::string& sk)
 {
     // create a BIO from the std::string
     BIO *mem;
-    mem = BIO_new_mem_buf(((const void*)sk.data()), (int)sk.length());
+    
+    // Some old implementation OpenSSL declares BIO_new_mem_buf( void *, int)
+    // instead BIO_new_mem_buf( const void *, int)
+    // silence the warning
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
+    mem = BIO_new_mem_buf(((void*)sk.data()), (int)sk.length());
+#pragma GCC diagnostic pop
+
 
     EVP_PKEY* evpkey;
     evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);

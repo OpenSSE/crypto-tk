@@ -42,7 +42,7 @@ class SetHash
 public:
 
 	SetHash();	
-	SetHash(const std::string &hex);	
+	SetHash(const std::string &hex_str);
 	SetHash(const SetHash& o);
 	SetHash(const SetHash&& o);
 	SetHash(const std::vector<std::string> &in_set);

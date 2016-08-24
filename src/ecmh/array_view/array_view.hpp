@@ -97,12 +97,12 @@ public:
     : begin_((value_type *)other.begin()), end_((value_type *)other.end()) {}
 
   template <class U, JBMS_ENABLE_IF(array_view_detail::is_constructible<T,U>)>
-  constexpr array_view(U *first, std::ptrdiff_t size)
-    : begin_((value_type *)first), end_(array_view_detail::advance_pointer(first, size))
+  constexpr array_view(U *first, std::ptrdiff_t sz)
+    : begin_((value_type *)first), end_(array_view_detail::advance_pointer(first, sz))
   {}
 
-  constexpr array_view(T *begin, T *end)
-    : begin_((value_type *)begin), end_((value_type *)end)
+  constexpr array_view(T *b, T *e)
+    : begin_((value_type *)b), end_((value_type *)e)
   {}
 
   array_view(array_view const &) = default;

@@ -127,8 +127,8 @@ struct AffinePoint {
   FE const &y() const { return y_; }
 
   AffinePoint() = default;
-  AffinePoint(FE const &x, FE const &y)
-    : x_(x), y_(y)
+  AffinePoint(FE const &x_in, FE const &y_in)
+    : x_(x_in), y_(y_in)
   {}
 
   explicit AffinePoint(Curve const &curve, LambdaAffinePoint<Curve> const &P) {
@@ -181,8 +181,8 @@ public:
   static constexpr jbms::binary_field::One z() { return {}; }
 
   LambdaAffinePoint() = default;
-  LambdaAffinePoint(FE const &x, FE const &m)
-    : x_(x), m_(m)
+  LambdaAffinePoint(FE const &x_in, FE const &m_in)
+    : x_(x_in), m_(m_in)
   {}
 
   FE &x() { return x_; }

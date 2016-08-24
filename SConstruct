@@ -21,7 +21,7 @@ def print_cmd_line(s, targets, sources, env):
     out_str = "=> %s\n"% (' and '.join([str(x) for x in targets]))
     sys.stdout.write(cmd + "\t " + in_str + " " + out_str)
 
-#env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
+env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 
 env.Append(CFLAGS=['-std=c99'])
 env.Append(CCFLAGS=['-march=native', '-fPIC'])

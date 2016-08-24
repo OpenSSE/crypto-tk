@@ -162,7 +162,7 @@ struct QuadraticExtension {
                                                      std::is_same<ElementT,DoubleElement>::value>;
 
   QuadraticExtension() = default;
-  QuadraticExtension(BaseField base_field) : base_field_(base_field) {}
+  QuadraticExtension(BaseField bf) : base_field_(bf) {}
   constexpr BaseField const &base_field() const { return base_field_; }
 
   template <class ElementT, JBMS_ENABLE_IF(is_element_or_double<ElementT>)>

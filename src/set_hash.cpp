@@ -62,7 +62,7 @@ public:
 
 	SetHashImpl();	
 	SetHashImpl(const MSH::State &s);	
-	SetHashImpl(const std::string &hex);
+	SetHashImpl(const std::string &hex_str);
 	SetHashImpl(const std::vector<std::string> &in_set);
  	template <class InputIterator> SetHashImpl(InputIterator first, InputIterator last);
 
@@ -99,7 +99,7 @@ SetHash::SetHash() : set_hash_imp_(new SetHashImpl())
 {
 }
 
-SetHash::SetHash(const std::string &hex) :  set_hash_imp_(new SetHashImpl(hex))
+SetHash::SetHash(const std::string &hex_str) :  set_hash_imp_(new SetHashImpl(hex_str))
 {
 }
 
@@ -191,9 +191,9 @@ SetHash::SetHashImpl::SetHashImpl(const MSH::State &s) : state_(s)
 {
 }
 
-SetHash::SetHashImpl::SetHashImpl(const std::string &hex)
+SetHash::SetHashImpl::SetHashImpl(const std::string &hex_str)
 {
-	state_ = from_hex(ecmh(), hex);
+	state_ = from_hex(ecmh(), hex_str);
 }
 
 SetHash::SetHashImpl::SetHashImpl(const std::vector<std::string> &in_set)

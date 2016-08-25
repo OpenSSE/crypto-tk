@@ -39,7 +39,7 @@ bool sha_512_vector_1()
 	string in = "abc";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
     
-	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
+	sse::crypto::hash::sha512::hash((const unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31,
@@ -123,9 +123,8 @@ bool sha_512_vector_2()
 bool sha_512_vector_3()
 {
 	string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-	string out;
+    std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 	
-	out.resize(sse::crypto::hash::sha512::kDigestSize);
 	sse::crypto::hash::sha512::hash((const unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
@@ -134,8 +133,11 @@ bool sha_512_vector_3()
 					0x96, 0xfd, 0x15, 0xc1, 0x3b, 0x1b, 0x07, 0xf9, 0xaa, 0x1d, 0x3b, 0xea, 0x57, 0x78, 0x9c, 0xa0,
 					0x31, 0xad, 0x85, 0xc7, 0xa7, 0x1d, 0xd7, 0x03, 0x54, 0xec, 0x63, 0x12, 0x38, 0xca, 0x34, 0x45
 				};
-												
-	if(out != string((char*)reference,sse::crypto::hash::sha512::kDigestSize))
+   
+    string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
+    string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
+    
+    if(out_string != ref_string)
 	{
 		cout << "Test case 3 failed!\n";
 		cout << "Input (" << dec << in.length() << " bytes):\n";
@@ -166,7 +168,7 @@ bool sha_512_vector_4()
 	string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 
-    sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
+    sse::crypto::hash::sha512::hash((const unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0x8e, 0x95, 0x9b, 0x75, 0xda, 0xe3, 0x13, 0xda, 0x8c, 0xf4, 0xf7, 0x28, 0x14, 0xfc, 0x14, 0x3f, 
@@ -209,7 +211,7 @@ bool sha_512_vector_5()
 	string in(1e6, 'a');
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 
-    sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
+    sse::crypto::hash::sha512::hash((const unsigned char*)in.data(), in.length(), (unsigned char*)out.data());
 	
 	uint8_t reference[] = {
 					0xe7, 0x18, 0x48, 0x3d, 0x0c, 0xe7, 0x69, 0x64, 0x4e, 0x2e, 0x42, 0xc7, 0xbc, 0x15, 0xb4, 0x63, 

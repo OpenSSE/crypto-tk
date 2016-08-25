@@ -48,11 +48,11 @@ public:
   explicit ECMH(Curve const &c)
     : curve_(c) {}
 
-  explicit ECMH(Curve const &c, Hash const &hash)
-    : curve_(c), hash_(hash) {}
+  explicit ECMH(Curve const &c, Hash const &h)
+    : curve_(c), hash_(h) {}
 
-  explicit ECMH(Curve const &c, Encoder const &encoder, Hash const &hash)
-    : curve_(c), encoder_(encoder), hash_(hash)
+  explicit ECMH(Curve const &c, Encoder const &e, Hash const &h)
+    : curve_(c), encoder_(e), hash_(h)
   {}
 
   Curve const &curve() const { return curve_; }

@@ -21,11 +21,22 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE CRYPTO
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
+
+
 #ifdef UNIT_TEST_SINGLE_HEADER
 #include <boost/test/included/unit_test.hpp>
 #else
 #include <boost/test/unit_test.hpp>
 #endif 
+
+#pragma GCC diagnostic pop
 
 #include "tests/test_ecmh.hpp"
 #include "tests/hashing.hpp"

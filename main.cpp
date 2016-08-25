@@ -336,39 +336,6 @@ static void test_hash()
 	
 	return;
 
-    /*
-	string out_openssl, out_acc;
-	out_openssl.resize(kDigestSize);
-	out_acc.resize(kDigestSize);
-	
-	for(size_t i = 1; i < 1e5; ++i)
-	{
-		string in(i,'a');
-	open_ssl_full((unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
-	sse::crypto::hash::sha512::hash((unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
-
-	if(out_openssl == out_acc)
-		continue;
-	// unsigned char in_array[128] = {0x00};
-	// sha512_update_acc(in_array,(unsigned char*)out_acc.data(),1);
-	
-	cout << "Not matching for length " << dec << i << endl;
-	
-	
-	cout << "OpenSSL: \n";
-	for(unsigned char c : out_openssl)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << endl;
-	cout << "Intel: \n";
-	for(unsigned char c : out_acc)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << dec << endl;
-	}
-    */
 }
 
 static void tdp()
@@ -377,19 +344,6 @@ static void tdp()
     
     cout << tdp.private_key() << endl;
     
-//    sse::crypto::TdpInverse tdp2(tdp.private_key());
-    
-//    cout << "\n\nSecond private key \n\n" << endl;
-//    cout << tdp2.private_key() << endl;
-
-    
-//    std::string in(10, 0xf0);
-//    std::string in(384, 0xf0);
-//    for (uint i = 0; i < 384; i++) {
-//        in[i]=i+1;
-//        in[i]=0xf0;
-//    }
-  
     std::string in = tdp.sample();
     
     cout << "Original input:\n" << endl;

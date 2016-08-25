@@ -28,6 +28,7 @@
 #pragma GCC diagnostic ignored "-Wredundant-decls"
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wstrict-overflow"
+#pragma GCC diagnostic ignored "-Wcast-qual"
 
 
 #ifdef UNIT_TEST_SINGLE_HEADER

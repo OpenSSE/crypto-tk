@@ -189,7 +189,7 @@ template <class H> std::array<uint8_t, H::kDigestSize> HMac<H>::hmac(const unsig
 // Convienience function to run HMac over a C++ string
 template <class H> std::array<uint8_t, H::kDigestSize> HMac<H>::hmac(const std::string &s) const
 {
-	return hmac((unsigned char*)s.data() , s.length());
+	return hmac((const unsigned char*)s.data() , s.length());
 }
 
 } // namespace crypto

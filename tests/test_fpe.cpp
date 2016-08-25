@@ -17,6 +17,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
+
+#include "../tests/test_fpe.hpp"
 #include "../src/fpe.hpp"
 
 

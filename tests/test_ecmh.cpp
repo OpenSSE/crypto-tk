@@ -18,6 +18,8 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "../tests/test_ecmh.hpp"
+
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
 #include "../src/set_hash.hpp"
@@ -165,8 +167,7 @@ void test_generic_multiset_hash_with_size() {
     // std::vector<std::array<uint8_t, N>> examples(num_examples);
     std::vector<std::string> examples(num_examples);
     for (auto &e : examples){
-		e.resize(N);
-		sse::crypto::random_bytes(N,(unsigned char*) e.data());
+        e = sse::crypto::random_string(N);
 	}			
   using sse::crypto::SetHash;
 

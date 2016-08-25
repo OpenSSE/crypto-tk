@@ -18,6 +18,8 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "../tests/encryption.hpp"
+
 #include "../src/cipher.hpp"
 
 

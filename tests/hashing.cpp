@@ -18,7 +18,8 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "hashing.hpp"
+#include "../tests/hashing.hpp"
+
 #include "../src/hash.hpp"
 #include "../src/hash/sha512.hpp"
 

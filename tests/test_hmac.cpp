@@ -18,7 +18,8 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "test_hmac.hpp"
+#include "../tests/test_hmac.hpp"
+
 #include "../src/hmac.hpp"
 #include "../src/hash/sha512.hpp"
 

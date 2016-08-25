@@ -24,7 +24,7 @@
 #include "hash.hpp"
 #include "random.hpp"
 
-#include <boost/test/unit_test.hpp>
+#include "boost_test_include.hpp"
 
 #include <iostream>
 #include <vector>

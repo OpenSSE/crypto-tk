@@ -24,7 +24,7 @@
 #include <iomanip>
 #include <string>
 
-#include <boost/test/unit_test.hpp>
+#include "boost_test_include.hpp"
 
 using namespace std;
 

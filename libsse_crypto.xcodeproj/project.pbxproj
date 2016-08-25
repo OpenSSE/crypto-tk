@@ -221,6 +221,7 @@
 		3185168D1D4BF45700A44AD7 /* aesni.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = aesni.hpp; sourceTree = "<group>"; };
 		318C72991C9730140040AEE7 /* tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tdp.cpp; sourceTree = "<group>"; };
 		318C729A1C9730140040AEE7 /* tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp.hpp; sourceTree = "<group>"; };
+		31D9DF621D6F4DDC00F0C960 /* boost_test_include.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = boost_test_include.hpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6CC2D3FD1C3185D700334ADD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -614,6 +615,7 @@
 				316F0D441D2565CB00F87904 /* test_prg.hpp */,
 				311934B61D27F1F00031804B /* test_block_hash.cpp */,
 				311934B71D27F1F00031804B /* test_block_hash.hpp */,
+				31D9DF621D6F4DDC00F0C960 /* boost_test_include.hpp */,
 			);
 			path = tests;
 			sourceTree = "<group>";

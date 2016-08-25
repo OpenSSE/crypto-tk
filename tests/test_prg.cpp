@@ -26,7 +26,7 @@
 #include <string>
 #include <algorithm>
 
-#include <boost/test/unit_test.hpp>
+#include "boost_test_include.hpp"
 
 #define TEST_COUNT 10
 

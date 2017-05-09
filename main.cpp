@@ -482,9 +482,9 @@ static void ppke()
     
     M_type M = 0xBABAff6969;
     
-    std::vector<std::string> tags = {"toto"};
+    std::string tag = "toto";
     
-    auto ct = ppke.encrypt<M_type>(pk, M, tags);
+    auto ct = ppke.encrypt<M_type>(pk, M, tag);
 
     M_type dec_M = ppke.decrypt(pk, sk, ct);
     

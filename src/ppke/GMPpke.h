@@ -29,7 +29,7 @@ class GmppkePublicKey: public  virtual  baseKey{
 public:
 	friend bool operator==(const GmppkePublicKey& x, const GmppkePublicKey& y){
 		return  ((baseKey)x == (baseKey)y &&
-				x.ppkeg1 == y.ppkeg1 && x.d == y.d && x.gqofxG1 == y.gqofxG1 &&
+				x.ppkeg1 == y.ppkeg1 && x.gqofxG1 == y.gqofxG1 &&
 				x.gqofxG2 == y.gqofxG2);
 	}
 	friend bool operator!=(const GmppkePublicKey& x, const GmppkePublicKey& y){
@@ -43,9 +43,12 @@ public:
 //	}
 protected:
 	relicxx::G2 ppkeg1;
-	unsigned int d;
-	std::vector<relicxx::G1> gqofxG1;
-	std::vector<relicxx::G2> gqofxG2;
+//    std::vector<relicxx::G1> gqofxG1;
+//    std::vector<relicxx::G2> gqofxG2;
+
+    std::array<relicxx::G1,2> gqofxG1;
+    std::array<relicxx::G2,2> gqofxG2;
+  
 //	friend class ::cereal::access;
 	friend class Gmppke;
 	friend class GMPfse;
@@ -93,7 +96,9 @@ public:
 	 * @param tags the tags
 	 * @return the intersection
 	 */
-	std::vector<std::string> puncturedIntersect(const std::vector<std::string> & tags)const ;
+//	std::vector<std::string> puncturedIntersect(const std::vector<std::string> & tags)const ;
+     bool isPuncturedOnTag(const std::string &tag) const;
+
 protected:
 	std::vector<GmppkePrivateKeyShare> shares;
 //	template <class Archive>
@@ -110,7 +115,7 @@ class PartialGmmppkeCT{
 public:
 	 PartialGmmppkeCT(){};
 		friend bool operator==(const PartialGmmppkeCT& x,const PartialGmmppkeCT& y){
-			return x.ct2 == y.ct2 && x.ct3 == y.ct3 && x.tags == y.tags;
+			return x.ct2 == y.ct2 && x.ct3 == y.ct3 && x.tag == y.tag;
 		}
 		friend bool operator!=(const PartialGmmppkeCT& x, const PartialGmmppkeCT& y){
 			return !(x==y);
@@ -126,8 +131,8 @@ public:
 
 protected:
 	relicxx::G1 ct2;
-	std::vector<relicxx::G1> ct3;
-    std::vector<std::string> tags;
+	relicxx::G1 ct3;
+    std::string tag;
 //	template <class Archive>
 //	void serialize( Archive & ar ){
 //		ar(ct2,ct3,tags);
@@ -195,11 +200,11 @@ public:
 	Gmppke(){};
 	~Gmppke() {};
 
-	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk,const unsigned int & d = 1) const;
+	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const;
 
 	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const std::string & tag) const;
 
-	PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const std::vector<std::string> & tags) const;
+	PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const std::string & tag) const;
 
 //	GmmppkeCT encrypt(const GmppkePublicKey & pk,const relicxx::GT & M,const std::vector<std::string> & tags) const;
  
@@ -211,12 +216,12 @@ public:
 //	relicxx::GT decrypt_unchecked(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const;
 
     template <typename T>
-   	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const std::vector<std::string> & tags) const
+   	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const std::string & tag) const
     {
         const relicxx::ZR s = group.randomZR();
-        GmmppkeCT<T> ct = blind(pk,s,tags);
+        GmmppkeCT<T> ct = blind(pk,s,tag);
         
-        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tags[0]);
+        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag);
         
         std::vector<uint8_t> gt_blind_bytes = group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false);
         
@@ -231,18 +236,8 @@ public:
     template <typename T>
     T decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
-        std::vector<std::string> intersect = sk.puncturedIntersect(ct.tags);
-        if(intersect.size()>0){
-            std::string duplicates = "";
-            bool first = true;
-            for(auto e: intersect){
-                if(!first){
-                    duplicates +=", ";
-                }
-                duplicates += e;
-                first = false;
-            }
-            throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tags in the ciphertext: " + duplicates + ".");
+        if (sk.isPuncturedOnTag(ct.tag)) {
+            throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tag in the ciphertext: " + ct.tag + ".");
         }
         return decrypt_unchecked(pk,sk,ct);
     }
@@ -252,7 +247,7 @@ public:
     {
         std::vector<uint8_t> gt_blind_bytes = recoverBlind(pk,sk,ct).getBytes(false);
         
-        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(ct.tags[0]);
+        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(ct.tag);
         
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*)&mask, sizeof(mask));
@@ -265,19 +260,19 @@ private:
 	relicxx::PairingGroup group;
 //	G1 vG1(const std::vector<G1> & gqofxG1, const ZR & x) const;
 //	G2 vG2(const std::vector<G2> & gqofxG2, const ZR & x) const;
-	template <class T>
-	T  vx(const std::vector<T> & gqofxG1, const std::string & x) const{
-	    std::vector<relicxx::ZR> xcords;
-	    int size = (int)gqofxG1.size();
-	    for(int i=0;i<size;i++){
-	    	relicxx::ZR xcord = i;
-	        xcords.push_back(xcord);
-	    }
-	    return LagrangeInterpInExponent(group,group.hashListToZR(x),xcords,gqofxG1);
+	template <class T, size_t N>
+	T  vx(const std::array<T,N> & gqofxG1, const std::string & x) const{
+        std::array<relicxx::ZR,2> xcords = {relicxx::ZR(0), relicxx::ZR(1)};
+//	    int size = (int)gqofxG1.size();
+//	    for(int i=0;i<N;i++){
+//	    	relicxx::ZR xcord = i;
+//	        xcords.push_back(xcord);
+//	    }
+	    return LagrangeInterpInExponent<T,N>(group,group.hashListToZR(x),xcords,gqofxG1);
 
 	}
 
-	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk,const unsigned int & d=1) const;
+	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk) const;
 	GmppkePrivateKeyShare skgen(const GmppkePublicKey &pk,const relicxx::ZR & alpha ) const;
 	friend class GMPfse;
 };

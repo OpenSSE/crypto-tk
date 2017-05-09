@@ -12,37 +12,19 @@ using namespace relicxx;
 static const string  NULLTAG = "whoever wishes to keep a secret, must hide from us that he possesses one.-- Johann Wolfgang von Goethe"; // the reserved tag
 
 using namespace std;
-std::vector<std::string> GmppkePrivateKey::puncturedIntersect(const std::vector<std::string> & tags)const {
-	unordered_set<std::string> tagset(tags.begin(),tags.end());
-	vector<string> duplicates;
-	for(auto share : shares){
-		if(tagset.count(share.sk4) >0){
-			duplicates.push_back(share.sk4);
-		}
-	}
-    return duplicates;
-}
-//G1  Gmppke::vG1(const std::vector<G1> & gqofxG1, const std::string & x) const{
-//    vector<ZR> xcords;
-//    int size = gqofxG1.size() ;
-//    for(int i=0;i<size;i++){
-//        ZR xcord = i;
-//        xcords.push_back(xcord);
-//    }
-//    return LagrangeInterpInExponent(group,group.hashListToZR(x),xcords,gqofxG1);
-//
-//}
-//G2 Gmppke::vG2(const std::vector<G2> & gqofxG2,const std::string  & x) const{
-//    vector<ZR> xcords;
-//        int size = gqofxG2.size() ;
-//
-//    for(int i=0; i <size; i++){
-//        ZR xcord = i;
-//        xcords.push_back(xcord);
-//    }
-//    return LagrangeInterpInExponent(group,group.hashListToZR(x),xcords,gqofxG2);
-//}
-void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk,const unsigned int & d) const
+    
+    bool GmppkePrivateKey::isPuncturedOnTag(const std::string &tag) const
+    {
+        for(auto share : shares){
+
+            if(share.sk4 == tag){
+                return true;
+            }
+        }
+        return false;
+    }
+
+void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const
 {
    GmppkePublicKey bpk;
    const ZR alpha = group.randomZR();
@@ -55,36 +37,36 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk,const unsigned i
    pk.gG2 = bpk.gG2;
    pk.g2G1 = bpk.g2G1;
    pk.g2G2 = bpk.g2G2;
-   keygenPartial(alpha,pk,sk,d);
+   keygenPartial(alpha,pk,sk);
 }
-void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const unsigned int & d) const
+    
+void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk) const
 {
-    pk.d = d;
     pk.ppkeg1 =  group.exp(pk.gG2,alpha);
 
     // Select a random polynomial of degree d subject to q(0)= beta. We do this
     // by selecting d+1 points. Because we don't actually  care about the
     // polynomial, only g^q(x), we merely select points as (x,g^q(x)).
 
-    vector<ZR> polynomial_xcordinates;
+    array<ZR,2> polynomial_xcordinates;
 
     // the first point is (x=0,y=beta) so  x=0, g^beta.
-    polynomial_xcordinates.push_back(ZR(0));
-    pk.gqofxG1.push_back(pk.g2G1); // g^beta
-    pk.gqofxG2.push_back(pk.g2G2); // g^beta
+    polynomial_xcordinates[0] = ZR(0);
+    pk.gqofxG1[0] = pk.g2G1; // g^beta
+    pk.gqofxG2[0] = pk.g2G2; // g^beta
 
     // the next d points' y values  are random
     // we use x= 1...d because this has the side effect
     // of easily computing g^q(0).... g^q(d).
-    for (unsigned int i = 1; i <= d; i++)
-    {
+//    for (unsigned int i = 1; i <= d; i++)
+//    {
         const ZR ry = group.randomZR();
 
-        polynomial_xcordinates.push_back(ZR(i));
-        pk.gqofxG1.push_back(group.exp(pk.gG1,ry));
-        pk.gqofxG2.push_back(group.exp(pk.gG2,ry));
+        polynomial_xcordinates[1] = ZR(1);
+        pk.gqofxG1[1] = group.exp(pk.gG1,ry);
+        pk.gqofxG2[1] = group.exp(pk.gG2,ry);
 
-    }
+//    }
     assert(polynomial_xcordinates.size()==pk.gqofxG1.size());
 
     // Sanity check that Lagrange interpolation works to get us g^beta on q(0).
@@ -136,108 +118,61 @@ void Gmppke::puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const s
 }
 
 
-//GmmppkeCT Gmppke::encrypt(const GmppkePublicKey & pk,const GT & M,const std::vector<std::string> & tags) const{
-//	const ZR s = group.randomZR();
-//	GmmppkeCT ct = blind(pk,s,tags);
-//	ct.ct1 = group.mul(group.exp(group.pair(pk.g2G1, pk.ppkeg1), s), M);
-//	return ct;
-//
-//}
-PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const std::vector<string> & tags ) const
+
+PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const std::string & tag ) const
 {
-	//simple duplicate check without modifying  tags by sorting
-	if(	unordered_set<string>(tags.begin(),tags.end()).size() != tags.size()){
-		throw invalid_argument("Tags must be unique. You have provided at least one duplicate tag.");
-	}
-	if(tags.size() != pk.d){
-		throw invalid_argument("You must provide exactly " +std::to_string(pk.d) + " tags. You provided " +std::to_string(tags.size())+" tag.");
-	}
     PartialGmmppkeCT  ct;
     ct.ct2 = group.exp(pk.gG1, s);
+    G1 vofx = vx(pk.gqofxG1,tag);
+    ct.ct3 = group.exp(vofx, s);
 
-    for (unsigned int i = 0; i < pk.d; i++)
-    {
-        G1 vofx = vx(pk.gqofxG1,tags.at(i));
-        ct.ct3.push_back(group.exp(vofx, s));
-    }
-    ct.tags = tags;
+    ct.tag = tag;
     return ct;
 }
 
 
 
-//GT Gmppke::decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const{
-//	vector<string> intersect =sk.puncturedIntersect(ct.tags);
-//    if(intersect.size()>0){
-//    	string duplicates = "";
-//    	bool first = true;
-//    	for(auto e: intersect){
-//    		if(!first){
-//    			duplicates +=", ";
-//    		}
-//    		duplicates += e;
-//    		first = false;
-//    	}
-//    	throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tags in the ciphertext: " + duplicates + ".");
-//    }
-//    return decrypt_unchecked(pk,sk,ct);
-//}
-//GT Gmppke::decrypt_unchecked(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const{
-//	return group.div(ct.ct1,recoverBlind(pk,sk,ct));
-//}
+GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
+{
+//    vector<ZR> shareTags(2);
+//    shareTags.at(0) = group.hashListToZR(ct.tag);
+    ZR ctTag = group.hashListToZR(ct.tag);
+    
+    const unsigned int numshares = (unsigned int)sk.shares.size(); // should be 2
+    
 
-    GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
-    {
-        assert(ct.tags.size()==pk.d);
-        vector<ZR> shareTags(ct.tags.size());
-        for(unsigned int i=0;i<ct.tags.size();i++){
-            shareTags.at(i) = group.hashListToZR(ct.tags.at(i));
-        }
-        const unsigned int numshares = (unsigned int)sk.shares.size();
-        
-        shareTags.resize( ct.tags.size()+1);// allow one more tag for share the private key holds
-        
-        assert(shareTags.size() == pk.d+1);
-        
-        // Compute w_i coefficients for recovery
-        vector<GT> z(numshares);
-        
-        
-        relicResourceHandle h(true);
+    // Compute w_i coefficients for recovery
+    vector<GT> z(numshares);
+    
+    
+    relicResourceHandle h(true);
 #pragma omp parallel for private(h) firstprivate(shareTags)
-        for (unsigned int i = 0; i < numshares; i++)
-        {
-            const GmppkePrivateKeyShare & s0 = sk.shares.at(i);
-            
-            // FIXME DO NOT COPY an entire  vector  if possible.
-            
-            shareTags.at(shareTags.size()-1) = group.hashListToZR(s0.sk4);
-            
-            vector<ZR> w;
-            
-            for(unsigned int j=0;j < shareTags.size(); j++){
-                w.push_back(LagrangeBasisCoefficients(group,j,0,shareTags));
-            }
-            const ZR wstar = w.at(w.size() - 1);
-            
-            G1 ct3prod_j;
-            for (unsigned int j = 0; j < pk.d; j++)
-            {
-                ct3prod_j = group.mul(ct3prod_j, group.exp(ct.ct3.at(j),w.at(j))); // w[0] = wstar
-                
-            }
-            GT denominator = group.mul(group.pair(ct3prod_j, s0.sk3), group.pair(group.exp(ct.ct2,wstar), s0.sk2));
-            GT nominator = group.pair(ct.ct2, s0.sk1);
-
-            z.at(i)=group.div(nominator, denominator);
-        }
+    for (unsigned int i = 0; i < numshares; i++)
+    {
+        const GmppkePrivateKeyShare & s0 = sk.shares.at(i);
+        ZR currentTag = group.hashListToZR(s0.sk4);
         
-        GT zprod;
-        for (unsigned int i = 0; i < numshares; i++)
-        {
-            zprod = group.mul(zprod, z.at(i));
-        }
-        return zprod;
+        
+        ZR w0 = LagrangeBasisCoefficients<2>(group,0,0, {ctTag, currentTag});
+        const ZR wstar = LagrangeBasisCoefficients<2>(group,1,0,{ctTag, currentTag});
+
+        
+        G1 ct3prod_j;
+
+        ct3prod_j = group.mul(ct3prod_j, group.exp(ct.ct3,w0));
+            
+        GT denominator = group.mul(group.pair(ct3prod_j, s0.sk3), group.pair(group.exp(ct.ct2,wstar), s0.sk2));
+        GT nominator = group.pair(ct.ct2, s0.sk1);
+
+        z.at(i)=group.div(nominator, denominator);
     }
+    
+    GT zprod;
+    for (unsigned int i = 0; i < numshares; i++)
+    {
+        zprod = group.mul(zprod, z.at(i));
+    }
+    return zprod;
+}
 
 }

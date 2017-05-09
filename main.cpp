@@ -29,6 +29,8 @@
 #include <netinet/in.h>
 #include <openssl/sha.h>
 
+#include "src/utils.hpp"
+
 #include "../src/hash.hpp"
 #include "../src/hmac.hpp"
 #include "src/hash/sha512.hpp"
@@ -36,6 +38,8 @@
 #include "src/tdp.hpp"
 #include "src/block_hash.hpp"
 #include "src/prg.hpp"
+
+#include "src/ppke/GMPpke.h"
 
 #include "src/aesni/aesni.hpp"
 
@@ -462,7 +466,40 @@ static void bench_prg()
 //    std::cout << "Cycles: " << (double)sse::crypto::tick_counter/N_sample << std::endl;
 }
 
+
+static void ppke()
+{
+
+    using namespace forwardsec;
+    
+    Gmppke ppke;
+    GmppkePublicKey pk;
+    GmppkePrivateKey sk;
+    
+    ppke.keygen(pk, sk);
+    
+    typedef uint64_t M_type;
+    
+    M_type M = 0xBABAff6969;
+    
+    std::vector<std::string> tags = {"toto"};
+    
+    auto ct = ppke.encrypt<M_type>(pk, M, tags);
+
+    M_type dec_M = ppke.decrypt(pk, sk, ct);
+    
+    std::cout << "M: " << hex <<  M << std::endl;
+    std::cout << "decrypted M: " << hex << dec_M << std::endl;
+
+}
+
 int main( int argc, char* argv[] ) {
-    bench_prg();
+    
+    sse::crypto::init_crypto_lib();
+    
+    ppke();
+    
+    sse::crypto::cleanup_crypto_lib();
+    
     return 0;
 }

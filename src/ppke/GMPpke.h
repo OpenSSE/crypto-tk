@@ -215,11 +215,13 @@ public:
     {
         const relicxx::ZR s = group.randomZR();
         GmmppkeCT<T> ct = blind(pk,s,tags);
+        
         auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tags[0]);
         
         std::vector<uint8_t> gt_blind_bytes = group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false);
+        
         T mask;
-        hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), &mask, sizeof(mask));
+        hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
         
         ct.ct1 = mask^M;
         return ct;
@@ -229,7 +231,7 @@ public:
     template <typename T>
     T decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
-        std::vector<std::string> intersect =sk.puncturedIntersect(ct.tags);
+        std::vector<std::string> intersect = sk.puncturedIntersect(ct.tags);
         if(intersect.size()>0){
             std::string duplicates = "";
             bool first = true;
@@ -249,10 +251,11 @@ public:
     T decrypt_unchecked(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
         std::vector<uint8_t> gt_blind_bytes = recoverBlind(pk,sk,ct).getBytes(false);
+        
         auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(ct.tags[0]);
         
         T mask;
-        hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), &mask, sizeof(mask));
+        hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*)&mask, sizeof(mask));
         
         return mask^ct.ct1;
     }

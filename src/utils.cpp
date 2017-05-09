@@ -12,6 +12,8 @@
 
 #include <thread>
 
+#include "ppke/relic_wrapper/relic_api.h"
+
 struct CRYPTO_dynlock_value
 {
     pthread_mutex_t mutex;
@@ -110,6 +112,9 @@ namespace sse
     
     namespace crypto
     {
+        
+        static relicxx::relicResourceHandle *__relic_handle;
+
         static int init_locks(void)
         {
             int i;
@@ -158,9 +163,15 @@ namespace sse
         void init_crypto_lib()
         {
             init_locks();
+            
+            __relic_handle = new relicxx::relicResourceHandle(false);
+
         }
         void cleanup_crypto_lib()
         {
+            delete  __relic_handle;
+            __relic_handle = NULL;
+            
             kill_locks();
         }
     }

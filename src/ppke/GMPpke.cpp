@@ -136,13 +136,13 @@ void Gmppke::puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const s
 }
 
 
-GmmppkeCT Gmppke::encrypt(const GmppkePublicKey & pk,const GT & M,const std::vector<std::string> & tags) const{
-	const ZR s = group.randomZR();
-	GmmppkeCT ct = blind(pk,s,tags);
-	ct.ct1 = group.mul(group.exp(group.pair(pk.g2G1, pk.ppkeg1), s), M);
-	return ct;
-
-}
+//GmmppkeCT Gmppke::encrypt(const GmppkePublicKey & pk,const GT & M,const std::vector<std::string> & tags) const{
+//	const ZR s = group.randomZR();
+//	GmmppkeCT ct = blind(pk,s,tags);
+//	ct.ct1 = group.mul(group.exp(group.pair(pk.g2G1, pk.ppkeg1), s), M);
+//	return ct;
+//
+//}
 PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const std::vector<string> & tags ) const
 {
 	//simple duplicate check without modifying  tags by sorting
@@ -166,76 +166,133 @@ PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const s
 
 
 
-GT Gmppke::decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const{
-	vector<string> intersect =sk.puncturedIntersect(ct.tags);
-    if(intersect.size()>0){
-    	string duplicates = "";
-    	bool first = true;
-    	for(auto e: intersect){
-    		if(!first){
-    			duplicates +=", ";
-    		}
-    		duplicates += e;
-    		first = false;
-    	}
-    	throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tags in the ciphertext: " + duplicates + ".");
-    }
-    return decrypt_unchecked(pk,sk,ct);
-}
-GT Gmppke::decrypt_unchecked(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const{
-	return group.div(ct.ct1,recoverBlind(pk,sk,ct));
-}
+//GT Gmppke::decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const{
+//	vector<string> intersect =sk.puncturedIntersect(ct.tags);
+//    if(intersect.size()>0){
+//    	string duplicates = "";
+//    	bool first = true;
+//    	for(auto e: intersect){
+//    		if(!first){
+//    			duplicates +=", ";
+//    		}
+//    		duplicates += e;
+//    		first = false;
+//    	}
+//    	throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tags in the ciphertext: " + duplicates + ".");
+//    }
+//    return decrypt_unchecked(pk,sk,ct);
+//}
+//GT Gmppke::decrypt_unchecked(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const{
+//	return group.div(ct.ct1,recoverBlind(pk,sk,ct));
+//}
 
-GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
-{
-    assert(ct.tags.size()==pk.d);
-    vector<ZR> shareTags(ct.tags.size());
-    for(unsigned int i=0;i<ct.tags.size();i++){
-    	shareTags.at(i) = group.hashListToZR(ct.tags.at(i));
-    }
-    const unsigned int numshares = (unsigned int)sk.shares.size();
+//GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
+//{
+//    assert(ct.tags.size()==pk.d);
+//    vector<ZR> shareTags(ct.tags.size());
+//    for(unsigned int i=0;i<ct.tags.size();i++){
+//    	shareTags.at(i) = group.hashListToZR(ct.tags.at(i));
+//    }
+//    const unsigned int numshares = (unsigned int)sk.shares.size();
+//
+//    shareTags.resize( ct.tags.size()+1);// allow one more tag for share the private key holds
+//
+//    assert(shareTags.size() == pk.d+1);
+//
+//    // Compute w_i coefficients for recovery
+//    vector<GT> z(numshares);
+//
+//
+//    relicResourceHandle h(true);
+//    #pragma omp parallel for private(h) firstprivate(shareTags)
+//    for (unsigned int i = 0; i < numshares; i++)
+//    {
+//        const GmppkePrivateKeyShare & s0 = sk.shares.at(i);
+//
+//        // FIXME DO NOT COPY an entire  vector  if possible.
+//
+//        shareTags.at(shareTags.size()-1) = group.hashListToZR(s0.sk4);
+//
+//        vector<ZR> w;
+//
+//        for(unsigned int j=0;j < shareTags.size(); j++){
+//            w.push_back(LagrangeBasisCoefficients(group,j,0,shareTags));
+//        }
+//        const ZR wstar = w.at(w.size() - 1);
+//
+//        G1 ct3prod_j;
+//        for (unsigned int j = 0; j < pk.d; j++)
+//        {
+//            ct3prod_j = group.mul(ct3prod_j, group.exp(ct.ct3.at(j),w.at(j))); // w[0] = wstar
+//
+//        }
+//       GT denominator = group.mul(group.pair(ct3prod_j, s0.sk3), group.pair(group.exp(ct.ct2,wstar), s0.sk2));
+//       GT nominator = group.pair(ct.ct2, s0.sk1);
+//       z.at(i)=group.div(nominator, denominator);
+//    }
+//
+//    GT zprod;
+//    for (unsigned int i = 0; i < numshares; i++)
+//    {
+//        zprod = group.mul(zprod, z.at(i));
+//    }
+//    return zprod;
+//}
 
-    shareTags.resize( ct.tags.size()+1);// allow one more tag for share the private key holds
-
-    assert(shareTags.size() == pk.d+1);
-
-    // Compute w_i coefficients for recovery
-    vector<GT> z(numshares);
-
-
-    relicResourceHandle h(true);
-    #pragma omp parallel for private(h) firstprivate(shareTags)
-    for (unsigned int i = 0; i < numshares; i++)
+    GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
     {
-        const GmppkePrivateKeyShare & s0 = sk.shares.at(i);
-
-        // FIXME DO NOT COPY an entire  vector  if possible.
-
-        shareTags.at(shareTags.size()-1) = group.hashListToZR(s0.sk4);
-
-        vector<ZR> w;
-
-        for(unsigned int j=0;j < shareTags.size(); j++){
-            w.push_back(LagrangeBasisCoefficients(group,j,0,shareTags));
+        assert(ct.tags.size()==pk.d);
+        vector<ZR> shareTags(ct.tags.size());
+        for(unsigned int i=0;i<ct.tags.size();i++){
+            shareTags.at(i) = group.hashListToZR(ct.tags.at(i));
         }
-        const ZR wstar = w.at(w.size() - 1);
-
-        G1 ct3prod_j;
-        for (unsigned int j = 0; j < pk.d; j++)
+        const unsigned int numshares = (unsigned int)sk.shares.size();
+        
+        shareTags.resize( ct.tags.size()+1);// allow one more tag for share the private key holds
+        
+        assert(shareTags.size() == pk.d+1);
+        
+        // Compute w_i coefficients for recovery
+        vector<GT> z(numshares);
+        
+        
+        relicResourceHandle h(true);
+#pragma omp parallel for private(h) firstprivate(shareTags)
+        for (unsigned int i = 0; i < numshares; i++)
         {
-            ct3prod_j = group.mul(ct3prod_j, group.exp(ct.ct3.at(j),w.at(j))); // w[0] = wstar
+            const GmppkePrivateKeyShare & s0 = sk.shares.at(i);
+            
+            // FIXME DO NOT COPY an entire  vector  if possible.
+            
+            shareTags.at(shareTags.size()-1) = group.hashListToZR(s0.sk4);
+            
+            vector<ZR> w;
+            
+            for(unsigned int j=0;j < shareTags.size(); j++){
+                w.push_back(LagrangeBasisCoefficients(group,j,0,shareTags));
+            }
+            const ZR wstar = w.at(w.size() - 1);
+            
+            G1 ct3prod_j;
+            for (unsigned int j = 0; j < pk.d; j++)
+            {
+                ct3prod_j = group.mul(ct3prod_j, group.exp(ct.ct3.at(j),w.at(j))); // w[0] = wstar
+                
+            }
+//            GT denominator = group.mul(group.pair(ct3prod_j, s0.sk3), group.pair(group.exp(ct.ct2,wstar), s0.sk2));
+//            GT nominator = group.pair(ct.ct2, s0.sk1);
+            GT nominator = group.mul(group.pair(ct3prod_j, s0.sk3), group.pair(group.exp(ct.ct2,wstar), s0.sk2));
+            GT denominator = group.pair(ct.ct2, s0.sk1);
 
+            z.at(i)=group.div(nominator, denominator);
         }
-       GT denominator = group.mul(group.pair(ct3prod_j, s0.sk3), group.pair(group.exp(ct.ct2,wstar), s0.sk2));
-       GT nominator = group.pair(ct.ct2, s0.sk1);
-       z.at(i)=group.div(nominator, denominator);
+        
+        GT zprod;
+        for (unsigned int i = 0; i < numshares; i++)
+        {
+            zprod = group.mul(zprod, z.at(i));
+        }
+        return zprod;
     }
 
-    GT zprod;
-    for (unsigned int i = 0; i < numshares; i++)
-    {
-        zprod = group.mul(zprod, z.at(i));
-    }
-    return zprod;
-}
 }

@@ -51,7 +51,7 @@ std::vector<ZR>  indexToPath(const unsigned int &index,const unsigned int & tree
 
 unsigned int pathToIndex(const std::vector<ZR> & path, const unsigned int & treeDepth){
     unsigned int index = 0;
-    unsigned int pathsize = path.size();
+    unsigned int pathsize = (unsigned int)path.size();
     if(pathsize > treeDepth){
         throw invalid_argument("path too long for tree depth");
     }
@@ -73,7 +73,7 @@ unsigned int pathToIndex(const std::vector<ZR> & path, const unsigned int & tree
 }
 
 ZR LagrangeBasisCoefficients(const PairingGroup & group, const unsigned int & j,const ZR &x , const vector<ZR> & polynomial_xcordinates){
-    unsigned int k = polynomial_xcordinates.size();
+    unsigned int k = (unsigned int)polynomial_xcordinates.size();
     ZR prod = 1;
     for(unsigned int  m=0;m<k;m++){
         if(j != m){
@@ -91,7 +91,7 @@ ZR LagrangeBasisCoefficients(const PairingGroup & group, const unsigned int & j,
 
 ZR LagrangeInterp(const PairingGroup & group, const ZR &x , const vector<ZR> & polynomial_xcordinates,
 		const vector<ZR> & polynomial_ycordinates){
-    unsigned int k =polynomial_ycordinates.size();
+    unsigned int k = (unsigned int)polynomial_ycordinates.size();
     assert(polynomial_xcordinates.size()==polynomial_ycordinates.size());
     ZR prod = 0;
     for(unsigned int j = 0; j < k;j++){

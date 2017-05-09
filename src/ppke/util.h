@@ -21,7 +21,7 @@ namespace forwardsec{
             const std::vector<type> & exp_polynomial_ycordinates){
         assert(polynomial_xcordinates.size() ==exp_polynomial_ycordinates.size());
         type prod;
-        unsigned int k = exp_polynomial_ycordinates.size();
+        unsigned int k = (unsigned int)exp_polynomial_ycordinates.size();
         for(uint j = 0; j < k;j++){
             relicxx::ZR lagrangeBasisPolyatX = LagrangeBasisCoefficients(group,j,x,polynomial_xcordinates);
                 prod =  group.mul(prod,group.exp(exp_polynomial_ycordinates[j],lagrangeBasisPolyatX));

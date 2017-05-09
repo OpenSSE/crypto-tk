@@ -193,7 +193,7 @@ GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk,
     for(unsigned int i=0;i<ct.tags.size();i++){
     	shareTags.at(i) = group.hashListToZR(ct.tags.at(i));
     }
-    const unsigned int numshares = sk.shares.size();
+    const unsigned int numshares = (unsigned int)sk.shares.size();
 
     shareTags.resize( ct.tags.size()+1);// allow one more tag for share the private key holds
 

@@ -51,7 +51,7 @@ ZR::ZR(char *str)
 	bn_inits(order);
 	g1_get_ord(order);
 	isInit = true;
-	bn_read_str(z, (const char *) str, strlen(str), DECIMAL);
+	bn_read_str(z, (const char *) str, (int)strlen(str), DECIMAL);
 	// bn_mod(z, z, order);
 }
  ZR ZR::inverse() const{
@@ -146,7 +146,7 @@ ZR hashToZR(const bytes & b)
 	unsigned int digest_len = SHA_LEN;
 	unsigned char digest[digest_len + 1];
 	memset(digest, 0, digest_len);
-	SHA_FUNC(digest,&data[0],data.size());
+	SHA_FUNC(digest,&data[0],(int)data.size());
 	bn_read_bin(zr.z, digest, digest_len);
 	if(bn_cmp(zr.z, zr.order) == CMP_GT) bn_mod(zr.z, zr.z, zr.order);
 	return zr;
@@ -284,7 +284,7 @@ G1 hashToG1(const bytes & b){
 	data.reserve(HASH_FUNCTION_BYTES_TO_G1_ROM.size());
 	data.insert(data.begin(),HASH_FUNCTION_BYTES_TO_G1_ROM.begin(),HASH_FUNCTION_BYTES_TO_G1_ROM.end());
 	// map internally already hashes.
-	g1_map(g1.g, &data[0], data.size());
+	g1_map(g1.g, &data[0], (int)data.size());
 	return g1;
 }
 
@@ -306,7 +306,7 @@ bool G1::ismember(const bn_t order) const
 std::vector<uint8_t> G1::getBytes(bool compress) const {
 	unsigned int l  = g1_size_bin(g,compress);
 	std::vector<uint8_t>data(l);
-	g1_write_bin(&data[0], data.size(), g,compress);
+	g1_write_bin(&data[0], (int)data.size(), g,compress);
 	return data;
 }
 
@@ -369,7 +369,7 @@ G2 hashToG2(const bytes & b)
 	data.reserve(HASH_FUNCTION_BYTES_TO_G2_ROM.size());
 	data.insert(data.begin(),HASH_FUNCTION_BYTES_TO_G2_ROM.begin(),HASH_FUNCTION_BYTES_TO_G2_ROM.end());
 	// map internally already hashes.
-	g2_map(g2.g, &data[0], data.size());
+	g2_map(g2.g, &data[0], (int)data.size());
 	return g2;
 }
 

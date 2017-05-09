@@ -182,7 +182,7 @@ private:
 	template <class T>
 	T  vx(const std::vector<T> & gqofxG1, const std::string & x) const{
 	    std::vector<relicxx::ZR> xcords;
-	    int size = gqofxG1.size();
+	    int size = (int)gqofxG1.size();
 	    for(int i=0;i<size;i++){
 	    	relicxx::ZR xcord = i;
 	        xcords.push_back(xcord);

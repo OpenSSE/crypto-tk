@@ -30,6 +30,7 @@
 #include <openssl/sha.h>
 
 #include "src/utils.hpp"
+#include "src/random.hpp"
 
 #include "../src/hash.hpp"
 #include "../src/hmac.hpp"
@@ -479,19 +480,56 @@ static void ppke()
     ppke.keygen(pk, sk);
     
     typedef uint64_t M_type;
-    
-    M_type M = 0xBABAff6969;
-    
-    tag_type tag;
-    std::string tag_string = "toto";
-    sse::crypto::Hash::hash((uint8_t *)tag_string.data(), tag_string.length(), tag.size(), tag.data());
-    
-    auto ct = ppke.encrypt<M_type>(pk, M, tag);
 
-    M_type dec_M = ppke.decrypt(pk, sk, ct);
+    std::chrono::duration<double, std::milli> encrypt_time;
+    std::chrono::duration<double, std::milli> decrypt_time;
+
+    size_t bench_count = 100;
     
-    std::cout << "M: " << hex <<  M << std::endl;
-    std::cout << "decrypted M: " << hex << dec_M << std::endl;
+    for (size_t i = 0; i < bench_count; i++) {
+        M_type M; // = 0xBABAff6969;
+        
+        sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
+        
+        tag_type tag;
+        tag[0] = i&0xFF;
+        tag[1] = (i>>8)&0xFF;
+        tag[2] = (i>>16)&0xFF;
+        tag[3] = (i>>24)&0xFF;
+        tag[4] = (i>>32)&0xFF;
+        tag[5] = (i>>40)&0xFF;
+        tag[6] = (i>>48)&0xFF;
+        tag[7] = (i>>56)&0xFF;
+        
+//        std::string tag_string = "toto";
+//        sse::crypto::Hash::hash((uint8_t *)tag_string.data(), tag_string.length(), tag.size(), tag.data());
+        
+        auto t_start = std::chrono::high_resolution_clock::now();
+        auto ct = ppke.encrypt<M_type>(pk, M, tag);
+        auto t_end = std::chrono::high_resolution_clock::now();
+
+        encrypt_time += t_end - t_start;
+
+        
+        t_start = std::chrono::high_resolution_clock::now();
+        M_type dec_M = ppke.decrypt(pk, sk, ct);
+        t_end = std::chrono::high_resolution_clock::now();
+        decrypt_time += t_end - t_start;
+
+        if (M == dec_M) {
+//            std::cout << " \t OK!" << std::endl;
+        }else{
+            std::cout << "Puncturable encryption error!" << std::endl;
+            std::cout << "M: " << hex <<  M;
+            std::cout << "\t decrypted M: " << hex << dec_M;
+            std::cout << std::endl;
+        }
+        
+    }
+    
+    std::cout << "Average encryption/decryption time for " << bench_count << " tries: " << std::endl;
+    std::cout << "Encryption: " << encrypt_time.count()/bench_count << " ms" << std::endl;
+    std::cout << "Decryption: " << decrypt_time.count()/bench_count << " ms" << std::endl;
 
 }
 

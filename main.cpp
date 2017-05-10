@@ -484,52 +484,68 @@ static void ppke()
     std::chrono::duration<double, std::milli> encrypt_time;
     std::chrono::duration<double, std::milli> decrypt_time;
 
+    size_t puncture_count = 100;
     size_t bench_count = 100;
     
-    for (size_t i = 0; i < bench_count; i++) {
-        M_type M; // = 0xBABAff6969;
+    for (size_t p = 1; p < puncture_count+1; p++) { // offset by 1 to avoid tag collisions
         
-        sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
-        
-        tag_type tag;
-        tag[0] = i&0xFF;
-        tag[1] = (i>>8)&0xFF;
-        tag[2] = (i>>16)&0xFF;
-        tag[3] = (i>>24)&0xFF;
-        tag[4] = (i>>32)&0xFF;
-        tag[5] = (i>>40)&0xFF;
-        tag[6] = (i>>48)&0xFF;
-        tag[7] = (i>>56)&0xFF;
-        
-//        std::string tag_string = "toto";
-//        sse::crypto::Hash::hash((uint8_t *)tag_string.data(), tag_string.length(), tag.size(), tag.data());
-        
-        auto t_start = std::chrono::high_resolution_clock::now();
-        auto ct = ppke.encrypt<M_type>(pk, M, tag);
-        auto t_end = std::chrono::high_resolution_clock::now();
+        for (size_t i = 0; i < bench_count; i++) {
+            M_type M; // = 0xBABAff6969;
+            
+            sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
+            
+            tag_type tag{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+            tag[0] = i&0xFF;
+            tag[1] = (i>>8)&0xFF;
+            tag[2] = (i>>16)&0xFF;
+            tag[3] = (i>>24)&0xFF;
+            tag[4] = (i>>32)&0xFF;
+            tag[5] = (i>>40)&0xFF;
+            tag[6] = (i>>48)&0xFF;
+            tag[7] = (i>>56)&0xFF;
+            
+    //        std::string tag_string = "toto";
+    //        sse::crypto::Hash::hash((uint8_t *)tag_string.data(), tag_string.length(), tag.size(), tag.data());
+            
+            auto t_start = std::chrono::high_resolution_clock::now();
+            auto ct = ppke.encrypt<M_type>(pk, M, tag);
+            auto t_end = std::chrono::high_resolution_clock::now();
 
-        encrypt_time += t_end - t_start;
+            encrypt_time += t_end - t_start;
 
-        
-        t_start = std::chrono::high_resolution_clock::now();
-        M_type dec_M = ppke.decrypt(pk, sk, ct);
-        t_end = std::chrono::high_resolution_clock::now();
-        decrypt_time += t_end - t_start;
+            
+            t_start = std::chrono::high_resolution_clock::now();
+            M_type dec_M = ppke.decrypt(pk, sk, ct);
+            t_end = std::chrono::high_resolution_clock::now();
+            decrypt_time += t_end - t_start;
 
-        if (M == dec_M) {
-//            std::cout << " \t OK!" << std::endl;
-        }else{
-            std::cout << "Puncturable encryption error!" << std::endl;
-            std::cout << "M: " << hex <<  M;
-            std::cout << "\t decrypted M: " << hex << dec_M;
-            std::cout << std::endl;
+            if (M == dec_M) {
+    //            std::cout << " \t OK!" << std::endl;
+            }else{
+                std::cout << "Puncturable encryption error!" << std::endl;
+                std::cout << "M: " << hex <<  M;
+                std::cout << "\t decrypted M: " << hex << dec_M << dec;
+                std::cout << std::endl;
+            }
+            
         }
         
+        std::cout << "Average encryption/decryption time with " << p-1 << " punctures (over " << bench_count << " tries)" << std::endl;
+        std::cout << "Encryption: " << encrypt_time.count()/bench_count << " ms" << std::endl;
+        std::cout << "Decryption: " << decrypt_time.count()/bench_count << " ms" << std::endl;
+        
+        tag_type punctured_tag{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+        punctured_tag[15] = p&0xFF;
+        punctured_tag[14] = (p>>8)&0xFF;
+        punctured_tag[13] = (p>>16)&0xFF;
+        punctured_tag[12] = (p>>24)&0xFF;
+        punctured_tag[11] = (p>>32)&0xFF;
+        punctured_tag[10] = (p>>40)&0xFF;
+        punctured_tag[9] = (p>>48)&0xFF;
+        punctured_tag[8] = (p>>56)&0xFF;
+
+        ppke.puncture(pk, sk, punctured_tag);
     }
-    
-    std::cout << "Average encryption/decryption time for " << bench_count << " tries: " << std::endl;
-    std::cout << "Encryption: " << encrypt_time.count()/bench_count << " ms" << std::endl;
-    std::cout << "Decryption: " << decrypt_time.count()/bench_count << " ms" << std::endl;
 
 }
 

@@ -482,7 +482,7 @@ static void ppke()
     typedef uint64_t M_type;
 
 
-    size_t puncture_count = 10;
+//    size_t puncture_count = 10;
     size_t bench_count = 100;
     
     std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40 , 50, 100};
@@ -490,22 +490,40 @@ static void ppke()
     size_t current_p_count = 0;
     
     for (size_t p : puncture_count_list) {
-        // add new punctures
-        for ( ; current_p_count < p; current_p_count++) {
-            tag_type punctured_tag{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-            punctured_tag[15] = current_p_count&0xFF;
-            punctured_tag[14] = (current_p_count>>8)&0xFF;
-            punctured_tag[13] = (current_p_count>>16)&0xFF;
-            punctured_tag[12] = (current_p_count>>24)&0xFF;
-            punctured_tag[11] = (current_p_count>>32)&0xFF;
-            punctured_tag[10] = (current_p_count>>40)&0xFF;
-            punctured_tag[9] = (current_p_count>>48)&0xFF;
-            //            punctured_tag[8] = (current_p_count>>56)&0xFF;
-            punctured_tag[8] = 0xFF;
-            
-            ppke.puncture(pk, sk, punctured_tag);
-        }
         
+        if (p > current_p_count) {
+            
+            size_t n_punctures = p-current_p_count;
+            std::cout << "Puncture the key " << n_punctures << " times...";
+            
+            std::chrono::duration<double, std::milli> puncture_time(0);
+
+            // add new punctures
+            for ( ; current_p_count < p; current_p_count++) {
+                tag_type punctured_tag{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+                punctured_tag[15] = current_p_count&0xFF;
+                punctured_tag[14] = (current_p_count>>8)&0xFF;
+                punctured_tag[13] = (current_p_count>>16)&0xFF;
+                punctured_tag[12] = (current_p_count>>24)&0xFF;
+                punctured_tag[11] = (current_p_count>>32)&0xFF;
+                punctured_tag[10] = (current_p_count>>40)&0xFF;
+                punctured_tag[9] = (current_p_count>>48)&0xFF;
+                //            punctured_tag[8] = (current_p_count>>56)&0xFF;
+                punctured_tag[8] = 0xFF;
+                
+                auto t_start = std::chrono::high_resolution_clock::now();
+
+                ppke.puncture(pk, sk, punctured_tag);
+                
+                auto t_end = std::chrono::high_resolution_clock::now();
+                puncture_time += t_end - t_start;
+
+            }
+            
+            std::cout << "Done\n";
+            std::cout << "Average puncturing time: " << puncture_time.count()/n_punctures << " ms/puncture" << std::endl;
+
+        }
         std::chrono::duration<double, std::milli> encrypt_time(0);
         std::chrono::duration<double, std::milli> decrypt_time(0);
 

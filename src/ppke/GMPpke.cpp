@@ -9,11 +9,19 @@ namespace forwardsec{
 
 using namespace std;
 using namespace relicxx;
-static const string  NULLTAG = "whoever wishes to keep a secret, must hide from us that he possesses one.-- Johann Wolfgang von Goethe"; // the reserved tag
+//static const string  NULLTAG = "whoever wishes to keep a secret, must hide from us that he possesses one.-- Johann Wolfgang von Goethe"; // the reserved tag
+
+static const tag_type NULLTAG = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15};
+    
+    
+std::string tag2string(const tag_type& tag)
+{
+    return string((char *)tag.data(),tag.size());
+}
 
 using namespace std;
     
-bool GmppkePrivateKey::isPuncturedOnTag(const std::string &tag) const
+bool GmppkePrivateKey::isPuncturedOnTag(const tag_type &tag) const
 {
     for(auto share : shares){
 
@@ -89,10 +97,11 @@ GmppkePrivateKeyShare Gmppke::skgen(const GmppkePublicKey &pk,const ZR & alpha  
     return share;
 }
 
-void Gmppke::puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const string & tag) const{
+void Gmppke::puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const{
 
 	if(tag == NULLTAG){
-		throw invalid_argument("Invalid tag "+tag +". The tag " + NULLTAG + " is reserved and cannot be used.");
+//		throw invalid_argument("Invalid tag "+tag +". The tag " + NULLTAG + " is reserved and cannot be used.");
+		throw invalid_argument("Invalid tag: the NULLTAG is reserved and cannot be used.");        
 	}
     GmppkePrivateKeyShare skentryn;
     GmppkePrivateKeyShare & skentry0 = sk.shares.at(0);
@@ -119,7 +128,7 @@ void Gmppke::puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const s
 
 
 
-PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const std::string & tag ) const
+PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const tag_type & tag ) const
 {
     PartialGmmppkeCT  ct;
     ct.ct2 = group.exp(pk.gG1, s);

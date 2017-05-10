@@ -17,6 +17,13 @@
 #include "hash.hpp"
 
 namespace forwardsec{
+
+constexpr static size_t kTagSize = 16;
+typedef std::array<uint8_t, kTagSize> tag_type;
+
+std::string tag2string(const tag_type& tag);
+    
+    
 class Gmppke;
 class GMPfse;
 class PartialGmmppkeCT;
@@ -56,7 +63,7 @@ protected:
 	relicxx::G2 sk1;
 	relicxx::G2 sk2;
 	relicxx::G2 sk3;
-	std::string sk4;
+	tag_type sk4;
 
     friend class Gmppke;
 	friend class GMPfse;
@@ -75,7 +82,7 @@ public:
 		return shares.size() > 1;
 	}
 
-    bool isPuncturedOnTag(const std::string &tag) const;
+    bool isPuncturedOnTag(const tag_type &tag) const;
 
 protected:
     std::vector<GmppkePrivateKeyShare> shares;
@@ -105,7 +112,7 @@ public:
 protected:
 	relicxx::G1 ct2;
 	relicxx::G1 ct3;
-    std::string tag;
+    tag_type tag;
 
     friend class Gmppke;
 	friend class GMPfse;
@@ -142,18 +149,18 @@ public:
 
 	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const;
 
-	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const std::string & tag) const;
+	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
 
-	PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const std::string & tag) const;
+	PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const tag_type & tag) const;
 	relicxx::GT recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct ) const;
 
     template <typename T>
-   	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const std::string & tag) const
+   	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const tag_type & tag) const
     {
         const relicxx::ZR s = group.randomZR();
         GmmppkeCT<T> ct = blind(pk,s,tag);
         
-        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag);
+        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag.data(),tag.size());
         
         std::vector<uint8_t> gt_blind_bytes = group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false);
         
@@ -169,7 +176,7 @@ public:
     T decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
         if (sk.isPuncturedOnTag(ct.tag)) {
-            throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tag in the ciphertext: " + ct.tag + ".");
+            throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tag in the ciphertext: " + tag2string(ct.tag) + ".");
         }
         return decrypt_unchecked(pk,sk,ct);
     }
@@ -179,7 +186,7 @@ public:
     {
         std::vector<uint8_t> gt_blind_bytes = recoverBlind(pk,sk,ct).getBytes(false);
         
-        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(ct.tag);
+        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(ct.tag.data(), ct.tag.size());
         
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*)&mask, sizeof(mask));
@@ -192,7 +199,7 @@ private:
 	relicxx::PairingGroup group;
 
     template <class T, size_t N>
-	T  vx(const std::array<T,N> & gqofxG1, const std::string & x) const{
+	T  vx(const std::array<T,N> & gqofxG1, const tag_type & x) const{
 
         return LagrangeInterpInExponent<T,N>(group,group.hashListToZR(x),{relicxx::ZR(0), relicxx::ZR(1)},gqofxG1);
 

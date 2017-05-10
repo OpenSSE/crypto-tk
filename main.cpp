@@ -482,7 +482,9 @@ static void ppke()
     
     M_type M = 0xBABAff6969;
     
-    std::string tag = "toto";
+    tag_type tag;
+    std::string tag_string = "toto";
+    sse::crypto::Hash::hash((uint8_t *)tag_string.data(), tag_string.length(), tag.size(), tag.data());
     
     auto ct = ppke.encrypt<M_type>(pk, M, tag);
 

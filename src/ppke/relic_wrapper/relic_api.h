@@ -192,6 +192,9 @@ public:
       {if (bn_cmp(x.z, y.z) == CMP_LT) return true; else return false; }
 };
 
+    
+ZR hashToZR(const bytes & b);
+    
 class G1
 {
 public:
@@ -458,6 +461,13 @@ public:
 
 	ZR hashListToZR(const std::string & str) const;
 	ZR hashListToZR(const bytes &) const;
+    
+    template <size_t N>
+    ZR hashListToZR(const std::array<uint8_t, N> &arr) const{
+        bytes b(arr.begin(),arr.end());
+        return hashToZR(b);
+    }
+
 	G1 hashListToG1(const std::string & str) const;
 	G1 hashListToG1(const bytes &) const;
 	G2 hashListToG2(const bytes &) const;

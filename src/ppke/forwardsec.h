@@ -46,6 +46,6 @@ public:
 		return !(x==y);
 	}
 };
-
+    
 }
 #endif /* SRC_FORWARDSEC_H_ */

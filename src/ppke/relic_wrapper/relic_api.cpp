@@ -761,6 +761,7 @@ ZR PairingGroup::hashListToZR(const std::string &str) const{
 	bytes b(str.begin(),str.end());
 	return hashToZR(b);
 }
+    
 ZR PairingGroup::hashListToZR(const bytes & b) const
 {
 	ZR r = hashToZR(b);

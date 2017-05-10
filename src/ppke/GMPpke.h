@@ -7,10 +7,6 @@
 
 #ifndef GMPPKE_H_
 #define GMPPKE_H_
-//#include <cereal/types/base_class.hpp>
-//#include <cereal/access.hpp>
-//#include <cereal/types/vector.hpp>
-//#include <cereal/types/string.hpp>
 
 #include <array>
 
@@ -35,21 +31,13 @@ public:
 	friend bool operator!=(const GmppkePublicKey& x, const GmppkePublicKey& y){
 		return !(x==y);
 	}
-//	template <class Archive>
-//	  void serialize( Archive & ar )
-//	{
-//		ar(::cereal::virtual_base_class<baseKey>(this),
-//				ppkeg1,d,gqofxG1,gqofxG2);
-//	}
+
 protected:
 	relicxx::G2 ppkeg1;
-//    std::vector<relicxx::G1> gqofxG1;
-//    std::vector<relicxx::G2> gqofxG2;
 
     std::array<relicxx::G1,2> gqofxG1;
     std::array<relicxx::G2,2> gqofxG2;
   
-//	friend class ::cereal::access;
 	friend class Gmppke;
 	friend class GMPfse;
 };
@@ -69,13 +57,8 @@ protected:
 	relicxx::G2 sk2;
 	relicxx::G2 sk3;
 	std::string sk4;
-//	template <class Archive>
-//	  void serialize( Archive & ar )
-//	{
-//		ar(sk1,sk2,sk3,sk4);
-//	}
-//	friend class cereal::access;
-	friend class Gmppke;
+
+    friend class Gmppke;
 	friend class GMPfse;
 	friend class GmppkePrivateKey;
 };
@@ -91,24 +74,14 @@ public:
 	bool punctured() const{
 		return shares.size() > 1;
 	}
-	/** Returns the tags, if any, that the key is punctured on.
-	 *
-	 * @param tags the tags
-	 * @return the intersection
-	 */
-//	std::vector<std::string> puncturedIntersect(const std::vector<std::string> & tags)const ;
-     bool isPuncturedOnTag(const std::string &tag) const;
+
+    bool isPuncturedOnTag(const std::string &tag) const;
 
 protected:
-	std::vector<GmppkePrivateKeyShare> shares;
-//	template <class Archive>
-//	  void serialize( Archive & ar )
-//	{
-//		ar(shares);
-//	}
-//	friend class cereal::access;
-	friend class Gmppke;
-	friend class GMPfse;
+    std::vector<GmppkePrivateKeyShare> shares;
+
+    friend class Gmppke;
+    friend class GMPfse;
  };
 
 class PartialGmmppkeCT{
@@ -133,39 +106,12 @@ protected:
 	relicxx::G1 ct2;
 	relicxx::G1 ct3;
     std::string tag;
-//	template <class Archive>
-//	void serialize( Archive & ar ){
-//		ar(ct2,ct3,tags);
-//	}
-//	friend class cereal::access;
-	friend class Gmppke;
+
+    friend class Gmppke;
 	friend class GMPfse;
 	friend class GMPfseCiphertext;
 };
 
-//class GmmppkeCT: public PartialGmmppkeCT{
-//public:
-//	GmmppkeCT(){};
-//	GmmppkeCT(const  PartialGmmppkeCT & c) : PartialGmmppkeCT(c){}
-//protected:
-//	relicxx::GT ct1;
-//	friend bool operator==(const GmmppkeCT& x,const GmmppkeCT& y){
-//		return x.ct1 == y.ct1 && (PartialGmmppkeCT) x == (PartialGmmppkeCT) y;
-//	}
-//	friend bool operator!=(const GmmppkeCT& x, const GmmppkeCT& y){
-//		return !(x==y);
-//	}
-////	template <class Archive>
-////	void serialize( Archive & ar ){
-////		ar(cereal::base_class<PartialGmmppkeCT>(this),ct1);
-////	}
-////	friend class cereal::access;
-//	friend class Gmppke;
-//	friend class GMPfse;
-//};
-
-    
-//    typedef uint64_t index_type;
 
 template <typename T>
 class GmmppkeCT: public PartialGmmppkeCT{
@@ -173,8 +119,6 @@ public:
     GmmppkeCT(){};
     GmmppkeCT(const  PartialGmmppkeCT & c) : PartialGmmppkeCT(c){}
 protected:
-//    relicxx::GT ct1;
-//    std::array<uint8_t, N> ct1;
     T ct1;
     
     friend bool operator==(const GmmppkeCT<T>& x,const GmmppkeCT<T>& y){
@@ -183,11 +127,7 @@ protected:
     friend bool operator!=(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y){
         return !(x==y);
     }
-    //	template <class Archive>
-    //	void serialize( Archive & ar ){
-    //		ar(cereal::base_class<PartialGmmppkeCT>(this),ct1);
-    //	}
-    //	friend class cereal::access;
+
     friend class Gmppke;
     friend class GMPfse;
 };
@@ -205,15 +145,7 @@ public:
 	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const std::string & tag) const;
 
 	PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const std::string & tag) const;
-
-//	GmmppkeCT encrypt(const GmppkePublicKey & pk,const relicxx::GT & M,const std::vector<std::string> & tags) const;
- 
-
-
 	relicxx::GT recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct ) const;
-//    relicxx::GT decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const;
-//	//For testing purposes only
-//	relicxx::GT decrypt_unchecked(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT & ct ) const;
 
     template <typename T>
    	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const std::string & tag) const
@@ -258,17 +190,11 @@ public:
     
 private:
 	relicxx::PairingGroup group;
-//	G1 vG1(const std::vector<G1> & gqofxG1, const ZR & x) const;
-//	G2 vG2(const std::vector<G2> & gqofxG2, const ZR & x) const;
-	template <class T, size_t N>
+
+    template <class T, size_t N>
 	T  vx(const std::array<T,N> & gqofxG1, const std::string & x) const{
-        std::array<relicxx::ZR,2> xcords = {relicxx::ZR(0), relicxx::ZR(1)};
-//	    int size = (int)gqofxG1.size();
-//	    for(int i=0;i<N;i++){
-//	    	relicxx::ZR xcord = i;
-//	        xcords.push_back(xcord);
-//	    }
-	    return LagrangeInterpInExponent<T,N>(group,group.hashListToZR(x),xcords,gqofxG1);
+
+        return LagrangeInterpInExponent<T,N>(group,group.hashListToZR(x),{relicxx::ZR(0), relicxx::ZR(1)},gqofxG1);
 
 	}
 
@@ -278,12 +204,4 @@ private:
 };
 
 }
-// cereal can't find the serialization function if we don't do this.
-// this has to be outside of the namespace.
-//namespace cereal
-//{
-// template <class Archive>
-// struct specialize<Archive, forwardsec::GmppkePublicKey, cereal::specialization::member_serialize> {};
-// // cereal no longer has any ambiguity when serializing MyDerived
-//}
 #endif /* GMPPKE_H_ */

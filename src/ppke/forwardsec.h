@@ -47,11 +47,5 @@ public:
 	}
 };
 
-// (from cereal documentation )Note the non-member serialize - trying to call serialize
-// from a derived class wouldn't work
-//template <class Archive>
-//void serialize( Archive & ar, baseKey & b )
-//{ ar( b.gG1,b.gG2,b.g2G1,b.g2G2 ); }
-//
 }
 #endif /* SRC_FORWARDSEC_H_ */

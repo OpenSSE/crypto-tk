@@ -13,16 +13,16 @@ static const string  NULLTAG = "whoever wishes to keep a secret, must hide from 
 
 using namespace std;
     
-    bool GmppkePrivateKey::isPuncturedOnTag(const std::string &tag) const
-    {
-        for(auto share : shares){
+bool GmppkePrivateKey::isPuncturedOnTag(const std::string &tag) const
+{
+    for(auto share : shares){
 
-            if(share.sk4 == tag){
-                return true;
-            }
+        if(share.sk4 == tag){
+            return true;
         }
-        return false;
     }
+    return false;
+}
 
 void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const
 {
@@ -58,15 +58,15 @@ void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivate
     // the next d points' y values  are random
     // we use x= 1...d because this has the side effect
     // of easily computing g^q(0).... g^q(d).
-//    for (unsigned int i = 1; i <= d; i++)
-//    {
-        const ZR ry = group.randomZR();
+    // here d = 1
+    
+    
+    const ZR ry = group.randomZR();
 
-        polynomial_xcordinates[1] = ZR(1);
-        pk.gqofxG1[1] = group.exp(pk.gG1,ry);
-        pk.gqofxG2[1] = group.exp(pk.gG2,ry);
+    polynomial_xcordinates[1] = ZR(1);
+    pk.gqofxG1[1] = group.exp(pk.gG1,ry);
+    pk.gqofxG2[1] = group.exp(pk.gG2,ry);
 
-//    }
     assert(polynomial_xcordinates.size()==pk.gqofxG1.size());
 
     // Sanity check that Lagrange interpolation works to get us g^beta on q(0).
@@ -134,11 +134,9 @@ PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const s
 
 GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
 {
-//    vector<ZR> shareTags(2);
-//    shareTags.at(0) = group.hashListToZR(ct.tag);
     ZR ctTag = group.hashListToZR(ct.tag);
     
-    const unsigned int numshares = (unsigned int)sk.shares.size(); // should be 2
+    const unsigned int numshares = (unsigned int)sk.shares.size();
     
 
     // Compute w_i coefficients for recovery

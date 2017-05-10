@@ -12,8 +12,6 @@ namespace forwardsec{
     bytes xorarray(const bytes & l,const bytes & r);
 
 
-//    relicxx::ZR LagrangeBasisCoefficients(const relicxx::PairingGroup & group, const unsigned int & j,const relicxx::ZR &x , const std::vector<relicxx::ZR> & polynomial_xcordinates);
-
     
     template <size_t N>
     relicxx::ZR LagrangeBasisCoefficients(const relicxx::PairingGroup & group, const unsigned int & j,const relicxx::ZR &x , const std::array<relicxx::ZR, N> & polynomial_xcordinates){

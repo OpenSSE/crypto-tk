@@ -496,6 +496,20 @@ std::vector<uint8_t> GT::getBytes(bool compress) const {
 	return data;
 }
 
+void GT::getBytes(bool compress, const size_t out_len, uint8_t* out) const {
+    RELICXX_GTunconst(*this,gg);
+    unsigned int l  = gt_size_bin(gg.g,compress);
+    
+    if (l < out_len) {
+        // fill the rest with 0's
+        for (size_t i = l; i < out_len; i++) {
+            out[i] = 0x00;
+        }
+    }
+    gt_write_bin(out, MIN(l,out_len), gg.g,compress);
+}
+    
+    
 ostream& operator<<(ostream& s, const GT& gt)
 {
 	auto data = gt.getBytes();

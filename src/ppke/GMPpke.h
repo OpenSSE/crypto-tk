@@ -178,7 +178,8 @@ public:
         
         auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag.data(),tag.size());
         
-        std::vector<uint8_t> gt_blind_bytes = group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false);
+        std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
+        group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
         
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
@@ -196,8 +197,9 @@ public:
         
         auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag.data(),tag.size());
         
-        std::vector<uint8_t> gt_blind_bytes = group.exp(group.generatorGT(), sp.alpha*sp.beta*s).getBytes(false);
-        
+        std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
+        group.exp(group.generatorGT(), sp.alpha*sp.beta*s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
+
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
         

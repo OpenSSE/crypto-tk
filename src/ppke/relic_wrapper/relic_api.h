@@ -141,7 +141,8 @@ public:
 		bool ismember() const;
 		ZR inverse() const;
 		std::vector<uint8_t> getBytes() const;
-//		friend class cereal::access;
+
+        //		friend class cereal::access;
 //		template <class Archive>
 //		void save( Archive & ar) const
 //		{
@@ -380,6 +381,7 @@ public:
 
 	bool ismember(bn_t);
 	std::vector<uint8_t> getBytes( bool compress = 0) const;
+    void getBytes(bool compress, const size_t out_len, uint8_t* out) const;
 
 //    template<class Archive>
 //    void save(Archive & ar) const

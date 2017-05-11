@@ -32,12 +32,14 @@ bool GmppkePrivateKey::isPuncturedOnTag(const tag_type &tag) const
     return false;
 }
 
-void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const
+void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
 {
    GmppkePublicKey bpk;
    const ZR alpha = group.randomZR();
-   bpk.gG1 = group.randomG1();
-   bpk.gG2 = group.randomG2();
+//   bpk.gG1 = group.randomG1();
+//   bpk.gG2 = group.randomG2();
+    bpk.gG1 = group.generatorG1();
+    bpk.gG2 = group.generatorG2();
    const ZR beta = group.randomZR();
    bpk.g2G1 = group.exp(bpk.gG1, beta);
    bpk.g2G2 = group.exp(bpk.gG2, beta);
@@ -45,10 +47,14 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const
    pk.gG2 = bpk.gG2;
    pk.g2G1 = bpk.g2G1;
    pk.g2G2 = bpk.g2G2;
-   keygenPartial(alpha,pk,sk);
+    
+    
+    sp.alpha = alpha;
+    sp.beta = beta;
+   keygenPartial(alpha,pk,sk, sp);
 }
     
-void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk) const
+void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
 {
     pk.ppkeg1 =  group.exp(pk.gG2,alpha);
 
@@ -72,18 +78,20 @@ void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivate
     const ZR ry = group.randomZR();
 
     polynomial_xcordinates[1] = ZR(1);
-    pk.gqofxG1[1] = group.exp(pk.gG1,ry);
-    pk.gqofxG2[1] = group.exp(pk.gG2,ry);
+    pk.gqofxG1[1] = group.mul(group.exp(pk.gG1,ry), pk.g2G1);
+    pk.gqofxG2[1] = group.mul(group.exp(pk.gG2,ry), pk.g2G2);
 
     assert(polynomial_xcordinates.size()==pk.gqofxG1.size());
 
     // Sanity check that Lagrange interpolation works to get us g^beta on q(0).
-    assert(pk.g2G1 == LagrangeInterpInExponent<G1>(group,0,polynomial_xcordinates,pk.gqofxG1));
-    assert(pk.g2G2 == LagrangeInterpInExponent<G2>(group,0,polynomial_xcordinates,pk.gqofxG2));
+//    assert(pk.g2G1 == LagrangeInterpInExponent<G1>(group,0,polynomial_xcordinates,pk.gqofxG1));
+//    assert(pk.g2G2 == LagrangeInterpInExponent<G2>(group,0,polynomial_xcordinates,pk.gqofxG2));
 
 
     sk.shares.push_back(skgen(pk,alpha));
 
+    sp.ry = ry;
+    
     return;
 }
 GmppkePrivateKeyShare Gmppke::skgen(const GmppkePublicKey &pk,const ZR & alpha  ) const{
@@ -139,6 +147,21 @@ PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const t
     return ct;
 }
 
+PartialGmmppkeCT Gmppke::blind(const GmppkeSecretParameters & sp, const relicxx::ZR & s,  const tag_type & tag) const
+{
+    PartialGmmppkeCT  ct;
+    ct.ct2 = group.exp(group.generatorG1(), s);
+    
+    ZR h = group.hashListToZR(tag);
+    G1 g = group.generatorG1();
+    
+    G1 vofx = group.exp(g, sp.alpha + (h* sp.ry));
+
+    ct.ct3 = group.exp(vofx, s);
+    
+    ct.tag = tag;
+    return ct;
+}
 
 
 GT Gmppke::recoverBlind(const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const

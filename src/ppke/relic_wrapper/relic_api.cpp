@@ -578,6 +578,28 @@ GT PairingGroup::randomGT() const
     return gts;
 }
 
+    
+G1 PairingGroup::generatorG1() const
+{
+    G1  g1;
+    g1_get_gen(g1.g);
+    return g1;
+}
+
+G2 PairingGroup::generatorG2() const
+{
+    G2  g2;
+    g2_get_gen(g2.g);
+    return g2;
+}
+
+GT PairingGroup::generatorGT() const
+{
+    GT  gt;
+    gt_get_gen(gt.g);
+    return gt;
+}
+
 ZR PairingGroup::neg(const ZR & r) const
 {
 

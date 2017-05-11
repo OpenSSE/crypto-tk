@@ -445,6 +445,11 @@ public:
 	G2 randomG2() const;
 	GT randomGT() const;
 
+    G1 generatorG1() const;
+    G2 generatorG2() const;
+    GT generatorGT() const;
+
+    
 	bool ismember(ZR&);
 	bool ismember(G1&);
 	bool ismember(GT&);

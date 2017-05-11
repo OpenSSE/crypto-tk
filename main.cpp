@@ -476,14 +476,15 @@ static void ppke()
     Gmppke ppke;
     GmppkePublicKey pk;
     GmppkePrivateKey sk;
+    GmppkeSecretParameters sp;
     
-    ppke.keygen(pk, sk);
+    ppke.keygen(pk, sk, sp);
     
     typedef uint64_t M_type;
 
 
 //    size_t puncture_count = 10;
-    size_t bench_count = 10;
+    size_t bench_count = 100;
     
     std::vector<size_t> puncture_count_list = {0, 1, 2};
 //    std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40 , 50, 100};
@@ -526,6 +527,7 @@ static void ppke()
 
         }
         std::chrono::duration<double, std::milli> encrypt_time(0);
+        std::chrono::duration<double, std::milli> sp_encrypt_time(0);
         std::chrono::duration<double, std::milli> decrypt_time(0);
 
         std::cout << "Running " << bench_count << " encryption/decryptions with " << current_p_count << " punctures...";
@@ -550,7 +552,13 @@ static void ppke()
             auto t_end = std::chrono::high_resolution_clock::now();
             
             encrypt_time += t_end - t_start;
+
+            t_start = std::chrono::high_resolution_clock::now();
+            auto ct2 = ppke.encrypt<M_type>(sp, M, tag);
+            t_end = std::chrono::high_resolution_clock::now();
             
+            sp_encrypt_time += t_end - t_start;
+
             
             t_start = std::chrono::high_resolution_clock::now();
             M_type dec_M = ppke.decrypt(sk, ct);
@@ -570,6 +578,7 @@ static void ppke()
 
         std::cout << "Done. \n";
         std::cout << "Encryption: " << encrypt_time.count()/bench_count << " ms" << std::endl;
+        std::cout << "Encryption with secret: " << sp_encrypt_time.count()/bench_count << " ms" << std::endl;
         std::cout << "Decryption: " << decrypt_time.count()/bench_count << " ms" << std::endl;
 
     }

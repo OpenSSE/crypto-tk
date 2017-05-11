@@ -87,6 +87,25 @@ protected:
     friend class Gmppke;
  };
 
+class GmppkeSecretParameters{
+    
+    friend bool operator==(const GmppkeSecretParameters & l, const GmppkeSecretParameters & r){
+        return l.alpha == r.alpha && l.beta == r.beta && l.gamma == r.gamma && l.ry == r.ry;
+    }
+    friend bool operator!=(const GmppkeSecretParameters & l, const GmppkeSecretParameters & r){
+        return !(l == r);
+    }
+        
+    protected:
+        relicxx::ZR alpha;
+        relicxx::ZR beta;
+        relicxx::ZR gamma;
+        relicxx::ZR ry;
+
+    friend class Gmppke;
+
+};
+    
 class PartialGmmppkeCT{
 public:
 	 PartialGmmppkeCT(){};
@@ -142,12 +161,14 @@ public:
     };
 	~Gmppke() {};
 
-	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const;
+	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
 
 	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
 
-	PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const tag_type & tag) const;
-	relicxx::GT recoverBlind(const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct ) const;
+    PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const tag_type & tag) const;
+    PartialGmmppkeCT blind(const GmppkeSecretParameters & sp, const relicxx::ZR & s,  const tag_type & tag) const;
+
+    relicxx::GT recoverBlind(const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct ) const;
 
     template <typename T>
    	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const tag_type & tag) const
@@ -158,6 +179,24 @@ public:
         auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag.data(),tag.size());
         
         std::vector<uint8_t> gt_blind_bytes = group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false);
+        
+        T mask;
+        hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
+        
+        ct.ct1 = mask^M;
+        return ct;
+        
+    }
+
+    template <typename T>
+   	GmmppkeCT<T> encrypt(const GmppkeSecretParameters & sp,const T & M,const tag_type & tag) const
+    {
+        const relicxx::ZR s = group.randomZR();
+        GmmppkeCT<T> ct = blind(sp,s,tag);
+        
+        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag.data(),tag.size());
+        
+        std::vector<uint8_t> gt_blind_bytes = group.exp(group.generatorGT(), sp.alpha*sp.beta*s).getBytes(false);
         
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
@@ -200,7 +239,7 @@ private:
 
 	}
 
-	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk) const;
+	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
 	GmppkePrivateKeyShare skgen(const GmppkePublicKey &pk,const relicxx::ZR & alpha ) const;
 };
 

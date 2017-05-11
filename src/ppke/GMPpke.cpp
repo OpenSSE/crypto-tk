@@ -36,10 +36,8 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretPar
 {
    GmppkePublicKey bpk;
    const ZR alpha = group.randomZR();
-//   bpk.gG1 = group.randomG1();
-//   bpk.gG2 = group.randomG2();
-    bpk.gG1 = group.generatorG1();
-    bpk.gG2 = group.generatorG2();
+   bpk.gG1 = group.generatorG1();
+   bpk.gG2 = group.generatorG2();
    const ZR beta = group.randomZR();
    bpk.g2G1 = group.exp(bpk.gG1, beta);
    bpk.g2G2 = group.exp(bpk.gG2, beta);
@@ -49,8 +47,8 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretPar
    pk.g2G2 = bpk.g2G2;
     
     
-    sp.alpha = alpha;
-    sp.beta = beta;
+   sp.alpha = alpha;
+   sp.beta = beta;
    keygenPartial(alpha,pk,sk, sp);
 }
     
@@ -155,7 +153,7 @@ PartialGmmppkeCT Gmppke::blind(const GmppkeSecretParameters & sp, const relicxx:
     ZR h = group.hashListToZR(tag);
     G1 g = group.generatorG1();
     
-    G1 vofx = group.exp(g, sp.alpha + (h* sp.ry));
+    G1 vofx = group.exp(g, sp.beta + (h* sp.ry));
 
     ct.ct3 = group.exp(vofx, s);
     

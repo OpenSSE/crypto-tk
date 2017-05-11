@@ -82,24 +82,30 @@ void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivate
     assert(polynomial_xcordinates.size()==pk.gqofxG1.size());
 
     // Sanity check that Lagrange interpolation works to get us g^beta on q(0).
-//    assert(pk.g2G1 == LagrangeInterpInExponent<G1>(group,0,polynomial_xcordinates,pk.gqofxG1));
-//    assert(pk.g2G2 == LagrangeInterpInExponent<G2>(group,0,polynomial_xcordinates,pk.gqofxG2));
+    assert(pk.g2G1 == LagrangeInterpInExponent<G1>(group,0,polynomial_xcordinates,pk.gqofxG1));
+    assert(pk.g2G2 == LagrangeInterpInExponent<G2>(group,0,polynomial_xcordinates,pk.gqofxG2));
 
-
-    sk.shares.push_back(skgen(pk,alpha));
 
     sp.ry = ry;
+
+    sk.shares.push_back(skgen(sp, alpha));
+
     
     return;
 }
-GmppkePrivateKeyShare Gmppke::skgen(const GmppkePublicKey &pk,const ZR & alpha  ) const{
-	GmppkePrivateKeyShare share;
+
+GmppkePrivateKeyShare Gmppke::skgen(const GmppkeSecretParameters &sp,const ZR & alpha  ) const{
+    GmppkePrivateKeyShare share;
     share.sk4 = NULLTAG;
     const ZR r = group.randomZR();
-    share.sk1 = group.exp(pk.g2G2, group.add(r,alpha));
-    G2 vofx = vx(pk.gqofxG2,NULLTAG); // calculate v(t0).
-    share.sk2 = group.exp(vofx, r);// v(t0)^r
-    share.sk3 = group.exp(pk.gG2, r);
+    //    share.sk1 = group.exp(pk.g2G2, group.add(r,alpha));
+    share.sk1 = group.exp(group.generatorG2(), sp.beta*(r+sp.alpha));
+    
+    ZR h = group.hashListToZR(NULLTAG);
+    
+    share.sk3 = group.exp(group.generatorG2(), r); // g^r
+    share.sk2 = group.exp(share.sk3, sp.beta + (h* sp.ry));// v(t0)^r
+    
     return share;
 }
 

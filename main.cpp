@@ -559,30 +559,30 @@ static void ppke()
             
             sp_encrypt_time += t_end - t_start;
             
-//            t_start = std::chrono::high_resolution_clock::now();
-//            M_type dec_M = ppke.decrypt(sk, ct2);
-//            t_end = std::chrono::high_resolution_clock::now();
-//            decrypt_time += t_end - t_start;
-//
-//            M_type dec_M2 = ppke.decrypt(sk, ct2);
-//
-//            if (M == dec_M) {
-//                //            std::cout << " \t OK!" << std::endl;
-//            }else{
-//                std::cout << "Puncturable encryption error!" << std::endl;
-//                std::cout << "M: " << hex <<  M;
-//                std::cout << "\t decrypted M: " << hex << dec_M << dec;
-//                std::cout << std::endl;
-//            }
-//
-//            if (M == dec_M2) {
-//                //            std::cout << " \t OK!" << std::endl;
-//            }else{
-//                std::cout << "Puncturable encryption error!" << std::endl;
-//                std::cout << "M: " << hex <<  M;
-//                std::cout << "\t decrypted M (from CT2): " << hex << dec_M2 << dec;
-//                std::cout << std::endl;
-//            }
+            t_start = std::chrono::high_resolution_clock::now();
+            M_type dec_M = ppke.decrypt(sk, ct2);
+            t_end = std::chrono::high_resolution_clock::now();
+            decrypt_time += t_end - t_start;
+
+            M_type dec_M2 = ppke.decrypt(sk, ct2);
+
+            if (M == dec_M) {
+                //            std::cout << " \t OK!" << std::endl;
+            }else{
+                std::cout << "Puncturable encryption error!" << std::endl;
+                std::cout << "M: " << hex <<  M;
+                std::cout << "\t decrypted M: " << hex << dec_M << dec;
+                std::cout << std::endl;
+            }
+
+            if (M == dec_M2) {
+                //            std::cout << " \t OK!" << std::endl;
+            }else{
+                std::cout << "Puncturable encryption error!" << std::endl;
+                std::cout << "M: " << hex <<  M;
+                std::cout << "\t decrypted M (from CT2): " << hex << dec_M2 << dec;
+                std::cout << std::endl;
+            }
 
         }
 

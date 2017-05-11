@@ -242,7 +242,8 @@ private:
 	}
 
 	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
-	GmppkePrivateKeyShare skgen(const GmppkePublicKey &pk,const relicxx::ZR & alpha ) const;
+//    GmppkePrivateKeyShare skgen(const GmppkePublicKey &pk,const relicxx::ZR & alpha ) const;
+    GmppkePrivateKeyShare skgen(const GmppkeSecretParameters &sp,const relicxx::ZR & alpha ) const;
 };
 
 }

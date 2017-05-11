@@ -132,8 +132,6 @@ void Gmppke::puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const t
     sk.shares.push_back(skentryn);
 }
 
-
-
 PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const tag_type & tag ) const
 {
     PartialGmmppkeCT  ct;
@@ -153,9 +151,7 @@ PartialGmmppkeCT Gmppke::blind(const GmppkeSecretParameters & sp, const relicxx:
     ZR h = group.hashListToZR(tag);
     G1 g = group.generatorG1();
     
-    G1 vofx = group.exp(g, sp.beta + (h* sp.ry));
-
-    ct.ct3 = group.exp(vofx, s);
+    ct.ct3 = group.exp(ct.ct2, (sp.beta + (h* sp.ry)));
     
     ct.tag = tag;
     return ct;

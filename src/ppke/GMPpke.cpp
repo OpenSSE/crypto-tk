@@ -11,7 +11,7 @@ using namespace std;
 using namespace relicxx;
 //static const string  NULLTAG = "whoever wishes to keep a secret, must hide from us that he possesses one.-- Johann Wolfgang von Goethe"; // the reserved tag
 
-static const tag_type NULLTAG = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15};
+static const tag_type NULLTAG = {{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15}};
     
     
 std::string tag2string(const tag_type& tag)
@@ -183,8 +183,8 @@ GT Gmppke::recoverBlind(const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct
         ZR currentTag = group.hashListToZR(s0.sk4);
         
         
-        ZR w0 = LagrangeBasisCoefficients<2>(group,0,0, {ctTag, currentTag});
-        const ZR wstar = LagrangeBasisCoefficients<2>(group,1,0,{ctTag, currentTag});
+        ZR w0 = LagrangeBasisCoefficients<2>(group,0,0, {{ctTag, currentTag}});
+        const ZR wstar = LagrangeBasisCoefficients<2>(group,1,0,{{ctTag, currentTag}});
 
         
         G1 ct3prod_j;

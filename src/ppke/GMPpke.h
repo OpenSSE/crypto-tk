@@ -237,7 +237,7 @@ private:
     template <class T, size_t N>
 	T  vx(const std::array<T,N> & gqofxG1, const tag_type & x) const{
 
-        return LagrangeInterpInExponent<T,N>(group,group.hashListToZR(x),{relicxx::ZR(0), relicxx::ZR(1)},gqofxG1);
+        return LagrangeInterpInExponent<T,N>(group,group.hashListToZR(x),{{relicxx::ZR(0), relicxx::ZR(1)}},gqofxG1);
 
 	}
 

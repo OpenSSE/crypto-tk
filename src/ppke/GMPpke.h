@@ -25,7 +25,6 @@ std::string tag2string(const tag_type& tag);
     
     
 class Gmppke;
-class GMPfse;
 class PartialGmmppkeCT;
 class GmppkePrivateKey;
 class GmppkePublicKey: public  virtual  baseKey{
@@ -46,7 +45,6 @@ protected:
     std::array<relicxx::G2,2> gqofxG2;
   
 	friend class Gmppke;
-	friend class GMPfse;
 };
 
  class GmppkePrivateKeyShare{
@@ -66,7 +64,6 @@ protected:
 	tag_type sk4;
 
     friend class Gmppke;
-	friend class GMPfse;
 	friend class GmppkePrivateKey;
 };
 
@@ -88,7 +85,6 @@ protected:
     std::vector<GmppkePrivateKeyShare> shares;
 
     friend class Gmppke;
-    friend class GMPfse;
  };
 
 class PartialGmmppkeCT{
@@ -115,8 +111,6 @@ protected:
     tag_type tag;
 
     friend class Gmppke;
-	friend class GMPfse;
-	friend class GMPfseCiphertext;
 };
 
 
@@ -136,7 +130,6 @@ protected:
     }
 
     friend class Gmppke;
-    friend class GMPfse;
 };
 
 
@@ -144,7 +137,9 @@ class Gmppke
 {
 public:
 
-	Gmppke(){};
+	Gmppke(){
+//        std::cout << "Pairing group order: " << group.order() << std::endl;
+    };
 	~Gmppke() {};
 
 	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk) const;
@@ -152,7 +147,7 @@ public:
 	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
 
 	PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const tag_type & tag) const;
-	relicxx::GT recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct ) const;
+	relicxx::GT recoverBlind(const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct ) const;
 
     template <typename T>
    	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const tag_type & tag) const
@@ -173,18 +168,18 @@ public:
     }
 
     template <typename T>
-    T decrypt(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
+    T decrypt(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
         if (sk.isPuncturedOnTag(ct.tag)) {
             throw PuncturedCiphertext("cannot decrypt. The key is punctured on the following tag in the ciphertext: " + tag2string(ct.tag) + ".");
         }
-        return decrypt_unchecked(pk,sk,ct);
+        return decrypt_unchecked(sk,ct);
     }
     //For testing purposes only
     template <typename T>
-    T decrypt_unchecked(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
+    T decrypt_unchecked(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
-        std::vector<uint8_t> gt_blind_bytes = recoverBlind(pk,sk,ct).getBytes(false);
+        std::vector<uint8_t> gt_blind_bytes = recoverBlind(sk,ct).getBytes(false);
         
         auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(ct.tag.data(), ct.tag.size());
         
@@ -207,7 +202,6 @@ private:
 
 	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk) const;
 	GmppkePrivateKeyShare skgen(const GmppkePublicKey &pk,const relicxx::ZR & alpha ) const;
-	friend class GMPfse;
 };
 
 }

@@ -141,7 +141,7 @@ PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey & pk, const ZR & s, const t
 
 
 
-GT Gmppke::recoverBlind(const GmppkePublicKey & pk, const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
+GT Gmppke::recoverBlind(const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct) const
 {
     ZR ctTag = group.hashListToZR(ct.tag);
     

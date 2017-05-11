@@ -152,6 +152,11 @@ ZR hashToZR(const bytes & b)
 	return zr;
 }
 
+    size_t ZR::byte_size() const
+    {
+        return bn_size_bin(z);
+    }
+
 bool ZR::ismember(void) const
 {
 	bool result;
@@ -170,7 +175,7 @@ std::vector<uint8_t> ZR::getBytes() const {
 
 ostream& operator<<(ostream& s, const ZR& zr)
 {
-	int length =BN_BYTES;
+    int length = bn_size_str(zr.z, DECIMAL);
 	char data[length + 1];
 	memset(data, 0, length);
 	bn_write_str(data, length, zr.z, DECIMAL);

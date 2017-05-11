@@ -137,6 +137,7 @@ public:
 		else ro_error();
 		return *this;
 	}
+        size_t byte_size() const;
 		bool ismember() const;
 		ZR inverse() const;
 		std::vector<uint8_t> getBytes() const;

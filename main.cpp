@@ -470,18 +470,16 @@ static void bench_prg()
 
 static void ppke()
 {
-
-    using namespace forwardsec;
     
     std::array<uint8_t, 16> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
         master_key[i] = 1 << i;
     }
     
-    Gmppke ppke;
-    GmppkePublicKey pk;
-    GmppkePrivateKey sk;
-    GmppkeSecretParameters sp;
+    sse::crypto::Gmppke ppke;
+    sse::crypto::GmppkePublicKey pk;
+    sse::crypto::GmppkePrivateKey sk;
+    sse::crypto::GmppkeSecretParameters sp;
     
     ppke.keygen(master_key, pk, sk, sp);
     
@@ -507,7 +505,7 @@ static void ppke()
 
             // add new punctures
             for ( ; current_p_count < p; current_p_count++) {
-                tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+                sse::crypto::tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
                 punctured_tag[15] = current_p_count&0xFF;
                 punctured_tag[14] = (current_p_count>>8)&0xFF;
                 punctured_tag[13] = (current_p_count>>16)&0xFF;
@@ -542,7 +540,7 @@ static void ppke()
             
             sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
             
-            tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+            sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
             tag[0] = i&0xFF;
             tag[1] = (i>>8)&0xFF;
             tag[2] = (i>>16)&0xFF;
@@ -602,21 +600,18 @@ static void ppke()
 
 static void deterministic_key_ppke()
 {
-    
-    using namespace forwardsec;
-    
     std::array<uint8_t, 16> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
         master_key[i] = 1 << i;
     }
-    sse::crypto::Prf<forwardsec::kPrfOutputSize> key_prf(master_key.data(), master_key.size());
+    sse::crypto::Prf<sse::crypto::kPrfOutputSize> key_prf(master_key.data(), master_key.size());
 
     std::cout << "Deterministic key generation\n";
 
-    Gmppke ppke;
-    GmppkePublicKey pk;
-    GmppkePrivateKey sk;
-    GmppkeSecretParameters sp;
+    sse::crypto::Gmppke ppke;
+    sse::crypto::GmppkePublicKey pk;
+    sse::crypto::GmppkePrivateKey sk;
+    sse::crypto::GmppkeSecretParameters sp;
     
     ppke.keygen(master_key, pk, sk, sp);
     
@@ -631,7 +626,7 @@ static void deterministic_key_ppke()
     
     size_t current_p_count = 0;
     
-    std::vector<forwardsec::GmppkePrivateKeyShare> keyshares;
+    std::vector<sse::crypto::GmppkePrivateKeyShare> keyshares;
     keyshares.push_back(ppke.sk0Gen(key_prf, sp, 0));
     
     for (size_t p : puncture_count_list) {
@@ -645,7 +640,7 @@ static void deterministic_key_ppke()
             
             // add new punctures
             for ( ; current_p_count < p; current_p_count++) {
-                tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+                sse::crypto::tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
                 punctured_tag[15] = current_p_count&0xFF;
                 punctured_tag[14] = (current_p_count>>8)&0xFF;
                 punctured_tag[13] = (current_p_count>>16)&0xFF;
@@ -688,7 +683,7 @@ static void deterministic_key_ppke()
             
             sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
             
-            tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+            sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
             tag[0] = i&0xFF;
             tag[1] = (i>>8)&0xFF;
             tag[2] = (i>>16)&0xFF;
@@ -711,11 +706,11 @@ static void deterministic_key_ppke()
             sp_encrypt_time += t_end - t_start;
             
             t_start = std::chrono::high_resolution_clock::now();
-            M_type dec_M = ppke.decrypt(forwardsec::GmppkePrivateKey(keyshares), ct2);
+            M_type dec_M = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
             t_end = std::chrono::high_resolution_clock::now();
             decrypt_time += t_end - t_start;
             
-            M_type dec_M2 = ppke.decrypt(forwardsec::GmppkePrivateKey(keyshares), ct2);
+            M_type dec_M2 = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
             
             if (M == dec_M) {
                 //            std::cout << " \t OK!" << std::endl;

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		310C2BD51EC0B59700E80B3A /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BCD1EC0B59700E80B3A /* common.h */; };
-		310C2BD61EC0B59700E80B3A /* forwardsec.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BCE1EC0B59700E80B3A /* forwardsec.h */; };
 		310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
 		310C2BDB1EC0B59700E80B3A /* relic_api.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BD11EC0B59700E80B3A /* relic_api.h */; };
 		310C2BDC1EC0B59700E80B3A /* common.c in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD31EC0B59700E80B3A /* common.c */; };
@@ -225,7 +224,6 @@
 
 /* Begin PBXFileReference section */
 		310C2BCD1EC0B59700E80B3A /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
-		310C2BCE1EC0B59700E80B3A /* forwardsec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = forwardsec.h; sourceTree = "<group>"; };
 		310C2BD01EC0B59700E80B3A /* GMPpke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GMPpke.cpp; sourceTree = "<group>"; };
 		310C2BD11EC0B59700E80B3A /* relic_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = relic_api.h; sourceTree = "<group>"; };
 		310C2BD31EC0B59700E80B3A /* common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = common.c; sourceTree = "<group>"; };
@@ -382,7 +380,6 @@
 		310C2BCC1EC0B59700E80B3A /* ppke */ = {
 			isa = PBXGroup;
 			children = (
-				310C2BCE1EC0B59700E80B3A /* forwardsec.h */,
 				310C2BE21EC0B63600E80B3A /* GMPpke.h */,
 				310C2BD01EC0B59700E80B3A /* GMPpke.cpp */,
 				310C2BE41EC0B6D800E80B3A /* util.cpp */,
@@ -759,7 +756,6 @@
 				6CC2D4FE1C31943300334ADD /* apply_linear_table_transform.hpp in Headers */,
 				6CC2D5151C31945000334ADD /* print.hpp in Headers */,
 				6CC2D5121C31945000334ADD /* is_byte.hpp in Headers */,
-				310C2BD61EC0B59700E80B3A /* forwardsec.h in Headers */,
 				6CC2D4DD1C31941000334ADD /* blake2b-round.h in Headers */,
 				310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */,
 				6CC2D4F31C31942F00334ADD /* batch_invert.hpp in Headers */,

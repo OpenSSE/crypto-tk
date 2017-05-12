@@ -10,88 +10,126 @@
 
 #include <array>
 
-#include "forwardsec.h"
+#include "relic_wrapper/relic_api.h"
+
 #include "util.h"
 
 #include "hmac.hpp"
 #include "hash.hpp"
 
-namespace forwardsec{
+namespace sse
+{
+    
+namespace crypto
+{
 
 constexpr static size_t kTagSize = 16;
 constexpr unsigned int kPPKEStatisticalSecurity = 32;
 constexpr static size_t kPrfOutputSize = BN_BYTES + kPPKEStatisticalSecurity/8;
-    
+
 typedef std::array<uint8_t, kTagSize> tag_type;
 
 std::string tag2string(const tag_type& tag);
-    
+
+class BadCiphertext : public std::invalid_argument
+{
+public:
+    BadCiphertext(std::string const& error)
+    : std::invalid_argument(error)
+    {}
+};
+
+class PuncturedCiphertext : public BadCiphertext
+{
+public:
+    PuncturedCiphertext(std::string const& error)
+    : BadCiphertext(error)
+    {}
+};
+
+
+
+class baseKey{
+public:
+    relicxx::G1 gG1;
+    relicxx::G2 gG2;
+    relicxx::G1 g2G1;
+    relicxx::G2 g2G2;
+    friend bool operator==(const baseKey& x, const baseKey& y){
+        return (x.gG1 == y.gG1 && x.gG2 == y.gG2 && x.g2G1 == y.g2G1
+                && x.g2G2 == y.g2G2);
+    }
+    friend bool operator!=(const baseKey& x, const baseKey& y){
+        return !(x==y);
+    }
+};
+
 
 class Gmppke;
 class PartialGmmppkeCT;
 class GmppkePrivateKey;
 class GmppkePublicKey: public  virtual  baseKey{
 public:
-	friend bool operator==(const GmppkePublicKey& x, const GmppkePublicKey& y){
-		return  ((baseKey)x == (baseKey)y &&
-				x.ppkeg1 == y.ppkeg1 && x.gqofxG1 == y.gqofxG1 &&
-				x.gqofxG2 == y.gqofxG2);
-	}
-	friend bool operator!=(const GmppkePublicKey& x, const GmppkePublicKey& y){
-		return !(x==y);
-	}
-
+    friend bool operator==(const GmppkePublicKey& x, const GmppkePublicKey& y){
+        return  ((baseKey)x == (baseKey)y &&
+                 x.ppkeg1 == y.ppkeg1 && x.gqofxG1 == y.gqofxG1 &&
+                 x.gqofxG2 == y.gqofxG2);
+    }
+    friend bool operator!=(const GmppkePublicKey& x, const GmppkePublicKey& y){
+        return !(x==y);
+    }
+    
 protected:
-	relicxx::G2 ppkeg1;
-
+    relicxx::G2 ppkeg1;
+    
     std::array<relicxx::G1,2> gqofxG1;
     std::array<relicxx::G2,2> gqofxG2;
-  
-	friend class Gmppke;
-};
-
- class GmppkePrivateKeyShare{
-public:
-
-	friend bool operator==(const GmppkePrivateKeyShare& x, const GmppkePrivateKeyShare& y){
-		return  (x.sk1 == y.sk1 && x.sk2 == y.sk2 && x.sk3 == y.sk3 &&
-				x.sk4 == y.sk4);
-	}
-	friend bool operator!=(const GmppkePrivateKeyShare& x, const GmppkePrivateKeyShare& y){
-		return !(x==y);
-	}
-protected:
-	relicxx::G2 sk1;
-	relicxx::G2 sk2;
-	relicxx::G2 sk3;
-	tag_type sk4;
-
+    
     friend class Gmppke;
-	friend class GmppkePrivateKey;
 };
 
- class GmppkePrivateKey{
+class GmppkePrivateKeyShare{
 public:
-     GmppkePrivateKey() : shares() {};
-     GmppkePrivateKey(const std::vector<GmppkePrivateKeyShare>& s) : shares(s) {};
-     
-	friend bool operator==(const GmppkePrivateKey & l, const GmppkePrivateKey & r){
-		return l.shares == r.shares;
-	}
-	friend bool operator!=(const GmppkePrivateKey & l, const GmppkePrivateKey & r){
-		return !(l.shares == r.shares);
-	}
-	bool punctured() const{
-		return shares.size() > 1;
-	}
+    
+    friend bool operator==(const GmppkePrivateKeyShare& x, const GmppkePrivateKeyShare& y){
+        return  (x.sk1 == y.sk1 && x.sk2 == y.sk2 && x.sk3 == y.sk3 &&
+                 x.sk4 == y.sk4);
+    }
+    friend bool operator!=(const GmppkePrivateKeyShare& x, const GmppkePrivateKeyShare& y){
+        return !(x==y);
+    }
+protected:
+    relicxx::G2 sk1;
+    relicxx::G2 sk2;
+    relicxx::G2 sk3;
+    tag_type sk4;
+    
+    friend class Gmppke;
+    friend class GmppkePrivateKey;
+};
 
+class GmppkePrivateKey{
+public:
+    GmppkePrivateKey() : shares() {};
+    GmppkePrivateKey(const std::vector<GmppkePrivateKeyShare>& s) : shares(s) {};
+    
+    friend bool operator==(const GmppkePrivateKey & l, const GmppkePrivateKey & r){
+        return l.shares == r.shares;
+    }
+    friend bool operator!=(const GmppkePrivateKey & l, const GmppkePrivateKey & r){
+        return !(l.shares == r.shares);
+    }
+    bool punctured() const{
+        return shares.size() > 1;
+    }
+    
     bool isPuncturedOnTag(const tag_type &tag) const;
-
+    
 protected:
     std::vector<GmppkePrivateKeyShare> shares;
-
+    
     friend class Gmppke;
- };
+};
 
 class GmppkeSecretParameters{
     
@@ -101,39 +139,39 @@ class GmppkeSecretParameters{
     friend bool operator!=(const GmppkeSecretParameters & l, const GmppkeSecretParameters & r){
         return !(l == r);
     }
-        
-    protected:
-        relicxx::ZR alpha;
-        relicxx::ZR beta;
-        relicxx::ZR ry;
-
-    friend class Gmppke;
-
-};
     
+protected:
+    relicxx::ZR alpha;
+    relicxx::ZR beta;
+    relicxx::ZR ry;
+    
+    friend class Gmppke;
+    
+};
+
 class PartialGmmppkeCT{
 public:
-	 PartialGmmppkeCT(){};
-		friend bool operator==(const PartialGmmppkeCT& x,const PartialGmmppkeCT& y){
-			return x.ct2 == y.ct2 && x.ct3 == y.ct3 && x.tag == y.tag;
-		}
-		friend bool operator!=(const PartialGmmppkeCT& x, const PartialGmmppkeCT& y){
-			return !(x==y);
-		}
-
-		/** Checks if you can decrypt a GMPfse ciphertext
-		 *
-		 * @param sk
-		 * @param ct
-		 * @return
-		 */
-		friend bool canDecrypt(const GmppkePrivateKey & sk,const PartialGmmppkeCT & ct);
-
+    PartialGmmppkeCT(){};
+    friend bool operator==(const PartialGmmppkeCT& x,const PartialGmmppkeCT& y){
+        return x.ct2 == y.ct2 && x.ct3 == y.ct3 && x.tag == y.tag;
+    }
+    friend bool operator!=(const PartialGmmppkeCT& x, const PartialGmmppkeCT& y){
+        return !(x==y);
+    }
+    
+    /** Checks if you can decrypt a GMPfse ciphertext
+     *
+     * @param sk
+     * @param ct
+     * @return
+     */
+    friend bool canDecrypt(const GmppkePrivateKey & sk,const PartialGmmppkeCT & ct);
+    
 protected:
-	relicxx::G1 ct2;
-	relicxx::G1 ct3;
+    relicxx::G1 ct2;
+    relicxx::G1 ct3;
     tag_type tag;
-
+    
     friend class Gmppke;
 };
 
@@ -152,7 +190,7 @@ protected:
     friend bool operator!=(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y){
         return !(x==y);
     }
-
+    
     friend class Gmppke;
 };
 
@@ -160,29 +198,29 @@ protected:
 class Gmppke
 {
 public:
-
+    
     static constexpr uint8_t kPRFKeySize = 16; // 128 bits
     
-	Gmppke(){
-//        std::cout << "Pairing group order: " << group.order() << std::endl;
+    Gmppke(){
+        //        std::cout << "Pairing group order: " << group.order() << std::endl;
     };
-	~Gmppke() {};
-
-	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+    ~Gmppke() {};
+    
+    void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     void keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     void keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
-
+    
     void paramgen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkeSecretParameters &sp) const;
-
-	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
-
+    
+    void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
+    
     PartialGmmppkeCT blind(const GmppkePublicKey & pk, const relicxx::ZR & s,  const tag_type & tag) const;
     PartialGmmppkeCT blind(const GmppkeSecretParameters & sp, const relicxx::ZR & s,  const tag_type & tag) const;
-
+    
     relicxx::GT recoverBlind(const GmppkePrivateKey & sk, const PartialGmmppkeCT & ct ) const;
-
+    
     template <typename T>
-   	GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const tag_type & tag) const
+    GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const tag_type & tag) const
     {
         const relicxx::ZR s = group.randomZR();
         GmmppkeCT<T> ct = blind(pk,s,tag);
@@ -199,9 +237,9 @@ public:
         return ct;
         
     }
-
+    
     template <typename T>
-   	GmmppkeCT<T> encrypt(const GmppkeSecretParameters & sp,const T & M,const tag_type & tag) const
+    GmmppkeCT<T> encrypt(const GmppkeSecretParameters & sp,const T & M,const tag_type & tag) const
     {
         const relicxx::ZR s = group.randomZR();
         GmmppkeCT<T> ct = blind(sp,s,tag);
@@ -210,7 +248,7 @@ public:
         
         std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
         group.exp(group.generatorGT(), sp.alpha*sp.beta*s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
-
+        
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
         
@@ -218,7 +256,7 @@ public:
         return ct;
         
     }
-
+    
     template <typename T>
     T decrypt(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
@@ -244,23 +282,24 @@ public:
     
     GmppkePrivateKeyShare sk0Gen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d) const;
     GmppkePrivateKeyShare skShareGen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d, const tag_type& tag) const;
-
+    
 private:
-	relicxx::PairingGroup group;
-
+    relicxx::PairingGroup group;
+    
     template <class T, size_t N>
-	T  vx(const std::array<T,N> & gqofxG1, const tag_type & x) const{
-
+    T  vx(const std::array<T,N> & gqofxG1, const tag_type & x) const{
+        
         return LagrangeInterpInExponent<T,N>(group,group.hashListToZR(x),{{relicxx::ZR(0), relicxx::ZR(1)}},gqofxG1);
-
-	}
-
-	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
+        
+    }
+    
+    void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
     void keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
-
+    
     GmppkePrivateKeyShare skgen(const GmppkeSecretParameters &sp ) const;
     GmppkePrivateKeyShare skgen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp ) const;
 };
 
+}
 }
 #endif /* GMPPKE_H_ */

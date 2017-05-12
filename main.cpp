@@ -473,12 +473,17 @@ static void ppke()
 
     using namespace forwardsec;
     
+    std::array<uint8_t, 16> master_key;
+    for (size_t i = 0; i < master_key.size(); i++) {
+        master_key[i] = 1 << i;
+    }
+    
     Gmppke ppke;
     GmppkePublicKey pk;
     GmppkePrivateKey sk;
     GmppkeSecretParameters sp;
     
-    ppke.keygen(pk, sk, sp);
+    ppke.keygen(master_key, pk, sk, sp);
     
     typedef uint64_t M_type;
 
@@ -595,11 +600,157 @@ static void ppke()
 
 }
 
+static void deterministic_key_ppke()
+{
+    
+    using namespace forwardsec;
+    
+    std::array<uint8_t, 16> master_key;
+    for (size_t i = 0; i < master_key.size(); i++) {
+        master_key[i] = 1 << i;
+    }
+    sse::crypto::Prf<forwardsec::kPrfOutputSize> key_prf(master_key.data(), master_key.size());
+
+    std::cout << "Deterministic key generation\n";
+
+    Gmppke ppke;
+    GmppkePublicKey pk;
+    GmppkePrivateKey sk;
+    GmppkeSecretParameters sp;
+    
+    ppke.keygen(master_key, pk, sk, sp);
+    
+    typedef uint64_t M_type;
+    
+    
+    //    size_t puncture_count = 10;
+    size_t bench_count = 200;
+    
+    std::vector<size_t> puncture_count_list = {0, 1, 2};
+    //    std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40 , 50, 100};
+    
+    size_t current_p_count = 0;
+    
+    std::vector<forwardsec::GmppkePrivateKeyShare> keyshares;
+    keyshares.push_back(ppke.sk0Gen(key_prf, sp, 0));
+    
+    for (size_t p : puncture_count_list) {
+        
+        if (p > current_p_count) {
+            
+            size_t n_punctures = p-current_p_count;
+            std::cout << "Puncture the key " << n_punctures << " times...";
+            
+            std::chrono::duration<double, std::milli> puncture_time(0);
+            
+            // add new punctures
+            for ( ; current_p_count < p; current_p_count++) {
+                tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+                punctured_tag[15] = current_p_count&0xFF;
+                punctured_tag[14] = (current_p_count>>8)&0xFF;
+                punctured_tag[13] = (current_p_count>>16)&0xFF;
+                punctured_tag[12] = (current_p_count>>24)&0xFF;
+                punctured_tag[11] = (current_p_count>>32)&0xFF;
+                punctured_tag[10] = (current_p_count>>40)&0xFF;
+                punctured_tag[9] = (current_p_count>>48)&0xFF;
+                //            punctured_tag[8] = (current_p_count>>56)&0xFF;
+                punctured_tag[8] = 0xFF;
+                
+                auto t_start = std::chrono::high_resolution_clock::now();
+                
+                auto share = ppke.skShareGen(key_prf, sp, current_p_count+1, punctured_tag);
+//                ppke.puncture(pk, sk, punctured_tag);
+                
+                auto t_end = std::chrono::high_resolution_clock::now();
+                
+                keyshares.push_back(share);
+                
+                puncture_time += t_end - t_start;
+                
+            }
+            
+            std::cout << "Done\n";
+            std::cout << "Average puncturing time: " << puncture_time.count()/n_punctures << " ms/puncture" << std::endl;
+            // update accordingly the first key share
+            keyshares[0] = ppke.sk0Gen(key_prf, sp, current_p_count);
+            
+        }
+        std::chrono::duration<double, std::milli> encrypt_time(0);
+        std::chrono::duration<double, std::milli> sp_encrypt_time(0);
+        std::chrono::duration<double, std::milli> decrypt_time(0);
+        
+        std::cout << "Running " << bench_count << " encryption/decryptions with " << current_p_count << " punctures...";
+        
+        
+        
+        for (size_t i = 0; i < bench_count; i++) {
+            M_type M;
+            
+            sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
+            
+            tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+            tag[0] = i&0xFF;
+            tag[1] = (i>>8)&0xFF;
+            tag[2] = (i>>16)&0xFF;
+            tag[3] = (i>>24)&0xFF;
+            tag[4] = (i>>32)&0xFF;
+            tag[5] = (i>>40)&0xFF;
+            tag[6] = (i>>48)&0xFF;
+            tag[7] = (i>>56)&0xFF;
+            
+            auto t_start = std::chrono::high_resolution_clock::now();
+            auto ct = ppke.encrypt<M_type>(pk, M, tag);
+            auto t_end = std::chrono::high_resolution_clock::now();
+            
+            encrypt_time += t_end - t_start;
+            
+            t_start = std::chrono::high_resolution_clock::now();
+            auto ct2 = ppke.encrypt<M_type>(sp, M, tag);
+            t_end = std::chrono::high_resolution_clock::now();
+            
+            sp_encrypt_time += t_end - t_start;
+            
+            t_start = std::chrono::high_resolution_clock::now();
+            M_type dec_M = ppke.decrypt(forwardsec::GmppkePrivateKey(keyshares), ct2);
+            t_end = std::chrono::high_resolution_clock::now();
+            decrypt_time += t_end - t_start;
+            
+            M_type dec_M2 = ppke.decrypt(forwardsec::GmppkePrivateKey(keyshares), ct2);
+            
+            if (M == dec_M) {
+                //            std::cout << " \t OK!" << std::endl;
+            }else{
+                std::cout << "Puncturable encryption error!" << std::endl;
+                std::cout << "M: " << hex <<  M;
+                std::cout << "\t decrypted M: " << hex << dec_M << dec;
+                std::cout << std::endl;
+            }
+            
+            if (M == dec_M2) {
+                //            std::cout << " \t OK!" << std::endl;
+            }else{
+                std::cout << "Puncturable encryption error!" << std::endl;
+                std::cout << "M: " << hex <<  M;
+                std::cout << "\t decrypted M (from CT2): " << hex << dec_M2 << dec;
+                std::cout << std::endl;
+            }
+            
+        }
+        
+        std::cout << "Done. \n";
+        std::cout << "Encryption: " << encrypt_time.count()/bench_count << " ms" << std::endl;
+        std::cout << "Encryption with secret: " << sp_encrypt_time.count()/bench_count << " ms" << std::endl;
+        std::cout << "Decryption: " << decrypt_time.count()/bench_count << " ms" << std::endl;
+        
+    }
+    
+}
+
 int main( int argc, char* argv[] ) {
     
     sse::crypto::init_crypto_lib();
     
-    ppke();
+    deterministic_key_ppke();
     
     sse::crypto::cleanup_crypto_lib();
     

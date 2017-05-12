@@ -19,11 +19,14 @@
 namespace forwardsec{
 
 constexpr static size_t kTagSize = 16;
+constexpr unsigned int kPPKEStatisticalSecurity = 32;
+constexpr static size_t kPrfOutputSize = BN_BYTES + kPPKEStatisticalSecurity/8;
+    
 typedef std::array<uint8_t, kTagSize> tag_type;
 
 std::string tag2string(const tag_type& tag);
     
-    
+
 class Gmppke;
 class PartialGmmppkeCT;
 class GmppkePrivateKey;
@@ -69,6 +72,9 @@ protected:
 
  class GmppkePrivateKey{
 public:
+     GmppkePrivateKey() : shares() {};
+     GmppkePrivateKey(const std::vector<GmppkePrivateKeyShare>& s) : shares(s) {};
+     
 	friend bool operator==(const GmppkePrivateKey & l, const GmppkePrivateKey & r){
 		return l.shares == r.shares;
 	}
@@ -156,12 +162,16 @@ class Gmppke
 {
 public:
 
+    static constexpr uint8_t kPRFKeySize = 16; // 128 bits
+    
 	Gmppke(){
 //        std::cout << "Pairing group order: " << group.order() << std::endl;
     };
 	~Gmppke() {};
 
 	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+    void keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+    void keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
 
 	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
 
@@ -231,6 +241,9 @@ public:
     }
     
     
+    GmppkePrivateKeyShare sk0Gen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d) const;
+    GmppkePrivateKeyShare skShareGen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d, const tag_type& tag) const;
+
 private:
 	relicxx::PairingGroup group;
 
@@ -242,8 +255,10 @@ private:
 	}
 
 	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
-//    GmppkePrivateKeyShare skgen(const GmppkePublicKey &pk,const relicxx::ZR & alpha ) const;
-    GmppkePrivateKeyShare skgen(const GmppkeSecretParameters &sp,const relicxx::ZR & alpha ) const;
+    void keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+
+    GmppkePrivateKeyShare skgen(const GmppkeSecretParameters &sp ) const;
+    GmppkePrivateKeyShare skgen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp ) const;
 };
 
 }

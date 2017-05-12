@@ -506,7 +506,7 @@ void GT::getBytes(bool compress, const size_t out_len, uint8_t* out) const {
             out[i] = 0x00;
         }
     }
-    gt_write_bin(out, MIN(l,out_len), gg.g,compress);
+    gt_write_bin(out, (int)MIN(l,out_len), gg.g,compress);
 }
     
     
@@ -569,6 +569,16 @@ ZR PairingGroup::randomZR() const
 	bn_rand(tt.z, BN_POS, bn_bits(grp_order));
 	bn_mod(zr.z,  tt.z, grp_order);
 	return zr;
+}
+
+ZR PairingGroup::pseudoRandomZR(const sse::crypto::Prf<kPRFOutputSize> &prf, const std::string &seed) const
+{
+    ZR zr,tt;
+    std::array<uint8_t, kPRFOutputSize> prf_out = prf.prf(seed);
+    bn_read_bin(tt.z, prf_out.data(), kPRFOutputSize);
+    //        bn_rand(tt.z, BN_POS, bn_bits(grp_order));
+    bn_mod(zr.z,  tt.z, grp_order);
+    return zr;
 }
 
 G1 PairingGroup::randomG1() const

@@ -17,6 +17,7 @@
 #include <cstring> // for memcpy
 #include <algorithm> // for std::fill
 
+#include "prf.hpp"
 
 // define classes
 #ifdef __cplusplus
@@ -441,8 +442,13 @@ public:
 
 	~PairingGroup();
 
+    constexpr static unsigned int kStatisticalSecurity = 32;
+    constexpr static unsigned int kPRFOutputSize = BN_BYTES + kStatisticalSecurity/8;
 
 	ZR randomZR() const;
+    ZR pseudoRandomZR(const sse::crypto::Prf<kPRFOutputSize> &prf, const std::string &seed) const;
+    
+    
 	G1 randomG1() const;
 	G2 randomG2() const;
 	GT randomGT() const;

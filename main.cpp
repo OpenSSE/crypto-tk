@@ -626,8 +626,8 @@ static void deterministic_key_ppke()
     //    size_t puncture_count = 10;
     size_t bench_count = 200;
     
-    std::vector<size_t> puncture_count_list = {0, 1, 2};
-    //    std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40 , 50, 100};
+//    std::vector<size_t> puncture_count_list = {0, 1, 2};
+        std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40 , 50, 100};
     
     size_t current_p_count = 0;
     

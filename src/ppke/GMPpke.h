@@ -96,7 +96,7 @@ protected:
 class GmppkeSecretParameters{
     
     friend bool operator==(const GmppkeSecretParameters & l, const GmppkeSecretParameters & r){
-        return l.alpha == r.alpha && l.beta == r.beta && l.gamma == r.gamma && l.ry == r.ry;
+        return l.alpha == r.alpha && l.beta == r.beta  && l.ry == r.ry;
     }
     friend bool operator!=(const GmppkeSecretParameters & l, const GmppkeSecretParameters & r){
         return !(l == r);
@@ -105,7 +105,6 @@ class GmppkeSecretParameters{
     protected:
         relicxx::ZR alpha;
         relicxx::ZR beta;
-        relicxx::ZR gamma;
         relicxx::ZR ry;
 
     friend class Gmppke;
@@ -172,6 +171,8 @@ public:
 	void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     void keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     void keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+
+    void paramgen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkeSecretParameters &sp) const;
 
 	void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
 
@@ -254,8 +255,8 @@ private:
 
 	}
 
-	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
-    void keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+	void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
+    void keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
 
     GmppkePrivateKeyShare skgen(const GmppkeSecretParameters &sp ) const;
     GmppkePrivateKeyShare skgen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp ) const;

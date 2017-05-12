@@ -49,6 +49,8 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretPar
     
    sp.alpha = alpha;
    sp.beta = beta;
+   sp.ry = group.randomZR();
+
    keygenPartial(alpha,pk,sk, sp);
 }
 
@@ -60,6 +62,8 @@ void Gmppke::keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePubli
 
 void Gmppke::keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
 {
+    paramgen(prf, sp);
+    
     GmppkePublicKey bpk;
     //    const ZR alpha = group.randomZR();
     
@@ -77,12 +81,18 @@ void Gmppke::keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey
     pk.g2G2 = bpk.g2G2;
     
     
-    sp.alpha = alpha;
-    sp.beta = beta;
     keygenPartial(prf, alpha, pk, sk, sp);
 }
 
-void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
+void Gmppke::paramgen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkeSecretParameters &sp) const
+{
+    sp.alpha = group.pseudoRandomZR(prf, "param_alpha");
+    sp.beta = group.pseudoRandomZR(prf, "param_beta");
+    sp.ry = group.pseudoRandomZR(prf, "param_ry");
+}
+
+
+void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const
 {
     pk.ppkeg1 =  group.exp(pk.gG2,alpha);
 
@@ -103,11 +113,9 @@ void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivate
     // here d = 1
     
     
-    const ZR ry = group.randomZR();
-
     polynomial_xcordinates[1] = ZR(1);
-    pk.gqofxG1[1] = group.mul(group.exp(pk.gG1,ry), pk.g2G1);
-    pk.gqofxG2[1] = group.mul(group.exp(pk.gG2,ry), pk.g2G2);
+    pk.gqofxG1[1] = group.mul(group.exp(pk.gG1,sp.ry), pk.g2G1);
+    pk.gqofxG2[1] = group.mul(group.exp(pk.gG2,sp.ry), pk.g2G2);
 
     assert(polynomial_xcordinates.size()==pk.gqofxG1.size());
 
@@ -116,15 +124,13 @@ void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivate
 //    assert(pk.g2G2 == LagrangeInterpInExponent<G2>(group,0,polynomial_xcordinates,pk.gqofxG2));
 
 
-    sp.ry = ry;
-
     sk.shares.push_back(skgen(sp));
 
     
     return;
 }
 
-void Gmppke::keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
+void Gmppke::keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const
 {
     pk.ppkeg1 =  group.exp(pk.gG2,alpha);
     
@@ -146,20 +152,16 @@ void Gmppke::keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const ZR
     
     
 //    const ZR ry = group.randomZR();
-    const ZR ry = group.pseudoRandomZR(prf, "param_ry");
     
     polynomial_xcordinates[1] = ZR(1);
-    pk.gqofxG1[1] = group.mul(group.exp(pk.gG1,ry), pk.g2G1);
-    pk.gqofxG2[1] = group.mul(group.exp(pk.gG2,ry), pk.g2G2);
+    pk.gqofxG1[1] = group.mul(group.exp(pk.gG1,sp.ry), pk.g2G1);
+    pk.gqofxG2[1] = group.mul(group.exp(pk.gG2,sp.ry), pk.g2G2);
     
     assert(polynomial_xcordinates.size()==pk.gqofxG1.size());
     
     // Sanity check that Lagrange interpolation works to get us g^beta on q(0).
     //    assert(pk.g2G1 == LagrangeInterpInExponent<G1>(group,0,polynomial_xcordinates,pk.gqofxG1));
     //    assert(pk.g2G2 == LagrangeInterpInExponent<G2>(group,0,polynomial_xcordinates,pk.gqofxG2));
-    
-    
-    sp.ry = ry;
     
     sk.shares.push_back(skgen(prf, sp));
     

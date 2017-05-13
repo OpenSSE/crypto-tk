@@ -29,6 +29,7 @@
 		311934B41D26B2360031804B /* block_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 311934B01D26B2360031804B /* block_hash.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		311934B51D27172A0031804B /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
 		311934B81D27F1F00031804B /* test_block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934B61D27F1F00031804B /* test_block_hash.cpp */; };
+		313CD4531EC719DD0058A0C5 /* test_ppke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD4511EC719DD0058A0C5 /* test_ppke.cpp */; };
 		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		316F0D3F1D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D401D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
@@ -235,6 +236,8 @@
 		311934B01D26B2360031804B /* block_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = block_hash.hpp; sourceTree = "<group>"; };
 		311934B61D27F1F00031804B /* test_block_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_block_hash.cpp; sourceTree = "<group>"; };
 		311934B71D27F1F00031804B /* test_block_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_block_hash.hpp; sourceTree = "<group>"; };
+		313CD4511EC719DD0058A0C5 /* test_ppke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_ppke.cpp; sourceTree = "<group>"; };
+		313CD4521EC719DD0058A0C5 /* test_ppke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_ppke.hpp; sourceTree = "<group>"; };
 		315D453A1C98909A00590A01 /* test_tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_tdp.cpp; sourceTree = "<group>"; };
 		315D453B1C98909A00590A01 /* test_tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_tdp.hpp; sourceTree = "<group>"; };
 		316F0D3D1D25600700F87904 /* prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prg.cpp; sourceTree = "<group>"; };
@@ -663,6 +666,8 @@
 				316F0D441D2565CB00F87904 /* test_prg.hpp */,
 				311934B61D27F1F00031804B /* test_block_hash.cpp */,
 				311934B71D27F1F00031804B /* test_block_hash.hpp */,
+				313CD4511EC719DD0058A0C5 /* test_ppke.cpp */,
+				313CD4521EC719DD0058A0C5 /* test_ppke.hpp */,
 				31D9DF621D6F4DDC00F0C960 /* boost_test_include.hpp */,
 			);
 			path = tests;
@@ -921,6 +926,7 @@
 				6CC2D4981C318DFE00334ADD /* blake2b.cpp in Sources */,
 				315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */,
 				6CC2D4931C318B3B00334ADD /* sha512_base.c in Sources */,
+				313CD4531EC719DD0058A0C5 /* test_ppke.cpp in Sources */,
 				318C729B1C9730140040AEE7 /* tdp.cpp in Sources */,
 				6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */,
 				311934B51D27172A0031804B /* test_prg.cpp in Sources */,
@@ -1196,8 +1202,9 @@
 			buildSettings = {
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = (
-					"-lcrypto",
 					"-lboost_unit_test_framework",
+					"-lcrypto",
+					"-lrelic",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1209,8 +1216,9 @@
 			buildSettings = {
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = (
-					"-lcrypto",
 					"-lboost_unit_test_framework",
+					"-lcrypto",
+					"-lrelic",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;

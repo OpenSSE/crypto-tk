@@ -21,6 +21,9 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE CRYPTO
 
+#define BOOST_TEST_NO_MAIN
+#define BOOST_TEST_ALTERNATIVE_INIT_API
+
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
@@ -39,6 +42,8 @@
 
 #pragma GCC diagnostic pop
 
+#include "src/utils.hpp";
+
 #include "tests/test_ecmh.hpp"
 #include "tests/hashing.hpp"
 #include "tests/test_hmac.hpp"
@@ -47,7 +52,9 @@
 #include "tests/test_tdp.hpp"
 #include "tests/test_prg.hpp"
 #include "tests/test_block_hash.hpp"
+#include "tests/test_ppke.hpp"
 
+/*
 BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
 	test_generic_multiset_hash();
 }
@@ -90,4 +97,25 @@ BOOST_AUTO_TEST_CASE(block_hash) {
 BOOST_AUTO_TEST_CASE(prg) {
     test_prg();
     test_prg_consistency();
+}
+*/
+BOOST_AUTO_TEST_CASE(ppke) {
+    test_relic_serialization_ZR();
+    test_relic_serialization_G1();
+    test_relic_serialization_G2();
+    
+    test_ppke_serialization();
+
+    test_pseudo_random_ppke();
+}
+
+int main(int argc, char* argv[], char* envp[])
+{
+    sse::crypto::init_crypto_lib();
+
+    int rv = boost::unit_test::unit_test_main(init_unit_test, argc, argv);
+    
+    sse::crypto::cleanup_crypto_lib();
+
+    return rv;
 }

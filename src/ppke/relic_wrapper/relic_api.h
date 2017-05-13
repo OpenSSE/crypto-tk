@@ -286,8 +286,8 @@ public:
 class G2
 {
 public:
-    constexpr static uint16_t kByteSize = 1 + 2*FP_BYTES;
-    constexpr static uint16_t kCompactByteSize = 1 + FP_BYTES;
+    constexpr static uint16_t kByteSize = 1 + 4*FP_BYTES;
+    constexpr static uint16_t kCompactByteSize = 1 + 2*FP_BYTES;
 
 	g2_t g;
 	bool isInit;

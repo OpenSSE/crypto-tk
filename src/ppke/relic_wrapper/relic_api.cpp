@@ -54,7 +54,25 @@ ZR::ZR(char *str)
 	bn_read_str(z, (const char *) str, (int)strlen(str), DECIMAL);
 	// bn_mod(z, z, order);
 }
- ZR ZR::inverse() const{
+
+ZR::ZR(const uint8_t *bytes,size_t len)
+{
+    error_if_relic_not_init();
+    bn_inits(z);
+    bn_inits(order);
+    g1_get_ord(order);
+    isInit = true;
+    
+    bn_read_bin(z, bytes, (int)len);
+}
+
+void ZR::writeBytes(uint8_t *bytes) const
+{
+    bn_write_bin(bytes, BN_BYTES, z);
+}
+
+    
+ZR ZR::inverse() const{
 	ZR i;
 	invertZR(i,z,i.order);
 	return i;
@@ -250,7 +268,15 @@ ZR operator&(const ZR& a, const ZR& b)
 // End ZR-specific classes
 
 // Begin G1-specific classes
+G1::G1(const uint8_t* bytes, bool compress)
+{
+    error_if_relic_not_init();
+    g1_inits(g);
+    isInit = true;
+    g1_read_bin(g, bytes, (compress) ? kCompactByteSize : kByteSize);
+}
 
+    
 G1 operator+(const G1& x, const G1& y)
 {
 	G1 z;
@@ -315,6 +341,15 @@ std::vector<uint8_t> G1::getBytes(bool compress) const {
 	return data;
 }
 
+void G1::writeBytes(uint8_t *bytes, bool compress) const
+{
+    unsigned int l  = g1_size_bin(g,compress);
+    
+    assert(l == ((compress) ? kCompactByteSize : kByteSize));
+    
+    g1_write_bin(bytes, l, g,compress);
+}
+
 ostream& operator<<(ostream& s, const G1& g1)
 {
 	auto data = g1.getBytes();
@@ -329,6 +364,13 @@ ostream& operator<<(ostream& s, const G1& g1)
 // End G1-specific classes
 
 // Begin G2-specific classes
+G2::G2(const uint8_t* bytes, bool compress)
+{
+    error_if_relic_not_init();
+    g2_inits(g);
+    isInit = true;
+    g2_read_bin(g, const_cast<uint8_t*>(bytes), (compress) ? kCompactByteSize : kByteSize);
+}
 
 G2 operator+(const G2& x, const G2& y)
 {
@@ -401,6 +443,15 @@ std::vector<uint8_t> G2::getBytes(bool compress) const {
 	return data;
 }
 
+void G2::writeBytes(uint8_t *bytes, bool compress) const
+{
+    unsigned int l  = g2_size_bin(const_cast<G2*>(this)->g,compress);
+    
+    assert(l == ((compress) ? kCompactByteSize : kByteSize));
+    
+    g2_write_bin(bytes, l, const_cast<G2*>(this)->g, compress);
+}
+
 
 ostream& operator<<(ostream& s, const G2& g2)
 {
@@ -416,6 +467,13 @@ ostream& operator<<(ostream& s, const G2& g2)
 // End G2-specific classes
 
 // Begin GT-specific classes
+GT::GT(const uint8_t* bytes)
+{
+    error_if_relic_not_init();
+    gt_inits(g);
+    isInit = true;
+    gt_read_bin(g, const_cast<uint8_t*>(bytes), kByteSize);
+}
 
 GT operator*(const GT& x, const GT& y)
 {
@@ -510,6 +568,15 @@ void GT::getBytes(bool compress, const size_t out_len, uint8_t* out) const {
 }
     
     
+void GT::writeBytes(uint8_t *bytes, bool compress) const
+{
+    unsigned int l  = gt_size_bin(const_cast<GT*>(this)->g, compress);
+    
+    assert(l == kByteSize);
+    
+    gt_write_bin(bytes, l, const_cast<GT*>(this)->g, compress);
+}
+
 ostream& operator<<(ostream& s, const GT& gt)
 {
 	auto data = gt.getBytes();
@@ -571,11 +638,11 @@ ZR PairingGroup::randomZR() const
 	return zr;
 }
 
-ZR PairingGroup::pseudoRandomZR(const sse::crypto::Prf<kPRFOutputSize> &prf, const std::string &seed) const
+ZR PairingGroup::pseudoRandomZR(const sse::crypto::Prf<kPrfOutputSize> &prf, const std::string &seed) const
 {
     ZR zr,tt;
-    std::array<uint8_t, kPRFOutputSize> prf_out = prf.prf(seed);
-    bn_read_bin(tt.z, prf_out.data(), kPRFOutputSize);
+    std::array<uint8_t, kPrfOutputSize> prf_out = prf.prf(seed);
+    bn_read_bin(tt.z, prf_out.data(), kPrfOutputSize);
     //        bn_rand(tt.z, BN_POS, bn_bits(grp_order));
     bn_mod(zr.z,  tt.z, grp_order);
     return zr;

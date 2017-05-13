@@ -25,7 +25,7 @@ namespace crypto
 
 constexpr static size_t kTagSize = 16;
 constexpr unsigned int kPPKEStatisticalSecurity = 32;
-constexpr static size_t kPrfOutputSize = BN_BYTES + kPPKEStatisticalSecurity/8;
+constexpr static size_t kPrfOutputSize = relicxx::PairingGroup::kPrfOutputSize;
 
 typedef std::array<uint8_t, kTagSize> tag_type;
 

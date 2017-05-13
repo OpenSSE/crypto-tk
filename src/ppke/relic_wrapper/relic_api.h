@@ -97,7 +97,8 @@ public:
 	ZR() 	 {error_if_relic_not_init(); bn_inits(z); bn_inits(order); g1_get_ord(order); isInit = true;bn_set_dig(z,1); }
 
 	ZR(int);
-	ZR(char*);
+    ZR(char*);
+    ZR(const uint8_t*,size_t);
 	ZR(const bn_t y) {error_if_relic_not_init(); bn_inits(z); bn_inits(order); g1_get_ord(order); isInit = true; bn_copy(z, y); }
 	ZR(const ZR& w) { error_if_relic_not_init();bn_inits(z); bn_inits(order); bn_copy(z, w.z); bn_copy(order, w.order); isInit = true; }
 
@@ -138,11 +139,13 @@ public:
 		else ro_error();
 		return *this;
 	}
-        size_t byte_size() const;
-		bool ismember() const;
-		ZR inverse() const;
-		std::vector<uint8_t> getBytes() const;
 
+    size_t byte_size() const;
+    bool ismember() const;
+    ZR inverse() const;
+    std::vector<uint8_t> getBytes() const;
+    void writeBytes(uint8_t *bytes) const;
+    
         //		friend class cereal::access;
 //		template <class Archive>
 //		void save( Archive & ar) const
@@ -201,11 +204,17 @@ ZR hashToZR(const bytes & b);
 class G1
 {
 public:
+    
+    constexpr static uint16_t kByteSize = 1 + 2*FP_BYTES;
+    constexpr static uint16_t kCompactByteSize = 1 + FP_BYTES;
+
+    
 	g1_t g;
 	bool isInit;
     G1()   {error_if_relic_not_init(); g1_inits(g); isInit = true; g1_set_infty(g); }
 	G1(const G1& w) { g1_inits(g); g1_copy(g, w.g); isInit = true; }
-
+    G1(const uint8_t* bytes, bool compress);
+    
 	~G1()  {
 		if(isInit) {
 			g1_free(g);
@@ -243,6 +252,10 @@ public:
 
 	bool ismember(const bn_t) const;
 	std::vector<uint8_t> getBytes(bool compress = 0) const;
+    void writeBytes(uint8_t *bytes, bool compress = 0) const;
+
+    
+    
 //    template<class Archive>
 //    void save(Archive & ar) const
 //    {
@@ -273,10 +286,14 @@ public:
 class G2
 {
 public:
+    constexpr static uint16_t kByteSize = 1 + 2*FP_BYTES;
+    constexpr static uint16_t kCompactByteSize = 1 + FP_BYTES;
+
 	g2_t g;
 	bool isInit;
     G2()   {error_if_relic_not_init(); g2_inits(g); isInit = true; g2_set_infty(g); }
 	G2(const G2& w) { g2_inits(g); g2_copy(g, const_cast<G2&>(w).g); isInit = true; }
+    G2(const uint8_t* bytes, bool compress);
 
 	~G2()  {
 		if(isInit){
@@ -314,6 +331,7 @@ public:
 	}
 	bool ismember(bn_t);
 	std::vector<uint8_t> getBytes( bool compress = 0) const;
+    void writeBytes(uint8_t *bytes, bool compress = 0) const;
 
 //    template<class Archive>
 //    void save(Archive & ar) const
@@ -344,10 +362,14 @@ public:
 class GT
 {
 public:
+    constexpr static uint16_t kByteSize = 12 * FP_BYTES;
+    
 	gt_t g;
 	bool isInit;
     GT()   { error_if_relic_not_init();gt_inits(g); isInit = true; gt_set_unity(g); }
     GT(const GT& x) { error_if_relic_not_init();gt_inits(g); isInit = true; gt_copy(g, const_cast<GT&>(x).g); }
+    GT(const uint8_t* bytes);
+
     ~GT()  {
     	if(isInit) {
     		gt_free(g);
@@ -383,6 +405,7 @@ public:
 	bool ismember(bn_t);
 	std::vector<uint8_t> getBytes( bool compress = 0) const;
     void getBytes(bool compress, const size_t out_len, uint8_t* out) const;
+    void writeBytes(uint8_t *bytes, bool compress) const;
 
 //    template<class Archive>
 //    void save(Archive & ar) const
@@ -443,10 +466,10 @@ public:
 	~PairingGroup();
 
     constexpr static unsigned int kStatisticalSecurity = 32;
-    constexpr static unsigned int kPRFOutputSize = BN_BYTES + kStatisticalSecurity/8;
+    constexpr static unsigned int kPrfOutputSize = BN_BYTES + kStatisticalSecurity/8;
 
 	ZR randomZR() const;
-    ZR pseudoRandomZR(const sse::crypto::Prf<kPRFOutputSize> &prf, const std::string &seed) const;
+    ZR pseudoRandomZR(const sse::crypto::Prf<kPrfOutputSize> &prf, const std::string &seed) const;
     
     
 	G1 randomG1() const;

@@ -90,6 +90,14 @@ protected:
 
 class GmppkePrivateKeyShare{
 public:
+    static constexpr size_t kByteSize = 3*relicxx::G2::kCompactByteSize + kTagSize;
+
+    GmppkePrivateKeyShare() {};
+    GmppkePrivateKeyShare(const uint8_t *bytes): sk1(bytes, true), sk2(bytes+relicxx::G2::kCompactByteSize, true), sk3(bytes+2*relicxx::G2::kCompactByteSize, true)
+    {
+        ::memcpy(sk4.data(), bytes+3*relicxx::G2::kCompactByteSize, kTagSize);
+    };
+
     
     friend bool operator==(const GmppkePrivateKeyShare& x, const GmppkePrivateKeyShare& y){
         return  (x.sk1 == y.sk1 && x.sk2 == y.sk2 && x.sk3 == y.sk3 &&
@@ -98,6 +106,15 @@ public:
     friend bool operator!=(const GmppkePrivateKeyShare& x, const GmppkePrivateKeyShare& y){
         return !(x==y);
     }
+    
+    void writeBytes(uint8_t *bytes) const
+    {
+        sk1.writeBytes(bytes, true); // compress
+        sk2.writeBytes(bytes+relicxx::G2::kCompactByteSize, true);
+        sk3.writeBytes(bytes+2*relicxx::G2::kCompactByteSize, true);
+        ::memcpy(bytes+3*relicxx::G2::kCompactByteSize, sk4.data(), sk4.size());
+    }
+
 protected:
     relicxx::G2 sk1;
     relicxx::G2 sk2;
@@ -151,7 +168,14 @@ protected:
 
 class PartialGmmppkeCT{
 public:
+    static constexpr size_t kByteSize = 2*relicxx::G1::kCompactByteSize + kTagSize;
+    
     PartialGmmppkeCT(){};
+    PartialGmmppkeCT(const uint8_t *bytes): ct2(bytes, true), ct3(bytes+relicxx::G1::kCompactByteSize, true)
+    {
+        ::memcpy(tag.data(), bytes+2*relicxx::G1::kCompactByteSize, kTagSize);
+    };
+    
     friend bool operator==(const PartialGmmppkeCT& x,const PartialGmmppkeCT& y){
         return x.ct2 == y.ct2 && x.ct3 == y.ct3 && x.tag == y.tag;
     }
@@ -167,6 +191,13 @@ public:
      */
     friend bool canDecrypt(const GmppkePrivateKey & sk,const PartialGmmppkeCT & ct);
     
+    void writeBytes(uint8_t *bytes) const
+    {
+        ct2.writeBytes(bytes, true); // compress
+        ct3.writeBytes(bytes+relicxx::G1::kCompactByteSize, true);
+        ::memcpy(bytes+2*relicxx::G1::kCompactByteSize, tag.data(), tag.size());
+    }
+
 protected:
     relicxx::G1 ct2;
     relicxx::G1 ct3;
@@ -179,8 +210,22 @@ protected:
 template <typename T>
 class GmmppkeCT: public PartialGmmppkeCT{
 public:
+    
+    static constexpr size_t kByteSize = PartialGmmppkeCT::kByteSize + sizeof(T);
+
     GmmppkeCT(){};
+    GmmppkeCT(const uint8_t *bytes) : PartialGmmppkeCT(bytes+sizeof(T))
+    {
+        ::memcpy(&ct1, bytes, sizeof(T));
+    };
     GmmppkeCT(const  PartialGmmppkeCT & c) : PartialGmmppkeCT(c){}
+
+    void writeBytes(uint8_t *bytes) const
+    {
+        ::memcpy(bytes, &ct1, sizeof(T));
+        PartialGmmppkeCT::writeBytes(bytes+sizeof(T));
+    }
+    
 protected:
     T ct1;
     

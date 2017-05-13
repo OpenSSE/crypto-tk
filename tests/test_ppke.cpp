@@ -30,7 +30,8 @@
 
 using namespace std;
 
-#define SERIALIZATION_TEST_COUNT 100
+#define SERIALIZATION_TEST_COUNT 500
+#define SERIALIZATION_PUNCT_COUNT 50
 #define ENCRYPTION_TEST_COUNT 50
 
 
@@ -100,7 +101,29 @@ void test_relic_serialization_G1()
 
 void test_ppke_serialization()
 {
+    sse::crypto::Prf<sse::crypto::kPrfOutputSize> key_prf;
     
+    sse::crypto::Gmppke ppke;
+    sse::crypto::GmppkePublicKey pk;
+    sse::crypto::GmppkePrivateKey sk;
+    sse::crypto::GmppkeSecretParameters sp;
+    
+    ppke.keygen(key_prf, pk, sk, sp);
+    
+
+    for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
+        
+        relicxx::ZR z((int)i);
+        
+        std::array<uint8_t, BN_BYTES> bytes;
+        z.writeBytes(bytes.data());
+        
+        relicxx::ZR y(bytes.data(), bytes.size());
+        
+        
+        BOOST_CHECK(z == y);
+    }
+
 }
 
 void test_relic_serialization_G2()
@@ -151,107 +174,67 @@ void test_pseudo_random_ppke()
     typedef uint64_t M_type;
     
     
-    //    size_t puncture_count = 10;
-    
-    //    std::vector<size_t> puncture_count_list = {0, 1, 2};
-    std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40};
-    
     size_t current_p_count = 0;
     
     std::vector<sse::crypto::GmppkePrivateKeyShare> keyshares;
     keyshares.push_back(ppke.sk0Gen(key_prf, sp, 0));
     
-    for (size_t p : puncture_count_list) {
-        
-        if (p > current_p_count) {
-            
-//            size_t n_punctures = p-current_p_count;
-//            std::cout << "Puncture the key " << n_punctures << " times...";
-            
-//            std::chrono::duration<double, std::milli> puncture_time(0);
-            
-            // add new punctures
-            for ( ; current_p_count < p; current_p_count++) {
-                sse::crypto::tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
-                punctured_tag[15] = current_p_count&0xFF;
-                punctured_tag[14] = (current_p_count>>8)&0xFF;
-                punctured_tag[13] = (current_p_count>>16)&0xFF;
-                punctured_tag[12] = (current_p_count>>24)&0xFF;
-                punctured_tag[11] = (current_p_count>>32)&0xFF;
-                punctured_tag[10] = (current_p_count>>40)&0xFF;
-                punctured_tag[9] = (current_p_count>>48)&0xFF;
-                //            punctured_tag[8] = (current_p_count>>56)&0xFF;
-                punctured_tag[8] = 0xFF;
-                
-//                auto t_start = std::chrono::high_resolution_clock::now();
-                
-                auto share = ppke.skShareGen(key_prf, sp, current_p_count+1, punctured_tag);
-                //                ppke.puncture(pk, sk, punctured_tag);
-                
-//                auto t_end = std::chrono::high_resolution_clock::now();
-                
-                keyshares.push_back(share);
-                
-//                puncture_time += t_end - t_start;
-                
-            }
-            
-//            std::cout << "Done\n";
-//            std::cout << "Average puncturing time: " << puncture_time.count()/n_punctures << " ms/puncture" << std::endl;
-            // update accordingly the first key share
-            keyshares[0] = ppke.sk0Gen(key_prf, sp, current_p_count);
-            
-        }
-//        std::chrono::duration<double, std::milli> encrypt_time(0);
-//        std::chrono::duration<double, std::milli> sp_encrypt_time(0);
-//        std::chrono::duration<double, std::milli> decrypt_time(0);
-        
-//        std::cout << "Running " << bench_count << " encryption/decryptions with " << current_p_count << " punctures...";
+    for ( ; current_p_count < SERIALIZATION_PUNCT_COUNT; current_p_count++) {
+        sse::crypto::tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+        punctured_tag[15] = current_p_count&0xFF;
+        punctured_tag[14] = (current_p_count>>8)&0xFF;
+        punctured_tag[13] = (current_p_count>>16)&0xFF;
+        punctured_tag[12] = (current_p_count>>24)&0xFF;
+        punctured_tag[11] = (current_p_count>>32)&0xFF;
+        punctured_tag[10] = (current_p_count>>40)&0xFF;
+        punctured_tag[9] = (current_p_count>>48)&0xFF;
+        punctured_tag[8] = 0xFF;
         
         
+        auto share = ppke.skShareGen(key_prf, sp, current_p_count+1, punctured_tag);
         
-        for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
-            M_type M;
-            
-            sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
-            
-            sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
-            tag[0] = i&0xFF;
-            tag[1] = (i>>8)&0xFF;
-            tag[2] = (i>>16)&0xFF;
-            tag[3] = (i>>24)&0xFF;
-            tag[4] = (i>>32)&0xFF;
-            tag[5] = (i>>40)&0xFF;
-            tag[6] = (i>>48)&0xFF;
-            tag[7] = (i>>56)&0xFF;
-            
-//            auto t_start = std::chrono::high_resolution_clock::now();
-            auto ct = ppke.encrypt<M_type>(pk, M, tag);
-//            auto t_end = std::chrono::high_resolution_clock::now();
-            
-//            encrypt_time += t_end - t_start;
-            
-//            t_start = std::chrono::high_resolution_clock::now();
-            auto ct2 = ppke.encrypt<M_type>(sp, M, tag);
-//            t_end = std::chrono::high_resolution_clock::now();
-            
-//            sp_encrypt_time += t_end - t_start;
-            
-//            t_start = std::chrono::high_resolution_clock::now();
-            M_type dec_M = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
-//            t_end = std::chrono::high_resolution_clock::now();
-//            decrypt_time += t_end - t_start;
-            
-            M_type dec_M2 = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
-            
-            BOOST_CHECK(M == dec_M);
-            BOOST_CHECK(M == dec_M2);
-        }
+        std::array<uint8_t, sse::crypto::GmppkePrivateKeyShare::kByteSize> share_data;
+        share.writeBytes(share_data.data());
         
-//        std::cout << "Done. \n";
-//        std::cout << "Encryption: " << encrypt_time.count()/bench_count << " ms" << std::endl;
-//        std::cout << "Encryption with secret: " << sp_encrypt_time.count()/bench_count << " ms" << std::endl;
-//        std::cout << "Decryption: " << decrypt_time.count()/bench_count << " ms" << std::endl;
-//        
+        sse::crypto::GmppkePrivateKeyShare serialized_share(share_data.data());
+        
+        BOOST_CHECK(share == serialized_share);
+        
+        keyshares.push_back(share);
+    }
+
+    keyshares[0] = ppke.sk0Gen(key_prf, sp, current_p_count);
+
+
+    std::array<uint8_t, sse::crypto::GmppkePrivateKeyShare::kByteSize> share_data;
+    keyshares[0].writeBytes(share_data.data());
+
+    sse::crypto::GmppkePrivateKeyShare serialized_share(share_data.data());
+    
+    BOOST_CHECK(keyshares[0] == serialized_share);
+
+
+    for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
+        M_type M;
+        
+        sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
+        
+        sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+        tag[0] = i&0xFF;
+        tag[1] = (i>>8)&0xFF;
+        tag[2] = (i>>16)&0xFF;
+        tag[3] = (i>>24)&0xFF;
+        tag[4] = (i>>32)&0xFF;
+        tag[5] = (i>>40)&0xFF;
+        tag[6] = (i>>48)&0xFF;
+        tag[7] = (i>>56)&0xFF;
+        
+        auto ct = ppke.encrypt<M_type>(pk, M, tag);
+
+        std::array<uint8_t, sse::crypto::GmmppkeCT<M_type>::kByteSize> ct_data;
+        ct.writeBytes(ct_data.data());
+        sse::crypto::GmmppkeCT<M_type> serialized_ct(ct_data.data());
+
+        BOOST_CHECK(ct == serialized_ct);
     }
 }

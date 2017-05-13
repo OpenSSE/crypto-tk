@@ -54,7 +54,7 @@
 #include "tests/test_block_hash.hpp"
 #include "tests/test_ppke.hpp"
 
-/*
+
 BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
 	test_generic_multiset_hash();
 }
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(prg) {
     test_prg();
     test_prg_consistency();
 }
-*/
+
 BOOST_AUTO_TEST_CASE(ppke) {
     test_relic_serialization_ZR();
     test_relic_serialization_G1();

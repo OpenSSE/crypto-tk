@@ -617,12 +617,12 @@ static void deterministic_key_ppke()
     
     typedef uint64_t M_type;
     
+    std::cout << "Key share size: " << sse::crypto::GmppkePrivateKeyShare::kByteSize << "B\n";
+    std::cout << "Ciphertext size: " << sse::crypto::GmmppkeCT<M_type>::kByteSize << "B\n";
     
-    //    size_t puncture_count = 10;
     size_t bench_count = 200;
     
-//    std::vector<size_t> puncture_count_list = {0, 1, 2};
-        std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40 , 50, 100};
+    std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40 , 50, 100};
     
     size_t current_p_count = 0;
     
@@ -654,7 +654,6 @@ static void deterministic_key_ppke()
                 auto t_start = std::chrono::high_resolution_clock::now();
                 
                 auto share = ppke.skShareGen(key_prf, sp, current_p_count+1, punctured_tag);
-//                ppke.puncture(pk, sk, punctured_tag);
                 
                 auto t_end = std::chrono::high_resolution_clock::now();
                 

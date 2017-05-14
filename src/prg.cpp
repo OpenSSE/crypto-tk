@@ -123,6 +123,11 @@ namespace sse
             return out;
         }
         
+        void Prg::derive(const uint32_t offset, const size_t len, unsigned char* out) const
+        {
+            prg_imp_->derive(offset,len, out);
+        }
+
         void Prg::derive(const uint8_t* k, const size_t len, std::string &out)
         {
             unsigned char *data = new unsigned char[len];

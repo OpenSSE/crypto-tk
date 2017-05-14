@@ -30,6 +30,10 @@
 		311934B51D27172A0031804B /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
 		311934B81D27F1F00031804B /* test_block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934B61D27F1F00031804B /* test_block_hash.cpp */; };
 		313CD4531EC719DD0058A0C5 /* test_ppke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD4511EC719DD0058A0C5 /* test_ppke.cpp */; };
+		313CD48D1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
+		313CD48E1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
+		313CD48F1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
+		313CD4901EC9034B0058A0C5 /* puncturable_enc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 313CD48C1EC9034B0058A0C5 /* puncturable_enc.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		316F0D3F1D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D401D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
@@ -238,6 +242,8 @@
 		311934B71D27F1F00031804B /* test_block_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_block_hash.hpp; sourceTree = "<group>"; };
 		313CD4511EC719DD0058A0C5 /* test_ppke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_ppke.cpp; sourceTree = "<group>"; };
 		313CD4521EC719DD0058A0C5 /* test_ppke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_ppke.hpp; sourceTree = "<group>"; };
+		313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = puncturable_enc.cpp; sourceTree = "<group>"; };
+		313CD48C1EC9034B0058A0C5 /* puncturable_enc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = puncturable_enc.hpp; sourceTree = "<group>"; };
 		315D453A1C98909A00590A01 /* test_tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_tdp.cpp; sourceTree = "<group>"; };
 		315D453B1C98909A00590A01 /* test_tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = test_tdp.hpp; sourceTree = "<group>"; };
 		316F0D3D1D25600700F87904 /* prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prg.cpp; sourceTree = "<group>"; };
@@ -437,6 +443,8 @@
 				6CC2D4041C3185D700334ADD /* cipher.cpp */,
 				6CC2D4051C3185D700334ADD /* cipher.hpp */,
 				6CC2D4061C3185D700334ADD /* ecmh */,
+				313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */,
+				313CD48C1EC9034B0058A0C5 /* puncturable_enc.hpp */,
 				310C2BCC1EC0B59700E80B3A /* ppke */,
 				6CC2D4411C3185D700334ADD /* fpe.cpp */,
 				6CC2D4421C3185D700334ADD /* fpe.hpp */,
@@ -701,12 +709,14 @@
 				6CC2D4CF1C3193E900334ADD /* random.hpp in Headers */,
 				6CF4160B1CB4FF1D00C448D4 /* utils.hpp in Headers */,
 				316F0D421D25600700F87904 /* prg.hpp in Headers */,
+				310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */,
 				311934B41D26B2360031804B /* block_hash.hpp in Headers */,
 				6CC2D50B1C31944A00334ADD /* bn.hpp in Headers */,
 				6CC2D5111C31945000334ADD /* enable_if.hpp in Headers */,
 				6CC2D4E41C31941500334ADD /* blake2s-round.h in Headers */,
 				6CC2D4FF1C31943300334ADD /* field_operation_helpers.hpp in Headers */,
 				6CC2D5101C31945000334ADD /* division.hpp in Headers */,
+				313CD4901EC9034B0058A0C5 /* puncturable_enc.hpp in Headers */,
 				6CC2D4FD1C31942F00334ADD /* solve_quadratic_blinded.hpp in Headers */,
 				6CC2D4EC1C31942700334ADD /* compress_point.hpp in Headers */,
 				6CC2D4E61C31941500334ADD /* blake2s.hpp in Headers */,
@@ -762,7 +772,6 @@
 				6CC2D5151C31945000334ADD /* print.hpp in Headers */,
 				6CC2D5121C31945000334ADD /* is_byte.hpp in Headers */,
 				6CC2D4DD1C31941000334ADD /* blake2b-round.h in Headers */,
-				310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */,
 				6CC2D4F31C31942F00334ADD /* batch_invert.hpp in Headers */,
 				6CC2D5161C31945000334ADD /* print_fwd.hpp in Headers */,
 				6CC2D5171C31945000334ADD /* static_repeat.hpp in Headers */,
@@ -940,6 +949,7 @@
 				6CC2D4991C318E0300334ADD /* blake2s.cpp in Sources */,
 				6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */,
 				6CC2D4901C318B1B00334ADD /* test_fpe.cpp in Sources */,
+				313CD48D1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				6CC2D4921C318B3500334ADD /* sha512.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -971,6 +981,7 @@
 				6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				310C2BDD1EC0B59700E80B3A /* common.c in Sources */,
 				6CC2D4AE1C318F2500334ADD /* GF2_127_63.cpp in Sources */,
+				313CD48E1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				6CC2D4B01C318F2500334ADD /* sha512.cpp in Sources */,
 				310C2BEB1EC0B98E00E80B3A /* util.cpp in Sources */,
 			);
@@ -988,6 +999,7 @@
 				6CC2D4D21C3193FA00334ADD /* aez.c in Sources */,
 				6CC2D4C81C3193E500334ADD /* fpe.cpp in Sources */,
 				311934B31D26B2360031804B /* block_hash.cpp in Sources */,
+				313CD48F1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				6CC2D4D81C31940B00334ADD /* sha512_base.c in Sources */,
 				6CC2D4F71C31942F00334ADD /* GF2_127_63.cpp in Sources */,
 				6CC2D4CA1C3193E900334ADD /* hash.cpp in Sources */,

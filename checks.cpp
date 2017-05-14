@@ -107,6 +107,8 @@ BOOST_AUTO_TEST_CASE(ppke) {
     test_ppke_serialization();
 
     test_pseudo_random_ppke();
+    
+    test_high_level_ppke();
 }
 
 int main(int argc, char* argv[], char* envp[])

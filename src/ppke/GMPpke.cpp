@@ -60,11 +60,11 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretPar
 
 void Gmppke::keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
 {
-    sse::crypto::Prf<kPrfOutputSize> prf(prf_key.data(), prf_key.size());
+    sse::crypto::Prf<kPPKEPrfOutputSize> prf(prf_key.data(), prf_key.size());
     keygen(prf, pk, sk, sp);
 }
 
-void Gmppke::keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
+void Gmppke::keygen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
 {
     paramgen(prf, sp);
     
@@ -88,7 +88,7 @@ void Gmppke::keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey
     keygenPartial(prf, alpha, pk, sk, sp);
 }
 
-void Gmppke::paramgen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkeSecretParameters &sp) const
+void Gmppke::paramgen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, GmppkeSecretParameters &sp) const
 {
     sp.alpha = group.pseudoRandomZR(prf, "param_alpha");
     sp.beta = group.pseudoRandomZR(prf, "param_beta");
@@ -134,7 +134,7 @@ void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivate
     return;
 }
 
-void Gmppke::keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const
+void Gmppke::keygenPartial(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const
 {
     pk.ppkeg1 =  group.exp(pk.gG2,alpha);
     
@@ -188,7 +188,7 @@ GmppkePrivateKeyShare Gmppke::skgen(const GmppkeSecretParameters &sp ) const{
     return share;
 }
 
-GmppkePrivateKeyShare Gmppke::skgen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp  ) const{
+GmppkePrivateKeyShare Gmppke::skgen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp  ) const{
     GmppkePrivateKeyShare share;
     share.sk4 = NULLTAG;
     //    const ZR r = group.randomZR();
@@ -204,7 +204,7 @@ GmppkePrivateKeyShare Gmppke::skgen(const sse::crypto::Prf<kPrfOutputSize> &prf,
     return share;
 }
 
-GmppkePrivateKeyShare Gmppke::sk0Gen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d) const{
+GmppkePrivateKeyShare Gmppke::sk0Gen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d) const{
     
     const ZR h = group.hashListToZR(NULLTAG);
     GmppkePrivateKeyShare sk_0;
@@ -241,7 +241,7 @@ GmppkePrivateKeyShare Gmppke::sk0Gen(const sse::crypto::Prf<kPrfOutputSize> &prf
     return sk_0;
 }
 
-GmppkePrivateKeyShare Gmppke::skShareGen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d, const tag_type& tag) const{
+GmppkePrivateKeyShare Gmppke::skShareGen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d, const tag_type& tag) const{
     
     const ZR h = group.hashListToZR(tag);
     GmppkePrivateKeyShare share;

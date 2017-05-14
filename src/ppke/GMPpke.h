@@ -25,7 +25,7 @@ namespace crypto
 
 constexpr static size_t kTagSize = 16;
 constexpr unsigned int kPPKEStatisticalSecurity = 32;
-constexpr static size_t kPrfOutputSize = relicxx::PairingGroup::kPrfOutputSize;
+constexpr static size_t kPPKEPrfOutputSize = relicxx::PairingGroup::kPrfOutputSize;
 
 typedef std::array<uint8_t, kTagSize> tag_type;
 
@@ -253,9 +253,9 @@ public:
     
     void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     void keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
-    void keygen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+    void keygen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     
-    void paramgen(const sse::crypto::Prf<kPrfOutputSize> &prf, GmppkeSecretParameters &sp) const;
+    void paramgen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, GmppkeSecretParameters &sp) const;
     
     void puncture(const GmppkePublicKey & pk, GmppkePrivateKey & sk, const tag_type & tag) const;
     
@@ -310,6 +310,16 @@ public:
         }
         return decrypt_unchecked(sk,ct);
     }
+    template <typename T>
+    bool decrypt(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct, T &m ) const
+    {
+        if (sk.isPuncturedOnTag(ct.tag)) {
+            return false;
+        }
+        m = decrypt_unchecked(sk,ct);
+        
+        return true;
+    }
     //For testing purposes only
     template <typename T>
     T decrypt_unchecked(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
@@ -325,8 +335,8 @@ public:
     }
     
     
-    GmppkePrivateKeyShare sk0Gen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d) const;
-    GmppkePrivateKeyShare skShareGen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d, const tag_type& tag) const;
+    GmppkePrivateKeyShare sk0Gen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d) const;
+    GmppkePrivateKeyShare skShareGen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d, const tag_type& tag) const;
     
 private:
     relicxx::PairingGroup group;
@@ -339,10 +349,10 @@ private:
     }
     
     void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
-    void keygenPartial(const sse::crypto::Prf<kPrfOutputSize> &prf, const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
+    void keygenPartial(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
     
     GmppkePrivateKeyShare skgen(const GmppkeSecretParameters &sp ) const;
-    GmppkePrivateKeyShare skgen(const sse::crypto::Prf<kPrfOutputSize> &prf, const GmppkeSecretParameters &sp ) const;
+    GmppkePrivateKeyShare skgen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp ) const;
 };
 
 }

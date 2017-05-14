@@ -164,7 +164,7 @@ namespace sse
         {
             init_locks();
             
-            __relic_handle = new relicxx::relicResourceHandle(false);
+            __relic_handle = new relicxx::relicResourceHandle(true);
 
         }
         void cleanup_crypto_lib()

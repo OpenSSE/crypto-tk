@@ -604,7 +604,7 @@ static void deterministic_key_ppke()
     for (size_t i = 0; i < master_key.size(); i++) {
         master_key[i] = 1 << i;
     }
-    sse::crypto::Prf<sse::crypto::kPrfOutputSize> key_prf(master_key.data(), master_key.size());
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key.data(), master_key.size());
 
     std::cout << "Deterministic key generation\n";
 

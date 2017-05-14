@@ -21,6 +21,7 @@
 #include "../tests/test_tdp.hpp"
 
 #include "../src/ppke/GMPpke.h"
+#include "../src/puncturable_enc.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -134,7 +135,7 @@ void test_relic_serialization_G2()
 
 void test_ppke_serialization()
 {
-    sse::crypto::Prf<sse::crypto::kPrfOutputSize> key_prf;
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
     
     sse::crypto::Gmppke ppke;
     sse::crypto::GmppkePublicKey pk;
@@ -213,7 +214,7 @@ void test_ppke_serialization()
 
 void test_pseudo_random_ppke()
 {
-    sse::crypto::Prf<sse::crypto::kPrfOutputSize> key_prf;
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
     
     sse::crypto::Gmppke ppke;
     sse::crypto::GmppkePublicKey pk;
@@ -280,5 +281,68 @@ void test_pseudo_random_ppke()
             BOOST_CHECK(M == dec_M);
             BOOST_CHECK(M == dec_M2);
         }
+    }
+}
+
+void test_high_level_ppke()
+{
+    std::array<uint8_t, 16> master_key;
+    for (size_t i = 0; i < master_key.size(); i++) {
+        master_key[i] = 1 << i;
+    }
+    
+    sse::crypto::PuncturableEncryption encryptor(master_key);
+
+    typedef uint64_t M_type;
+    
+    
+    size_t current_p_count = 0;
+    
+    sse::crypto::punct::punctured_key_type punctured_key;
+    punctured_key.push_back(encryptor.initial_keyshare(0));
+    
+    for ( ; current_p_count < 5; current_p_count++) {
+        sse::crypto::tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+        punctured_tag[15] = current_p_count&0xFF;
+        punctured_tag[14] = (current_p_count>>8)&0xFF;
+        punctured_tag[13] = (current_p_count>>16)&0xFF;
+        punctured_tag[12] = (current_p_count>>24)&0xFF;
+        punctured_tag[11] = (current_p_count>>32)&0xFF;
+        punctured_tag[10] = (current_p_count>>40)&0xFF;
+        punctured_tag[9] = (current_p_count>>48)&0xFF;
+        punctured_tag[8] = 0xFF;
+        
+        
+        auto share = encryptor.inc_puncture(current_p_count+1, punctured_tag);
+        
+        punctured_key.push_back(share);
+    }
+    
+    punctured_key[0] = encryptor.initial_keyshare(current_p_count);
+    
+    
+    sse::crypto::PuncturableDecryption decryptor(punctured_key);
+
+    for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
+        M_type M = i, dec_M;
+        
+//        sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
+        
+        sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+        tag[0] = i&0xFF;
+        tag[1] = (i>>8)&0xFF;
+        tag[2] = (i>>16)&0xFF;
+        tag[3] = (i>>24)&0xFF;
+        tag[4] = (i>>32)&0xFF;
+        tag[5] = (i>>40)&0xFF;
+        tag[6] = (i>>48)&0xFF;
+        tag[7] = (i>>56)&0xFF;
+        
+        auto ct = encryptor.encrypt(M, tag);
+        bool success = decryptor.decrypt(ct, dec_M);
+
+        BOOST_CHECK(success);
+        BOOST_CHECK(M == dec_M);
+
     }
 }

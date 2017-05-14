@@ -64,6 +64,7 @@ namespace sse
 
             void derive(const uint32_t offset, const size_t len, std::string &out) const;
             std::string derive(const uint32_t offset, const size_t len) const;
+            void derive(const uint32_t offset, const size_t len, unsigned char* out) const;
 
             static void derive(const uint8_t* k, const size_t len, std::string &out);
             static void derive(const std::array<uint8_t,kKeySize>& k, const size_t len, std::string &out);

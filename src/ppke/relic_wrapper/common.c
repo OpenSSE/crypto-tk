@@ -4,7 +4,7 @@
 int compute_length(int type)
 {
 	switch(type) {
-		case ZR_t: return BN_BYTES + 1; // null bytes included
+		case ZR_t: return RELIC_BN_BYTES + 1; // null bytes included
 		case G1_t: return G1_LEN; // (FP_BYTES * 2) + 2;
 		case G2_t: return G2_LEN; // (FP_BYTES * 4) + 4;
 		case GT_t: return GT_LEN; // (FP_BYTES * 12) + 12;

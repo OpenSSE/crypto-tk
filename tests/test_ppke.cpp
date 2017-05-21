@@ -42,7 +42,7 @@ void test_relic_serialization_ZR()
         
         relicxx::ZR z((int)i);
         
-        std::array<uint8_t, BN_BYTES> bytes;
+        std::array<uint8_t, RELIC_BN_BYTES> bytes;
         z.writeBytes(bytes.data());
         
         relicxx::ZR y(bytes.data(), bytes.size());
@@ -57,7 +57,7 @@ void test_relic_serialization_ZR()
         
         relicxx::ZR z = group.randomZR();
         
-        std::array<uint8_t, BN_BYTES> bytes;
+        std::array<uint8_t, RELIC_BN_BYTES> bytes;
         z.writeBytes(bytes.data());
         
         relicxx::ZR y(bytes.data(), bytes.size());

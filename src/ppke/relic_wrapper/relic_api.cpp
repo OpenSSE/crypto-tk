@@ -68,7 +68,7 @@ ZR::ZR(const uint8_t *bytes,size_t len)
 
 void ZR::writeBytes(uint8_t *bytes) const
 {
-    bn_write_bin(bytes, BN_BYTES, z);
+    bn_write_bin(bytes, RELIC_BN_BYTES, z);
 }
 
     
@@ -186,8 +186,8 @@ bool ZR::ismember(void) const
 }
 
 std::vector<uint8_t> ZR::getBytes() const {
-	std::vector<uint8_t>data(BN_BYTES);
-	bn_write_bin(&data[0], BN_BYTES, z);
+	std::vector<uint8_t>data(RELIC_BN_BYTES);
+	bn_write_bin(&data[0], RELIC_BN_BYTES, z);
 	return data;
 }
 

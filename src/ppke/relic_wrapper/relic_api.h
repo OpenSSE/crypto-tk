@@ -466,7 +466,7 @@ public:
 	~PairingGroup();
 
     constexpr static unsigned int kStatisticalSecurity = 32;
-    constexpr static unsigned int kPrfOutputSize = BN_BYTES + kStatisticalSecurity/8;
+    constexpr static unsigned int kPrfOutputSize = RELIC_BN_BYTES + kStatisticalSecurity/8;
 
 	ZR randomZR() const;
     ZR pseudoRandomZR(const sse::crypto::Prf<kPrfOutputSize> &prf, const std::string &seed) const;

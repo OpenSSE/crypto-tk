@@ -1,5 +1,5 @@
 before_script:
-  - apt-get update -qq && apt-get install -y -qq libssl-dev scons yasm libgmp-dev
+  - apt-get update -qq && apt-get install -y -qq libssl-dev scons yasm libgmp-dev cmake
   - wget -q http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz; tar xf boost_1_60_0.tar.gz ; mv boost_1_60_0/boost src/.
   - ./install_relic.sh
  

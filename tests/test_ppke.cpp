@@ -26,6 +26,8 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <memory>
+
 
 #include "boost_test_include.hpp"
 

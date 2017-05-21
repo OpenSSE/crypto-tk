@@ -14,8 +14,6 @@ crypto:
   - scons
   
 check:
-  except:
-    - ppke
   stage: test
   script:
   - scons check_ci  

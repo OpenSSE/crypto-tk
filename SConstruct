@@ -122,6 +122,8 @@ Clean('lib', 'library')
 
 
 test_env = env.Clone()
+test_env.Append(LIBS = ['pthread'])
+
 test_objects = SConscript('tests/build.scons', exports='test_env', variant_dir='build_test', duplicate=0)
 
 Clean(test_objects, 'build_test')

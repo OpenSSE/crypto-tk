@@ -18,7 +18,6 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/test_fpe.hpp"
 #include "../src/fpe.hpp"
 
 

@@ -18,7 +18,6 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/test_block_hash.hpp"
 #include "../src/block_hash.hpp"
 
 #include <array>

@@ -26,8 +26,6 @@
  *
  ********/
 
-#include "../tests/encryption.hpp"
-
 #include "../src/cipher.hpp"
 
 

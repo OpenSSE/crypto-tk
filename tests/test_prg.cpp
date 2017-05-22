@@ -18,8 +18,6 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/test_prg.hpp"
-
 #include "../src/prg.hpp"
 #include "../src/random.hpp"
 

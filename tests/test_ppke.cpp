@@ -18,8 +18,6 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/test_tdp.hpp"
-
 #include "../src/ppke/GMPpke.h"
 #include "../src/puncturable_enc.hpp"
 

@@ -27,7 +27,7 @@
 #include <iostream>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 template <size_t N, class MSH>
 void test_ecmh_with_size(MSH const &msh) {

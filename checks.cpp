@@ -20,7 +20,7 @@
 
 
 #include "src/utils.hpp"
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 //  Google Test takes care of everything
 //  Tests are automatically registered and run

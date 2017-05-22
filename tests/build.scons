@@ -1,6 +1,6 @@
 Import('*')
 
 files = Glob('*.cpp')
-objs = env.Object(files, CPPPATH = ['../src/'])
+objs = test_env.Object(files, CPPPATH = ['../src/','../'])
 
 Return('objs')

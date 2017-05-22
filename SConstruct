@@ -79,10 +79,8 @@ bld = Builder(action = run_test)
 env.Append(BUILDERS = {'Test' :  bld})
 
 objects = SConscript('src/build.scons', exports='env', variant_dir='build', duplicate=0)
-test_objects = SConscript('tests/build.scons', exports='env', variant_dir='build_test', duplicate=0)
 
 Clean(objects, 'build')
-Clean(test_objects, 'build_test')
 
 debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = smart_concat(['src'], env.get('CPPPATH')))
 
@@ -111,44 +109,31 @@ Clean('lib', 'library')
 # Alias('lib', [lib_install] + headers_lib)
 
 
-check_obj_ci = env.Object(source = 'checks.cpp', target = 'check_ci.o', CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
-                                CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
-test_prog_ci = env.Program('check_ci', check_obj_ci + objects + test_objects, 
-                                CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
-                                CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
-
-test_run_ci = env.Test('test_run_ci', test_prog_ci)
-Depends(test_run_ci, test_prog_ci)
-
-env.Alias('check_ci', [test_prog_ci, test_run_ci])
+# check_obj_ci = env.Object(source = 'checks.cpp', target = 'check_ci.o', CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
+#                                 CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
+# test_prog_ci = env.Program('check_ci', check_obj_ci + objects + test_objects,
+#                                 CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
+#                                 CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
+#
+# test_run_ci = env.Test('test_run_ci', test_prog_ci)
+# Depends(test_run_ci, test_prog_ci)
+#
+# env.Alias('check_ci', [test_prog_ci, test_run_ci])
 
 
 test_env = env.Clone()
+test_objects = SConscript('tests/build.scons', exports='test_env', variant_dir='build_test', duplicate=0)
 
-if not test_env.GetOption('clean'):
-    conf = Configure(test_env)
-    if conf.CheckLib('boost_unit_test_framework'):
-        print 'Found boost unit test framework'
+Clean(test_objects, 'build_test')
 
-        test_env.Append(LIBS = ['boost_unit_test_framework'])
+gtest_obj = test_env.Object('gtest/gtest-all.cc', CPPPATH=['.'])
 
-        test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects)
+test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects + gtest_obj)
 
-        test_run = test_env.Test('test_run', test_prog)
-        Depends(test_run, test_prog)
-
-        test_env.Alias('check', [test_prog, test_run])
-
-        # Depends([shared_lib, static_lib, headers_lib], test_run)
-        # Depends([static_lib, shared_lib, headers_lib], test_run)
-
-    else:
-        print 'boost unit test framework not found'
-        print 'Skipping checks. Be careful!'
-    test_env = conf.Finish()
+test_run = test_env.Test('test_run', test_prog)
+Depends(test_run, test_prog)
+test_env.Alias('check', [test_prog, test_run])
 
 test_env.Clean('check', ['check'] + objects)
-
-
 
 

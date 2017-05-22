@@ -27,7 +27,7 @@
 #include <string>
 #include <algorithm>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 
 TEST(block_hash_aes, test_vector)

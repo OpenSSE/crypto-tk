@@ -28,7 +28,7 @@
 #include <string>
 #include <algorithm>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #define TEST_COUNT 100
 

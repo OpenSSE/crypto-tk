@@ -34,7 +34,7 @@
 #include <string>
 #include <array>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 using namespace std;
 

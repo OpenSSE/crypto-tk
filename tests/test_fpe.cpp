@@ -26,13 +26,12 @@
 #include <iomanip>
 #include <string>
 
-#include "boost_test_include.hpp"
+#include "gtest/gtest.h"
 
 using namespace std;
 
 
-void fpe_correctness_test()
-{
+TEST(fpe, correctness) {
 	string in_enc = "This is a test input.";
 	string out_enc, out_dec;
 	
@@ -42,46 +41,12 @@ void fpe_correctness_test()
 	sse::crypto::Fpe fpe(k);
 	fpe.encrypt(in_enc, out_enc);
 	
-	BOOST_CHECK(in_enc.length() == out_enc.length());
+	ASSERT_EQ(in_enc.length(), out_enc.length());
 	
 	string in_dec = string(out_enc);
 	
 	fpe.decrypt(in_dec, out_dec);
 	
-	BOOST_CHECK(in_dec.length() == out_dec.length());
-	BOOST_CHECK(in_enc == out_dec);
-	
-	
-	if(in_enc != out_dec){
-		cout << "Decryption output does not match original input\n";
-		
-		cout << "Original input: ( " << dec << in_enc.size() << " bytes) \n";
-		for(uint8_t c : in_enc)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Encryption output : ( " << dec << out_enc.size() << " bytes) \n";
-		for(uint8_t c : out_enc)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Decryption input : ( " << dec << in_dec.size() << " bytes) \n";
-		for(uint8_t c : in_dec)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Decryption Output: ( " << dec << out_dec.size() << " bytes) \n";
-		for(uint8_t c : out_dec)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	}
-	// cout << "Encryption/decryption test succeeded!\n";
+    ASSERT_EQ(in_dec.length(), out_dec.length());
+	ASSERT_EQ(in_enc, out_dec);
 }

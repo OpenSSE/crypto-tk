@@ -18,18 +18,16 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/test_ecmh.hpp"
-
 #include "ecmh/binary_elliptic_curve/GLS254.hpp"
 #include "ecmh/multiset_hash/ECMH.hpp"
 #include "../src/set_hash.hpp"
 #include "hash.hpp"
 #include "random.hpp"
 
-#include "boost_test_include.hpp"
-
 #include <iostream>
 #include <vector>
+
+#include "gtest/gtest.h"
 
 template <size_t N, class MSH>
 void test_ecmh_with_size(MSH const &msh) {
@@ -44,18 +42,18 @@ void test_ecmh_with_size(MSH const &msh) {
 
     State I = initial_state(msh);
 
-#define REQUIRE_HEX_EQUAL(a, b) BOOST_REQUIRE_EQUAL(to_hex(msh, a), to_hex(msh, b))
+#define REQUIRE_HEX_EQUAL(a, b) ASSERT_EQ(to_hex(msh, a), to_hex(msh, b))
 
     // Hex
     {
       State a = I;
-      BOOST_REQUIRE(equal(msh, a, from_hex(msh, to_hex(msh, a))));
+      ASSERT_TRUE(equal(msh, a, from_hex(msh, to_hex(msh, a))));
       REQUIRE_HEX_EQUAL(a, from_hex(msh, to_hex(msh, a)));
 
       add(msh, a, examples[0]);
       add(msh, a, examples[1]);
       remove(msh, a, examples[2]);
-      BOOST_REQUIRE(equal(msh, a, from_hex(msh, to_hex(msh, a))));
+      ASSERT_TRUE(equal(msh, a, from_hex(msh, to_hex(msh, a))));
       REQUIRE_HEX_EQUAL(a, from_hex(msh, to_hex(msh, a)));
     }
 
@@ -69,10 +67,10 @@ void test_ecmh_with_size(MSH const &msh) {
       add(msh, b, examples[0]);
 
       REQUIRE_HEX_EQUAL(a, b);
-      BOOST_REQUIRE(equal(msh, a, b));
-      BOOST_REQUIRE(equal(msh, b, a));
-      BOOST_REQUIRE(!equal(msh, b, I));
-      BOOST_REQUIRE(!equal(msh, I, a));
+      ASSERT_TRUE(equal(msh, a, b));
+      ASSERT_TRUE(equal(msh, b, a));
+      ASSERT_TRUE(!equal(msh, b, I));
+      ASSERT_TRUE(!equal(msh, I, a));
     }
 
     // Associative
@@ -91,8 +89,8 @@ void test_ecmh_with_size(MSH const &msh) {
       add_hash(msh, c, d);
 
       REQUIRE_HEX_EQUAL(a, c);
-      BOOST_REQUIRE(equal(msh, a, c));
-      BOOST_REQUIRE(equal(msh, c, a));
+      ASSERT_TRUE(equal(msh, a, c));
+      ASSERT_TRUE(equal(msh, c, a));
     }
 
     // Inverse property
@@ -101,20 +99,20 @@ void test_ecmh_with_size(MSH const &msh) {
       add(msh, a, examples[0]);
       add(msh, a, examples[1]);
 
-      BOOST_REQUIRE(to_hex(msh, a) != to_hex(msh, I));
-      BOOST_REQUIRE(!equal(msh, a, I));
+      ASSERT_TRUE(to_hex(msh, a) != to_hex(msh, I));
+      ASSERT_TRUE(!equal(msh, a, I));
 
       State b = invert(msh, a);
 
       add_hash(msh, b, a);
       REQUIRE_HEX_EQUAL(b, I);
-      BOOST_REQUIRE(equal(msh, b, I));
+      ASSERT_TRUE(equal(msh, b, I));
 
       State c = a;
       remove(msh, c, examples[0]);
       remove(msh, c, examples[1]);
       REQUIRE_HEX_EQUAL(c, I);
-      BOOST_REQUIRE(equal(msh, c, I));
+      ASSERT_TRUE(equal(msh, c, I));
     }
 
     // Identity
@@ -126,12 +124,12 @@ void test_ecmh_with_size(MSH const &msh) {
       State b = a;
       add_hash(msh, b, I);
       REQUIRE_HEX_EQUAL(a, b);
-      BOOST_REQUIRE(equal(msh, a, b));
+      ASSERT_TRUE(equal(msh, a, b));
 
       State c = a;
       remove_hash(msh, c, I);
       REQUIRE_HEX_EQUAL(a, c);
-      BOOST_REQUIRE(equal(msh, a, c));
+      ASSERT_TRUE(equal(msh, a, c));
     }
 
     // Batch add
@@ -142,7 +140,7 @@ void test_ecmh_with_size(MSH const &msh) {
       for (auto &&e : examples)
         add(msh, b, e);
       REQUIRE_HEX_EQUAL(a, b);
-      BOOST_REQUIRE(equal(msh, a, b));
+      ASSERT_TRUE(equal(msh, a, b));
     }
 
     // Batch remove
@@ -153,7 +151,7 @@ void test_ecmh_with_size(MSH const &msh) {
       for (auto &&e : examples)
         remove(msh, b, e);
       REQUIRE_HEX_EQUAL(a, b);
-      BOOST_REQUIRE(equal(msh, a, b));
+      ASSERT_TRUE(equal(msh, a, b));
     }
 
   }
@@ -174,13 +172,13 @@ void test_generic_multiset_hash_with_size() {
 	const SetHash I;
     // State I = initial_state(msh);
 
-#define REQUIRE_HEX_EQUAL_MH(a, b) BOOST_REQUIRE_EQUAL(a.hex(), b.hex())
+#define REQUIRE_HEX_EQUAL_MH(a, b) ASSERT_EQ(a.hex(), b.hex())
 
     // Hex
 	{
 		SetHash a = I;
 		SetHash b(SetHash(a.hex()));
-		BOOST_REQUIRE_EQUAL(a,b);
+		ASSERT_EQ(a,b);
 		REQUIRE_HEX_EQUAL_MH(a, b);
 
 		a.add_element(examples[0]);
@@ -188,7 +186,7 @@ void test_generic_multiset_hash_with_size() {
 		a.remove_element(examples[2]);
 
 		b = SetHash(a.hex());
-		BOOST_REQUIRE_EQUAL(a,b);
+		ASSERT_EQ(a,b);
 		REQUIRE_HEX_EQUAL_MH(a, b);
     }
 
@@ -202,10 +200,10 @@ void test_generic_multiset_hash_with_size() {
 		b.add_element(examples[0]);
 
 		REQUIRE_HEX_EQUAL_MH(a, b);
-		BOOST_REQUIRE_EQUAL(a, b);
-		BOOST_REQUIRE_EQUAL(b, a);
-		BOOST_REQUIRE((b != I));
-		BOOST_REQUIRE((I != a));
+		ASSERT_EQ(a, b);
+		ASSERT_EQ(b, a);
+		ASSERT_TRUE((b != I));
+		ASSERT_TRUE((I != a));
     }
 
     // Associative
@@ -224,8 +222,8 @@ void test_generic_multiset_hash_with_size() {
 		c.add_set(d);
 
 		REQUIRE_HEX_EQUAL_MH(a, c);
-		BOOST_REQUIRE(a == c);
-		BOOST_REQUIRE(c == a);
+		ASSERT_EQ(a, c);
+		ASSERT_EQ(c, a);
 	}
   
 	// Inverse property
@@ -237,20 +235,20 @@ void test_generic_multiset_hash_with_size() {
 		// BOOST_REQUIRE(to_hex(msh, a) != to_hex(msh, I));
 		// BOOST_REQUIRE(!equal(msh, a, I));
 
-		BOOST_REQUIRE(a.hex() != I.hex());
-		BOOST_REQUIRE(a != I);
+		ASSERT_TRUE(a.hex() != I.hex());
+		ASSERT_TRUE(a != I);
 		
 		SetHash b = a.invert_set();
 		
 		b.add_set(a);
 		REQUIRE_HEX_EQUAL_MH(b, I);
-		BOOST_REQUIRE(b == I);
+		ASSERT_TRUE(b == I);
 
 		SetHash c = a;
 		c.remove_element(examples[0]);
 		c.remove_element(examples[1]);
 		REQUIRE_HEX_EQUAL_MH(c, I);
-		BOOST_REQUIRE(c == I);
+		ASSERT_TRUE(c == I);
 	}
 
     // Identity
@@ -263,12 +261,12 @@ void test_generic_multiset_hash_with_size() {
 		SetHash b = a;
 		b.add_set(I);
 		REQUIRE_HEX_EQUAL_MH(a, b);
-		BOOST_REQUIRE(a == b);
+		ASSERT_TRUE(a == b);
 
 		SetHash c = a;
 		c.remove_set(I);
 		REQUIRE_HEX_EQUAL_MH(a, c);
-		BOOST_REQUIRE(a == c);
+		ASSERT_TRUE(a == c);
     }
 	
     // Batch add
@@ -280,7 +278,7 @@ void test_generic_multiset_hash_with_size() {
 		  b.add_element(e);
 	  
       REQUIRE_HEX_EQUAL_MH(a, b);
-      BOOST_REQUIRE(a == b);
+      ASSERT_TRUE(a == b);
     }
 	
   }
@@ -299,14 +297,38 @@ public:
 	
 };
 
-void test_generic_multiset_hash() {
-	
+TEST(set_hash, ecmh_10)
+{
     jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,TestHash, false> ecmh;
     test_ecmh_with_size<10>(ecmh);
+}
+
+TEST(set_hash, ecmh_100)
+{
+    jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,TestHash, false> ecmh;
     test_ecmh_with_size<100>(ecmh);
+}
+
+TEST(set_hash, ecmh_150)
+{
+    jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,TestHash, false> ecmh;
     test_ecmh_with_size<150>(ecmh);
-  
+}
+
+TEST(set_hash, generic_hash_10)
+{
+    jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,TestHash, false> ecmh;
     test_generic_multiset_hash_with_size<10>();
+}
+
+TEST(set_hash, generic_hash_100)
+{
+    jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,TestHash, false> ecmh;
     test_generic_multiset_hash_with_size<100>();
+}
+
+TEST(set_hash, generic_hash_150)
+{
+    jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,TestHash, false> ecmh;
     test_generic_multiset_hash_with_size<150>();
 }

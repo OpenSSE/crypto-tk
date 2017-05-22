@@ -1,8 +1,9 @@
 before_script:
-  - apt-get update -qq && apt-get install -y -qq libssl-dev scons yasm
-  - wget -q http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz; tar xf boost_1_60_0.tar.gz ; mv boost_1_60_0/boost src/.
+  - apt-get update -qq && apt-get install -y -qq libssl-dev scons yasm libgmp-dev
+  - ./install_relic.sh
  
 stages:
+
   - build
   - test
   
@@ -14,5 +15,5 @@ crypto:
 check:
   stage: test
   script:
-  - scons check_ci  
-  - scons check_ci no_aesni=1
+  - scons check  
+  - scons check no_aesni=1

@@ -19,6 +19,3 @@
 //
 
 #pragma once
-
-
-void fpe_correctness_test();

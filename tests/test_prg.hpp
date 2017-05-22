@@ -19,6 +19,3 @@
 //
 
 #pragma once
-
-void test_prg();
-void test_prg_consistency();

@@ -18,23 +18,21 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/test_tdp.hpp"
-
 #include "../src/tdp.hpp"
 
 #include <iostream>
 #include <iomanip>
 #include <string>
 
-#include "boost_test_include.hpp"
+#include "gtest/gtest.h"
 
 using namespace std;
 
-#define TEST_COUNT 10
+#define TEST_COUNT 30
 #define POOL_COUNT 20
-#define INV_MULT_COUNT 1000
+#define INV_MULT_COUNT 100
 
-void tdp_correctness_test()
+TEST(tdp, correctness)
 {
     for (size_t i = 0; i < TEST_COUNT; i++) {
         sse::crypto::TdpInverse tdp_inv;
@@ -50,11 +48,11 @@ void tdp_correctness_test()
         
         string dec = tdp_inv.invert(enc);
         
-        BOOST_CHECK(sample == dec);
+        ASSERT_EQ(sample, dec);
     }
 }
 
-void tdp_functional_test()
+TEST(tdp, inverse_correctness)
 {
     for (size_t i = 0; i < TEST_COUNT; i++) {
         sse::crypto::TdpInverse tdp_inv;
@@ -76,12 +74,12 @@ void tdp_functional_test()
         }
         
         
-        BOOST_CHECK(sample == v);
+        ASSERT_EQ(sample, v);
     }
 }
 
 
-void tdp_mult_eval_test()
+TEST(tdp, multiple_eval)
 {
     for (size_t i = 0; i < TEST_COUNT; i++) {
         sse::crypto::TdpInverse tdp_inv;
@@ -99,13 +97,13 @@ void tdp_mult_eval_test()
             v1 = pool.eval(sample, j);
             v2 = tdp_inv.eval(v2);
 
-            BOOST_CHECK(v1 == v2);
+            ASSERT_EQ(v1, v2);
         }
         
     }
 }
 
-void tdp_mult_inv_test()
+TEST(tdp, multiple_inverse_1)
 {
     for (size_t i = 0; i < TEST_COUNT; i++) {
         sse::crypto::TdpInverse tdp_inv;
@@ -124,12 +122,12 @@ void tdp_mult_inv_test()
         for (size_t j = 0; j < INV_MULT_COUNT; j++) {
             v = tdp_inv.invert(v);
         }
-        BOOST_CHECK(goal == v);
+        ASSERT_EQ(goal, v);
         
     }
 }
 
-void tdp_full_mult_inv_test()
+TEST(tdp, multiple_inverse_2)
 {
         sse::crypto::TdpInverse tdp_inv;
         
@@ -140,30 +138,12 @@ void tdp_full_mult_inv_test()
         
         string sample = tdp_inv.sample();
         string v1, v2;
-        
-//        goal = tdp_inv.invert_mult(sample, INV_MULT_COUNT);
     
         v2 = sample;
         for (uint32_t j = 0; j < INV_MULT_COUNT; j++) {
             v2 = tdp_inv.invert(v2);
             v1 = tdp_inv.invert_mult(sample, j+1);
-            BOOST_CHECK(v1 == v2);
-            
-            if (v1 != v2) {
-                std::cout << j+1 << std::endl;
-                for(unsigned char c : v1)
-                {
-                    cout << hex << setw(2) << setfill('0') << (uint) c;
-                }
-                cout << "\n\n";
-                for(unsigned char c : v2)
-                {
-                    cout << hex << setw(2) << setfill('0') << (uint) c;
-                }
-                cout << "\n==================";
-                cout << "\n\n";
-
-            }
+            ASSERT_EQ(v1, v2);
         }
     
 }

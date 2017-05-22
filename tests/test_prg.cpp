@@ -28,11 +28,11 @@
 #include <string>
 #include <algorithm>
 
-#include "boost_test_include.hpp"
+#include "gtest/gtest.h"
 
-#define TEST_COUNT 10
+#define TEST_COUNT 100
 
-void test_prg()
+TEST(prg, offset_1)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     for (size_t i = 0; i < TEST_COUNT; i++) {
@@ -47,9 +47,13 @@ void test_prg()
         out1 = prg.derive(32);
         out2 = prg.derive(16,16);
         
-        BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+16));
-
+        ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
+        
     }
+}
+TEST(prg, offset_2)
+{
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
         sse::crypto::random_bytes(k);
@@ -61,8 +65,13 @@ void test_prg()
         out1 = prg.derive(32);
         out2 = prg.derive(15,16);
         
-        BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+15));
+        ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+15));
     }
+}
+
+TEST(prg, offset_3)
+{
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
         sse::crypto::random_bytes(k);
@@ -76,14 +85,14 @@ void test_prg()
         out3 = prg.derive(32);
         out4 = prg.derive(16,16);
         
-        BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+17));
-        BOOST_CHECK(std::equal(out3.begin(), out3.end(), out1.begin()));
-        BOOST_CHECK(std::equal(out2.begin(), out2.end()-1, out4.begin()+1));
+        ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+17));
+        ASSERT_TRUE(std::equal(out3.begin(), out3.end(), out1.begin()));
+        ASSERT_TRUE(std::equal(out2.begin(), out2.end()-1, out4.begin()+1));
     }
 }
 
 
-void test_prg_consistency()
+TEST(prg, consistency_1)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     
@@ -98,8 +107,14 @@ void test_prg_consistency()
         out1 = prg.derive(32);
         out2 = sse::crypto::Prg::derive(k,16,16);
         
-        BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+16));
+        ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
+}
+
+TEST(prg, consistency_2)
+{
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+
     for (size_t i = 0; i < TEST_COUNT; i++) {
                 
         sse::crypto::random_bytes(k);
@@ -111,6 +126,6 @@ void test_prg_consistency()
         out1 = prg.derive(64);
         out2 = sse::crypto::Prg::derive(k,16,64-16);
       
-        BOOST_CHECK(std::equal(out2.begin(), out2.end(), out1.begin()+16));
+        ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
 }

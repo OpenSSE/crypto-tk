@@ -18,7 +18,16 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/test_hmac.hpp"
+/*******
+ *  prf_mac.cpp
+ *
+ *  Implementation of the HMAC's test vector verification.
+ *  Reference vectors are taken from RFC 4231 [https://tools.ietf.org/html/rfc4231]
+ *  Only the first four test cases are implemented:
+ *  the HMAC-based PRF implementation does not support keys larger than 64 bytes
+ ********/
+
+//#include "../tests/test_hmac.hpp"
 
 #include "../src/hmac.hpp"
 #include "../src/hash/sha512.hpp"
@@ -28,16 +37,19 @@
 #include <iomanip>
 #include <string>
 
+#include "gtest/gtest.h"
+
 using namespace std;
 
 typedef sse::crypto::HMac<sse::crypto::hash::sha512> HMAC_SHA512;
 
-bool hmac_tests()
-{
-	return hmac_test_case_1() && hmac_test_case_2() && hmac_test_case_3() && hmac_test_case_4();
-}
+//bool hmac_tests()
+//{
+//	return hmac_test_case_1() && hmac_test_case_2() && hmac_test_case_3() && hmac_test_case_4();
+//}
 
-bool hmac_test_case_1() {
+TEST(hmac_sha_512, test_vector_1)
+{
 
 	array<uint8_t,HMAC_SHA512::kKeySize> k;
 	k.fill(0x0b);
@@ -56,30 +68,11 @@ bool hmac_test_case_1() {
 								}};
 	
 	
-	if(result_64 != reference){
-		cout << "HMAC Test case 1 failed!\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : result_64)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	// cout << "HMAC Test case 1 succeeded!\n";
-	return true;	
+    ASSERT_EQ(result_64, reference);
 }
 
-bool hmac_test_case_2() {
-
+TEST(hmac_sha_512, test_vector_2)
+{
 	array<uint8_t,4> k = {{ 0x4a, 0x65, 0x66, 0x65}};
 	
 	
@@ -100,30 +93,11 @@ bool hmac_test_case_2() {
 									}};
 	
 	
-	if(result_64 != reference){
-		cout << "HMAC Test case 2 failed!\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : result_64)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	// cout << "HMAC Test case 2 succeeded!\n";
-	return true;	
+    ASSERT_EQ(result_64, reference);
 }
 
-bool hmac_test_case_3() {
-
+TEST(hmac_sha_512, test_vector_3)
+{
 	array<uint8_t,HMAC_SHA512::kKeySize> k;
 	k.fill(0xaa);
 	
@@ -143,31 +117,12 @@ bool hmac_test_case_3() {
 									}};
 	
 	
-	if(result_64 != reference){
-		cout << "HMAC Test case 3 failed!\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : result_64)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	// cout << "HMAC Test case 3 succeeded!\n";
-	return true;	
+    ASSERT_EQ(result_64, reference);
 }
 
-bool hmac_test_case_4() {
-
-	array<uint8_t,25> k = {{ 	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 
+TEST(hmac_sha_512, test_vector_4)
+{
+	array<uint8_t,25> k = {{ 	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
 								0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19}};
 	
 	
@@ -186,25 +141,6 @@ bool hmac_test_case_4() {
 									}};
 	
 	
-	if(result_64 != reference){
-		cout << "HMAC Test case 4 failed!\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : result_64)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	// cout << "HMAC Test case 4 succeeded!\n";
-	return true;	
+    ASSERT_EQ(result_64, reference);
 }
 

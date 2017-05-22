@@ -18,104 +18,19 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE CRYPTO
 
-#define BOOST_TEST_NO_MAIN
-#define BOOST_TEST_ALTERNATIVE_INIT_API
+#include "src/utils.hpp"
+#include <gtest/gtest.h>
 
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverloaded-virtual"
-#pragma GCC diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wredundant-decls"
-#pragma GCC diagnostic ignored "-Wmissing-declarations"
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
-#pragma GCC diagnostic ignored "-Wcast-qual"
-
-
-#ifdef UNIT_TEST_SINGLE_HEADER
-#include <boost/test/included/unit_test.hpp>
-#else
-#include <boost/test/unit_test.hpp>
-#endif 
-
-#pragma GCC diagnostic pop
-
-#include "src/utils.hpp";
-
-#include "tests/test_ecmh.hpp"
-#include "tests/hashing.hpp"
-#include "tests/test_hmac.hpp"
-#include "tests/encryption.hpp"
-#include "tests/test_fpe.hpp"
-#include "tests/test_tdp.hpp"
-#include "tests/test_prg.hpp"
-#include "tests/test_block_hash.hpp"
-#include "tests/test_ppke.hpp"
-
-
-BOOST_AUTO_TEST_CASE(ecmh_GLS254) {
-	test_generic_multiset_hash();
-}
-
-BOOST_AUTO_TEST_CASE(sha_512) {
-	BOOST_REQUIRE(sha_512_vector_1());
-	BOOST_REQUIRE(sha_512_vector_2());
-	BOOST_REQUIRE(sha_512_vector_3());
-	BOOST_REQUIRE(sha_512_vector_4());
-	BOOST_REQUIRE(sha_512_vector_5());
-}
-
-BOOST_AUTO_TEST_CASE(hmac_sha_512) {
-	BOOST_REQUIRE(hmac_test_case_1());
-	BOOST_REQUIRE(hmac_test_case_2());
-	BOOST_REQUIRE(hmac_test_case_3());
-	BOOST_REQUIRE(hmac_test_case_4());
-}
-
-BOOST_AUTO_TEST_CASE(encryption) {
-	BOOST_REQUIRE(encryption_decryption_test());
-}
-
-BOOST_AUTO_TEST_CASE(fpe) {
-    fpe_correctness_test();
-}
-
-BOOST_AUTO_TEST_CASE(tdp) {
-    tdp_correctness_test();
-    tdp_functional_test();
-    tdp_mult_eval_test();
-    tdp_mult_inv_test();
-    tdp_full_mult_inv_test();
-}
-
-BOOST_AUTO_TEST_CASE(block_hash) {
-    test_block_hash();
-}
-
-BOOST_AUTO_TEST_CASE(prg) {
-    test_prg();
-    test_prg_consistency();
-}
-
-BOOST_AUTO_TEST_CASE(ppke) {
-    test_relic_serialization_ZR();
-    test_relic_serialization_G1();
-    test_relic_serialization_G2();
-    
-    test_ppke_serialization();
-
-    test_pseudo_random_ppke();
-    
-    test_high_level_ppke();
-}
+//  Google Test takes care of everything
+//  Tests are automatically registered and run
 
 int main(int argc, char* argv[], char* envp[])
 {
     sse::crypto::init_crypto_lib();
 
-    int rv = boost::unit_test::unit_test_main(init_unit_test, argc, argv);
+    ::testing::InitGoogleTest(&argc, argv);
+    int rv = RUN_ALL_TESTS();
     
     sse::crypto::cleanup_crypto_lib();
 

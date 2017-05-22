@@ -29,7 +29,7 @@
 #include <memory>
 
 
-#include "boost_test_include.hpp"
+#include <gtest/gtest.h>
 
 using namespace std;
 
@@ -38,7 +38,7 @@ using namespace std;
 #define ENCRYPTION_TEST_COUNT 50
 
 
-void test_relic_serialization_ZR()
+TEST(relic, serialization_ZR)
 {
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
         
@@ -50,7 +50,7 @@ void test_relic_serialization_ZR()
         relicxx::ZR y(bytes.data(), bytes.size());
 
         
-        BOOST_CHECK(z == y);
+        ASSERT_EQ(z, y);
     }
     
     relicxx::PairingGroup group;
@@ -65,13 +65,13 @@ void test_relic_serialization_ZR()
         relicxx::ZR y(bytes.data(), bytes.size());
         
         
-        BOOST_CHECK(z == y);
+        ASSERT_EQ(z, y);
     }
  
 
 }
 
-void test_relic_serialization_G1()
+TEST(relic, serialization_G1)
 {
     relicxx::PairingGroup group;
     
@@ -85,7 +85,7 @@ void test_relic_serialization_G1()
         relicxx::G1 y(bytes.data(), false);
         
         
-        BOOST_CHECK(z == y);
+        ASSERT_EQ(z, y);
     }
     
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
@@ -98,11 +98,11 @@ void test_relic_serialization_G1()
         relicxx::G1 y(bytes.data(), true);
         
         
-        BOOST_CHECK(z == y);
+        ASSERT_EQ(z, y);
     }
 }
 
-void test_relic_serialization_G2()
+TEST(relic, serialization_G2)
 {
     relicxx::PairingGroup group;
     
@@ -116,7 +116,7 @@ void test_relic_serialization_G2()
         relicxx::G2 y(bytes.data(), false);
         
         
-        BOOST_CHECK(z == y);
+        ASSERT_EQ(z, y);
     }
     
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
@@ -129,13 +129,13 @@ void test_relic_serialization_G2()
         relicxx::G2 y(bytes.data(), true);
         
         
-        BOOST_CHECK(z == y);
+        ASSERT_EQ(z, y);
     }
 
 }
 
 
-void test_ppke_serialization()
+TEST(ppke, serialization)
 {
     sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
     
@@ -173,7 +173,7 @@ void test_ppke_serialization()
         
         sse::crypto::GmppkePrivateKeyShare serialized_share(share_data.data());
         
-        BOOST_CHECK(share == serialized_share);
+        ASSERT_EQ(share, serialized_share);
         
         keyshares.push_back(share);
     }
@@ -186,7 +186,7 @@ void test_ppke_serialization()
 
     sse::crypto::GmppkePrivateKeyShare serialized_share(share_data.data());
     
-    BOOST_CHECK(keyshares[0] == serialized_share);
+    ASSERT_EQ(keyshares[0], serialized_share);
 
 
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
@@ -210,11 +210,11 @@ void test_ppke_serialization()
         ct.writeBytes(ct_data.data());
         sse::crypto::GmmppkeCT<M_type> serialized_ct(ct_data.data());
 
-        BOOST_CHECK(ct == serialized_ct);
+        ASSERT_EQ(ct, serialized_ct);
     }
 }
 
-void test_pseudo_random_ppke()
+TEST(ppke, correctness)
 {
     sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
     
@@ -280,13 +280,13 @@ void test_pseudo_random_ppke()
             M_type dec_M = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
             M_type dec_M2 = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
             
-            BOOST_CHECK(M == dec_M);
-            BOOST_CHECK(M == dec_M2);
+            ASSERT_EQ(M, dec_M);
+            ASSERT_EQ(M, dec_M2);
         }
     }
 }
 
-void test_high_level_ppke()
+TEST(puncturable, correctness)
 {
     std::array<uint8_t, 16> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
@@ -343,8 +343,8 @@ void test_high_level_ppke()
         auto ct = encryptor.encrypt(M, tag);
         bool success = decryptor.decrypt(ct, dec_M);
 
-        BOOST_CHECK(success);
-        BOOST_CHECK(M == dec_M);
+        ASSERT_TRUE(success);
+        ASSERT_EQ(M, dec_M);
 
     }
 }

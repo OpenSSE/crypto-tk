@@ -18,7 +18,13 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../tests/hashing.hpp"
+
+/*******
+ *  hashing.cpp
+ *
+ *  Implementation of SHA-512's test vector verification.
+ *  Reference vectors are taken from NIST's test vectors.
+ ********/
 
 #include "../src/hash.hpp"
 #include "../src/hash/sha512.hpp"
@@ -28,15 +34,13 @@
 #include <string>
 #include <array>
 
+#include <gtest/gtest.h>
+
 using namespace std;
 
-bool sha_512_test_vectors()
+TEST(sha_512, test_vector_1)
 {
-	return sha_512_vector_1() && sha_512_vector_2() && sha_512_vector_3()&& sha_512_vector_4() && sha_512_vector_5();
-}
 
-bool sha_512_vector_1()
-{
 	string in = "abc";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
     
@@ -52,33 +56,11 @@ bool sha_512_vector_1()
     string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
     string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
     
-	if(out_string != ref_string)
-	{
-		cout << "Test case 1 failed!\n";
-		cout << "Input (" << dec << in.length() << " bytes):\n";
-		cout << in << "\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : out)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	
-	// cout << "SHA-512 Test case 1 succeeded!\n";
-	return true;
+    
+    ASSERT_EQ(out_string, ref_string);
 }
 
-bool sha_512_vector_2()
+TEST(sha_512, test_vector_2)
 {
 	string in = "";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
@@ -95,33 +77,10 @@ bool sha_512_vector_2()
     string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
     string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
     
-    if(out_string != ref_string)
-	{
-		cout << "Test case 2 failed!\n";
-		cout << "Input (" << dec << in.length() << " bytes):\n";
-		cout << in << "\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : out)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	
-	// cout << "SHA-512 Test case 2 succeeded!\n";
-	return true;
+    ASSERT_EQ(out_string, ref_string);
 }
 
-bool sha_512_vector_3()
+TEST(sha_512, test_vector_3)
 {
 	string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
@@ -138,33 +97,10 @@ bool sha_512_vector_3()
     string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
     string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
     
-    if(out_string != ref_string)
-	{
-		cout << "Test case 3 failed!\n";
-		cout << "Input (" << dec << in.length() << " bytes):\n";
-		cout << in << "\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : out)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	
-	// cout << "SHA-512 Test case 3 succeeded!\n";
-	return true;
+    ASSERT_EQ(out_string, ref_string);
 }
 
-bool sha_512_vector_4()
+TEST(sha_512, test_vector_4)
 {
 	string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
@@ -181,33 +117,10 @@ bool sha_512_vector_4()
     string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
     string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
     
-    if(out_string != ref_string)
-	{
-		cout << "Test case 4 failed!\n";
-		cout << "Input (" << dec << in.length() << " bytes):\n";
-		cout << in << "\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : out)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	
-	// cout << "SHA-512 Test case 4 succeeded!\n";
-	return true;
+    ASSERT_EQ(out_string, ref_string);
 }
 
-bool sha_512_vector_5()
+TEST(sha_512, test_vector_5)
 {
 	string in(1e6, 'a');
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
@@ -224,28 +137,5 @@ bool sha_512_vector_5()
     string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
     string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
     
-    if(out_string != ref_string)
-	{
-		cout << "Test case 5 failed!\n";
-		cout << "Input (" << dec << in.length() << " bytes):\n";
-		cout << in << "\n";
-		cout << "Reference: \n";
-		for(uint8_t c : reference)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-		
-		cout << "Computed: \n";
-		for(uint8_t c : out)
-		{
-			cout << hex << setw(2) << setfill('0') << (uint) c;
-		}
-		cout << endl;
-	
-		return false;
-	}
-	
-	// cout << "SHA-512 Test case 5 succeeded!\n";
-	return true;
+    ASSERT_EQ(out_string, ref_string);
 }

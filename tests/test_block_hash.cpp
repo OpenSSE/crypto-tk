@@ -27,11 +27,10 @@
 #include <string>
 #include <algorithm>
 
-#include "boost_test_include.hpp"
+#include <gtest/gtest.h>
 
-#define TEST_COUNT 2
 
-void test_block_hash()
+TEST(block_hash_aes, test_vector)
 {
     std::array<uint8_t, 16> in_array = {{0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a}};
 
@@ -42,6 +41,6 @@ void test_block_hash()
     std::string  out = sse::crypto::BlockHash::hash(in);
     
 
-    BOOST_CHECK(out == std::string(expected_out.begin(), expected_out.end()));
+    ASSERT_EQ(out, std::string(expected_out.begin(), expected_out.end()));
 
 }

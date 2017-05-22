@@ -19,5 +19,3 @@
 //
 
 #pragma once
-
-void test_block_hash();

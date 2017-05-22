@@ -19,14 +19,3 @@
 //
 
 #pragma once
-
-void test_relic_serialization_ZR();
-void test_relic_serialization_G1();
-void test_relic_serialization_G2();
-void test_relic_serialization_GT();
-
-void test_ppke_serialization();
-void test_pseudo_random_ppke();
-
-
-void test_high_level_ppke();

@@ -62,6 +62,12 @@ if int(debug):
 else:
 	env.Append(CCFLAGS = ['-O2'])
 
+gcov = ARGUMENTS.get('gcov', 0)
+if int(gcov):
+    env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage'])
+    env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage'])
+
+
 no_aes_ni = ARGUMENTS.get('no_aesni', 0)
 if int(no_aes_ni):
     env.Append(CCFLAGS = ['-D', 'NO_AESNI'])
@@ -117,8 +123,6 @@ Clean('lib', 'library')
 
 test_env = env.Clone()
 test_env.Append(LIBS = ['pthread'])
-test_env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage'])
-test_env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage'])
 
 test_objects = SConscript('tests/build.scons', exports='test_env', variant_dir='build_test', duplicate=0)
 

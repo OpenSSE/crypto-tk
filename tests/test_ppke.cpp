@@ -33,7 +33,7 @@ using namespace std;
 
 #define SERIALIZATION_TEST_COUNT 500
 #define SERIALIZATION_PUNCT_COUNT 50
-#define ENCRYPTION_TEST_COUNT 50
+#define ENCRYPTION_TEST_COUNT 10
 
 
 TEST(relic, serialization_ZR)

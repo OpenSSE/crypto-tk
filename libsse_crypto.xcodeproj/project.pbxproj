@@ -10,9 +10,6 @@
 		310C2BD51EC0B59700E80B3A /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BCD1EC0B59700E80B3A /* common.h */; };
 		310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
 		310C2BDB1EC0B59700E80B3A /* relic_api.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BD11EC0B59700E80B3A /* relic_api.h */; };
-		310C2BDC1EC0B59700E80B3A /* common.c in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD31EC0B59700E80B3A /* common.c */; };
-		310C2BDD1EC0B59700E80B3A /* common.c in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD31EC0B59700E80B3A /* common.c */; };
-		310C2BDE1EC0B59700E80B3A /* common.c in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD31EC0B59700E80B3A /* common.c */; };
 		310C2BDF1EC0B59700E80B3A /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
 		310C2BE01EC0B59700E80B3A /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
 		310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
@@ -231,7 +228,6 @@
 		310C2BCD1EC0B59700E80B3A /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		310C2BD01EC0B59700E80B3A /* GMPpke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GMPpke.cpp; sourceTree = "<group>"; };
 		310C2BD11EC0B59700E80B3A /* relic_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = relic_api.h; sourceTree = "<group>"; };
-		310C2BD31EC0B59700E80B3A /* common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = common.c; sourceTree = "<group>"; };
 		310C2BD41EC0B59700E80B3A /* relic_api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = relic_api.cpp; sourceTree = "<group>"; };
 		310C2BE21EC0B63600E80B3A /* GMPpke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GMPpke.h; sourceTree = "<group>"; };
 		310C2BE41EC0B6D800E80B3A /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = util.cpp; sourceTree = "<group>"; };
@@ -394,7 +390,6 @@
 			isa = PBXGroup;
 			children = (
 				310C2BCD1EC0B59700E80B3A /* common.h */,
-				310C2BD31EC0B59700E80B3A /* common.c */,
 				310C2BD11EC0B59700E80B3A /* relic_api.h */,
 				310C2BD41EC0B59700E80B3A /* relic_api.cpp */,
 			);
@@ -931,7 +926,6 @@
 				318C729B1C9730140040AEE7 /* tdp.cpp in Sources */,
 				6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */,
 				311934B51D27172A0031804B /* test_prg.cpp in Sources */,
-				310C2BDC1EC0B59700E80B3A /* common.c in Sources */,
 				6CC2D4871C31889B00334ADD /* hash.cpp in Sources */,
 				6CC2D48A1C3188A000334ADD /* aez.c in Sources */,
 				6CC2D4911C318B1B00334ADD /* test_hmac.cpp in Sources */,
@@ -971,7 +965,6 @@
 				6CC2D4AC1C318F2500334ADD /* fpe.cpp in Sources */,
 				6CC2D4AD1C318F2500334ADD /* blake2s.cpp in Sources */,
 				6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */,
-				310C2BDD1EC0B59700E80B3A /* common.c in Sources */,
 				6CC2D4AE1C318F2500334ADD /* GF2_127_63.cpp in Sources */,
 				313CD48E1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				6CC2D4B01C318F2500334ADD /* sha512.cpp in Sources */,
@@ -985,7 +978,6 @@
 			files = (
 				318C729D1C9730140040AEE7 /* tdp.cpp in Sources */,
 				310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */,
-				310C2BDE1EC0B59700E80B3A /* common.c in Sources */,
 				6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				6CC2D4E51C31941500334ADD /* blake2s.cpp in Sources */,
 				6CC2D4D21C3193FA00334ADD /* aez.c in Sources */,

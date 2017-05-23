@@ -39,9 +39,6 @@ enum G1_type { G1_t = 2, listG1_t = 3 };
 enum G2_type { G2_t = 4, listG2_t = 5 };
 enum GT_type { GT_t = 6, listGT_t = 7 };
 enum Other_type { Str_t = 8, listStr_t = 9, int_t = 10, listInt_t = 11, list_t = 12, None_t = 13 };
-// #define g1_write_str(S, L, P, R)	CAT(fp_, write_str)(S, L, P, R)
-// #define g2_write_str(S, L, P, R)	CAT(fp_, write_str)(S, L, P, R)
-// #define gt_write_str(S, L, P, R)	CAT(fp_, write_str)(S, L, P, R)
 
 #define bn_inits(b) \
 		bn_null(b);	\
@@ -64,17 +61,5 @@ enum Other_type { Str_t = 8, listStr_t = 9, int_t = 10, listInt_t = 11, list_t =
 /* KSS_P508 */
 #define G2_LEN G1_LEN
 #define GT_LEN G1_LEN
-
-// status_t g1_read_bin(g1_t g, uint8_t *data, int data_len);
-// status_t g1_write_bin(g1_t g, uint8_t *data, int data_len, int comp);
-// status_t g1_write_str(g1_t g, uint8_t *data, int data_len);
-
-// status_t g2_read_bin(g2_t g, uint8_t *data, int data_len);
-// status_t g2_write_bin(g2_t g, uint8_t *data, int data_len);
-// status_t g2_write_str(g2_t g, uint8_t *data, int data_len);
-
-// status_t gt_read_bin(gt_t g, uint8_t *data, int data_len);
-// status_t gt_write_bin(gt_t g, uint8_t *data, int data_len);
-// status_t gt_write_str(gt_t g, uint8_t *data, int data_len);
 
 #endif

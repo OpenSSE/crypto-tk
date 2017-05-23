@@ -123,6 +123,14 @@ namespace sse
                 throw std::invalid_argument("Invalid in_len: in_len%16 != 0");
             }
             
+            if (in == NULL) {
+                throw std::invalid_argument("in must not be NULL");
+            }
+            
+            if (out == NULL) {
+                throw std::invalid_argument("out must not be NULL");
+            }
+
             
 #if USE_AESNI
             aesni_encrypt_xor(in, in_len/AES_BLOCK_SIZE, *get_key(), out);

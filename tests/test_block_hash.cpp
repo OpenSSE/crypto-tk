@@ -123,4 +123,8 @@ TEST(block_hash_aes, exceptions)
     ASSERT_THROW(sse::crypto::BlockHash::hash(NULL, 16, (uint8_t *)out.data()), std::invalid_argument);
     ASSERT_THROW(sse::crypto::BlockHash::hash((uint8_t *)in_array.data(), 16, NULL), std::invalid_argument);
 
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash((uint8_t *)in_array.data(), 18, (uint8_t *)out.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(NULL, 16, (uint8_t *)out.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash((uint8_t *)in_array.data(), 16, NULL), std::invalid_argument);
+
 }

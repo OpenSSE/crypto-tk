@@ -136,7 +136,8 @@ test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects + 
 
 test_run = test_env.Test('test_run', test_prog)
 Depends(test_run, test_prog)
-test_env.Alias('check', [test_prog, test_run])
+# test_env.Alias('check', [test_prog, test_run])
+test_env.Alias('check', [test_prog])
 
 test_env.Clean('check', ['check'] + objects)
 

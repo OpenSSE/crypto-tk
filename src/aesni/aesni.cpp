@@ -972,10 +972,10 @@ S8 = _mm_aesenclast_si128(S8, K);
             
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+9);
             ENCRYPT_ROUND_3(SK, state1, state2, state3);
-            
+
             SK = _mm_loadu_si128(reinterpret_cast<const __m128i*>(subkeys.data())+10);
-            ENCRYPT_ROUND_3(SK, state1, state2, state3);
-            
+            ENCRYPT_ROUND_LAST_3(SK, state1, state2, state3);
+
             //            tick_counter += rdtsc() - now;
             
             // cleanup
@@ -1444,7 +1444,7 @@ S8 = _mm_aesenclast_si128(S8, K);
             uint64_t i = 0;
             
             while (i+8 <= len) { // at least 8 blocks to generate
-                aesni_encrypt_xor8(in+i, subkeys, out + (i*kAESBlockSize));
+                aesni_encrypt_xor8(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                 i+=8;
             }
 			
@@ -1453,25 +1453,25 @@ S8 = _mm_aesenclast_si128(S8, K);
                 case 0:
                     break;
                 case 1:
-                    aesni_encrypt_xor1(in+i, subkeys, out + (i*kAESBlockSize));
+                    aesni_encrypt_xor1(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                     break;
                 case 2:
-                    aesni_encrypt_xor2(in+i, subkeys, out + (i*kAESBlockSize));
+                    aesni_encrypt_xor2(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                     break;
                 case 3:
-                    aesni_encrypt_xor3(in+i, subkeys, out + (i*kAESBlockSize));
+                    aesni_encrypt_xor3(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                     break;
                 case 4:
-                    aesni_encrypt_xor4(in+i, subkeys, out + (i*kAESBlockSize));
+                    aesni_encrypt_xor4(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                     break;
                 case 5:
-                    aesni_encrypt_xor5(in+i, subkeys, out + (i*kAESBlockSize));
+                    aesni_encrypt_xor5(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                     break;
                 case 6:
-                    aesni_encrypt_xor6(in+i, subkeys, out + (i*kAESBlockSize));
+                    aesni_encrypt_xor6(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                     break;
                 case 7:
-                    aesni_encrypt_xor7(in+i, subkeys, out + (i*kAESBlockSize));
+                    aesni_encrypt_xor7(in+(i*kAESBlockSize), subkeys, out + (i*kAESBlockSize));
                     break;
                     
                 default:

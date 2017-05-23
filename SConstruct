@@ -1,11 +1,13 @@
 import os, sys
 
-env = Environment()
+env = Environment(tools = ['default', 'gcccov'])
 
 try:
     env.Append(ENV = {'TERM' : os.environ['TERM']}) # Keep our nice terminal environment (like colors ...)
 except:
     print "Not running in a terminal"
+
+env.GCovInjectObjectEmitters()
 
 
 if FindFile('config.scons', '.'):

@@ -4,4 +4,4 @@ if [ ! -d "gcov" ]; then
 	mkdir gcov
 fi
 
-gcovr  -r . -f '(.*)src(.*)' --html --html-detail -o gcov/index.html
+gcovr  -r . -f '(.*)src(.*)' -e '(.*)boost(.*)' --html --html-detail -o gcov/index.html

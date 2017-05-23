@@ -33,3 +33,8 @@ src/boost
 !default.perspectivev3
 xcuserdata
 xcshareddata
+
+
+# Code coverage
+*.gcda
+*.gcno

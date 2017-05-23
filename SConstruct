@@ -93,8 +93,9 @@ debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = smart_conca
 
 Default(debug)
 
+lib_env = env.Clone()
+shared_lib_env = lib_env.Clone() 
 
-shared_lib_env = env.Clone();
 
 if env['PLATFORM'] == 'darwin':
     # We have to add '@rpath' to the library install name
@@ -102,10 +103,10 @@ if env['PLATFORM'] == 'darwin':
     
 library_build_prefix = 'library'
 shared_lib = shared_lib_env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects);
-static_lib = env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
+static_lib = lib_env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 
 headers = Glob('src/*.h') + Glob('src/*.hpp') + ['src/ppke/GMPpke.h']
-headers_lib = [env.Install(library_build_prefix+'/include/sse/crypto', headers)]
+headers_lib = [lib_env.Install(library_build_prefix+'/include/sse/crypto', headers)]
 
 env.Clean(headers_lib,[library_build_prefix+'/include'])
 
@@ -113,23 +114,11 @@ Alias('headers', headers_lib)
 Alias('lib', [shared_lib, static_lib] + headers_lib)
 Clean('lib', 'library')
 
-# Alias('lib', [lib_install] + headers_lib)
-
-
-# check_obj_ci = env.Object(source = 'checks.cpp', target = 'check_ci.o', CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
-#                                 CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
-# test_prog_ci = env.Program('check_ci', check_obj_ci + objects + test_objects,
-#                                 CPPPATH = smart_concat(['src'], env.get('CPPPATH')),
-#                                 CCFLAGS = smart_concat(env.get('CCFLAGS'),['-DUNIT_TEST_SINGLE_HEADER']))
-#
-# test_run_ci = env.Test('test_run_ci', test_prog_ci)
-# Depends(test_run_ci, test_prog_ci)
-#
-# env.Alias('check_ci', [test_prog_ci, test_run_ci])
-
 
 test_env = env.Clone()
 test_env.Append(LIBS = ['pthread'])
+test_env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage'])
+test_env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage'])
 
 test_objects = SConscript('tests/build.scons', exports='test_env', variant_dir='build_test', duplicate=0)
 

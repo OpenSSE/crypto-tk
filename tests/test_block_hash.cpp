@@ -109,3 +109,18 @@ TEST(block_hash_aes, mult_hash)
     }
 }
 
+TEST(block_hash_aes, exceptions)
+{
+    std::array<uint8_t, 16> in_array = {{0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a}};
+    std::string in(in_array.begin(), in_array.end());
+    std::string out;
+    
+    ASSERT_THROW(sse::crypto::BlockHash::hash(in, 18, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(in, 0, out), std::invalid_argument);
+
+    ASSERT_THROW(sse::crypto::BlockHash::hash((uint8_t *)in_array.data(), 18, (uint8_t *)out.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash((uint8_t *)in_array.data(), 0, (uint8_t *)out.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(NULL, 16, (uint8_t *)out.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash((uint8_t *)in_array.data(), 16, NULL), std::invalid_argument);
+
+}

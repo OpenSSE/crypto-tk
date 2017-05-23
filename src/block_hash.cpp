@@ -159,11 +159,19 @@ namespace sse
         void BlockHash::hash(const unsigned char *in, const size_t out_len, unsigned char *out)
         {
             if (out_len > AES_BLOCK_SIZE) {
-                throw std::runtime_error("out_len is too large. out_len must be less than " + AES_BLOCK_SIZE);
+                throw std::invalid_argument("out_len is too large. out_len must be less than " + AES_BLOCK_SIZE);
             }
 
             if (out_len <= 0) {
-                throw std::runtime_error("out_len must be larger than 0");
+                throw std::invalid_argument("out_len must be larger than 0");
+            }
+            
+            if (in == NULL) {
+                throw std::invalid_argument("in must not be NULL");
+            }
+
+            if (out == NULL) {
+                throw std::invalid_argument("out must not be NULL");
             }
 
             unsigned char tmp [AES_BLOCK_SIZE];
@@ -186,11 +194,11 @@ namespace sse
         void BlockHash::hash(const std::string &in, const size_t out_len, std::string &out)
         {
             if (out_len > AES_BLOCK_SIZE) {
-                throw std::runtime_error("out_len is too large. out_len must be less than " + AES_BLOCK_SIZE);
+                throw std::invalid_argument("out_len is too large. out_len must be less than " + AES_BLOCK_SIZE);
             }
             
             if (out_len <= 0) {
-                throw std::runtime_error("out_len must be larger than 0");
+                throw std::invalid_argument("out_len must be larger than 0");
             }
             
             unsigned char tmp [AES_BLOCK_SIZE];

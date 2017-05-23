@@ -11,10 +11,10 @@ stages:
 crypto:
   stage: build
   script:
-  - scons
+  - scons static_relic=1
   
 check:
   stage: test
   script:
-  - scons check  
-  - scons check no_aesni=1
+  - scons check static_relic=1 
+  - scons check static_relic=1 no_aesni=1

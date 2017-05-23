@@ -32,7 +32,14 @@ env.Append(CCFLAGS=['-Wall', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat
 env.Append(CXXFLAGS=['-Weffc++','-Woverloaded-virtual',  '-Wsign-promo', '-Wstrict-overflow=5'])
 
 
-env.Append(LIBS = ['crypto','relic'])
+env.Append(LIBS = ['crypto','gmp'])
+
+
+static_relic = ARGUMENTS.get('static_relic', 0)
+if int(static_relic):
+    env.Append(LIBS = ['relic_s'])
+else:
+	env.Append(LIBS = ['relic'])
 
 env['AS'] = ['yasm']
 env.Append(ASFLAGS = ['-D', 'LINUX'])

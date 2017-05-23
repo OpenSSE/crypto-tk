@@ -44,7 +44,7 @@ class Cipher
 public:
 	static constexpr uint8_t kKeySize = 32;
 
-	Cipher();
+	Cipher() = delete;
 	
 	// we should not be able to duplicate Cipher objects
 	Cipher(const Cipher& c) = delete;

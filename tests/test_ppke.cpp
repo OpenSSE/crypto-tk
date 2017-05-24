@@ -35,6 +35,7 @@ using namespace std;
 #define SERIALIZATION_PUNCT_COUNT 50
 #define ENCRYPTION_TEST_COUNT 10
 
+#define ARITHMETIC_TEST_COUNT 100
 
 TEST(relic, serialization_ZR)
 {
@@ -46,9 +47,17 @@ TEST(relic, serialization_ZR)
         z.writeBytes(bytes.data());
         
         relicxx::ZR y(bytes.data(), bytes.size());
-
         
         ASSERT_EQ(z, y);
+        
+        
+        auto vec_bytes = z.getBytes();
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+        
+        std::string i_str = std::to_string(i);
+        relicxx::ZR zr_str((char*)i_str.c_str());
+        ASSERT_EQ(z, zr_str);
     }
     
     relicxx::PairingGroup group;
@@ -62,8 +71,14 @@ TEST(relic, serialization_ZR)
         
         relicxx::ZR y(bytes.data(), bytes.size());
         
-        
         ASSERT_EQ(z, y);
+        
+        
+        auto vec_bytes = z.getBytes();
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+
+        ASSERT_TRUE(group.ismember(y));
     }
  
 
@@ -84,6 +99,12 @@ TEST(relic, serialization_G1)
         
         
         ASSERT_EQ(z, y);
+        
+        auto vec_bytes = z.getBytes();
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+        
+        ASSERT_TRUE(group.ismember(y));
     }
     
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
@@ -97,6 +118,12 @@ TEST(relic, serialization_G1)
         
         
         ASSERT_EQ(z, y);
+        
+        auto vec_bytes = z.getBytes(true);
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+
+        ASSERT_TRUE(group.ismember(y));
     }
 }
 
@@ -115,6 +142,12 @@ TEST(relic, serialization_G2)
         
         
         ASSERT_EQ(z, y);
+
+        auto vec_bytes = z.getBytes();
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+
+        ASSERT_TRUE(group.ismember(y));
     }
     
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
@@ -128,10 +161,196 @@ TEST(relic, serialization_G2)
         
         
         ASSERT_EQ(z, y);
+    
+        auto vec_bytes = z.getBytes(true);
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+
+        ASSERT_TRUE(group.ismember(y));
     }
 
 }
 
+TEST(relic, serialization_GT)
+{
+    relicxx::PairingGroup group;
+    
+    for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
+        
+        relicxx::GT z = group.randomGT();
+        
+        std::array<uint8_t, relicxx::GT::kByteSize> bytes;
+        z.writeBytes(bytes.data(), false);
+        
+        relicxx::GT y(bytes.data(), false);
+        
+        
+        ASSERT_EQ(z, y);
+        
+        auto vec_bytes = z.getBytes();
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+
+        ASSERT_TRUE(group.ismember(y));
+    }
+    
+    for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
+        
+        relicxx::GT z = group.randomGT();
+        
+        std::array<uint8_t, relicxx::GT::kCompactByteSize> bytes;
+        z.writeBytes(bytes.data(), true);
+        
+        relicxx::GT y(bytes.data(), true);
+        
+        
+        ASSERT_EQ(z, y);
+        
+        auto vec_bytes = z.getBytes(true);
+        ASSERT_EQ(vec_bytes.size(), bytes.size());
+        ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
+  
+        ASSERT_TRUE(group.ismember(y));
+    }
+    
+}
+
+TEST(relic, arithmetic_ZR)
+{
+    relicxx::PairingGroup group;
+    
+    for (size_t i = 0; i < ARITHMETIC_TEST_COUNT; i++) {
+        
+        relicxx::ZR z1 = group.randomZR();
+        relicxx::ZR z2 = group.randomZR();
+        relicxx::ZR z3 = group.randomZR();
+        relicxx::ZR z4 = group.randomZR();
+        
+        ASSERT_EQ(z1+z2, z2+z1);
+        ASSERT_EQ(group.add(z3, z4), group.add(z4, z3));
+        ASSERT_EQ(group.sub(z1, z2), group.add(group.neg(z2), z1));
+        ASSERT_EQ(group.mul(z3, z4), group.mul(z4, z3));
+        
+        
+        ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
+        ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
+
+        ASSERT_EQ(z1<<1, z1*2);
+        ASSERT_EQ(z2<<2, z2*4);
+        ASSERT_EQ(z3<<3, z3*8);
+        ASSERT_EQ(z4<<4, z4*16);
+
+        ASSERT_EQ(group.exp(z1, (int) 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, (int) 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, (int) 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, (int) 233453451), group.exp(z4, relicxx::ZR(233453451)));
+    }
+    
+}
+
+
+TEST(relic, arithmetic_G1)
+{
+    relicxx::PairingGroup group;
+    
+    for (size_t i = 0; i < ARITHMETIC_TEST_COUNT; i++) {
+        
+        relicxx::G1 z1 = group.randomG1();
+        relicxx::G1 z2 = group.randomG1();
+        relicxx::G1 z3 = group.randomG1();
+        relicxx::G1 z4 = group.randomG1();
+        
+        ASSERT_EQ(z1+z2, z2+z1);
+        ASSERT_EQ(z3+z4, z4+z3);
+        ASSERT_EQ(z1-z2, (-z2) + z1);
+        ASSERT_EQ(group.mul(z3, z4), group.mul(z4, z3));
+        
+        
+        ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
+        ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
+        
+        ASSERT_EQ(group.exp(z1, (int) 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, (int) 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, (int) 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, (int) 233453451), group.exp(z4, relicxx::ZR(233453451)));
+    }
+    
+}
+
+TEST(relic, arithmetic_G2)
+{
+    relicxx::PairingGroup group;
+    
+    for (size_t i = 0; i < ARITHMETIC_TEST_COUNT; i++) {
+        
+        relicxx::G2 z1 = group.randomG2();
+        relicxx::G2 z2 = group.randomG2();
+        relicxx::G2 z3 = group.randomG2();
+        relicxx::G2 z4 = group.randomG2();
+        
+        ASSERT_EQ(z1+z2, z2+z1);
+        ASSERT_EQ(z3+z4, z4+z3);
+        ASSERT_EQ(z1-z2, (-z2) + z1);
+        ASSERT_EQ(group.mul(z3, z4), group.mul(z4, z3));
+        
+        
+        ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
+        ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
+        
+        ASSERT_EQ(group.exp(z1, (int) 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, (int) 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, (int) 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, (int) 233453451), group.exp(z4, relicxx::ZR(233453451)));
+    }
+    
+}
+
+TEST(relic, arithmetic_GT)
+{
+    relicxx::PairingGroup group;
+    
+    for (size_t i = 0; i < ARITHMETIC_TEST_COUNT; i++) {
+        
+        relicxx::GT z1 = group.randomGT();
+        relicxx::GT z2 = group.randomGT();
+        relicxx::GT z3 = group.randomGT();
+        relicxx::GT z4 = group.randomGT();
+        
+        ASSERT_EQ(group.mul(z3, z4), group.mul(z4, z3));
+        
+        
+        ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
+        ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
+        
+        ASSERT_EQ(group.exp(z1, (int) 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, (int) 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, (int) 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, (int) 233453451), group.exp(z4, relicxx::ZR(233453451)));
+    }
+    
+}
+
+TEST(relic, pairing)
+{
+    relicxx::PairingGroup group;
+    
+    for (size_t i = 0; i < ARITHMETIC_TEST_COUNT; i++) {
+        
+        relicxx::G1 z1 = group.randomG1();
+        relicxx::G2 z2 = group.randomG2();
+        
+        relicxx::GT p12 = group.pair(z1,z2);
+        
+        relicxx::ZR e1 = group.randomZR();
+        relicxx::ZR e2 = group.randomZR();
+        
+        
+        ASSERT_EQ(group.pair(power(z1,e1),z2), power(p12,e1));
+        ASSERT_EQ(group.pair(z1,power(z2,e2)), power(p12,e2));
+        ASSERT_EQ(group.pair(power(z1,e1),power(z2,e2)), power(p12,e1*e2));
+    }
+    
+}
 
 TEST(ppke, serialization)
 {

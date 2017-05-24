@@ -229,6 +229,10 @@ namespace sse
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))
         void Prg::PrgImpl::gen_subkeys(const unsigned char *userKey)
         {
+            if (userKey == NULL) {
+                throw std::invalid_argument("PRG input key is NULL");
+            }
+
 #if USE_AESNI
             aes_enc_key_ = aesni_derive_subkeys(userKey);
 #else
@@ -250,7 +254,7 @@ namespace sse
         void Prg::PrgImpl::derive(const uint32_t offset, const size_t len, unsigned char* out) const
         {
             if (len == 0) {
-                throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
+                throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
             }
             
             uint32_t extra_len = (offset % AES_BLOCK_SIZE);
@@ -333,8 +337,11 @@ namespace sse
         
         void Prg::PrgImpl::derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out)
         {
+            if (k == NULL) {
+                throw std::invalid_argument("PRG input key is NULL");
+            }
             if (len == 0) {
-                throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
+                throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
             }
             
             uint32_t extra_len = (offset % AES_BLOCK_SIZE);

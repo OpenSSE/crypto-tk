@@ -249,7 +249,8 @@ class Gmppke
 public:
     
     static constexpr uint8_t kPRFKeySize = 16; // 128 bits
-    
+    static const tag_type NULLTAG;
+
     Gmppke(){
         //        std::cout << "Pairing group order: " << group.order() << std::endl;
     };

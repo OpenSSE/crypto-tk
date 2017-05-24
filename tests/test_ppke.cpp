@@ -135,14 +135,17 @@ TEST(relic, serialization_G2)
 
 TEST(ppke, serialization)
 {
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
+    std::array<uint8_t, sse::crypto::Gmppke::kPRFKeySize> master_key;
+    sse::crypto::random_bytes(master_key);
+    
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key.data(), master_key.size());
     
     sse::crypto::Gmppke ppke;
     sse::crypto::GmppkePublicKey pk;
     sse::crypto::GmppkePrivateKey sk;
     sse::crypto::GmppkeSecretParameters sp;
     
-    ppke.keygen(key_prf, pk, sk, sp);
+    ppke.keygen(master_key, pk, sk, sp);
     
     typedef uint64_t M_type;
     
@@ -212,7 +215,71 @@ TEST(ppke, serialization)
     }
 }
 
-TEST(ppke, correctness)
+TEST(ppke, probabilitic_correctness)
+{
+    
+    sse::crypto::Gmppke ppke;
+    sse::crypto::GmppkePublicKey pk;
+    sse::crypto::GmppkePrivateKey sk;
+    sse::crypto::GmppkeSecretParameters sp;
+    
+    ppke.keygen(pk, sk, sp);
+    
+    typedef uint64_t M_type;
+    
+    
+    std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10};
+    
+    size_t current_p_count = 0;
+    
+    
+    for (size_t p : puncture_count_list) {
+        
+        if (p > current_p_count) {
+            
+            // add new punctures
+            for ( ; current_p_count < p; current_p_count++) {
+                sse::crypto::tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+                punctured_tag[15] = current_p_count&0xFF;
+                punctured_tag[14] = (current_p_count>>8)&0xFF;
+                punctured_tag[13] = (current_p_count>>16)&0xFF;
+                punctured_tag[12] = (current_p_count>>24)&0xFF;
+                punctured_tag[11] = (current_p_count>>32)&0xFF;
+                punctured_tag[10] = (current_p_count>>40)&0xFF;
+                punctured_tag[9] = (current_p_count>>48)&0xFF;
+                punctured_tag[8] = 0xFF;
+                
+                ppke.puncture(pk, sk, punctured_tag);
+            }
+        }
+        
+        for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
+            M_type M;
+            
+            sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
+            
+            sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
+            tag[0] = i&0xFF;
+            tag[1] = (i>>8)&0xFF;
+            tag[2] = (i>>16)&0xFF;
+            tag[3] = (i>>24)&0xFF;
+            tag[4] = (i>>32)&0xFF;
+            tag[5] = (i>>40)&0xFF;
+            tag[6] = (i>>48)&0xFF;
+            tag[7] = (i>>56)&0xFF;
+            
+            auto ct = ppke.encrypt<M_type>(pk, M, tag);
+            auto ct2 = ppke.encrypt<M_type>(sp, M, tag);
+            M_type dec_M = ppke.decrypt(sk, ct2);
+            M_type dec_M2 = ppke.decrypt(sk, ct2);
+            
+            ASSERT_EQ(M, dec_M);
+            ASSERT_EQ(M, dec_M2);
+        }
+    }
+}
+
+TEST(ppke, deterministic_correctness)
 {
     sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
     
@@ -284,93 +351,16 @@ TEST(ppke, correctness)
     }
     
     for (auto share : keyshares) {
-        auto ct = ppke.encrypt<M_type>(pk, 0, share.get_tag() );
-        
-        ASSERT_THROW(ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct), sse::crypto::PuncturedCiphertext);
+        if (share.get_tag() == sse::crypto::Gmppke::NULLTAG) { // first key share
+            ASSERT_THROW(ppke.encrypt<M_type>(pk, 0, share.get_tag() ), std::invalid_argument);
+        }else{
+            auto ct = ppke.encrypt<M_type>(pk, 0, share.get_tag() );
+            
+            ASSERT_THROW(ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct), sse::crypto::PuncturedCiphertext);
+        }
     }
 
 }
-
-/*
-TEST(ppke, consistency)
-{
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
-    
-    sse::crypto::Gmppke ppke;
-    sse::crypto::GmppkePublicKey pk;
-    sse::crypto::GmppkePrivateKey sk;
-    sse::crypto::GmppkeSecretParameters sp;
-    
-    ppke.keygen(key_prf, pk, sk, sp);
-    
-    typedef uint64_t M_type;
-    
-    
-    std::vector<size_t> puncture_count_list = {0, 1, 2, 5, 10, 15, 20, 30, 40};
-    
-    size_t current_p_count = 0;
-    
-    std::vector<sse::crypto::GmppkePrivateKeyShare> keyshares;
-    keyshares.push_back(ppke.sk0Gen(key_prf, sp, 0));
-    
-    for (size_t p : puncture_count_list) {
-        
-        if (p > current_p_count) {
-            
-            // add new punctures
-            for ( ; current_p_count < p; current_p_count++) {
-                sse::crypto::tag_type punctured_tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
-                punctured_tag[15] = current_p_count&0xFF;
-                punctured_tag[14] = (current_p_count>>8)&0xFF;
-                punctured_tag[13] = (current_p_count>>16)&0xFF;
-                punctured_tag[12] = (current_p_count>>24)&0xFF;
-                punctured_tag[11] = (current_p_count>>32)&0xFF;
-                punctured_tag[10] = (current_p_count>>40)&0xFF;
-                punctured_tag[9] = (current_p_count>>48)&0xFF;
-                punctured_tag[8] = 0xFF;
-                
-                auto share = ppke.skShareGen(key_prf, sp, current_p_count+1, punctured_tag);
-                
-                keyshares.push_back(share);
-            }
-            
-            keyshares[0] = ppke.sk0Gen(key_prf, sp, current_p_count);
-            
-        }
-        
-        for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
-            M_type M;
-            
-            sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
-            
-            sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
-            tag[0] = i&0xFF;
-            tag[1] = (i>>8)&0xFF;
-            tag[2] = (i>>16)&0xFF;
-            tag[3] = (i>>24)&0xFF;
-            tag[4] = (i>>32)&0xFF;
-            tag[5] = (i>>40)&0xFF;
-            tag[6] = (i>>48)&0xFF;
-            tag[7] = (i>>56)&0xFF;
-            
-            auto ct = ppke.encrypt<M_type>(pk, M, tag);
-            auto ct2 = ppke.encrypt<M_type>(sp, M, tag);
-            M_type dec_M = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
-            M_type dec_M2 = ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct2);
-            
-            ASSERT_EQ(M, dec_M);
-            ASSERT_EQ(M, dec_M2);
-        }
-    }
-    
-    for (auto share : keyshares) {
-        auto ct = ppke.encrypt<M_type>(pk, 0, share.get_tag() );
-        
-        ASSERT_THROW(ppke.decrypt(sse::crypto::GmppkePrivateKey(keyshares), ct), sse::crypto::PuncturedCiphertext);
-    }
-    
-}
-*/
 
 TEST(puncturable, correctness)
 {
@@ -414,8 +404,6 @@ TEST(puncturable, correctness)
     for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
         M_type M = i, dec_M;
         
-//        sse::crypto::random_bytes(sizeof(M_type), (uint8_t*) &M);
-        
         sse::crypto::tag_type tag{{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
         tag[0] = i&0xFF;
         tag[1] = (i>>8)&0xFF;
@@ -425,7 +413,8 @@ TEST(puncturable, correctness)
         tag[5] = (i>>40)&0xFF;
         tag[6] = (i>>48)&0xFF;
         tag[7] = (i>>56)&0xFF;
-        
+        tag[8] = 0xCC;
+
         auto ct = encryptor.encrypt(M, tag);
         bool success = decryptor.decrypt(ct, dec_M);
 
@@ -435,9 +424,15 @@ TEST(puncturable, correctness)
     }
     
     for (auto share : punctured_key) {
-        auto ct = encryptor.encrypt(0, sse::crypto::punct::extract_tag(share) );
-        M_type tmp;
         
-        ASSERT_FALSE(decryptor.decrypt(ct, tmp));
+        if (sse::crypto::punct::extract_tag(share) == sse::crypto::Gmppke::NULLTAG) { // first key share
+            ASSERT_THROW(encryptor.encrypt(0, sse::crypto::punct::extract_tag(share)), std::invalid_argument);
+        }else{
+            auto ct = encryptor.encrypt(0, sse::crypto::punct::extract_tag(share) );
+            
+            M_type tmp;
+            
+            ASSERT_FALSE(decryptor.decrypt(ct, tmp));
+        }
     }
 }

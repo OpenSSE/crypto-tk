@@ -10,14 +10,6 @@ namespace sse
 namespace crypto
 {
 
-std::vector<relicxx::ZR>  indexToPath(const unsigned int &index,const unsigned int & treeDepth);
-unsigned int pathToIndex(const std::vector<relicxx::ZR> & path, const unsigned int & treeDepth);
-
-typedef  std::vector<uint8_t> bytes;
-bytes xorarray(const bytes & l,const bytes & r);
-
-
-
 template <size_t N>
 relicxx::ZR LagrangeBasisCoefficients(const relicxx::PairingGroup & group, const unsigned int & j,const relicxx::ZR &x , const std::array<relicxx::ZR, N> & polynomial_xcordinates){
     unsigned int k = N;

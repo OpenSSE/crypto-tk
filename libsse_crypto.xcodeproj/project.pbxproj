@@ -248,6 +248,7 @@
 		3163D39F1ED59FF500A7FCD9 /* blake2b-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "blake2b-common.h"; sourceTree = "<group>"; };
 		3163D3A21ED5A50100A7FCD9 /* blake2s-common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "blake2s-common.c"; sourceTree = "<group>"; };
 		3163D3A31ED5A50100A7FCD9 /* blake2s-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "blake2s-common.h"; sourceTree = "<group>"; };
+		3163D3A81ED5ABA400A7FCD9 /* blake2_kat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = blake2_kat.h; sourceTree = "<group>"; };
 		316F0D3D1D25600700F87904 /* prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prg.cpp; sourceTree = "<group>"; };
 		316F0D3E1D25600700F87904 /* prg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = prg.hpp; sourceTree = "<group>"; };
 		316F0D431D2565CB00F87904 /* test_prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_prg.cpp; sourceTree = "<group>"; };
@@ -672,6 +673,7 @@
 				316F0D431D2565CB00F87904 /* test_prg.cpp */,
 				311934B61D27F1F00031804B /* test_block_hash.cpp */,
 				313CD4511EC719DD0058A0C5 /* test_ppke.cpp */,
+				3163D3A81ED5ABA400A7FCD9 /* blake2_kat.h */,
 			);
 			path = tests;
 			sourceTree = "<group>";

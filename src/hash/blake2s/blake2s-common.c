@@ -14,6 +14,7 @@
  */
 
 #include "./blake2-config.h"
+#include "./blake2s-common.h"
 
 #include <stddef.h>
 #include <stdint.h>

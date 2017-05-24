@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "./blake2s-common.h"
+
 #include <string.h>
 
 namespace sse {

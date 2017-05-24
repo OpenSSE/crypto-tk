@@ -181,7 +181,7 @@ TEST(prg, exceptions)
     
     ASSERT_THROW(prg.derive(0, out), std::invalid_argument);
     ASSERT_THROW(sse::crypto::Prg::derive(k.data(),0, out), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::Prg::derive(NULL,10, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Prg::derive((const uint8_t*)NULL,10, out), std::invalid_argument);
     
     ASSERT_THROW(sse::crypto::Prg p(NULL), std::invalid_argument);
 }

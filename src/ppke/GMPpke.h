@@ -115,6 +115,10 @@ public:
         ::memcpy(bytes+3*relicxx::G2::kCompactByteSize, sk4.data(), sk4.size());
     }
 
+    inline const tag_type& get_tag() const
+    {
+        return sk4;
+    }
 protected:
     relicxx::G2 sk1;
     relicxx::G2 sk2;

@@ -34,6 +34,9 @@
 		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		3163D3941ED33C8E00A7FCD9 /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */; };
 		3163D3991ED56BEA00A7FCD9 /* aesni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3981ED56BEA00A7FCD9 /* aesni.cpp */; };
+		3163D39E1ED59FC400A7FCD9 /* blake2b-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */; };
+		3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */; };
+		3163D3A11ED5A11A00A7FCD9 /* blake2b-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */; };
 		316F0D3F1D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D401D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D411D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
@@ -243,6 +246,8 @@
 		3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "gtest-all.cc"; sourceTree = "<group>"; };
 		3163D3931ED33C8E00A7FCD9 /* gtest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gtest.h; sourceTree = "<group>"; };
 		3163D3981ED56BEA00A7FCD9 /* aesni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aesni.cpp; sourceTree = "<group>"; };
+		3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "blake2b-common.c"; sourceTree = "<group>"; };
+		3163D39F1ED59FF500A7FCD9 /* blake2b-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "blake2b-common.h"; sourceTree = "<group>"; };
 		316F0D3D1D25600700F87904 /* prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prg.cpp; sourceTree = "<group>"; };
 		316F0D3E1D25600700F87904 /* prg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = prg.hpp; sourceTree = "<group>"; };
 		316F0D431D2565CB00F87904 /* test_prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_prg.cpp; sourceTree = "<group>"; };
@@ -622,6 +627,8 @@
 				6CC2D4461C3185D700334ADD /* blake2b-load-sse2.h */,
 				6CC2D4471C3185D700334ADD /* blake2b-load-sse41.h */,
 				6CC2D4481C3185D700334ADD /* blake2b-round.h */,
+				3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */,
+				3163D39F1ED59FF500A7FCD9 /* blake2b-common.h */,
 				6CC2D4491C3185D700334ADD /* blake2b.cpp */,
 				6CC2D44A1C3185D700334ADD /* blake2b.hpp */,
 			);
@@ -928,6 +935,7 @@
 				6CC2D4931C318B3B00334ADD /* sha512_base.c in Sources */,
 				313CD4531EC719DD0058A0C5 /* test_ppke.cpp in Sources */,
 				318C729B1C9730140040AEE7 /* tdp.cpp in Sources */,
+				3163D39E1ED59FC400A7FCD9 /* blake2b-common.c in Sources */,
 				6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */,
 				311934B51D27172A0031804B /* test_prg.cpp in Sources */,
 				6CC2D4871C31889B00334ADD /* hash.cpp in Sources */,
@@ -950,6 +958,7 @@
 			files = (
 				6CC2D49E1C318F2500334ADD /* set_hash.cpp in Sources */,
 				316F0D401D25600700F87904 /* prg.cpp in Sources */,
+				3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */,
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
 				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
 				6CC2D4B81C318F2E00334ADD /* main.cpp in Sources */,
@@ -982,6 +991,7 @@
 			files = (
 				318C729D1C9730140040AEE7 /* tdp.cpp in Sources */,
 				310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */,
+				3163D3A11ED5A11A00A7FCD9 /* blake2b-common.c in Sources */,
 				6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				6CC2D4E51C31941500334ADD /* blake2s.cpp in Sources */,
 				6CC2D4D21C3193FA00334ADD /* aez.c in Sources */,

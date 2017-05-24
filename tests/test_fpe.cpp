@@ -19,6 +19,7 @@
 //
 
 #include "../src/fpe.hpp"
+#include "../src/random.hpp"
 
 
 #include <iostream>
@@ -31,21 +32,25 @@ using namespace std;
 
 
 TEST(fpe, correctness) {
-	string in_enc = "This is a test input.";
-	string out_enc, out_dec;
-	
-	array<uint8_t,sse::crypto::Fpe::kKeySize> k;
-	k.fill(0x00);
-	
-	sse::crypto::Fpe fpe(k);
-	fpe.encrypt(in_enc, out_enc);
-	
-	ASSERT_EQ(in_enc.length(), out_enc.length());
-	
-	string in_dec = string(out_enc);
-	
-	fpe.decrypt(in_dec, out_dec);
-	
-    ASSERT_EQ(in_dec.length(), out_dec.length());
-	ASSERT_EQ(in_enc, out_dec);
+    
+    for (size_t i = 1; i <= 100; i++) {
+        
+        string in_enc = sse::crypto::random_string(i);
+        string out_enc, out_dec;
+        
+        array<uint8_t,sse::crypto::Fpe::kKeySize> k;
+        sse::crypto::random_bytes(k);
+        
+        sse::crypto::Fpe fpe(k);
+        fpe.encrypt(in_enc, out_enc);
+        
+        ASSERT_EQ(in_enc.length(), out_enc.length());
+        
+        string in_dec = string(out_enc);
+        
+        fpe.decrypt(in_dec, out_dec);
+        
+        ASSERT_EQ(in_dec.length(), out_dec.length());
+        ASSERT_EQ(in_enc, out_dec);
+    }
 }

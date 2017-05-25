@@ -218,6 +218,11 @@ std::string TdpImpl::public_key() const
 
 void TdpImpl::eval(const std::string &in, std::string &out) const
 {
+    if(in.size() != rsa_size())
+    {
+        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+    }
+
     std::array<uint8_t, kMessageSpaceSize> in_array;
     
     
@@ -654,7 +659,7 @@ void TdpMultPoolImpl::eval(const std::string &in, std::string &out, const uint8_
 {
     if(in.size() != rsa_size())
     {
-        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
     }
     
     std::array<uint8_t, kMessageSpaceSize> a_in, a_out;

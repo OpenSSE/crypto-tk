@@ -47,10 +47,19 @@ TEST(tdp, correctness)
         string sample_string = std::string(sample.begin(), sample.end());
         
         string enc = tdp.eval(sample_string);
+        string enc2;
+        tdp.eval(sample_string, enc2);
 
+        std::array<uint8_t, sse::crypto::Tdp::kMessageSize> enc_arr = tdp.eval(sample);
+        std::array<uint8_t, sse::crypto::Tdp::kMessageSize> enc_arr_inv = tdp_inv.eval(sample);
+        
         string enc_inv;
         tdp_inv.eval(sample_string, enc_inv);
+        
+        ASSERT_EQ(enc, enc2);
         ASSERT_EQ(enc, enc_inv);
+        ASSERT_EQ(enc, std::string(enc_arr.begin(), enc_arr.end()));
+        ASSERT_EQ(enc_arr, enc_arr_inv);
 
         
         string enc_mult1 = tdp_mult.eval(sample_string);
@@ -72,6 +81,41 @@ TEST(tdp, correctness)
 
         ASSERT_EQ(sample, dec_array);
     }
+
+    for (size_t i = 0; i < TEST_COUNT; i++) {
+        sse::crypto::TdpInverse tdp_inv;
+        
+        string pk = tdp_inv.public_key();
+        
+        sse::crypto::Tdp tdp(pk);
+        sse::crypto::TdpMultPool tdp_mult(pk, 2);
+        
+        
+        string sample_string = tdp.sample();
+        
+        string enc = tdp.eval(sample_string);
+        string enc2;
+        tdp.eval(sample_string, enc2);
+        
+        string enc_inv;
+        tdp_inv.eval(sample_string, enc_inv);
+        
+        ASSERT_EQ(enc, enc2);
+        ASSERT_EQ(enc, enc_inv);
+        
+        string enc_mult1 = tdp_mult.eval(sample_string);
+        string enc_mult2;
+        tdp_mult.eval(sample_string, enc_mult2);
+        ASSERT_EQ(enc_mult1, enc_mult2);
+        ASSERT_EQ(enc_mult1, enc);
+        
+        
+        
+        string dec = tdp_inv.invert(enc);
+        
+        ASSERT_EQ(sample_string, dec);        
+    }
+
 }
 
 TEST(tdp, inverse_correctness)
@@ -83,8 +127,8 @@ TEST(tdp, inverse_correctness)
         
         sse::crypto::Tdp tdp(pk);
         
-        
-        string sample = tdp_inv.sample();
+        auto sample_arr =  tdp_inv.sample_array();
+        string sample = std::string(sample_arr.begin(), sample_arr.end());
         
         string v = sample;
         
@@ -176,16 +220,22 @@ TEST(tdp, multiple_inverse_1)
         
         
         string sample = tdp_inv.sample();
-        string goal, v;
+        std::array<uint8_t, sse::crypto::TdpMultPool::kMessageSize> sample_arr;
+        ::copy(sample.begin(), sample.end(), sample_arr.begin());
+
+        string goal, v, w;
         
         goal = tdp_inv.invert_mult(sample, INV_MULT_COUNT);
+        tdp_inv.invert_mult(sample, w, INV_MULT_COUNT);
+        auto goal_arr = tdp_inv.invert_mult(sample_arr, INV_MULT_COUNT);
         
         v = sample;
         for (size_t j = 0; j < INV_MULT_COUNT; j++) {
             v = tdp_inv.invert(v);
         }
         ASSERT_EQ(goal, v);
-        
+        ASSERT_EQ(goal, w);
+        ASSERT_EQ(goal, std::string(goal_arr.begin(), goal_arr.end()));
     }
 }
 
@@ -335,11 +385,21 @@ TEST(tdp, exceptions)
     
     ASSERT_THROW(sse::crypto::Tdp tdp(" "), std::runtime_error);
     ASSERT_THROW(sse::crypto::TdpInverse tdp_inv(" "), std::runtime_error);
+    ASSERT_THROW(sse::crypto::TdpMultPool pool(" ",2), std::runtime_error);
     
     sse::crypto::TdpInverse tdp_inv;
     
     std::string out;
     
     ASSERT_THROW(tdp_inv.invert(" ", out), std::invalid_argument);
+
+    ASSERT_THROW(sse::crypto::TdpMultPool pool(tdp_inv.public_key(), 0), std::invalid_argument);
+    
+    sse::crypto::TdpMultPool pool(tdp_inv.public_key(), 2);
+    
+    ASSERT_THROW(tdp_inv.eval(" ", out), std::invalid_argument);
+    
+    ASSERT_THROW(pool.eval(" ", out, 1), std::invalid_argument);
+    ASSERT_THROW(pool.eval(pool.sample(), out, 45), std::invalid_argument);
 
 }

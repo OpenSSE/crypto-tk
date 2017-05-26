@@ -5,6 +5,18 @@ The SSE protocols rely on high level cryptographic features such as pseudo-rando
 
 For now, the hash function and encryption implementations rely on OpenSSL. This might (and probably will) in the future. However, this will have no influence on the code written using this library: the interfaces to the cryptographic services are *opaque*. It means that all implementation details are hidden. In particular, even if the implementation changes, the header files shouldn't.
 
+
+## Why a new crypto library?
+
+A lot of great crypto libraries exist out there (*e.g.* [libsodium](https://github.com/jedisct1/libsodium)). Unfortunately, they do not offer the level of abstraction needed to implement searchable encryption schemes easily. Indeed, cryptographic objects such as pseudo-random functions, trapdoor permutations, pseudo-random generators, *etc*, are building blocks of such constructions, and OpenSSL or libsodium do not offer interfaces to such objects.
+
+This library provides these APIs so that the SSE implementer has consistent high-level crypto interfaces and does not have to care about the inner implementation of the blocks.
+
+
+## Disclaimer
+
+This is code for a **research project**. It **should not be used in practice**: the code lacks good C/C++ security practice, and it has never been externally reviewed.
+
 ## Building
 
 Building is done through [SConstruct](http://www.scons.org). 
@@ -12,7 +24,7 @@ Three targets can be built:
 
 * `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features). It is the default target.
 
-* `check`: unit tests. It uses boost's [unit test framework](http://www.boost.org/doc/libs/1_59_0/libs/test/doc/html/index.html).
+* `check`: unit tests. It uses [Google Test](https://github.com/google/googletest).
 
 * `lib`: the compiled library. It produces both the static and the shared versions of `libsse_crypto`, copied in the directory `library/lib`, together with the headers in `library/include`. If possible, unit tests are run before constructing the library.
 
@@ -26,8 +38,6 @@ To build the library, just enter in your terminal
 * [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The code has been compiled and tested using OpenSSL 1.0.2d.
 
 * [Boost](http://www.boost.org/) Only headers from Boost are needed to build the library. As the incremental set hashing code relies on the [Endian](http://www.boost.org/doc/libs/release/libs/endian/) library, release older than 1.58 are necessary.
-
-* (Optional) [Boost's unit test framework](http://www.boost.org/doc/libs/1_59_0/libs/test/doc/html/index.html) Only for unit tests. If the framework is not available, no test will be built and run.
 
 ### Compiler
 

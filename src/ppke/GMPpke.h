@@ -115,6 +115,10 @@ public:
         ::memcpy(bytes+3*relicxx::G2::kCompactByteSize, sk4.data(), sk4.size());
     }
 
+    inline const tag_type& get_tag() const
+    {
+        return sk4;
+    }
 protected:
     relicxx::G2 sk1;
     relicxx::G2 sk2;
@@ -245,7 +249,8 @@ class Gmppke
 public:
     
     static constexpr uint8_t kPRFKeySize = 16; // 128 bits
-    
+    static const tag_type NULLTAG;
+
     Gmppke(){
         //        std::cout << "Pairing group order: " << group.order() << std::endl;
     };

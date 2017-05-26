@@ -1,4 +1,5 @@
 # SSE Project's cryptographic layer
+[![build status](https://gitlab.com/sse/crypto/badges/master/build.svg)](https://gitlab.com/sse/crypto/commits/master) [![coverage report](https://gitlab.com/sse/crypto/badges/master/coverage.svg)](https://gitlab.com/sse/crypto/commits/master)
 
 The SSE protocols rely on high level cryptographic features such as pseudo-random functions, hash functions, encryption schemes, or incremental set hashing. The cryptographic layer provides interfaces and implementations of these features. 
 

@@ -29,8 +29,8 @@
 
 //#include "../tests/test_hmac.hpp"
 
-#include "../src/hmac.hpp"
 #include "../src/hash/sha512.hpp"
+#include "../src/hmac.hpp"
 
 
 #include <iostream>
@@ -55,10 +55,13 @@ TEST(hmac_sha_512, test_vector_1)
 	k.fill(0x0b);
 	
 	
-	HMAC_SHA512 hmac(k.data(),20);
+    HMAC_SHA512 hmac(k.data(),20);
+    HMAC_SHA512 hmac2(std::string(k.begin(), k.end()),20);
+    
 	string in = "Hi There";
 	
-	array<uint8_t,64> result_64 = hmac.hmac(in);
+    array<uint8_t,64> result_64 = hmac.hmac(in);
+    array<uint8_t,64> result_64_2 = hmac2.hmac(in);
 	
 	array<uint8_t,64> reference = {{
 							0x87, 0xaa, 0x7c, 0xde, 0xa5, 0xef, 0x61, 0x9d, 0x4f, 0xf0, 0xb4, 0x24, 0x1a, 0x1d, 0x6c, 0xb0,
@@ -69,6 +72,7 @@ TEST(hmac_sha_512, test_vector_1)
 	
 	
     ASSERT_EQ(result_64, reference);
+    ASSERT_EQ(result_64_2, reference);
 }
 
 TEST(hmac_sha_512, test_vector_2)
@@ -144,3 +148,43 @@ TEST(hmac_sha_512, test_vector_4)
     ASSERT_EQ(result_64, reference);
 }
 
+TEST(hmac, consistency)
+{
+    array<uint8_t,HMAC_SHA512::kKeySize> key_arr;
+
+    sse::crypto::random_bytes(key_arr);
+    string key = string(key_arr.begin(), key_arr.end());
+    
+    HMAC_SHA512 hmac1(key);
+    HMAC_SHA512 hmac2(key,key_arr.size());
+    HMAC_SHA512 hmac3(key.data());
+    HMAC_SHA512 hmac4(key.data(),key_arr.size());
+    HMAC_SHA512 hmac5(key_arr);
+    HMAC_SHA512 hmac6 = hmac1;
+
+    string in = sse::crypto::random_string(1000);
+    auto ref = hmac1.hmac(in);
+    
+    ASSERT_EQ(ref, hmac2.hmac(in));
+    ASSERT_EQ(ref, hmac3.hmac(in));
+    ASSERT_EQ(ref, hmac4.hmac(in));
+    ASSERT_EQ(ref, hmac5.hmac(in));
+    ASSERT_EQ(ref, hmac6.hmac(in));
+    
+}
+
+TEST(hmac, exception)
+{
+    array<uint8_t,25> k = {{ 	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+								0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19}};
+    
+    
+    ASSERT_THROW(HMAC_SHA512 hmac(NULL), std::invalid_argument);
+    ASSERT_THROW(HMAC_SHA512 hmac(k.data(),0), std::invalid_argument);
+    ASSERT_THROW(HMAC_SHA512 hmac(k.data(),255), std::invalid_argument);
+    ASSERT_THROW(HMAC_SHA512 hmac(NULL,25), std::invalid_argument);
+
+    ASSERT_THROW(HMAC_SHA512 hmac(std::string(k.begin(), k.end()),0), std::invalid_argument);
+    ASSERT_THROW(HMAC_SHA512 hmac(std::string(k.begin(), k.end()),255), std::invalid_argument);
+
+}

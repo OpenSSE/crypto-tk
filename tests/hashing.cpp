@@ -28,6 +28,10 @@
 
 #include "../src/hash.hpp"
 #include "../src/hash/sha512.hpp"
+#include "../src/hash/blake2s/blake2s.hpp"
+#include "../src/hash/blake2b/blake2b.hpp"
+
+#include "blake2_kat.h"
 
 #include <iostream>
 #include <iomanip>
@@ -138,4 +142,86 @@ TEST(sha_512, test_vector_5)
     string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
     
     ASSERT_EQ(out_string, ref_string);
+}
+
+TEST(blake2,blake2s)
+{
+    // use the test vectors in header blake2_kat.h
+    constexpr size_t IN_LENGTH = 256;
+    constexpr size_t HASH_LENGTH = 256;
+    
+    uint8_t in[IN_LENGTH] = {0};
+    uint8_t hash[HASH_LENGTH] = {0};
+    
+    for (size_t i = 0; i < sizeof(in); ++i){
+        in[i] = i;
+    }
+
+    for (size_t i = 0; i < sizeof(in); ++i){
+        sse::crypto::hash::blake2s::hash(in, i, hash);
+        
+        string ref_string((char*)blake2s_kat[i], sse::crypto::hash::blake2s::kDigestSize);
+        string out_string((char*)hash, sse::crypto::hash::blake2s::kDigestSize);
+
+        ASSERT_EQ(ref_string, out_string);
+    }
+}
+
+TEST(blake2,blake2b)
+{
+    // use the test vectors in header blake2_kat.h
+    constexpr size_t IN_LENGTH = 256;
+    constexpr size_t HASH_LENGTH = 256;
+    
+    uint8_t in[IN_LENGTH] = {0};
+    uint8_t hash[HASH_LENGTH] = {0};
+    
+    for (size_t i = 0; i < sizeof(in); ++i){
+        in[i] = i;
+    }
+    
+    for (size_t i = 0; i < sizeof(in); ++i){
+        sse::crypto::hash::blake2b::hash(in, i, hash);
+        
+        string ref_string((char*)blake2b_kat[i], sse::crypto::hash::blake2b::kDigestSize);
+        string out_string((char*)hash, sse::crypto::hash::blake2b::kDigestSize);
+        
+        ASSERT_EQ(ref_string, out_string);
+    }
+}
+
+
+TEST(hash, consistency)
+{
+    for (size_t i = 1; i < sse::crypto::Hash::kDigestSize; i++) {
+        std::string in = std::to_string(i);
+        std::string out, trunc_out;
+        std::array<uint8_t, sse::crypto::Hash::kDigestSize> out_array;
+        std::array<uint8_t, sse::crypto::Hash::kDigestSize> trunc_out_array;
+        
+        out = sse::crypto::Hash::hash(in);
+        trunc_out = sse::crypto::Hash::hash(in, i);
+        sse::crypto::Hash::hash((uint8_t *)in.data(), in.size(), out_array.data());
+        sse::crypto::Hash::hash((uint8_t *)in.data(), in.size(), i, trunc_out_array.data());
+        
+        ASSERT_EQ(trunc_out, std::string(out.begin(), out.begin()+i));
+        ASSERT_EQ(out, std::string(out_array.begin(), out_array.end()));
+        ASSERT_EQ(trunc_out, std::string(trunc_out_array.begin(), trunc_out_array.begin()+i));
+    }
+}
+
+TEST(hash, exceptions)
+{
+    std::string in;
+    std::string out;
+    
+    ASSERT_THROW(sse::crypto::Hash::hash(in, sse::crypto::Hash::kDigestSize + 1), std::invalid_argument);
+    
+    ASSERT_THROW(sse::crypto::Hash::hash((uint8_t*)in.data(), 0, NULL), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Hash::hash(NULL, 0, (uint8_t*)out.data()), std::invalid_argument);
+
+    ASSERT_THROW(sse::crypto::Hash::hash((uint8_t*)in.data(), 0, sse::crypto::Hash::kDigestSize + 1, (uint8_t*)out.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Hash::hash(NULL, 0, sse::crypto::Hash::kDigestSize - 1, (uint8_t*)out.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Hash::hash((uint8_t*)in.data(), 0, sse::crypto::Hash::kDigestSize - 1, NULL), std::invalid_argument);
+
 }

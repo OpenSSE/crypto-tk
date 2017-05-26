@@ -112,18 +112,76 @@ TEST(prg, consistency_1)
 TEST(prg, consistency_2)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
-
+    
     for (size_t i = 0; i < TEST_COUNT; i++) {
-                
+        
         sse::crypto::random_bytes(k);
         
         sse::crypto::Prg prg(k);
         
         std::string out1, out2;
         
-        out1 = prg.derive(64);
-        out2 = sse::crypto::Prg::derive(k,16,64-16);
-      
+        out1 = prg.derive(31);
+        out2 = sse::crypto::Prg::derive(k,16,15);
+        
         ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
+}
+
+TEST(prg, consistency_3)
+{
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+
+    for (size_t i = 0; i < TEST_COUNT; i++) {
+                
+        sse::crypto::random_bytes(k);
+        
+        sse::crypto::Prg prg(k);
+        sse::crypto::Prg prg2(k.data());
+        
+        std::string out1, out2, out3, out4, out5, out6;
+        std::string out7, out8, out10;
+        
+        std::array<uint8_t, 58> out_arr;
+        uint8_t out_bytes[30];
+        
+        out1 = prg.derive(64);
+        out2 = sse::crypto::Prg::derive(k,16,64-16);
+        sse::crypto::Prg::derive(k.data(),64,out3);
+        sse::crypto::Prg::derive(k,64,out4);
+        out5 = sse::crypto::Prg::derive(k,64);
+        sse::crypto::Prg::derive(k,15,10, out6);
+        sse::crypto::Prg::derive(k.data(),6,58, out_arr.data());
+      
+        prg2.derive(64,out7);
+        prg2.derive(18,46,out8);
+        prg2.derive(34, 30, out_bytes);
+        
+        ASSERT_EQ(out2, std::string(out1.begin()+16, out1.end()));
+        ASSERT_EQ(out1, out3);
+        ASSERT_EQ(out1, out4);
+        ASSERT_EQ(out1, out5);
+        ASSERT_EQ(out6, std::string(out1.begin()+15, out1.begin()+15+10));
+        ASSERT_EQ(std::string(out_arr.begin(), out_arr.end()),
+                  std::string(out1.begin()+6, out1.begin()+6+58));
+        
+        ASSERT_EQ(out1, out7);
+        ASSERT_EQ(out8, std::string(out1.begin()+18, out1.end()));
+        ASSERT_EQ(std::string((char*)out_bytes, 30), std::string(out1.begin()+34, out1.end()));
+
+    }
+}
+
+TEST(prg, exceptions)
+{
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+    sse::crypto::Prg prg(k);
+
+    std::string out;
+    
+    ASSERT_THROW(prg.derive(0, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Prg::derive(k.data(),0, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Prg::derive((const uint8_t*)NULL,10, out), std::invalid_argument);
+    
+    ASSERT_THROW(sse::crypto::Prg p(NULL), std::invalid_argument);
 }

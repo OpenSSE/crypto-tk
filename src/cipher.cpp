@@ -43,7 +43,7 @@ public:
 	// This is enough to encrypt 2^48 blocks which is the security bound of counter mode
 	static constexpr uint8_t kIVSize = 6; 
 
-	CipherImpl();
+    CipherImpl() = delete;
 	
 	CipherImpl(const std::array<uint8_t,kKeySize>& k);
 	CipherImpl(const uint8_t* k);
@@ -66,10 +66,6 @@ private:
 	uint64_t remaining_block_count_;
 };
 	
-
-Cipher::Cipher() : cipher_imp_(new CipherImpl())
-{
-}
 
 Cipher::Cipher(const std::array<uint8_t,kKeySize>& k) : cipher_imp_(new CipherImpl(k))
 {	
@@ -95,15 +91,6 @@ void Cipher::decrypt(const std::string &in, std::string &out)
 }
 
 // Cipher implementation
-
-Cipher::CipherImpl::CipherImpl()
-    : aes_enc_key_{}, remaining_block_count_(0)
-{
-	unsigned char k[kKeySize];
-	random_bytes(kKeySize, k);
-	gen_subkeys(k);
-	reset_iv();
-}
 
 Cipher::CipherImpl::CipherImpl(const std::array<uint8_t,kKeySize>& k)
     : aes_enc_key_{}, remaining_block_count_(0)
@@ -148,7 +135,7 @@ void Cipher::CipherImpl::reset_iv()
 void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
     if (len == 0) {
-        throw std::runtime_error("The minimum number of bytes to encrypt is 1.");
+        throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
     }
 	if(remaining_block_count_ < ((len/16)+1)){
 		// throw an exception
@@ -218,7 +205,7 @@ void Cipher::CipherImpl::decrypt(const std::string &in, std::string &out)
 	size_t len = in.size();
 
     if (len <= kIVSize) {
-        throw std::runtime_error("The minimum number of bytes to decrypt is 1. The minimum length for a decryption input is kIVSize+1");
+        throw std::invalid_argument("The minimum number of bytes to decrypt is 1. The minimum length for a decryption input is kIVSize+1");
     }
 
     unsigned char *data = new unsigned char[len-kIVSize];

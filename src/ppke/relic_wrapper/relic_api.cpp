@@ -208,6 +208,7 @@ ZR operator<<(const ZR& a, int b)
 	// left shift
 	ZR zr;
 	bn_lsh(zr.z, a.z, b);
+    if(bn_cmp(zr.z, zr.order) == CMP_GT) bn_mod(zr.z, zr.z, zr.order);
 	return zr;
 }
 
@@ -467,12 +468,12 @@ ostream& operator<<(ostream& s, const G2& g2)
 // End G2-specific classes
 
 // Begin GT-specific classes
-GT::GT(const uint8_t* bytes)
+GT::GT(const uint8_t* bytes, bool compress)
 {
     error_if_relic_not_init();
     gt_inits(g);
     isInit = true;
-    gt_read_bin(g, const_cast<uint8_t*>(bytes), kByteSize);
+    gt_read_bin(g, const_cast<uint8_t*>(bytes), (compress) ? kCompactByteSize : kByteSize);
 }
 
 GT operator*(const GT& x, const GT& y)
@@ -572,7 +573,7 @@ void GT::writeBytes(uint8_t *bytes, bool compress) const
 {
     unsigned int l  = gt_size_bin(const_cast<GT*>(this)->g, compress);
     
-    assert(l == kByteSize);
+    assert(l == ((compress) ? kCompactByteSize : kByteSize));
     
     gt_write_bin(bytes, l, const_cast<GT*>(this)->g, compress);
 }

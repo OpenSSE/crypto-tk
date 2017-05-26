@@ -58,6 +58,11 @@ namespace sse
             
             HMac(const void* k)
             {
+                if(k == NULL)
+                {
+                    throw std::invalid_argument("Invalid key: key == NULL");
+                }
+                
                 std::memcpy(key_.data(),k,kKeySize);
                 gen_padded_keys(key_);
             };
@@ -67,7 +72,17 @@ namespace sse
             {
                 if(len > kKeySize)
                 {
-                    throw std::runtime_error("Invalid key length: len > kKeySize");
+                    throw std::invalid_argument("Invalid key length: len > kKeySize");
+                }
+                
+                if(len == 0)
+                {
+                    throw std::invalid_argument("Invalid key length: len == 0");
+                }
+                
+                if(k == NULL)
+                {
+                    throw std::invalid_argument("Invalid key: key == NULL");
                 }
                 
                 uint8_t l = (kKeySize < len) ? kKeySize : len;
@@ -90,6 +105,16 @@ namespace sse
             
             HMac(const std::string& k, const uint8_t &len)
             {
+                if(len > kKeySize)
+                {
+                    throw std::invalid_argument("Invalid key length: len > kKeySize");
+                }
+                
+                if(len == 0)
+                {
+                    throw std::invalid_argument("Invalid key length: len == 0");
+                }
+
                 uint8_t l = (kKeySize < len) ? kKeySize : len;
                 
                 std::memset(key_.data(), 0x00, kKeySize);

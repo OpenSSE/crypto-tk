@@ -23,6 +23,10 @@
 
 #include <stdio.h>
 
+#if !(defined __AVX2__) || !(defined __AVX__) || !(defined __SSE4_1__)
+
+#pragma "Use SHA 512 base implementation"
+
 void sha512_base(const void* M, void* D, uint64_t L);
 
 #define UL64(x) x##ULL
@@ -184,3 +188,5 @@ void sha512_base(const void* M, void* D, uint64_t L)
 		mbedtls_sha512_process((M+(i << 7)), (uint64_t*)D);
 	}
 }
+
+#endif

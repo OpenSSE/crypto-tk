@@ -44,6 +44,14 @@ namespace sse
             const static size_t kCiphertextSize = 90;
             typedef std::array<uint8_t, kCiphertextSize> ciphertext_type;
 
+            
+            inline tag_type extract_tag(const key_share_type& keyshare)
+            {
+                tag_type tag;
+                std::copy(keyshare.end()-kTagSize, keyshare.end(), tag.begin());
+                return tag;
+            }
+            
         }
         
         class PuncturableEncryption

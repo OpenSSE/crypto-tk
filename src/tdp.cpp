@@ -151,7 +151,7 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
     
 TdpImpl::TdpImpl(const TdpImpl& tdp)
 {
-    set_rsa_key(RSAPrivateKey_dup(tdp.rsa_key_));
+    set_rsa_key(RSAPublicKey_dup(tdp.rsa_key_));
 }
     
 
@@ -164,7 +164,7 @@ inline void TdpImpl::set_rsa_key(RSA* k)
 {
     if(k == NULL)
     {
-        throw std::runtime_error("Invalid input: k == NULL.");
+        throw std::invalid_argument("Invalid input: k == NULL.");
     }
 
     rsa_key_ = k;
@@ -218,6 +218,11 @@ std::string TdpImpl::public_key() const
 
 void TdpImpl::eval(const std::string &in, std::string &out) const
 {
+    if(in.size() != rsa_size())
+    {
+        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+    }
+
     std::array<uint8_t, kMessageSpaceSize> in_array;
     
     
@@ -501,7 +506,7 @@ void TdpInverseImpl::invert(const std::string &in, std::string &out) const
 
     if(in.size() != rsa_size())
     {
-        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
     }
  
     ret = RSA_private_decrypt((int)in.size(), (const unsigned char*)in.data(), rsa_out, get_rsa_key(), RSA_NO_PADDING);
@@ -530,7 +535,7 @@ std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mu
     
     if(in.size() != rsa_size())
     {
-        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
     }
     
     BN_CTX* ctx = BN_CTX_new();
@@ -654,7 +659,7 @@ void TdpMultPoolImpl::eval(const std::string &in, std::string &out, const uint8_
 {
     if(in.size() != rsa_size())
     {
-        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
     }
     
     std::array<uint8_t, kMessageSpaceSize> a_in, a_out;
@@ -758,7 +763,7 @@ TdpInverse::TdpInverse(const std::string& sk) : tdp_inv_imp_(new TdpInverseImpl(
 {
 }
 
-TdpInverse::TdpInverse(const TdpInverse& tdp) : tdp_inv_imp_(new TdpInverseImpl(tdp.private_key()))
+TdpInverse::TdpInverse(const TdpInverse& tdp) : tdp_inv_imp_(new TdpInverseImpl(*tdp.tdp_inv_imp_))
 {
 }
 

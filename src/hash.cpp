@@ -37,6 +37,16 @@ using hash_function = hash::blake2b;
 	
 void Hash::hash(const unsigned char *in, const size_t &len, unsigned char *out)
 {
+    if(in == NULL)
+    {
+        throw std::invalid_argument("in is NULL");
+    }
+    
+    if(out == NULL)
+    {
+        throw std::invalid_argument("out is NULL");
+    }
+
 	// memset(out,0x00, kDigestSize);
 	static_assert(kDigestSize == hash_function::kDigestSize, "Declared digest size and hash_function digest size do not match");
 	static_assert(kBlockSize == hash_function::kBlockSize, "Declared block size and hash_function block size do not match");
@@ -47,9 +57,20 @@ void Hash::hash(const unsigned char *in, const size_t &len, const size_t &out_le
 {
     if(out_len > kDigestSize)
     {
-        throw std::runtime_error("Invalid output length: out_len > kDigestSize");
+        throw std::invalid_argument("Invalid output length: out_len > kDigestSize");
     }
-
+    
+    if(in == NULL)
+    {
+        throw std::invalid_argument("in is NULL");
+    }
+    
+    if(out == NULL)
+    {
+        throw std::invalid_argument("out is NULL");
+    }
+    
+    
 	unsigned char digest[kDigestSize];
 
 	hash(in, len, digest);
@@ -68,7 +89,7 @@ void Hash::hash(const std::string &in, const size_t &out_len, std::string &out)
 {
     if(out_len > kDigestSize)
     {
-        throw std::runtime_error("Invalid output length: out_len > kDigestSize");
+        throw std::invalid_argument("Invalid output length: out_len > kDigestSize");
     }
 
     unsigned char tmp_out [kDigestSize];

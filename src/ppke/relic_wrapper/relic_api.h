@@ -146,33 +146,6 @@ public:
     std::vector<uint8_t> getBytes() const;
     void writeBytes(uint8_t *bytes) const;
     
-        //		friend class cereal::access;
-//		template <class Archive>
-//		void save( Archive & ar) const
-//		{
-//			auto data = getBytes();
-//			ar(data);
-//		}
-//		template <class Archive>
-//		void load( Archive & ar)
-//		{
-//			std::vector<uint8_t>data(BN_BYTES);
-//			ar(data);
-//			bn_read_bin(z,&data[0],BN_BYTES);
-//		}
-//		template <>
-//		void save<cereal::JSONOutputArchive>(cereal::JSONOutputArchive & ar) const{
-//			std::cout <<"binarysave" << std::endl;
-//			auto data = getBytes();
-//			ar.saveBinaryValue(&data[0],data.size());
-//		}
-//		template <>
-//		void load<cereal::JSONInputArchive>(cereal::JSONInputArchive & ar)
-//		{
-//			std::vector<uint8_t>data(BN_BYTES);
-//			ar.loadBinaryValue(&data[0],data.size());
-//			bn_read_bin(z,&data[0],BN_BYTES);
-//		}
 	friend ZR hashToZR(const bytes &);
 	friend ZR power(const ZR&, int);
 	friend ZR power(const ZR&, const ZR&);
@@ -255,22 +228,6 @@ public:
     void writeBytes(uint8_t *bytes, bool compress = 0) const;
 
     
-    
-//    template<class Archive>
-//    void save(Archive & ar) const
-//    {
-//    	auto data = getBytes(POINT_COMPRESS);
-//		ar(data);
-//    }
-//    template<class Archive>
-//    void load(Archive & ar){
-//    	std::vector<uint8_t>data;
-//		ar(data);
-//    	g1_read_bin(g,&data[0],data.size());
-//    }
-//    friend class cereal::access;
-
-
 	friend G1 hashToG1(const bytes &);
 	friend G1 power(const G1&, const ZR&);
 	friend G1 operator-(const G1&);
@@ -333,20 +290,6 @@ public:
 	std::vector<uint8_t> getBytes( bool compress = 0) const;
     void writeBytes(uint8_t *bytes, bool compress = 0) const;
 
-//    template<class Archive>
-//    void save(Archive & ar) const
-//    {
-//    	auto data = getBytes(POINT_COMPRESS);
-//		ar(data);
-//    }
-//    template<class Archive>
-//    void load(Archive & ar){
-//    	std::vector<uint8_t>data;
-//		ar(data);
-//    	g2_read_bin(g,&data[0],data.size());
-//    }
-//    friend class cereal::access;
-
 	friend G2 hashToG2(const bytes &);
 	friend G2 power(const G2&, const ZR&);
 	friend G2 operator-(const G2&);
@@ -363,12 +306,13 @@ class GT
 {
 public:
     constexpr static uint16_t kByteSize = 12 * FP_BYTES;
+    constexpr static uint16_t kCompactByteSize = 8 * FP_BYTES;
     
 	gt_t g;
 	bool isInit;
     GT()   { error_if_relic_not_init();gt_inits(g); isInit = true; gt_set_unity(g); }
     GT(const GT& x) { error_if_relic_not_init();gt_inits(g); isInit = true; gt_copy(g, const_cast<GT&>(x).g); }
-    GT(const uint8_t* bytes);
+    GT(const uint8_t* bytes, bool compress);
 
     ~GT()  {
     	if(isInit) {
@@ -407,20 +351,6 @@ public:
     void getBytes(bool compress, const size_t out_len, uint8_t* out) const;
     void writeBytes(uint8_t *bytes, bool compress) const;
 
-//    template<class Archive>
-//    void save(Archive & ar) const
-//    {
-//    	auto data = getBytes(POINT_COMPRESS);
-//		ar(data);
-//    }
-//    template<class Archive>
-//    void load(Archive & ar){
-//    	std::vector<uint8_t>data;
-//		ar(data);
-//    	gt_read_bin(g,&data[0],data.size());
-//    }
-//    friend class cereal::access;
-
 	friend GT pairing(const G1&, const G1&);
 	friend GT pairing(const G1&, const G2&);
 	friend GT power(const GT&, const ZR&);
@@ -457,12 +387,6 @@ class PairingGroup
 {
 public:
 	PairingGroup();
-	// PairingGroup(int ptype,bool init,bn_t o){
-	// 	pairingType = ptype;
-	// 	isInit = init;
-	// 	bn_copy(o,grp_order);
-	// }
-
 	~PairingGroup();
 
     constexpr static unsigned int kStatisticalSecurity = 32;
@@ -544,8 +468,5 @@ private:
 	bn_t grp_order;
 };
 
-//template<> 
-//ZR PairingGroup::random12<ZR>(){return this->random(ZR_t);}
-//byte256 intToBits(const ZR & id);
 }
 #endif

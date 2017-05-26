@@ -698,8 +698,10 @@ Tdp::~Tdp()
 
 Tdp& Tdp::operator=(const Tdp& t)
 {
-    delete tdp_imp_;
-    tdp_imp_ = new TdpImpl(*t.tdp_imp_);
+    if (tdp_imp_ != t.tdp_imp_) {
+        delete tdp_imp_;
+        tdp_imp_ = new TdpImpl(*t.tdp_imp_);
+    }
     
     return *this;
 }
@@ -769,9 +771,10 @@ TdpInverse::TdpInverse(const TdpInverse& tdp) : tdp_inv_imp_(new TdpInverseImpl(
 
 TdpInverse& TdpInverse::operator=(const TdpInverse& t)
 {
-    delete tdp_inv_imp_;
-    tdp_inv_imp_ = new TdpInverseImpl(*t.tdp_inv_imp_);
-    
+    if (tdp_inv_imp_ != t.tdp_inv_imp_) {
+        delete tdp_inv_imp_;
+        tdp_inv_imp_ = new TdpInverseImpl(*t.tdp_inv_imp_);
+    }
     return *this;
 }
 
@@ -885,9 +888,10 @@ TdpMultPool::TdpMultPool(const TdpMultPool& pool) :
 
 TdpMultPool& TdpMultPool::operator=(const TdpMultPool& t)
 {
-    delete tdp_pool_imp_;
-    tdp_pool_imp_ = new TdpMultPoolImpl(*t.tdp_pool_imp_);
-    
+    if (tdp_pool_imp_ != t.tdp_pool_imp_) {
+        delete tdp_pool_imp_;
+        tdp_pool_imp_ = new TdpMultPoolImpl(*t.tdp_pool_imp_);
+    }
     return *this;
 }
 

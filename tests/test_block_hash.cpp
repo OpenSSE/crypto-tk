@@ -92,7 +92,6 @@ TEST(block_hash_aes, mult_hash)
     for (size_t i = 1; i <= 32; i++) {
         uint8_t *in, *out;
         in = new uint8_t [i*16];
-        out = new uint8_t [i*16];
         
         // copy the input array i types
         for (size_t j = 0; j < i; j++) {
@@ -100,12 +99,16 @@ TEST(block_hash_aes, mult_hash)
             std::string in_string((char *)in+j*16, 16);
             ASSERT_EQ(in_string, std::string(in_array.begin(), in_array.end()));
         }
+        out = new uint8_t [i*16];
         sse::crypto::BlockHash::mult_hash(in, i*16, out);
         
         for (size_t j = 0; j < i; j++) {
             std::string out_string((char *)out+j*16, 16);
             ASSERT_EQ(out_string, std::string(expected_out.begin(), expected_out.end()));
         }
+        
+        delete [] in;
+        delete [] out;
     }
 }
 

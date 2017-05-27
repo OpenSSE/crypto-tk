@@ -151,7 +151,7 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
     
 TdpImpl::TdpImpl(const TdpImpl& tdp)
 {
-    set_rsa_key(RSAPublicKey_dup(tdp.rsa_key_));
+    set_rsa_key(RSAPublicKey_dup(tdp.rsa_key_)); /* LCOV_EXCL_LINE */
 }
     
 
@@ -193,7 +193,7 @@ std::string TdpImpl::public_key() const
 
     if(ret != 1)
     {
-        throw std::runtime_error("Error when serializing the RSA public key.");
+        throw std::runtime_error("Error when serializing the RSA public key."); /* LCOV_EXCL_LINE */
     }
     
 
@@ -205,7 +205,7 @@ std::string TdpImpl::public_key() const
     
     if(read_bytes == 0)
     {
-        throw std::runtime_error("Error when reading BIO.");
+        throw std::runtime_error("Error when reading BIO."); /* LCOV_EXCL_LINE */
     }
 
     std::string v(reinterpret_cast<const char*>(buf), len);
@@ -241,7 +241,7 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::eval(const std::array<u
     
     if(in.size() != rsa_size())
     {
-        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long."); /* LCOV_EXCL_LINE */
     }
     
     BN_CTX* ctx = BN_CTX_new();
@@ -288,7 +288,7 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
     ret = BN_rand_range(rnd, rsa_key_->n);
     if(ret != 1)
     {
-        throw std::runtime_error("Invalid random number generation.");
+        throw std::runtime_error("Invalid random number generation."); /* LCOV_EXCL_LINE */
     }
     size_t offset = kMessageSpaceSize - BN_num_bytes(rnd);
     
@@ -361,13 +361,13 @@ TdpInverseImpl::TdpInverseImpl()
     ret = BN_set_word(bne, e);
     if(ret != 1)
     {
-        throw std::runtime_error("Invalid BIGNUM initialization.");
+        throw std::runtime_error("Invalid BIGNUM initialization."); /* LCOV_EXCL_LINE */
     }
     
     ret = RSA_generate_key_ex(get_rsa_key(), RSA_MODULUS_SIZE, bne, NULL);
     if(ret != 1)
     {
-        throw std::runtime_error("Invalid RSA key generation.");
+        throw std::runtime_error("Invalid RSA key generation."); /* LCOV_EXCL_LINE */
     }
     
     // initialize the useful variables
@@ -465,7 +465,7 @@ std::string TdpInverseImpl::private_key() const
     ret = EVP_PKEY_set1_RSA(evpkey, get_rsa_key());
     if(ret != 1)
     {
-        throw std::runtime_error("Invalid EVP initialization.");
+        throw std::runtime_error("Invalid EVP initialization."); /* LCOV_EXCL_LINE */
     }
     
     // initialize a buffer
@@ -475,7 +475,7 @@ std::string TdpInverseImpl::private_key() const
     ret = PEM_write_bio_PKCS8PrivateKey(bio, evpkey, NULL, NULL, 0, NULL, NULL);
     if(ret != 1)
     {
-        throw std::runtime_error("Failure when writing private KEY.");
+        throw std::runtime_error("Failure when writing private KEY."); /* LCOV_EXCL_LINE */
     }
     
     // put the buffer in a std::string
@@ -485,7 +485,7 @@ std::string TdpInverseImpl::private_key() const
     int read_bytes = BIO_read(bio, buf, (int)len);
     if(read_bytes == 0)
     {
-        throw std::runtime_error("Error when reading BIO.");
+        throw std::runtime_error("Error when reading BIO."); /* LCOV_EXCL_LINE */
     }
     
     
@@ -535,7 +535,7 @@ std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mu
     
     if(in.size() != rsa_size())
     {
-        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
+        throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long."); /* LCOV_EXCL_LINE */
     }
     
     BN_CTX* ctx = BN_CTX_new();

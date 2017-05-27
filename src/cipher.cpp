@@ -139,7 +139,7 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
     }
 	if(remaining_block_count_ < ((len/16)+1)){
 		// throw an exception
-		throw std::runtime_error("Too many blocks were encrypted with the same key. Encrypting using this key is now insecure.");
+		throw std::runtime_error("Too many blocks were encrypted with the same key. Encrypting using this key is now insecure."); /* LCOV_EXCL_LINE */
 	}
 	
     unsigned char enc_iv[AES_BLOCK_SIZE];

@@ -52,6 +52,13 @@ namespace sse
                 return tag;
             }
             
+            inline tag_type extract_tag(const ciphertext_type& ciphertext)
+            {
+                tag_type tag;
+                std::copy(ciphertext.end()-kTagSize, ciphertext.end(), tag.begin());
+                return tag;
+            }
+            
         }
         
         class PuncturableEncryption

@@ -1,0 +1,28 @@
+language: cpp
+
+os: linux
+dist: trusty
+sudo: required
+addons:
+   apt:
+     sources:
+       - ubuntu-toolchain-r-test
+     packages:
+       - g++-4.9
+       - libssl-dev
+       - yasm
+       - libgmp-dev
+       - gcovr
+
+
+env:
+- MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+  - wget -q http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz; tar xf boost_1_60_0.tar.gz ; mv boost_1_60_0/boost src/.
+  - ./install_relic.sh
+ 
+script:
+  - scons check static_relic=1 no_aesni=1
+  - scons -Q -c check && scons check debug=1 gcov=1 static_relic=1

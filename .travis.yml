@@ -26,4 +26,4 @@ before_install:
  
 script:
   - scons check static_relic=1 no_aesni=1
-  - scons -Q -c check && scons check debug=1 gcov=1 static_relic=1
+  # - scons -Q -c check && scons check debug=1 gcov=1 static_relic=1

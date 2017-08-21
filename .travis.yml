@@ -1,0 +1,37 @@
+language: cpp
+
+os: linux
+dist: trusty
+sudo: required
+addons:
+   apt:
+     sources:
+       - ubuntu-toolchain-r-test
+     packages:
+       - g++-4.9
+       - libssl-dev
+       - yasm
+       - libgmp-dev
+       - lcov
+
+
+env:
+- MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+  # - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - wget -q http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz; tar xf boost_1_60_0.tar.gz ; mv boost_1_60_0/boost src/.
+  - ./install_relic.sh
+  - gem install coveralls-lcov
+ 
+script:
+  - scons check static_relic=1 no_aesni=1
+  - scons -Q -c check && scons check debug=1 gcov=1 static_relic=1
+
+after_success:
+  - lcov --directory build -b . --capture --output-file coverage.info
+  - lcov --remove coverage.info 'tests/*' '/usr/*' '*boost*' --output-file coverage.info
+  # - lcov --remove coverage.info '/Applications/*' --output-file coverage.info # For Mac OS
+  - lcov --list coverage.info # debug before upload
+  - coveralls-lcov coverage.info

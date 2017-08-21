@@ -7,6 +7,7 @@ config.scons
 config.log
 *.o
 build
+build_test
 bin
 
 debug_crypto
@@ -39,3 +40,4 @@ xcshareddata
 *.gcda
 *.gcno
 gcov
+coverage.info

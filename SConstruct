@@ -6,7 +6,7 @@ try:
     # env.Append(ENV = {'TERM' : os.environ['TERM']}) # Keep our nice terminal environment (like colors ...)
     env.Append(ENV = os.environ) # Keep our nice terminal environment (like colors ...)
 except:
-    print "Not running in a terminal"
+    print("Not running in a terminal")
 
 
 if 'CC' in os.environ:

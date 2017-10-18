@@ -502,7 +502,8 @@ std::string TdpInverseImpl::private_key() const
 void TdpInverseImpl::invert(const std::string &in, std::string &out) const
 {
     int ret;
-    unsigned char rsa_out[rsa_size()];
+    //	alloc on the stack
+    unsigned char *rsa_out = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()));
 
     if(in.size() != rsa_size())
     {

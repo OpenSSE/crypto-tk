@@ -15,7 +15,9 @@ void assign_hash(Field const &F, Hash const &H, typename Field::Element &result,
   static_assert(Hash::block_bytes > Hash::digest_bytes + 1,"");
 
   const size_t num_digests = div_ceil(F.num_bytes(), Hash::digest_bytes);
-  uint8_t buf[num_digests * Hash::digest_bytes];
+  
+  //  alloc on the stack instead of uint8_t buf[num_digests * Hash::digest_bytes]
+  uint8_t *buf = (uint8_t *)alloca(sizeof(uint8_t)*num_digests * Hash::digest_bytes);
 
   hash::hash_expand(H, buf, num_digests, data);
   assign(F, result, jbms::little_endian(jbms::array_view<uint8_t>(buf, F.num_bytes())));

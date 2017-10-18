@@ -69,10 +69,10 @@ namespace crypto
 
 	inline std::string random_string(const size_t &length)
 	{
-        uint8_t buffer [length];
-		random_bytes(length, buffer);
+        std::string out(length,0x00);
+		random_bytes(length, (unsigned char*)out.data());
         
-        return std::string((char *)buffer, length);
+        return out;
 	}
 }
 }

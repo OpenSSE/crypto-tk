@@ -40,7 +40,8 @@ namespace binary_field {
       return;                                                                                                                  \
     }                                                                                                                          \
     using FE = typename Field::Element;                                                                                        \
-    buffer_declaration;                                                                                                        \
+    buffer_declaration;                                                                                                    \
+    /*FE *temp_buffer = (FE *)alloca(sizeof(FE)*(sz - 2));*/                                                                       \
     /* temp_buffer[i] = a_{i+1}  */                                                                                            \
     auto input_it = boost::prior(boost::end(input)), input_begin = boost::begin(input);                                        \
     FE cumulative = *input_it;                                                                                                 \
@@ -74,7 +75,7 @@ namespace binary_field {
 // clang doesn't allow runtime-bound arrays of non-POD types, so we need a separate heap-allocating implementation
 // This code gets instantiated during testing with jbms::openssl::bignum
 #define JBMS_BINARY_FIELD_DEFINE_BATCH_INVERT2(invert_fn)                                                               \
-  JBMS_BINARY_FIELD_DEFINE_BATCH_INVERT(invert_fn, std::is_pod<typename Field::Element>::value, FE temp_buffer[sz - 2]) \
+  JBMS_BINARY_FIELD_DEFINE_BATCH_INVERT(invert_fn, std::is_pod<typename Field::Element>::value, FE *temp_buffer = (FE *)alloca(sizeof(FE)*(sz - 2))) \
       JBMS_BINARY_FIELD_DEFINE_BATCH_INVERT(                                                                            \
           invert_fn, !std::is_pod<typename Field::Element>::value, std::vector<FE> temp_buffer(sz - 2))                 \
       /**/

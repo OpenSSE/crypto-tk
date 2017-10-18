@@ -114,10 +114,15 @@ void batch_map_blinded(Curve const &curve, Encoder<Curve> const &encoder, Output
 
   size_t batch_size = boost::size(w_range);
 
-  // variable length array
-  FE c_arr[batch_size];
-  FE w_arr[batch_size];
-  bool zero_flag[batch_size];
+//  // variable length array
+//  FE c_arr[batch_size];
+//  FE w_arr[batch_size];
+//  bool zero_flag[batch_size];
+
+  //  alloc on the stack instead
+  FE *c_arr = (FE *)alloca(sizeof(FE)*batch_size);
+  FE *w_arr = (FE *)alloca(sizeof(FE)*batch_size);
+  bool *zero_flag = (bool *)alloca(sizeof(bool)*batch_size);
 
   auto w_it = boost::begin(w_range);
   for (size_t i = 0; i < batch_size; ++i, ++w_it) {

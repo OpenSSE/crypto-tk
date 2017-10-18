@@ -16,7 +16,7 @@ void error_if_relic_not_init(){
 	}
 }
 
-void invertZR(ZR & c, const ZR & a, const bn_t order)
+static void invertZR(ZR & c, const ZR & a, const bn_t order)
 {
 	ZR a1 =a;
 	bn_t s;
@@ -122,7 +122,8 @@ ZR operator*(const ZR& x, const ZR& y)
 
 	return zr;
 }
-int bn_is_one(bn_t a)
+
+static int bn_is_one(bn_t a)
 {
 	if(a->used == 0) return 0; // false
 	else if((a->used == 1) && (a->dp[0] == 1)) return 1; // true
@@ -154,9 +155,9 @@ ZR power(const ZR& x, const ZR& r)
 	return zr;
 }
 
-ZR hashToZR(const bytes & b)
+ZR hashToZR(const bytes_vec & b)
 {
-	bytes data(b);
+	bytes_vec data(b);
 	data.reserve(HASH_FUNCTION_BYTES_TO_Zr_CRH.size());
 	data.insert(data.begin(),HASH_FUNCTION_BYTES_TO_Zr_CRH.begin(),HASH_FUNCTION_BYTES_TO_Zr_CRH.end());
 
@@ -310,9 +311,9 @@ G1 power(const G1& g, const ZR& zr)
 	return g1;
 }
 
-G1 hashToG1(const bytes & b){
+G1 hashToG1(const bytes_vec & b){
 	G1 g1;
-	bytes data(b);
+	bytes_vec data(b);
 	data.reserve(HASH_FUNCTION_BYTES_TO_G1_ROM.size());
 	data.insert(data.begin(),HASH_FUNCTION_BYTES_TO_G1_ROM.begin(),HASH_FUNCTION_BYTES_TO_G1_ROM.end());
 	// map internally already hashes.
@@ -410,10 +411,10 @@ G2 power(const G2& g, const ZR& zr)
 	return g2;
 }
 
-G2 hashToG2(const bytes & b)
+G2 hashToG2(const bytes_vec & b)
 {
 	G2 g2;
-	bytes data(b);
+	bytes_vec data(b);
 	data.reserve(HASH_FUNCTION_BYTES_TO_G2_ROM.size());
 	data.insert(data.begin(),HASH_FUNCTION_BYTES_TO_G2_ROM.begin(),HASH_FUNCTION_BYTES_TO_G2_ROM.end());
 	// map internally already hashes.
@@ -877,26 +878,26 @@ GT PairingGroup::exp(const GT & g, const int & r) const
 }
 
 ZR PairingGroup::hashListToZR(const std::string &str) const{
-	bytes b(str.begin(),str.end());
+	bytes_vec b(str.begin(),str.end());
 	return hashToZR(b);
 }
     
-ZR PairingGroup::hashListToZR(const bytes & b) const
+ZR PairingGroup::hashListToZR(const bytes_vec & b) const
 {
 	ZR r = hashToZR(b);
 	return r;
 }
 G1 PairingGroup::hashListToG1(const std::string & str) const{
-	bytes b(str.begin(),str.end());
+	bytes_vec b(str.begin(),str.end());
 	return hashToG1(b);
 }
-G1 PairingGroup::hashListToG1(const bytes & b) const
+G1 PairingGroup::hashListToG1(const bytes_vec & b) const
 {
 	G1 l = hashToG1(b);
 	return l;
 }
 
-G2 PairingGroup::hashListToG2(const bytes & b) const
+G2 PairingGroup::hashListToG2(const bytes_vec & b) const
 {
 	G2 l = hashToG2(b);
 	return l;

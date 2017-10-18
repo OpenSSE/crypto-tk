@@ -20,7 +20,7 @@ using namespace relicxx;
 
 std::string tag2string(const tag_type& tag)
 {
-    return string((char *)tag.data(),tag.size());
+    return string((const char *)tag.data(),tag.size());
 }
 
 using namespace std;

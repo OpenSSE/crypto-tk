@@ -70,7 +70,7 @@ static_assert(MULTI == OPENMP, "Error. Relicxx compiled to use OPENMP. But Relic
 #define convert_str(a)  a /* nothing */
 
 namespace relicxx{
-typedef  std::vector<uint8_t> bytes;
+typedef  std::vector<uint8_t> bytes_vec;
 void ro_error(void);
 
 const static std::string HASH_FUNCTION_STRINGS       = "0";
@@ -146,7 +146,7 @@ public:
     std::vector<uint8_t> getBytes() const;
     void writeBytes(uint8_t *bytes) const;
     
-	friend ZR hashToZR(const bytes &);
+	friend ZR hashToZR(const bytes_vec &);
 	friend ZR power(const ZR&, int);
 	friend ZR power(const ZR&, const ZR&);
 	friend ZR operator-(const ZR&);
@@ -172,7 +172,7 @@ public:
 };
 
     
-ZR hashToZR(const bytes & b);
+ZR hashToZR(const bytes_vec & b);
     
 class G1
 {
@@ -228,7 +228,7 @@ public:
     void writeBytes(uint8_t *bytes, bool compress = 0) const;
 
     
-	friend G1 hashToG1(const bytes &);
+	friend G1 hashToG1(const bytes_vec &);
 	friend G1 power(const G1&, const ZR&);
 	friend G1 operator-(const G1&);
 	friend G1 operator-(const G1&, const G1&);
@@ -290,7 +290,7 @@ public:
 	std::vector<uint8_t> getBytes( bool compress = 0) const;
     void writeBytes(uint8_t *bytes, bool compress = 0) const;
 
-	friend G2 hashToG2(const bytes &);
+	friend G2 hashToG2(const bytes_vec &);
 	friend G2 power(const G2&, const ZR&);
 	friend G2 operator-(const G2&);
 	friend G2 operator-(const G2&, const G2&);
@@ -421,17 +421,17 @@ public:
 	ZR order() const; // returns the order of the group
 
 	ZR hashListToZR(const std::string & str) const;
-	ZR hashListToZR(const bytes &) const;
+	ZR hashListToZR(const bytes_vec &) const;
     
     template <size_t N>
     ZR hashListToZR(const std::array<uint8_t, N> &arr) const{
-        bytes b(arr.begin(),arr.end());
+        bytes_vec b(arr.begin(),arr.end());
         return hashToZR(b);
     }
 
 	G1 hashListToG1(const std::string & str) const;
-	G1 hashListToG1(const bytes &) const;
-	G2 hashListToG2(const bytes &) const;
+	G1 hashListToG1(const bytes_vec &) const;
+	G2 hashListToG2(const bytes_vec &) const;
 
 	GT pair(const G1 &, const G1 &) const;
 	int mul(const int &, const int &) const;

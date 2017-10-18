@@ -121,13 +121,13 @@ TEST(block_hash_aes, exceptions)
     ASSERT_THROW(sse::crypto::BlockHash::hash(in, 18, out), std::invalid_argument);
     ASSERT_THROW(sse::crypto::BlockHash::hash(in, 0, out), std::invalid_argument);
 
-    ASSERT_THROW(sse::crypto::BlockHash::hash((uint8_t *)in_array.data(), 18, (uint8_t *)out.data()), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::hash((uint8_t *)in_array.data(), 0, (uint8_t *)out.data()), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::hash(NULL, 16, (uint8_t *)out.data()), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::hash((uint8_t *)in_array.data(), 16, NULL), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(reinterpret_cast<const uint8_t*>(in.data()), 18, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(reinterpret_cast<const uint8_t*>(in.data()), 0, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(NULL, 16, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(reinterpret_cast<const uint8_t*>(in.data()), 16, NULL), std::invalid_argument);
 
-    ASSERT_THROW(sse::crypto::BlockHash::mult_hash((uint8_t *)in_array.data(), 18, (uint8_t *)out.data()), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(NULL, 16, (uint8_t *)out.data()), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::mult_hash((uint8_t *)in_array.data(), 16, NULL), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(reinterpret_cast<const uint8_t*>(in.data()), 18, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(NULL, 16, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(reinterpret_cast<const uint8_t*>(in.data()), 16, NULL), std::invalid_argument);
 
 }

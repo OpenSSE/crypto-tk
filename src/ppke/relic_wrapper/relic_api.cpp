@@ -44,7 +44,7 @@ ZR::ZR(int x)
 	}
 }
 
-ZR::ZR(char *str)
+ZR::ZR(const char *str)
 {
 	error_if_relic_not_init();
 	bn_inits(z);

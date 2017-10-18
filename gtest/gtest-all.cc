@@ -109,6 +109,10 @@
 #ifndef GTEST_INCLUDE_GTEST_GTEST_SPI_H_
 #define GTEST_INCLUDE_GTEST_GTEST_SPI_H_
 
+#pragma GCC diagnostic push
+
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+
 
 namespace testing {
 
@@ -10401,3 +10405,6 @@ const char* TypedTestCasePState::VerifyRegisteredTestNames(
 
 }  // namespace internal
 }  // namespace testing
+    
+#pragma GCC diagnostic pop
+

@@ -56,7 +56,7 @@ TEST(relic, serialization_ZR)
         ASSERT_TRUE(std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
         
         std::string i_str = std::to_string(i);
-        relicxx::ZR zr_str((char*)i_str.c_str());
+        relicxx::ZR zr_str(i_str.c_str());
         ASSERT_EQ(z, zr_str);
     }
     

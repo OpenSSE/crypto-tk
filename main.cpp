@@ -263,13 +263,13 @@ static void benchmarks()
 			string in(1e5, rand());
 		
 			auto begin_ssl = std::chrono::high_resolution_clock::now();
-			open_ssl((const unsigned char*)in.data(), in.length(), (unsigned char*)out_openssl.data());
+			open_ssl((const unsigned char*)in.data(), in.length(), reinterpret_cast<unsigned char*>(const_cast<char*>(out_openssl.data())));
 			auto end_ssl = std::chrono::high_resolution_clock::now();
 		
 			time_ssl += std::chrono::duration_cast<std::chrono::nanoseconds>(end_ssl-begin_ssl).count();
 		
 			auto begin_intel = std::chrono::high_resolution_clock::now();
-			hash_acc((const unsigned char*)in.data(), in.length(), (unsigned char*)out_acc.data());
+			hash_acc((const unsigned char*)in.data(), in.length(), reinterpret_cast<unsigned char*>(const_cast<char*>(out_acc.data())));
 			auto end_intel = std::chrono::high_resolution_clock::now();
 		
 			time_intel += std::chrono::duration_cast<std::chrono::nanoseconds>(end_intel-begin_intel).count();

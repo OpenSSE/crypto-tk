@@ -40,10 +40,6 @@ namespace sse
         public:
             
             static inline void hash(const unsigned char *in, unsigned char *out);
-            static inline void hash(const std::string &in, std::string &out);
-            static inline void hash(const std::string &in, const size_t out_len, std::string &out);
-            static inline std::string hash(const std::string &in);
-            static inline std::string hash(const std::string &in, const size_t out_len);
             
             static inline void mult_hash(const unsigned char *in, uint64_t in_len, unsigned char *out);
 
@@ -189,7 +185,15 @@ namespace sse
             memcpy(out, tmp, out_len);
             memset(tmp, 0x00, AES_BLOCK_SIZE);
         }
-                
+        
+        std::array<uint8_t, BlockHash::kBlockSize> BlockHash::hash(const std::array<uint8_t, kBlockSize> &in)
+        {
+            std::array<uint8_t, kBlockSize> out;
+            hash(in.data(), out.data());
+            
+            return out;
+        }
+
         void BlockHash::mult_hash(const unsigned char *in, uint64_t in_len, unsigned char *out)
         {
             BlockHash::BlockHashImpl::mult_hash(in, in_len, out);

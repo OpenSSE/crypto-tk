@@ -189,48 +189,7 @@ namespace sse
             memcpy(out, tmp, out_len);
             memset(tmp, 0x00, AES_BLOCK_SIZE);
         }
-        
-        void BlockHash::hash(const std::string &in, std::string &out)
-        {
-            unsigned char tmp [AES_BLOCK_SIZE];
-            hash(reinterpret_cast<const unsigned char*>(in.data()), tmp);
-            
-            out = std::string((char *)tmp, AES_BLOCK_SIZE);
-            memset(tmp, 0x00, AES_BLOCK_SIZE);
-        }
-        
-        void BlockHash::hash(const std::string &in, const size_t out_len, std::string &out)
-        {
-            if (out_len > AES_BLOCK_SIZE) {
-                throw std::invalid_argument("out_len is too large. out_len must be less than " + AES_BLOCK_SIZE);
-            }
-            
-            if (out_len <= 0) {
-                throw std::invalid_argument("out_len must be larger than 0");
-            }
-            
-            unsigned char tmp [AES_BLOCK_SIZE];
-            hash(reinterpret_cast<const unsigned char*>(in.data()), tmp);
-            
-            out = std::string((char *)tmp, out_len);
-            memset(tmp, 0x00, AES_BLOCK_SIZE);
-
-        }
-        
-        std::string BlockHash::hash(const std::string &in)
-        {
-            std::string out;
-            hash(in, out);
-            return out;
-        }
-        
-        std::string BlockHash::hash(const std::string &in, const size_t out_len)
-        {
-            std::string out;
-            hash(in, out_len, out);
-            return out;
-        }
-        
+                
         void BlockHash::mult_hash(const unsigned char *in, uint64_t in_len, unsigned char *out)
         {
             BlockHash::BlockHashImpl::mult_hash(in, in_len, out);

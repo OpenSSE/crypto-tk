@@ -61,10 +61,12 @@ namespace sse
         
             sse::crypto::GmppkeSecretParameters sp_;
             const sse::crypto::Prf<kPPKEPrfOutputSize> master_prf_;
+            
+            static_assert(punct::kMasterKeySize == sse::crypto::Prf<kPPKEPrfOutputSize>::kKeySize, "PPKE: Invalid master key size");
         };
         
 
-        PuncturableEncryption::PEncImpl::PEncImpl(const punct::master_key_type& key) : master_prf_(key.data(), punct::kMasterKeySize)
+        PuncturableEncryption::PEncImpl::PEncImpl(const punct::master_key_type& key) : master_prf_(key)
         {
             PPKE.paramgen(master_prf_, sp_);
         }

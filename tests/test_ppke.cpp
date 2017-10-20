@@ -357,7 +357,7 @@ TEST(ppke, serialization)
     std::array<uint8_t, sse::crypto::Gmppke::kPRFKeySize> master_key;
     sse::crypto::random_bytes(master_key);
     
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key.data(), master_key.size());
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key);
     
     sse::crypto::Gmppke ppke;
     sse::crypto::GmppkePublicKey pk;
@@ -583,7 +583,7 @@ TEST(ppke, deterministic_correctness)
 
 TEST(puncturable, correctness)
 {
-    std::array<uint8_t, 16> master_key;
+    std::array<uint8_t, 32> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
         master_key[i] = 1 << i;
     }

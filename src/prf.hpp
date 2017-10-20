@@ -51,20 +51,14 @@ template <uint16_t NBYTES> class Prf
 {
 public:
 	typedef HMac<Hash> PrfBase;
-	static constexpr uint8_t kKeySize = PrfBase::kKeySize;
+	static constexpr uint8_t kKeySize = 32;
 		
-	Prf() : base_()
+    static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too small for the hash block size");
+    
+    Prf() : base_(random_bytes<uint8_t,kKeySize>().data(), kKeySize)
 	{
 	}
-	
-	Prf(const void* k) : base_(k)
-	{
-	}
-
-	Prf(const void* k, const uint8_t &len) : base_(k, len)
-	{
-	}
-	
+		
 	Prf(const std::string& k) : base_(k)
 	{
 	}
@@ -73,7 +67,7 @@ public:
 	{
 	}
 	
-	Prf(const std::array<uint8_t,kKeySize>& k) : base_(k)
+	Prf(const std::array<uint8_t,kKeySize>& k) : base_(k.data(), kKeySize)
 	{	
 	}
 
@@ -100,11 +94,12 @@ public:
     
     template <size_t L>  std::array<uint8_t, NBYTES> prf(const std::array<uint8_t, L> &in) const;
 //	void prf(const unsigned char* in, const size_t &length, unsigned char* out) const;
-	std::string prf_string(const std::string &s) const;
 private:
 	
 	PrfBase base_;
 };
+
+template <uint16_t NBYTES> constexpr uint8_t Prf<NBYTES>::kKeySize;
 
 // PRF instantiation
 // For now, use HMAC-Hash where Hash is the hash function defined in hash.hpp
@@ -164,14 +159,6 @@ template<size_t L>
 //	base_.hmac(in, length, out);
 //}
 
-
-template <uint16_t NBYTES> std::string Prf<NBYTES>::prf_string(const std::string &s) const
-{
-	std::array<uint8_t, NBYTES> tmp = prf(s);
-	std::string result(tmp.begin(), tmp.end());
-	
-	return result;
-}
 
 } // namespace crypto
 } // namespace sse

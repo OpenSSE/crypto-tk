@@ -61,12 +61,20 @@ namespace crypto
 	   rng.next(byte_count, out);
 	}
 
-	template <typename T, size_t N>
-	inline void random_bytes(std::array<T,N> &out)
-	{
-		random_bytes(out.size()*sizeof(T), reinterpret_cast<unsigned char*>(out.data()));
-	}
-
+    template <typename T, size_t N>
+    inline void random_bytes(std::array<T,N> &out)
+    {
+        random_bytes(out.size()*sizeof(T), reinterpret_cast<unsigned char*>(out.data()));
+    }
+    
+    template <typename T, size_t N>
+    inline std::array<T,N> random_bytes()
+    {
+        std::array<T,N> out;
+        random_bytes(out.size()*sizeof(T), reinterpret_cast<unsigned char*>(out.data()));
+        return out;
+    }
+    
 	inline std::string random_string(const size_t &length)
 	{
         std::string out(length,0x00);

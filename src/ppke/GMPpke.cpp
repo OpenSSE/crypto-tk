@@ -60,7 +60,7 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretPar
 
 void Gmppke::keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
 {
-    sse::crypto::Prf<kPPKEPrfOutputSize> prf(prf_key.data(), prf_key.size());
+    sse::crypto::Prf<kPPKEPrfOutputSize> prf(prf_key);
     keygen(prf, pk, sk, sp);
 }
 

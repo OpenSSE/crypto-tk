@@ -471,7 +471,7 @@ static void bench_prg()
 static void ppke()
 {
     
-    std::array<uint8_t, 16> master_key;
+    std::array<uint8_t, 32> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
         master_key[i] = 1 << i;
     }
@@ -600,11 +600,11 @@ static void ppke()
 
 static void deterministic_key_ppke()
 {
-    std::array<uint8_t, 16> master_key;
+    std::array<uint8_t, 32> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
         master_key[i] = 1 << i;
     }
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key.data(), master_key.size());
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key);
 
     std::cout << "Deterministic key generation\n";
 

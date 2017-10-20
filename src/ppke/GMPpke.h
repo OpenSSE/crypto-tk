@@ -14,6 +14,7 @@
 
 #include "util.h"
 
+#include "prf.hpp"
 #include "hmac.hpp"
 #include "hash.hpp"
 
@@ -248,7 +249,7 @@ class Gmppke
 {
 public:
     
-    static constexpr uint8_t kPRFKeySize = 16; // 128 bits
+    static constexpr uint8_t kPRFKeySize = 32; // 256 bits
     static const tag_type NULLTAG;
 
     Gmppke(){

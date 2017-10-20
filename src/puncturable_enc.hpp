@@ -38,7 +38,7 @@ namespace sse
             typedef std::array<uint8_t, kKeyShareSize> key_share_type;
             typedef std::vector<key_share_type> punctured_key_type;
             
-            const static size_t kMasterKeySize = 16;
+            const static size_t kMasterKeySize = 32;
             typedef std::array<uint8_t, kMasterKeySize> master_key_type;
             
             const static size_t kCiphertextSize = 90;

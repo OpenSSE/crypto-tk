@@ -71,8 +71,8 @@ public:
 
     std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
     std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
-    std::string generate(const std::string& key, const std::string& seed) const;
-    std::array<uint8_t, kMessageSpaceSize> generate_array(const std::string& key, const std::string& seed) const;
+    std::string generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
+    std::array<uint8_t, kMessageSpaceSize> generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
     
 protected:
     TdpImpl();
@@ -332,14 +332,14 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::generate_array(const Pr
     return out;
 }
 
-std::string TdpImpl::generate(const std::string& key, const std::string& seed) const
+std::string TdpImpl::generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     std::array<uint8_t, TdpImpl::kMessageSpaceSize> tmp = generate_array(key, seed);
     
     return std::string(tmp.begin(), tmp.end());
 }
 
-std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::generate_array(const std::string& key, const std::string& seed) const
+std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     Prf<Tdp::kRSAPrgSize> prg(key);
     
@@ -722,11 +722,11 @@ std::array<uint8_t, Tdp::kMessageSize> Tdp::sample_array() const
     return tdp_imp_->sample_array();
 }
 
-std::string Tdp::generate(const std::string& key, const std::string& seed) const
+std::string Tdp::generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     return tdp_imp_->generate(key, seed);
 }
-std::array<uint8_t, Tdp::kMessageSize> Tdp::generate_array(const std::string& key, const std::string& seed) const
+std::array<uint8_t, Tdp::kMessageSize> Tdp::generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     return tdp_imp_->generate_array(key, seed);
 }
@@ -805,11 +805,11 @@ std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::sample_array() const
     return tdp_inv_imp_->sample_array();
 }
 
-std::string TdpInverse::generate(const std::string& key, const std::string& seed) const
+std::string TdpInverse::generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     return tdp_inv_imp_->generate(key, seed);
 }
-std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(const std::string& key, const std::string& seed) const
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     return tdp_inv_imp_->generate_array(key, seed);
 }
@@ -918,11 +918,11 @@ std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::sample_array() const
     return tdp_pool_imp_->sample_array();
 }
 
-std::string TdpMultPool::generate(const std::string& key, const std::string& seed) const
+std::string TdpMultPool::generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     return tdp_pool_imp_->generate(key, seed);
 }
-std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(const std::string& key, const std::string& seed) const
+std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const
 {
     return tdp_pool_imp_->generate_array(key, seed);
 }

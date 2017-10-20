@@ -311,7 +311,7 @@ TEST(tdp, copy)
         ASSERT_EQ(tdp_pool_assign.pool_size(), tdp_pool.pool_size());
       
         
-        std::string key = sse::crypto::random_string(16);
+        std::array<uint8_t, 32> key = sse::crypto::random_bytes<uint8_t, 32>();
         
         for (size_t j = 0; j < 10; j++) {
             string sample_orig = tdp_inv_orig.generate(key, std::to_string(j));
@@ -339,7 +339,7 @@ TEST(tdp, deterministic_generation)
     sse::crypto::Tdp tdp(inv_tdp.public_key());
     sse::crypto::TdpMultPool pool_tdp(inv_tdp.public_key(),2);
 
-    std::string key = sse::crypto::random_string(128);
+    std::array<uint8_t, 32> key = sse::crypto::random_bytes<uint8_t, 32>();
     const sse::crypto::Prf<sse::crypto::Tdp::kRSAPrgSize> prf(key);
     
     for (size_t i = 0; i < TEST_COUNT; i++) {

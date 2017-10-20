@@ -37,28 +37,11 @@ TEST(block_hash_aes, test_vector)
 
     std::string in(in_array.begin(), in_array.end());
     
-    std::string  out = sse::crypto::BlockHash::hash(in);
+    std::array<uint8_t, 16>  out = sse::crypto::BlockHash::hash(in_array);
     
 
-    ASSERT_EQ(out, std::string(expected_out.begin(), expected_out.end()));
+    ASSERT_EQ(out, expected_out);
 
-}
-
-
-TEST(block_hash_aes, test_vector_trunc)
-{
-    std::array<uint8_t, 16> in_array = {{0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a}};
-    
-    std::array<uint8_t, 16> expected_out = {{0x51, 0x16, 0xc5, 0x56, 0x23, 0x3a, 0xa9, 0xf6, 0x41, 0xa3, 0xb4, 0xe2, 0x57, 0xf5, 0xf8, 0xbd}};
-    std::string expected_out_string = std::string((char *)expected_out.data(), 10);
-    
-    std::string in(in_array.begin(), in_array.end());
-    
-    std::string  out = sse::crypto::BlockHash::hash(in, 10);
-    
-    
-    ASSERT_EQ(out, expected_out_string);
-    
 }
 
 TEST(block_hash_aes, test_vector_array_trunc)
@@ -71,7 +54,6 @@ TEST(block_hash_aes, test_vector_array_trunc)
     
     uint8_t out[test_size];
     
-//    std::string in(in_array.begin(), in_array.end());
     
     sse::crypto::BlockHash::hash(in_array.data(), test_size, out);
     
@@ -115,19 +97,15 @@ TEST(block_hash_aes, mult_hash)
 TEST(block_hash_aes, exceptions)
 {
     std::array<uint8_t, 16> in_array = {{0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a}};
-    std::string in(in_array.begin(), in_array.end());
-    std::string out;
+    std::array<uint8_t, 16> out_array;
     
-    ASSERT_THROW(sse::crypto::BlockHash::hash(in, 18, out), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::hash(in, 0, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(in_array.data(), 18, out_array.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(in_array.data(), 0, out_array.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(NULL, 16, out_array.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::hash(in_array.data(), 16, NULL), std::invalid_argument);
 
-    ASSERT_THROW(sse::crypto::BlockHash::hash(reinterpret_cast<const uint8_t*>(in.data()), 18, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::hash(reinterpret_cast<const uint8_t*>(in.data()), 0, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::hash(NULL, 16, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::hash(reinterpret_cast<const uint8_t*>(in.data()), 16, NULL), std::invalid_argument);
-
-    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(reinterpret_cast<const uint8_t*>(in.data()), 18, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(NULL, 16, reinterpret_cast<unsigned char*>(const_cast<char*>(out.data()))), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(reinterpret_cast<const uint8_t*>(in.data()), 16, NULL), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(in_array.data(), 18, out_array.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(NULL, 16, out_array.data()), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::BlockHash::mult_hash(in_array.data(), 16, NULL), std::invalid_argument);
 
 }

@@ -58,15 +58,7 @@ public:
     Prf() : base_(random_bytes<uint8_t,kKeySize>().data(), kKeySize)
 	{
 	}
-		
-	Prf(const std::string& k) : base_(k)
-	{
-	}
-	
-	Prf(const std::string& k, const uint8_t &len) : base_(k, len)
-	{
-	}
-	
+    
 	Prf(const std::array<uint8_t,kKeySize>& k) : base_(k.data(), kKeySize)
 	{	
 	}
@@ -78,14 +70,11 @@ public:
 	// Destructor.
 	~Prf() {}; 
 
-	const std::array<uint8_t,kKeySize>& key() const
+	std::array<uint8_t,kKeySize> key() const
 	{
-		return base_.key();
-	};
-	
-	const uint8_t* key_data() const
-	{
-		return base_.key_data();
+        std::array<uint8_t,kKeySize> k;
+        std::copy(base_.key().begin(), base_.key().begin()+kKeySize, k.begin());
+		return k;
 	};
 	
 	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;

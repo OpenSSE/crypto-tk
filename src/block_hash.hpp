@@ -23,6 +23,7 @@
 
 #include <cstddef>
 #include <string>
+#include <array>
 
 
 namespace sse

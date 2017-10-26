@@ -58,9 +58,9 @@ void Gmppke::keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretPar
     keygenPartial(alpha,pk,sk, sp);
 }
 
-void Gmppke::keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
+void Gmppke::keygen(std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const
 {
-    sse::crypto::Prf<kPPKEPrfOutputSize> prf(prf_key);
+    sse::crypto::Prf<kPPKEPrfOutputSize> prf((Key<kPRFKeySize>(prf_key.data())));
     keygen(prf, pk, sk, sp);
 }
 

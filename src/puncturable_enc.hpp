@@ -65,7 +65,7 @@ namespace sse
         {
         public:
             
-            PuncturableEncryption(const punct::master_key_type& key);
+            PuncturableEncryption(punct::master_key_type& key);
             ~PuncturableEncryption();
             
             punct::ciphertext_type encrypt(const uint64_t m, const punct::tag_type &tag);

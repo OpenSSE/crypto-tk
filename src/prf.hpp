@@ -54,26 +54,18 @@ public:
 	typedef HMac<Hash> PrfBase;
 	static constexpr uint8_t kKeySize = 32;
 		
-    static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too small for the hash block size");
+    static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too large for the hash block size");
     
     Prf() : base_(random_bytes<uint8_t,kKeySize>().data(), kKeySize)
 	{
 	}
     
-	Prf(const std::array<uint8_t,kKeySize>& k) : base_(k.data(), kKeySize)
-	{	
-	}
-
     Prf(Key<kKeySize>&& key)
     {
         key.unlock();
         base_ = PrfBase(key.data(), kKeySize);
         key.lock();
     }
-
-	Prf(const Prf<NBYTES>& p) : base_(p.base_)
-	{		
-	}
 
 	// Destructor.
 	~Prf() {}; 

@@ -73,7 +73,38 @@ namespace sse {
                 }
                 is_locked_ = true;
             }
-            
+
+            /**
+             *  @brief Constructor
+             *
+             *  Initializes the key with the byte array given as argument.
+             *  The argument is set to zero.
+             *
+             *  @param key    The input byte array. When the constructor returns,
+             *  key is set to 0.
+             *
+             *  @exception std::bad_alloc       Memory cannot be allocated.
+             *  @exception std::runtime_erro    Memory could not be protected.
+             */
+            Key(uint8_t* const key)
+            {
+                content_ = static_cast<uint8_t*>(sodium_malloc(N));
+                
+                if( content_ == NULL)
+                {
+                    throw std::bad_alloc::bad_alloc();
+                }
+                
+                memcpy(content_, key, N); // copy the content of the input key
+                sodium_memzero(key, N); // erase the content of the input key
+                
+                int err = sodium_mprotect_noaccess(content_);
+                if (err == -1 && errno != ENOSYS) {
+                    throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno)));
+                }
+                is_locked_ = true;
+            }
+
             Key(Key<N>& k) = delete;
             
             /**

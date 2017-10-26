@@ -31,6 +31,7 @@
 
 #include "src/utils.hpp"
 #include "src/random.hpp"
+#include "src/key.hpp"
 
 #include "../src/hash.hpp"
 #include "../src/hmac.hpp"
@@ -605,7 +606,7 @@ static void deterministic_key_ppke()
     for (size_t i = 0; i < master_key.size(); i++) {
         master_key[i] = 1 << i;
     }
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key);
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf((sse::crypto::Key<32>(master_key.data())));
 
     std::cout << "Deterministic key generation\n";
 
@@ -745,7 +746,8 @@ int main( int argc, char* argv[] ) {
     
     sse::crypto::init_crypto_lib();
     
-    sse::crypto::test_keys();
+//    sse::crypto::test_keys();
+    deterministic_key_ppke();
     
     sse::crypto::cleanup_crypto_lib();
     

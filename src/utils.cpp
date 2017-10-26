@@ -14,6 +14,8 @@
 
 #include "ppke/relic_wrapper/relic_api.h"
 
+#include "sodium/core.h"
+
 struct CRYPTO_dynlock_value
 {
     pthread_mutex_t mutex;
@@ -166,6 +168,10 @@ namespace sse
             
             __relic_handle = new relicxx::relicResourceHandle(true);
 
+            if(sodium_init() < 0 )
+            {
+                throw std::runtime_error("Unable to init libsodium");
+            }
         }
         void cleanup_crypto_lib()
         {

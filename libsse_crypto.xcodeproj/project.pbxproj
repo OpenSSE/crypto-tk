@@ -20,6 +20,27 @@
 		310C2BEA1EC0B8F100E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
 		310C2BEB1EC0B98E00E80B3A /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BE41EC0B6D800E80B3A /* util.cpp */; };
 		310C2BEC1EC0B99300E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
+		311400781F9D49DA0025DE3A /* export.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400751F9D49DA0025DE3A /* export.h */; };
+		311400791F9D49DA0025DE3A /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 311400761F9D49DA0025DE3A /* utils.c */; };
+		3114007A1F9D49DA0025DE3A /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 311400761F9D49DA0025DE3A /* utils.c */; };
+		3114007B1F9D49DA0025DE3A /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 311400761F9D49DA0025DE3A /* utils.c */; };
+		3114007C1F9D49DA0025DE3A /* utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400771F9D49DA0025DE3A /* utils.h */; };
+		3114007E1F9D4A100025DE3A /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 3114007D1F9D4A100025DE3A /* core.h */; };
+		311400801F9D4A3F0025DE3A /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114007F1F9D4A3F0025DE3A /* core.c */; };
+		311400811F9D4A3F0025DE3A /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114007F1F9D4A3F0025DE3A /* core.c */; };
+		311400821F9D4A3F0025DE3A /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114007F1F9D4A3F0025DE3A /* core.c */; };
+		311400891F9D4AA20025DE3A /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400841F9D4AA10025DE3A /* common.h */; };
+		3114008B1F9D4AA20025DE3A /* implementations.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400861F9D4AA10025DE3A /* implementations.h */; };
+		3114008C1F9D4AA20025DE3A /* mutex.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400871F9D4AA10025DE3A /* mutex.h */; };
+		3114008D1F9D4AA20025DE3A /* sse2_64_32.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400881F9D4AA10025DE3A /* sse2_64_32.h */; };
+		3114008F1F9D4B480025DE3A /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114008E1F9D4B480025DE3A /* runtime.c */; };
+		311400901F9D4B480025DE3A /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114008E1F9D4B480025DE3A /* runtime.c */; };
+		311400911F9D4B480025DE3A /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114008E1F9D4B480025DE3A /* runtime.c */; };
+		311400931F9D4B530025DE3A /* runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400921F9D4B530025DE3A /* runtime.h */; };
+		311400981F9E628C0025DE3A /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311400961F9E628C0025DE3A /* key.cpp */; };
+		311400991F9E628C0025DE3A /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311400961F9E628C0025DE3A /* key.cpp */; };
+		3114009A1F9E628C0025DE3A /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311400961F9E628C0025DE3A /* key.cpp */; };
+		3114009B1F9E628C0025DE3A /* key.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 311400971F9E628C0025DE3A /* key.hpp */; };
 		311934B11D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
 		311934B21D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
 		311934B31D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
@@ -234,6 +255,19 @@
 		310C2BE21EC0B63600E80B3A /* GMPpke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GMPpke.h; sourceTree = "<group>"; };
 		310C2BE41EC0B6D800E80B3A /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = util.cpp; sourceTree = "<group>"; };
 		310C2BE51EC0B6D800E80B3A /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		311400751F9D49DA0025DE3A /* export.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = export.h; sourceTree = "<group>"; };
+		311400761F9D49DA0025DE3A /* utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = utils.c; sourceTree = "<group>"; };
+		311400771F9D49DA0025DE3A /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
+		3114007D1F9D4A100025DE3A /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
+		3114007F1F9D4A3F0025DE3A /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = core.c; sourceTree = "<group>"; };
+		311400841F9D4AA10025DE3A /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		311400861F9D4AA10025DE3A /* implementations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = implementations.h; sourceTree = "<group>"; };
+		311400871F9D4AA10025DE3A /* mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mutex.h; sourceTree = "<group>"; };
+		311400881F9D4AA10025DE3A /* sse2_64_32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sse2_64_32.h; sourceTree = "<group>"; };
+		3114008E1F9D4B480025DE3A /* runtime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = runtime.c; sourceTree = "<group>"; };
+		311400921F9D4B530025DE3A /* runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
+		311400961F9E628C0025DE3A /* key.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = key.cpp; sourceTree = "<group>"; };
+		311400971F9E628C0025DE3A /* key.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = key.hpp; sourceTree = "<group>"; };
 		311934AF1D26B2360031804B /* block_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_hash.cpp; sourceTree = "<group>"; };
 		311934B01D26B2360031804B /* block_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = block_hash.hpp; sourceTree = "<group>"; };
 		311934B61D27F1F00031804B /* test_block_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_block_hash.cpp; sourceTree = "<group>"; };
@@ -402,6 +436,32 @@
 			path = relic_wrapper;
 			sourceTree = "<group>";
 		};
+		311400741F9D49DA0025DE3A /* sodium */ = {
+			isa = PBXGroup;
+			children = (
+				311400831F9D4AA10025DE3A /* private */,
+				3114007F1F9D4A3F0025DE3A /* core.c */,
+				3114007D1F9D4A100025DE3A /* core.h */,
+				311400751F9D49DA0025DE3A /* export.h */,
+				3114008E1F9D4B480025DE3A /* runtime.c */,
+				311400921F9D4B530025DE3A /* runtime.h */,
+				311400761F9D49DA0025DE3A /* utils.c */,
+				311400771F9D49DA0025DE3A /* utils.h */,
+			);
+			path = sodium;
+			sourceTree = "<group>";
+		};
+		311400831F9D4AA10025DE3A /* private */ = {
+			isa = PBXGroup;
+			children = (
+				311400841F9D4AA10025DE3A /* common.h */,
+				311400861F9D4AA10025DE3A /* implementations.h */,
+				311400871F9D4AA10025DE3A /* mutex.h */,
+				311400881F9D4AA10025DE3A /* sse2_64_32.h */,
+			);
+			path = private;
+			sourceTree = "<group>";
+		};
 		3163D3911ED33C8E00A7FCD9 /* gtest */ = {
 			isa = PBXGroup;
 			children = (
@@ -438,6 +498,7 @@
 		6CC2D3FF1C3185D700334ADD /* src */ = {
 			isa = PBXGroup;
 			children = (
+				311400741F9D49DA0025DE3A /* sodium */,
 				6CC2D4001C3185D700334ADD /* aez */,
 				6CC2D4031C3185D700334ADD /* build.scons */,
 				318516851D4BF3D700A44AD7 /* aesni */,
@@ -462,6 +523,8 @@
 				6CC2D4611C3185D700334ADD /* set_hash.hpp */,
 				318C72991C9730140040AEE7 /* tdp.cpp */,
 				318C729A1C9730140040AEE7 /* tdp.hpp */,
+				311400961F9E628C0025DE3A /* key.cpp */,
+				311400971F9E628C0025DE3A /* key.hpp */,
 				316F0D3D1D25600700F87904 /* prg.cpp */,
 				316F0D3E1D25600700F87904 /* prg.hpp */,
 				311934AF1D26B2360031804B /* block_hash.cpp */,
@@ -705,6 +768,8 @@
 				6CC2D4C71C3193E200334ADD /* cipher.hpp in Headers */,
 				6CC2D4CF1C3193E900334ADD /* random.hpp in Headers */,
 				6CF4160B1CB4FF1D00C448D4 /* utils.hpp in Headers */,
+				3114008D1F9D4AA20025DE3A /* sse2_64_32.h in Headers */,
+				311400931F9D4B530025DE3A /* runtime.h in Headers */,
 				316F0D421D25600700F87904 /* prg.hpp in Headers */,
 				310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */,
 				311934B41D26B2360031804B /* block_hash.hpp in Headers */,
@@ -723,11 +788,14 @@
 				6CC2D4E31C31941500334ADD /* blake2s-load-xop.h in Headers */,
 				6CC2D5081C31944100334ADD /* ECMH.hpp in Headers */,
 				6CC2D50A1C31944500334ADD /* operation_helpers.hpp in Headers */,
+				3114009B1F9E628C0025DE3A /* key.hpp in Headers */,
 				6CC2D4D51C31940400334ADD /* sha512.hpp in Headers */,
 				6CC2D4F91C31942F00334ADD /* GF2_254.hpp in Headers */,
+				3114007C1F9D49DA0025DE3A /* utils.h in Headers */,
 				6CC2D50C1C31944A00334ADD /* error.hpp in Headers */,
 				6CC2D4E11C31941500334ADD /* blake2s-load-sse2.h in Headers */,
 				6CC2D5051C31943300334ADD /* polynomial_reduce_127_63.hpp in Headers */,
+				311400781F9D49DA0025DE3A /* export.h in Headers */,
 				6CC2D4D31C3193FA00334ADD /* aez.h in Headers */,
 				6CC2D5041C31943300334ADD /* polynomial_multiply.hpp in Headers */,
 				6CC2D4E21C31941500334ADD /* blake2s-load-sse41.h in Headers */,
@@ -744,6 +812,8 @@
 				6CC2D4FB1C31942F00334ADD /* invert_blinded.hpp in Headers */,
 				310C2BDB1EC0B59700E80B3A /* relic_api.h in Headers */,
 				310C2BD51EC0B59700E80B3A /* common.h in Headers */,
+				311400891F9D4AA20025DE3A /* common.h in Headers */,
+				3114007E1F9D4A100025DE3A /* core.h in Headers */,
 				6CC2D4FC1C31942F00334ADD /* QuadraticExtension.hpp in Headers */,
 				6CC2D4F11C31942700334ADD /* sw_blinded.hpp in Headers */,
 				6CC2D4F61C31942F00334ADD /* generic_trace.hpp in Headers */,
@@ -762,6 +832,7 @@
 				6CC2D5021C31943300334ADD /* limb_ops.hpp in Headers */,
 				6CC2D5001C31943300334ADD /* GF2.hpp in Headers */,
 				6CC2D4DC1C31941000334ADD /* blake2b-load-sse41.h in Headers */,
+				3114008B1F9D4AA20025DE3A /* implementations.h in Headers */,
 				6CC2D4DF1C31941000334ADD /* blake2b.hpp in Headers */,
 				6CC2D4F81C31942F00334ADD /* GF2_127_63.hpp in Headers */,
 				6CC2D4FE1C31943300334ADD /* apply_linear_table_transform.hpp in Headers */,
@@ -769,6 +840,7 @@
 				6CC2D5121C31945000334ADD /* is_byte.hpp in Headers */,
 				6CC2D4DD1C31941000334ADD /* blake2b-round.h in Headers */,
 				6CC2D4F31C31942F00334ADD /* batch_invert.hpp in Headers */,
+				3114008C1F9D4AA20025DE3A /* mutex.h in Headers */,
 				3163D3A71ED5A50100A7FCD9 /* blake2s-common.h in Headers */,
 				6CC2D5161C31945000334ADD /* print_fwd.hpp in Headers */,
 				6CC2D5171C31945000334ADD /* static_repeat.hpp in Headers */,
@@ -916,11 +988,13 @@
 				6CC2D48D1C318B1B00334ADD /* encryption.cpp in Sources */,
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
 				3163D3991ED56BEA00A7FCD9 /* aesni.cpp in Sources */,
+				3114008F1F9D4B480025DE3A /* runtime.c in Sources */,
 				3185168E1D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */,
 				311934B11D26B2360031804B /* block_hash.cpp in Sources */,
 				6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				310C2BDF1EC0B59700E80B3A /* relic_api.cpp in Sources */,
+				311400981F9E628C0025DE3A /* key.cpp in Sources */,
 				311934B81D27F1F00031804B /* test_block_hash.cpp in Sources */,
 				6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */,
 				6CC2D4961C318B4100334ADD /* sha512_sse4.asm in Sources */,
@@ -941,6 +1015,7 @@
 				6CC2D4871C31889B00334ADD /* hash.cpp in Sources */,
 				6CC2D48A1C3188A000334ADD /* aez.c in Sources */,
 				6CC2D4911C318B1B00334ADD /* test_hmac.cpp in Sources */,
+				311400801F9D4A3F0025DE3A /* core.c in Sources */,
 				310C2BE61EC0B6D800E80B3A /* util.cpp in Sources */,
 				6CC2D4861C31889B00334ADD /* fpe.cpp in Sources */,
 				3163D3A41ED5A50100A7FCD9 /* blake2s-common.c in Sources */,
@@ -948,6 +1023,7 @@
 				6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */,
 				6CC2D4901C318B1B00334ADD /* test_fpe.cpp in Sources */,
 				313CD48D1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
+				311400791F9D49DA0025DE3A /* utils.c in Sources */,
 				6CC2D4921C318B3500334ADD /* sha512.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -961,14 +1037,17 @@
 				3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */,
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
 				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
+				311400991F9E628C0025DE3A /* key.cpp in Sources */,
 				6CC2D4B81C318F2E00334ADD /* main.cpp in Sources */,
 				310C2BEC1EC0B99300E80B3A /* GMPpke.cpp in Sources */,
+				3114007A1F9D49DA0025DE3A /* utils.c in Sources */,
 				3185168F1D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4A01C318F2500334ADD /* sha512_sse4.asm in Sources */,
 				6CC2D4A11C318F2500334ADD /* sha512_avx2_rorx.asm in Sources */,
 				6CC2D4A21C318F2500334ADD /* GLS254.cpp in Sources */,
 				6CC2D4A31C318F2500334ADD /* sha512_avx.asm in Sources */,
 				6CC2D4A41C318F2500334ADD /* random.cpp in Sources */,
+				311400901F9D4B480025DE3A /* runtime.c in Sources */,
 				6CC2D4A71C318F2500334ADD /* sha512_base.c in Sources */,
 				6CC2D4A91C318F2500334ADD /* hash.cpp in Sources */,
 				310C2BE01EC0B59700E80B3A /* relic_api.cpp in Sources */,
@@ -978,6 +1057,7 @@
 				6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				6CC2D4AE1C318F2500334ADD /* GF2_127_63.cpp in Sources */,
 				313CD48E1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
+				311400811F9D4A3F0025DE3A /* core.c in Sources */,
 				6CC2D4B01C318F2500334ADD /* sha512.cpp in Sources */,
 				3163D3A51ED5A50100A7FCD9 /* blake2s-common.c in Sources */,
 				310C2BEB1EC0B98E00E80B3A /* util.cpp in Sources */,
@@ -988,8 +1068,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				311400821F9D4A3F0025DE3A /* core.c in Sources */,
 				318C729D1C9730140040AEE7 /* tdp.cpp in Sources */,
 				310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */,
+				311400911F9D4B480025DE3A /* runtime.c in Sources */,
 				3163D3A11ED5A11A00A7FCD9 /* blake2b-common.c in Sources */,
 				6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				6CC2D4D21C3193FA00334ADD /* aez.c in Sources */,
@@ -1003,11 +1085,13 @@
 				318516901D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4D91C31940B00334ADD /* sha512_sse4.asm in Sources */,
 				3163D3A61ED5A50100A7FCD9 /* blake2s-common.c in Sources */,
+				3114009A1F9E628C0025DE3A /* key.cpp in Sources */,
 				310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */,
 				6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */,
 				6CC2D4ED1C31942700334ADD /* GLS254.cpp in Sources */,
 				316F0D411D25600700F87904 /* prg.cpp in Sources */,
 				6CC2D4D41C31940400334ADD /* sha512.cpp in Sources */,
+				3114007B1F9D49DA0025DE3A /* utils.c in Sources */,
 				6CC2D4CE1C3193E900334ADD /* random.cpp in Sources */,
 				6CC2D4D61C31940B00334ADD /* sha512_avx.asm in Sources */,
 				6CC2D4D71C31940B00334ADD /* sha512_avx2_rorx.asm in Sources */,
@@ -1083,6 +1167,7 @@
 					/usr/local/lib,
 					/usr/local/opt/openssl/lib,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -1153,6 +1238,7 @@
 					/usr/local/lib,
 					/usr/local/opt/openssl/lib,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
 					"-maes",

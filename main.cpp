@@ -44,6 +44,7 @@
 
 #include "src/aesni/aesni.hpp"
 
+#include "src/key.hpp"
 
 using namespace std;
 
@@ -744,7 +745,7 @@ int main( int argc, char* argv[] ) {
     
     sse::crypto::init_crypto_lib();
     
-    deterministic_key_ppke();
+    sse::crypto::test_keys();
     
     sse::crypto::cleanup_crypto_lib();
     

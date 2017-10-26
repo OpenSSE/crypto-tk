@@ -51,16 +51,16 @@ namespace crypto
 template <uint16_t NBYTES> class Prf
 {
 public:
-	typedef HMac<Hash> PrfBase;
 	static constexpr uint8_t kKeySize = 32;
-		
+    typedef HMac<Hash,kKeySize> PrfBase;
+
     static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too large for the hash block size");
     
-    Prf() : base_(random_bytes<uint8_t,kKeySize>().data(), kKeySize)
+    Prf() : base_(random_bytes<uint8_t,kKeySize>().data())
 	{
 	}
     
-    Prf(Key<kKeySize>&& key) : base_(key.unlock_get(), kKeySize)
+    Prf(Key<kKeySize>&& key) : base_(std::move(key))
     {
         key.lock();
     }
@@ -119,8 +119,8 @@ template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const un
 //        throw std::runtime_error("Invalid output length: NBYTES > Hash::kDigestSize");
     }else if(NBYTES <= Hash::kDigestSize){
 		// only need one output bloc of PrfBase.
-
-        std::copy_n(base_.hmac(in, length).begin(), NBYTES, result.begin());
+        auto hmac_out = base_.hmac(in, length);
+        std::copy_n(hmac_out.begin(), NBYTES, result.begin());
 	}
 	
 	

@@ -286,65 +286,6 @@ static void benchmarks()
 
 }
 
-static void test_hash()
-{
-	// string in = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
-	// string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-	
-	array<uint8_t,kKeySize> k;
-	k.fill(0x0b);
-	
-	string in = "Hi There";
-	// string in(1e6, 'a');
-	
-	sse::crypto::HMac<HashOpenSSLFull> hmac_full_ssl(k.data(),20);
-	sse::crypto::HMac<HashOpenSSL> hmac_ssl(k.data(),20);
-	sse::crypto::HMac<Local> hmac_local(k.data(),20);
-	sse::crypto::HMac<sse::crypto::hash::sha512> hmac_lib(k.data(),20);
-	
-	cout << "====== FULL SSL ======\n";
-	auto result_full_ssl = hmac_full_ssl.hmac((const unsigned char*)in.data(), in.length());
-	cout << "\n\n";
-
-	cout << "====== HOME SSL ======\n";
-	auto result_ssl = hmac_ssl.hmac((const unsigned char*)in.data(), in.length());
-	cout << "\n\n";
-
-	cout << "====== LOCAL ======\n";
-	auto result_local = hmac_local.hmac((const unsigned char*)in.data(), in.length());
-	cout << "\n\n";
-	
-	cout << "====== LIB ======\n";
-	auto result_lib = hmac_local.hmac((const unsigned char*)in.data(), in.length());
-	cout << "\n\n";
-	
-	
-	for(unsigned char c : result_full_ssl)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << "\n\n";
-	for(unsigned char c : result_ssl)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << "\n\n";
-	for(unsigned char c : result_local)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << "\n\n";
-	for(unsigned char c : result_lib)
-	{
-        cout << hex << setw(2) << setfill('0') << (uint) c;
-	}
-	cout << "\n\n";
-	
-	
-	return;
-
-}
-
 static void tdp()
 {
     sse::crypto::TdpInverse tdp;
@@ -742,12 +683,33 @@ static void deterministic_key_ppke()
     
 }
 
+void relic()
+{
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
+
+    relicxx::PairingGroup group;
+
+//    relicxx::ZR rho_1 = group.pseudoRandomZR(key_prf, ("param_rho_1"));
+//    relicxx::ZR rho_2 = group.pseudoRandomZR(key_prf, ("param_rho_2"));
+    
+    std::array<uint8_t, sse::crypto::kPPKEPrfOutputSize> out_1 = key_prf.prf(("1"));
+    std::array<uint8_t, sse::crypto::kPPKEPrfOutputSize> out_2 = key_prf.prf(("2"));
+
+    if (out_1 == out_2) {
+        cout << "EQUALITY" << endl;
+
+    }
+    
+//    cout << rho_1 << endl;
+//    cout << rho_2 << endl;
+}
+
 int main( int argc, char* argv[] ) {
     
     sse::crypto::init_crypto_lib();
     
 //    sse::crypto::test_keys();
-    deterministic_key_ppke();
+    relic();
     
     sse::crypto::cleanup_crypto_lib();
     

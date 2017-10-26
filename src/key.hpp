@@ -46,8 +46,13 @@ namespace sse {
             // declare all the friend classes and functions
             friend void test_keys();
             
-            template <class Hash> friend class HMAC;
+            template <class Hash, uint16_t key_size> friend class HMac;
             template <uint16_t NBYTES> friend class Prf;
+
+            
+            
+//            friend class TdpImpl;
+            
         public:
             /**
              *  @brief Constructor
@@ -144,7 +149,7 @@ namespace sse {
              *
              *  @exception std::runtime_error Memory cannot be locked.
              */
-            void lock()
+            void lock() const
             {
                 if (content_ != NULL && !is_locked_) {
                     int err = sodium_mprotect_noaccess(content_);
@@ -162,7 +167,7 @@ namespace sse {
              *
              *  @exception std::runtime_error Memory cannot be locked.
              */
-            void unlock()
+            void unlock() const
             {
                 if (content_ != NULL && is_locked_) {
                     int err = sodium_mprotect_readonly(content_);
@@ -197,7 +202,7 @@ namespace sse {
              *  @exception std::runtime_error The memory cannot be accessed: it is absent (happens when
              *  the key has been modved) or cannot be unlocked.
              */
-            const uint8_t* unlock_get()
+            const uint8_t* unlock_get() const
             {
                 if (content_ == NULL) {
                     throw std::runtime_error("Memory is absent");
@@ -207,9 +212,9 @@ namespace sse {
                 return content_;
             }
             
-
-            uint8_t *content_;
-            bool is_locked_;
+            
+            uint8_t *content_; /*!< Pointer to the key content */
+            mutable bool is_locked_; /*!< Flag denoting is the content_ point is read_protected */
             
             
             

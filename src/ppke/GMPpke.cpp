@@ -228,11 +228,11 @@ GmppkePrivateKeyShare Gmppke::sk0Gen(const sse::crypto::Prf<kPPKEPrfOutputSize> 
         //        const ZR rho_d_1 = group.pseudoRandomZR(prf, std::string("param_rho_%d",d-1));
         
         const ZR l_d = group.pseudoRandomZR(prf, ("param_l_" + d_string));
-        
+
         //        const ZR l_d_1 = (d > 1) ? (group.pseudoRandomZR(prf, std::string("param_l_%d",d-1))) : (-sp.alpha);
-        
-        sk_0.sk1 = group.exp(group.generatorG2(), sp.beta*(rho_d - l_d));
-        sk_0.sk3 = group.exp(group.generatorG2(), rho_d); // g^r
+        auto g = group.generatorG2();
+        sk_0.sk1 = group.exp(g, sp.beta*(rho_d - l_d));
+        sk_0.sk3 = group.exp(g, rho_d); // g^r
         sk_0.sk2 = group.exp(sk_0.sk3, sp.beta + (h* sp.ry));// v(t0)^r
         
     }

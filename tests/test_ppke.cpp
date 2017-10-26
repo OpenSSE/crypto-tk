@@ -354,10 +354,10 @@ TEST(relic, pairing)
 
 TEST(ppke, serialization)
 {
-    std::array<uint8_t, sse::crypto::Gmppke::kPRFKeySize> master_key;
-    sse::crypto::random_bytes(master_key);
+//    std::array<uint8_t, sse::crypto::Gmppke::kPRFKeySize> master_key;
+//    sse::crypto::random_bytes(master_key);
 
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(sse::crypto::Key<32>(master_key.data()));
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
     
     sse::crypto::Gmppke ppke;
     sse::crypto::GmppkePublicKey pk;
@@ -405,7 +405,7 @@ TEST(ppke, serialization)
     keyshares[0].writeBytes(share_data.data());
 
     sse::crypto::GmppkePrivateKeyShare serialized_share(share_data.data());
-    
+
     ASSERT_EQ(keyshares[0], serialized_share);
 
 

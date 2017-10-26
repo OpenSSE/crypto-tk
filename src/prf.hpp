@@ -60,10 +60,8 @@ public:
 	{
 	}
     
-    Prf(Key<kKeySize>&& key)
+    Prf(Key<kKeySize>&& key) : base_(key.unlock_get(), kKeySize)
     {
-        key.unlock();
-        base_ = PrfBase(key.data(), kKeySize);
         key.lock();
     }
 

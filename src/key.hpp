@@ -188,6 +188,26 @@ namespace sse {
                 return content_;
             }
             
+            /**
+             *  @brief Unlocks the key and gets its content
+             *
+             *  Returns a pointer to the key data.
+             *  The caller has to relock the key after by calling unlock().
+             *
+             *  @exception std::runtime_error The memory cannot be accessed: it is absent (happens when
+             *  the key has been modved) or cannot be unlocked.
+             */
+            const uint8_t* unlock_get()
+            {
+                if (content_ == NULL) {
+                    throw std::runtime_error("Memory is absent");
+                }
+                
+                unlock();
+                return content_;
+            }
+            
+
             uint8_t *content_;
             bool is_locked_;
             

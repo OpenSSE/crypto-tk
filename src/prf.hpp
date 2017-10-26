@@ -23,6 +23,7 @@
 #include "random.hpp"
 #include "hmac.hpp"
 #include "hash.hpp"
+#include "key.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -62,6 +63,13 @@ public:
 	Prf(const std::array<uint8_t,kKeySize>& k) : base_(k.data(), kKeySize)
 	{	
 	}
+
+    Prf(Key<kKeySize>&& key)
+    {
+        key.unlock();
+        base_ = PrfBase(key.data(), kKeySize);
+        key.lock();
+    }
 
 	Prf(const Prf<NBYTES>& p) : base_(p.base_)
 	{		

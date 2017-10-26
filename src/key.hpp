@@ -21,6 +21,7 @@ namespace sse {
     namespace crypto {
         
         void test_keys();
+
         /** @class Key
          *  @brief A class for keys represented as byte strings.
          *
@@ -44,7 +45,9 @@ namespace sse {
         class Key {
             // declare all the friend classes and functions
             friend void test_keys();
-
+            
+            template <class Hash> friend class HMAC;
+            template <uint16_t NBYTES> friend class Prf;
         public:
             /**
              *  @brief Constructor

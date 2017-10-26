@@ -88,11 +88,16 @@ namespace sse {
              *  @param key    The input byte array. When the constructor returns,
              *  key is set to 0.
              *
-             *  @exception std::bad_alloc       Memory cannot be allocated.
-             *  @exception std::runtime_erro    Memory could not be protected.
+             *  @exception std::bad_alloc           Memory cannot be allocated.
+             *  @exception std::runtime_error       Memory could not be protected.
+             *  @exception std::invalid_argument    The input argument is NULL.
              */
             Key(uint8_t* const key)
             {
+                if(key == NULL)
+                {
+                    throw std::invalid_argument("Invalid key: key == NULL");
+                }
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
                 
                 if( content_ == NULL)

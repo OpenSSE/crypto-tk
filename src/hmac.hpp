@@ -30,6 +30,7 @@
 #include <string>
 #include <array>
 #include <iostream>
+#include <iomanip>
 
 #include <cassert>
 
@@ -207,20 +208,35 @@ namespace sse
             
             key_.unlock();
             
+            // set the buffer to 0x00
+            memset(buffer, 0, kHMACKeySize);
+            
+            // copy the key to the buffer
             memcpy(buffer, key_.data(), kKeySize);
             
+            // set the other bytes to 0x00
+            if (kKeySize < kHMACKeySize) {
+                memset(buffer+kKeySize, 0x00, kHMACKeySize-kKeySize);
+            }
+
             // xor the magic number for input
-            for(uint8_t i = 0; i < kHMACKeySize; ++i){
+            for(uint16_t i = 0; i < kHMACKeySize; ++i){
                 buffer[i] ^= 0x36;
             }
             
             memcpy(buffer + kHMACKeySize, in, length);
-            
+
             H::hash(buffer, i_len, buffer);
             
+            // prepend the key
             memcpy(tmp, key_.data(), kKeySize);
+            // set the other bytes to 0x00
+            if (kKeySize < kHMACKeySize) {
+                memset(tmp+kKeySize, 0x00, kHMACKeySize-kKeySize);
+            }
+
             // xor the magic number for output
-            for(uint8_t i = 0; i < kHMACKeySize; ++i){
+            for(uint16_t i = 0; i < kHMACKeySize; ++i){
                 tmp[i] ^= 0x5c;
             }
 

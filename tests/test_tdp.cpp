@@ -314,13 +314,21 @@ TEST(tdp, copy)
         std::array<uint8_t, 32> key = sse::crypto::random_bytes<uint8_t, 32>();
         
         for (size_t j = 0; j < 10; j++) {
-            string sample_orig = tdp_inv_orig.generate(key, std::to_string(j));
-            string sample_orig_copy = tdp_inv_orig.generate(key, std::to_string(j));
-            string sample_sk_copy = tdp_inv_orig.generate(key, std::to_string(j));
-            string sample_inv_assign = tdp_inv_assign.generate(key, std::to_string(j));
-            string sample_pk_copy = tdp_pk_copy.generate(key, std::to_string(j));
-            string sample_eq = tdp_pk_copy_copy.generate(key, std::to_string(j));
-            string sample_assign = tdp_assign.generate(key, std::to_string(j));
+            std::array<uint8_t, 32> key1 = key;
+            std::array<uint8_t, 32> key2 = key;
+            std::array<uint8_t, 32> key3 = key;
+            std::array<uint8_t, 32> key4 = key;
+            std::array<uint8_t, 32> key5 = key;
+            std::array<uint8_t, 32> key6 = key;
+            std::array<uint8_t, 32> key7 = key;
+
+            string sample_orig = tdp_inv_orig.generate(sse::crypto::Key<32>(key1.data()), std::to_string(j));
+            string sample_orig_copy = tdp_inv_orig.generate(sse::crypto::Key<32>(key2.data()), std::to_string(j));
+            string sample_sk_copy = tdp_inv_orig.generate(sse::crypto::Key<32>(key3.data()), std::to_string(j));
+            string sample_inv_assign = tdp_inv_assign.generate(sse::crypto::Key<32>(key4.data()), std::to_string(j));
+            string sample_pk_copy = tdp_pk_copy.generate(sse::crypto::Key<32>(key5.data()), std::to_string(j));
+            string sample_eq = tdp_pk_copy_copy.generate(sse::crypto::Key<32>(key6.data()), std::to_string(j));
+            string sample_assign = tdp_assign.generate(sse::crypto::Key<32>(key7.data()), std::to_string(j));
 
             ASSERT_EQ(sample_orig_copy, sample_orig);
             ASSERT_EQ(sample_sk_copy, sample_orig);
@@ -340,23 +348,31 @@ TEST(tdp, deterministic_generation)
     sse::crypto::TdpMultPool pool_tdp(inv_tdp.public_key(),2);
 
     std::array<uint8_t, 32> key = sse::crypto::random_bytes<uint8_t, 32>();
-    const sse::crypto::Prf<sse::crypto::Tdp::kRSAPrgSize> prf(key);
+    std::array<uint8_t, 32> key_prf = key;
+    const sse::crypto::Prf<sse::crypto::Tdp::kRSAPrgSize> prf(sse::crypto::Key<32>(key_prf.data()));
     
     for (size_t i = 0; i < TEST_COUNT; i++) {
         std::string seed = sse::crypto::random_string(128);
+        std::array<uint8_t, 32> key_tmp = key;
 
-        auto tdp_array_key = tdp.generate_array(key, seed);
+        
+        auto tdp_array_key = tdp.generate_array(sse::crypto::Key<32>(key_tmp.data()), seed);
         auto tdp_array_prf = tdp.generate_array(prf, seed);
-        std::string tdp_string_key = tdp.generate(key, seed);
+        
+        key_tmp = key;
+        std::string tdp_string_key = tdp.generate(sse::crypto::Key<32>(key_tmp.data()), seed);
         std::string tdp_string_prf = tdp.generate(prf, seed);
         
         ASSERT_EQ(tdp_array_key, tdp_array_prf);
         ASSERT_EQ(tdp_string_key, tdp_string_prf);
         ASSERT_EQ(tdp_string_key, std::string(tdp_array_key.begin(), tdp_array_key.end()));
      
-        auto inv_tdp_array_key = inv_tdp.generate_array(key, seed);
+        key_tmp = key;
+        auto inv_tdp_array_key = inv_tdp.generate_array(sse::crypto::Key<32>(key_tmp.data()), seed);
         auto inv_tdp_array_prf = inv_tdp.generate_array(prf, seed);
-        std::string inv_tdp_string_key = inv_tdp.generate(key, seed);
+        
+        key_tmp = key;
+        std::string inv_tdp_string_key = inv_tdp.generate(sse::crypto::Key<32>(key_tmp.data()), seed);
         std::string inv_tdp_string_prf = inv_tdp.generate(prf, seed);
         
         ASSERT_EQ(inv_tdp_array_key, inv_tdp_array_prf);
@@ -365,9 +381,12 @@ TEST(tdp, deterministic_generation)
         
         ASSERT_EQ(inv_tdp_array_key, tdp_array_key);
         
-        auto pool_tdp_array_key = pool_tdp.generate_array(key, seed);
+        key_tmp = key;
+        auto pool_tdp_array_key = pool_tdp.generate_array(sse::crypto::Key<32>(key_tmp.data()), seed);
         auto pool_tdp_array_prf = pool_tdp.generate_array(prf, seed);
-        std::string pool_tdp_string_key = pool_tdp.generate(key, seed);
+        
+        key_tmp = key;
+        std::string pool_tdp_string_key = pool_tdp.generate(sse::crypto::Key<32>(key_tmp.data()), seed);
         std::string pool_tdp_string_prf = pool_tdp.generate(prf, seed);
         
         ASSERT_EQ(pool_tdp_array_key, pool_tdp_array_prf);

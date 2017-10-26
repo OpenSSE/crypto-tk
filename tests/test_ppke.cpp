@@ -356,15 +356,15 @@ TEST(ppke, serialization)
 {
     std::array<uint8_t, sse::crypto::Gmppke::kPRFKeySize> master_key;
     sse::crypto::random_bytes(master_key);
-    
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key);
+
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(sse::crypto::Key<32>(master_key.data()));
     
     sse::crypto::Gmppke ppke;
     sse::crypto::GmppkePublicKey pk;
     sse::crypto::GmppkePrivateKey sk;
     sse::crypto::GmppkeSecretParameters sp;
     
-    ppke.keygen(master_key, pk, sk, sp);
+    ppke.keygen(key_prf, pk, sk, sp);
     
     typedef uint64_t M_type;
     

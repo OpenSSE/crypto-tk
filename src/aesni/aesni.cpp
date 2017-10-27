@@ -2541,29 +2541,29 @@ S8 = _mm_aesenclast_si128(S8, K);
                 case 0:
                     break;
                 case 1:
-                    aesni_ctr1(i+iv, subkeys, out + (i*kAESBlockSize));
+                    aesni_ctr1_subkeys(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 2:
-                    aesni_ctr2(i+iv, subkeys, out + (i*kAESBlockSize));
+                    aesni_ctr2_subkeys(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 3:
-                    aesni_ctr3(i+iv, subkeys, out + (i*kAESBlockSize));
+                    aesni_ctr3_subkeys(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 4:
-                    aesni_ctr4(i+iv, subkeys, out + (i*kAESBlockSize));
+                    aesni_ctr4_subkeys(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 5:
-                    aesni_ctr5(i+iv, subkeys, out + (i*kAESBlockSize));
+                    aesni_ctr5_subkeys(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 6:
-                    aesni_ctr6(i+iv, subkeys, out + (i*kAESBlockSize));
+                    aesni_ctr6_subkeys(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                 case 7:
-                    aesni_ctr7(i+iv, subkeys, out + (i*kAESBlockSize));
+                    aesni_ctr7_subkeys(i+iv, subkeys, out + (i*kAESBlockSize));
                     break;
                     
                 default:
-                    throw std::out_of_range("N-i > 7");
+                    throw std::out_of_range("N-i > 7"); /* LCOV_EXCL_LINE */
                     break;
             }
             
@@ -2607,7 +2607,7 @@ S8 = _mm_aesenclast_si128(S8, K);
                         break;
                         
                     default:
-                        throw std::out_of_range("N > 7");
+                        throw std::out_of_range("N > 7");  /* LCOV_EXCL_LINE */
                         break;
                 }
             }

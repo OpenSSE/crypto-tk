@@ -106,7 +106,7 @@ namespace sse
             for (size_t i = 0; i < keys.size(); i++) {
                 auto subkeys = aesni_derive_subkeys(keys[i]);
 
-                aesni_encrypt1(plain, subkeys, enc_result.data());
+                aesni_encrypt1(plain, subkeys.data(), enc_result.data());
                 
                 ASSERT_EQ(enc_result, references[i]);
             }
@@ -193,7 +193,7 @@ namespace sse
             std::array<uint8_t, 16> enc_result;
             
             for (size_t i = 0; i < plains.size(); i++) {
-                aesni_encrypt1(plains[i].data(), subkeys, enc_result.data());
+                aesni_encrypt1(plains[i].data(), subkeys.data(), enc_result.data());
                 
                 ASSERT_EQ(enc_result, references[i]);
             }
@@ -244,7 +244,7 @@ namespace sse
             for (size_t i = 0; i < plains.size()/16; i++) {
                 uint8_t * enc_result = new uint8_t[16*(i+1)];
 
-                aesni_encrypt(plains.data(), i+1, subkeys, enc_result);
+                aesni_encrypt(plains.data(), i+1, subkeys.data(), enc_result);
                 
                 ASSERT_EQ(std::string((char *)enc_result, 16*(i+1)), std::string(references.begin(), references.begin()+16*(i+1)));
                 
@@ -269,7 +269,7 @@ namespace sse
                 uint8_t * enc_result_derived_keys = new uint8_t[16*(i+1)];
                 uint8_t * enc_result_direct_keys = new uint8_t[16*(i+1)];
                 
-                aesni_ctr(i+1, 0, subkeys, enc_result_derived_keys);
+                aesni_ctr_subkeys(i+1, 0, subkeys.data(), enc_result_derived_keys);
                 aesni_ctr(i+1, 0, key, enc_result_direct_keys);
                 
                 ASSERT_EQ(std::string((char *)enc_result_derived_keys, 16*(i+1)),
@@ -302,8 +302,8 @@ namespace sse
                 uint8_t * enc_result_direct = new uint8_t[16*(i+1)];
                 uint8_t * enc_result_indirect = new uint8_t[16*(i+1)];
                 
-                aesni_ctr(i+1, 0, subkeys, enc_result_direct);
-                aesni_encrypt(in.data(), i+1, subkeys, enc_result_indirect);
+                aesni_ctr_subkeys(i+1, 0, subkeys.data(), enc_result_direct);
+                aesni_encrypt(in.data(), i+1, subkeys.data(), enc_result_indirect);
                 
                 ASSERT_EQ(std::string((char *)enc_result_direct, 16*(i+1)),
                           std::string((char *)enc_result_indirect, 16*(i+1)));
@@ -318,7 +318,7 @@ namespace sse
             uint8_t * enc_result_indirect = new uint8_t[16*8];
             
             aesni_ctr8(0, key, enc_result_direct);
-            aesni_encrypt(in.data(), 8, subkeys, enc_result_indirect);
+            aesni_encrypt(in.data(), 8, subkeys.data(), enc_result_indirect);
             
             ASSERT_EQ(std::string((char *)enc_result_direct, 16*8),
                       std::string((char *)enc_result_indirect, 16*8));
@@ -340,14 +340,14 @@ namespace sse
             
             auto subkeys = aesni_derive_subkeys(key);
             uint8_t * reference = new uint8_t[16*(n_blocks+shift)];
-            aesni_ctr(n_blocks+shift, 0, subkeys, reference);
+            aesni_ctr_subkeys(n_blocks+shift, 0, subkeys.data(), reference);
 
             
             for (size_t i = 0; i < n_blocks; i++) {
                 for (size_t j = 0; j < shift; j++) {
                     uint8_t * enc_result = new uint8_t[16*(i+1)];
                     
-                    aesni_ctr(i+1, j, subkeys, enc_result);
+                    aesni_ctr_subkeys(i+1, j, subkeys.data(), enc_result);
                     
                     ASSERT_EQ(std::string((char *)enc_result, 16*(i+1)),
                               std::string((char *)reference+(16*j), 16*(i+1)));

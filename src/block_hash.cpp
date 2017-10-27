@@ -89,7 +89,7 @@ namespace sse
         {
             
 #if USE_AESNI
-            aesni_encrypt_xor1(in, *get_key(), out);
+            aesni_encrypt_xor1(in, get_key()->data(), out);
 #else
             unsigned char *internal_out = out;
             
@@ -129,7 +129,7 @@ namespace sse
 
             
 #if USE_AESNI
-            aesni_encrypt_xor(in, in_len/AES_BLOCK_SIZE, *get_key(), out);
+            aesni_encrypt_xor(in, in_len/AES_BLOCK_SIZE, get_key()->data(), out);
 #else
             unsigned char *internal_out = out;
 

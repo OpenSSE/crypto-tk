@@ -48,17 +48,19 @@ namespace sse
         public:
 #if USE_AESNI
             typedef aes_subkeys_type key_type;
+            static constexpr uint16_t kAESSubKeySize = (kNAESRound+1)*kAESBlockSize;
+
 #else
             typedef AES_KEY key_type;
+            static constexpr uint16_t kAESSubKeySize = sizeof(AES_KEY);
 #endif
             
 
             PrgImpl() = delete;
             
-            inline PrgImpl(const std::array<uint8_t,kKeySize>& k);
-            inline PrgImpl(const uint8_t* k);
+            inline PrgImpl(Key<kKeySize>&& key);
             
-            inline ~PrgImpl();
+//            inline ~PrgImpl();
             
             inline void derive(const size_t len, std::string &out) const;
             inline void derive(const size_t len, unsigned char* out) const;
@@ -66,28 +68,22 @@ namespace sse
             inline void derive(const uint32_t offset, const size_t len, unsigned char* out) const;
             inline void derive(const uint32_t offset, const size_t len, std::string &out) const;
             
-            inline void gen_subkeys(const unsigned char *userKey);
 
             
             inline static void derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out);
             
             static constexpr uint8_t kBlockSize = AES_BLOCK_SIZE;
 
+            static Key<kAESSubKeySize> gen_subkeys(Key<kKeySize>&& key);
+
         private:
-            
-            key_type aes_enc_key_;
-
-
+     
+            Key<kAESSubKeySize> aes_enc_key_;
         };
         
         
-        Prg::Prg(const std::array<uint8_t,kKeySize>& k) : prg_imp_(new PrgImpl(k))
+        Prg::Prg(Key<kKeySize>&& k) : prg_imp_(new PrgImpl(std::move(k)))
         {
-        }
-        
-        Prg::Prg(const uint8_t* k) : prg_imp_(new PrgImpl(k))
-        {
-            
         }
         
         Prg::~Prg()
@@ -204,44 +200,40 @@ namespace sse
 
         // Prg implementation
         
-        Prg::PrgImpl::PrgImpl(const std::array<uint8_t,kKeySize>& k)
-        : aes_enc_key_{}
+        Prg::PrgImpl::PrgImpl(Key<kKeySize>&& key)
+        : aes_enc_key_(gen_subkeys(std::move(key)))
         {
-            gen_subkeys(k.data());
         }
         
-        Prg::PrgImpl::PrgImpl(const uint8_t* k)
-        : aes_enc_key_{}
-        {
-            gen_subkeys(k);
-        }
-        
-        Prg::PrgImpl::~PrgImpl()
-        {
-            // erase subkeys
-#if USE_AESNI
-            std::fill(aes_enc_key_.begin(), aes_enc_key_.end(), 0x00);
-#else
-            memset(&aes_enc_key_, 0x00, sizeof(AES_KEY));
-#endif
-        }
 
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))
-        void Prg::PrgImpl::gen_subkeys(const unsigned char *userKey)
+        
+        Key<Prg::PrgImpl::kAESSubKeySize> Prg::PrgImpl::gen_subkeys(Key<kKeySize>&& key)
         {
-            if (userKey == NULL) {
-                throw std::invalid_argument("PRG input key is NULL");
-            }
-
+            key.unlock();
+            
+            const uint8_t *key_data = key.data();
 #if USE_AESNI
-            aes_enc_key_ = aesni_derive_subkeys(userKey);
-#else
-            if (AES_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
+            auto fill_callback = [key_data](uint8_t* subkeys_content)
             {
-                // throw an exception
-                throw std::runtime_error("Unable to init AES subkeys");
-            }
-#endif
+                aesni_derive_subkeys(key_data,subkeys_content);
+            };
+            
+#else
+            auto fill_callback = [key_data](uint8_t* subkeys_content)
+            {
+                if (AES_set_encrypt_key(key_data, 128,  reinterpret_cast<aes_key_st*>(subkeys_content)) != 0)
+                {
+                    // throw an exception
+                    throw std::runtime_error("Unable to init AES subkeys");
+                }
+            };
+
+#endif /* USE_AESNI */
+            
+            key.lock();
+            
+            return Key<Prg::PrgImpl::kAESSubKeySize>(fill_callback);
         }
 
         void Prg::PrgImpl::derive(const size_t len, unsigned char* out) const
@@ -267,17 +259,17 @@ namespace sse
             
             size_t block_len = max_block_index - block_offset;
 
-            
+            aes_enc_key_.unlock();
 #if USE_AESNI
             if (offset%AES_BLOCK_SIZE == 0 && len%AES_BLOCK_SIZE == 0) {
                 // things are aligned, good !
                 
-                aesni_ctr(block_len, block_offset, aes_enc_key_, out);
+                aesni_ctr(block_len, block_offset, aes_enc_key_.data(), out);
                 
             }else{
                 // we need to create a buffer
                 unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
-                aesni_ctr(block_len, block_offset, aes_enc_key_, tmp);
+                aesni_ctr(block_len, block_offset, aes_enc_key_.data(), tmp);
 
                 memcpy(out, tmp+extra_len, len);
                 memset(tmp, 0x00, block_len*AES_BLOCK_SIZE);
@@ -297,7 +289,7 @@ namespace sse
             memset(out, 0, len);
             
             for (size_t i = 0; i < block_len; i++) {
-                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key_);
+                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, reinterpret_cast<const aes_key_st*>(aes_enc_key_.data()));
             }
             
             memcpy(out, tmp+extra_len, len);
@@ -306,6 +298,7 @@ namespace sse
             delete [] tmp;
             delete [] in;
 #endif
+            aes_enc_key_.lock();
         }
 
         void Prg::PrgImpl::derive(const size_t len, std::string &out) const

@@ -144,7 +144,7 @@ void Drbg::DrbgImpl::fill()
 	
 	
 #if USE_AESNI
-    aesni_ctr(kBlockCount, iv_, aes_key_, buffer_.data());
+    aesni_ctr(kBlockCount, iv_, aes_key_.data(), buffer_.data());
     iv_ += kBlockCount;
 #else
     unsigned char ecount[AES_BLOCK_SIZE];

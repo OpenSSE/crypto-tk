@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "key.hpp"
+
 #include <cstdint>
 
 #include <array>
@@ -46,8 +48,7 @@ namespace sse
             static constexpr uint8_t kKeySize = 16;
             
             Prg() = delete;
-            Prg(const std::array<uint8_t,kKeySize>& k);
-            Prg(const uint8_t* k);
+            Prg(Key<kKeySize>&& k);
 
             // we should not be able to duplicate Cipher objects
             Prg(const Prg& c) = delete;

@@ -67,13 +67,6 @@ public:
 
 	// Destructor.
 	~Prf() {}; 
-
-	std::array<uint8_t,kKeySize> key() const
-	{
-        std::array<uint8_t,kKeySize> k;
-        std::copy(base_.key().begin(), base_.key().begin()+kKeySize, k.begin());
-		return k;
-	};
 	
 	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;

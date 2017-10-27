@@ -13,6 +13,7 @@ inline void hash_expand(Hash const &H, uint8_t *result, size_t num_digests, arra
     // Just a single call to the hash function is required
     H.hash(result, data.data(), data.size());
   } else {
+      /* LCOV_EXCL_START */ // this chunk is never executed ...
     if (data.size() >= Hash::block_bytes - 1) {
       // Compute a hash of the hash, rather than a hash directly
 
@@ -42,6 +43,7 @@ inline void hash_expand(Hash const &H, uint8_t *result, size_t num_digests, arra
         H.hash(result + Hash::digest_bytes * i, temp, data_size + 2);
       }
     }
+      /* LCOV_EXCL_STOP */
   }
 }
 

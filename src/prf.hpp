@@ -112,7 +112,7 @@ template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const un
 //        throw std::runtime_error("Invalid output length: NBYTES > Hash::kDigestSize");
     }else if(NBYTES <= Hash::kDigestSize){
 		// only need one output bloc of PrfBase.
-        auto hmac_out = base_.hmac(in, length);
+        std::array<uint8_t, Hash::kDigestSize> hmac_out(std::move(base_.hmac(in, length)));
         std::copy_n(hmac_out.begin(), NBYTES, result.begin());
 	}
 	

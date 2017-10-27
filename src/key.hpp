@@ -68,13 +68,13 @@ namespace sse {
                 
                 if( content_ == NULL)
                 {
-                    throw std::bad_alloc::bad_alloc();
+                    throw std::bad_alloc::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
                 
                 random_bytes(N, content_);
                 int err = sodium_mprotect_noaccess(content_);
                 if (err == -1 && errno != ENOSYS) {
-                    throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno)));
+                    throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
                 }
                 is_locked_ = true;
             }
@@ -102,7 +102,7 @@ namespace sse {
                 
                 if(content_ == NULL)
                 {
-                    throw std::bad_alloc::bad_alloc();
+                    throw std::bad_alloc::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
                 
                 memcpy(content_, key, N); // copy the content of the input key

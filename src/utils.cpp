@@ -162,6 +162,11 @@ namespace sse
             return 0;
         }
 
+        static void sodium_misuse_handler()
+        {
+            throw std::runtime_error("Sodium Misuse");
+        }
+        
         void init_crypto_lib()
         {
             init_locks();
@@ -172,6 +177,7 @@ namespace sse
             {
                 throw std::runtime_error("Unable to init libsodium");
             }
+            sodium_set_misuse_handler(sodium_misuse_handler);
         }
         void cleanup_crypto_lib()
         {

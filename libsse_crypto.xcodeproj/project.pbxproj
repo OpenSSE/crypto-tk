@@ -37,9 +37,6 @@
 		311400901F9D4B480025DE3A /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114008E1F9D4B480025DE3A /* runtime.c */; };
 		311400911F9D4B480025DE3A /* runtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 3114008E1F9D4B480025DE3A /* runtime.c */; };
 		311400931F9D4B530025DE3A /* runtime.h in Headers */ = {isa = PBXBuildFile; fileRef = 311400921F9D4B530025DE3A /* runtime.h */; };
-		311400981F9E628C0025DE3A /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311400961F9E628C0025DE3A /* key.cpp */; };
-		311400991F9E628C0025DE3A /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311400961F9E628C0025DE3A /* key.cpp */; };
-		3114009A1F9E628C0025DE3A /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311400961F9E628C0025DE3A /* key.cpp */; };
 		3114009B1F9E628C0025DE3A /* key.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 311400971F9E628C0025DE3A /* key.hpp */; };
 		311934B11D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
 		311934B21D26B2360031804B /* block_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311934AF1D26B2360031804B /* block_hash.cpp */; };
@@ -266,7 +263,6 @@
 		311400881F9D4AA10025DE3A /* sse2_64_32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sse2_64_32.h; sourceTree = "<group>"; };
 		3114008E1F9D4B480025DE3A /* runtime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = runtime.c; sourceTree = "<group>"; };
 		311400921F9D4B530025DE3A /* runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = runtime.h; sourceTree = "<group>"; };
-		311400961F9E628C0025DE3A /* key.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = key.cpp; sourceTree = "<group>"; };
 		311400971F9E628C0025DE3A /* key.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = key.hpp; sourceTree = "<group>"; };
 		311934AF1D26B2360031804B /* block_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_hash.cpp; sourceTree = "<group>"; };
 		311934B01D26B2360031804B /* block_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = block_hash.hpp; sourceTree = "<group>"; };
@@ -523,7 +519,6 @@
 				6CC2D4611C3185D700334ADD /* set_hash.hpp */,
 				318C72991C9730140040AEE7 /* tdp.cpp */,
 				318C729A1C9730140040AEE7 /* tdp.hpp */,
-				311400961F9E628C0025DE3A /* key.cpp */,
 				311400971F9E628C0025DE3A /* key.hpp */,
 				316F0D3D1D25600700F87904 /* prg.cpp */,
 				316F0D3E1D25600700F87904 /* prg.hpp */,
@@ -994,7 +989,6 @@
 				311934B11D26B2360031804B /* block_hash.cpp in Sources */,
 				6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				310C2BDF1EC0B59700E80B3A /* relic_api.cpp in Sources */,
-				311400981F9E628C0025DE3A /* key.cpp in Sources */,
 				311934B81D27F1F00031804B /* test_block_hash.cpp in Sources */,
 				6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */,
 				6CC2D4961C318B4100334ADD /* sha512_sse4.asm in Sources */,
@@ -1037,7 +1031,6 @@
 				3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */,
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
 				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
-				311400991F9E628C0025DE3A /* key.cpp in Sources */,
 				6CC2D4B81C318F2E00334ADD /* main.cpp in Sources */,
 				310C2BEC1EC0B99300E80B3A /* GMPpke.cpp in Sources */,
 				3114007A1F9D49DA0025DE3A /* utils.c in Sources */,
@@ -1085,7 +1078,6 @@
 				318516901D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4D91C31940B00334ADD /* sha512_sse4.asm in Sources */,
 				3163D3A61ED5A50100A7FCD9 /* blake2s-common.c in Sources */,
-				3114009A1F9E628C0025DE3A /* key.cpp in Sources */,
 				310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */,
 				6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */,
 				6CC2D4ED1C31942700334ADD /* GLS254.cpp in Sources */,

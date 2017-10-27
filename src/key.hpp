@@ -100,7 +100,7 @@ namespace sse {
                 }
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
                 
-                if( content_ == NULL)
+                if(content_ == NULL)
                 {
                     throw std::bad_alloc::bad_alloc();
                 }
@@ -110,7 +110,7 @@ namespace sse {
                 
                 int err = sodium_mprotect_noaccess(content_);
                 if (err == -1 && errno != ENOSYS) {
-                    throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno)));
+                    throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
                 }
                 is_locked_ = true;
             }
@@ -159,7 +159,7 @@ namespace sse {
                 if (content_ != NULL && !is_locked_) {
                     int err = sodium_mprotect_noaccess(content_);
                     if (err == -1 && errno != ENOSYS) {
-                        throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno)));
+                        throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
                     }
                     is_locked_ = true;
                 }
@@ -177,7 +177,7 @@ namespace sse {
                 if (content_ != NULL && is_locked_) {
                     int err = sodium_mprotect_readonly(content_);
                     if (err == -1 && errno != ENOSYS) {
-                        throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno)));
+                        throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
                     }
                     is_locked_ = false;
                 }

@@ -70,7 +70,7 @@ namespace sse
             
 
             
-            inline static void derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out);
+            inline static void derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out);
             
             static constexpr uint8_t kBlockSize = AES_BLOCK_SIZE;
 
@@ -124,11 +124,11 @@ namespace sse
             prg_imp_->derive(offset,len, out);
         }
 
-        void Prg::derive(const uint8_t* k, const size_t len, std::string &out)
+        void Prg::derive(Key<kKeySize>&& k, const size_t len, std::string &out)
         {
             unsigned char *data = new unsigned char[len];
             
-            Prg::PrgImpl::derive(k, 0, len, data);
+            Prg::PrgImpl::derive(std::move(k), 0, len, data);
             out = std::string((char *)data, len);
             
             // erase the buffer
@@ -137,29 +137,16 @@ namespace sse
             delete [] data;
         }
         
-        void Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const size_t len, std::string &out)
+        void Prg::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out)
         {
-            unsigned char *data = new unsigned char[len];
-            
-            Prg::PrgImpl::derive(k.data(), 0, len, data);
-            out = std::string((char *)data, len);
-            
-            // erase the buffer
-            memset(data, 0, len);
-            
-            delete [] data;
-        }
-        
-        void Prg::derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out)
-        {
-            Prg::PrgImpl::derive(k, offset, len, out);
+            Prg::PrgImpl::derive(std::move(k), offset, len, out);
         }
 
-        std::string Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const size_t len)
+        std::string Prg::derive(Key<kKeySize>&& k, const size_t len)
         {
             unsigned char *data = new unsigned char[len];
             
-            Prg::PrgImpl::derive(k.data(), 0, len, data);
+            Prg::PrgImpl::derive(std::move(k), 0, len, data);
             std::string out = std::string((char *)data, len);
             
             // erase the buffer
@@ -169,11 +156,11 @@ namespace sse
             return out;
         }
         
-        void Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const uint32_t offset, const size_t len, std::string &out)
+        void Prg::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, std::string &out)
         {
             unsigned char *data = new unsigned char[len];
             
-            Prg::PrgImpl::derive(k.data(), offset, len, data);
+            Prg::PrgImpl::derive(std::move(k), offset, len, data);
             out = std::string((char *)data, len);
             
             // erase the buffer
@@ -182,11 +169,11 @@ namespace sse
             delete [] data;
         }
 
-        std::string Prg::derive(const std::array<uint8_t,Prg::kKeySize>& k, const uint32_t offset, const size_t len)
+        std::string Prg::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len)
         {
             unsigned char *data = new unsigned char[len];
             
-            Prg::PrgImpl::derive(k.data(), offset, len, data);
+            Prg::PrgImpl::derive(std::move(k), offset, len, data);
             std::string out = std::string((char *)data, len);
             
             // erase the buffer
@@ -328,14 +315,16 @@ namespace sse
         }
         
         
-        void Prg::PrgImpl::derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out)
+        void Prg::PrgImpl::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out)
         {
-            if (k == NULL) {
-                throw std::invalid_argument("PRG input key is NULL");
+            if (k.is_empty()) {
+                throw std::invalid_argument("PRG input key is empty");
             }
             if (len == 0) {
                 throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
             }
+            
+            Key<kKeySize> local_key(std::move(k));
             
             uint32_t extra_len = (offset % AES_BLOCK_SIZE);
             uint32_t block_offset = offset/AES_BLOCK_SIZE;
@@ -347,17 +336,17 @@ namespace sse
             
             size_t block_len = max_block_index - block_offset;
             
-            
+            local_key.unlock();
 #if USE_AESNI
             if (offset%AES_BLOCK_SIZE == 0 && len%AES_BLOCK_SIZE == 0) {
                 // things are aligned, good !
                 
-                aesni_ctr(block_len, block_offset, k, out);
+                aesni_ctr(block_len, block_offset, local_key.data(), out);
                 
             }else{
                 // we need to create a buffer
                 unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
-                aesni_ctr(block_len, block_offset, k, tmp);
+                aesni_ctr(block_len, block_offset, local_key.data(), tmp);
                 
                 memcpy(out, tmp+extra_len, len);
                 memset(tmp, 0x00, block_len*AES_BLOCK_SIZE);
@@ -367,7 +356,7 @@ namespace sse
 #else
             key_type aes_enc_key;
 
-            if (AES_set_encrypt_key(k, 128, &aes_enc_key) != 0)
+            if (AES_set_encrypt_key(local_key.data(), 128, &aes_enc_key) != 0)
             {
                 // throw an exception
                 throw std::runtime_error("Unable to init AES subkeys");
@@ -396,6 +385,7 @@ namespace sse
             delete [] tmp;
             delete [] in;
 #endif
+            local_key.unlock();
         }
 
     }

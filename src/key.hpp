@@ -18,6 +18,8 @@
 #include <new>
 #include <functional>
 
+#include <iostream>
+
 namespace sse {
     namespace crypto {
         
@@ -176,6 +178,35 @@ namespace sse {
                 }
             }
             
+            /**
+             *  @brief Move assignment operator
+             *
+             *  Erases the current key content,
+             *  sets the key content to the content of the parameter key,
+             *  and empties the content of the parameter key.
+             *
+             *  @param k    The moved key
+             *
+             */
+
+            Key& operator=(Key<N>&& other)
+            {
+                std::cout << "Move" << std::endl;
+                if (this != &other)
+                {
+                    if (content_ != NULL) {
+                        sodium_free(content_);
+                    }
+                    
+                    content_ = other.content_;
+                    is_locked_ = other.is_locked_;
+                    
+                    other.content_ = NULL;
+                    other.is_locked_ = true;
+                }
+                return *this;
+            }
+
         private:
             
             /**
@@ -214,6 +245,28 @@ namespace sse {
                 }
             }
             
+            /**
+             *  @brief Checks if the key is empty
+             *
+             *  Returns true if the key content is NULL.
+             *
+             */
+            const bool is_empty() const noexcept
+            {
+                return content_ == NULL;
+            }
+
+            /**
+             *  @brief Checks if the key is locked
+             *
+             *  Returns true if the key is not read accessible.
+             *
+             */
+            const bool is_locked() const noexcept
+            {
+                return is_locked_;
+            }
+
             /**
              *  @brief Gets the key content
              *

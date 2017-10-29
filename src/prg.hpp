@@ -67,15 +67,17 @@ namespace sse
             std::string derive(const uint32_t offset, const size_t len) const;
             void derive(const uint32_t offset, const size_t len, unsigned char* out) const;
 
-            static void derive(const uint8_t* k, const size_t len, std::string &out);
-            static void derive(const std::array<uint8_t,kKeySize>& k, const size_t len, std::string &out);
-            static void derive(const uint8_t* k, const uint32_t offset, const size_t len, unsigned char* out);
+            static void derive(Key<kKeySize>&& k, const size_t len, std::string &out);
+            static void derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, std::string &out);
+            static std::string derive(Key<kKeySize>&& k, const size_t len);
+            static std::string derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len);
 
-            template <size_t N> static inline void derive(const std::array<uint8_t,kKeySize>& k, const uint32_t offset, std::array<uint8_t, N> &out);
             
-            static std::string derive(const std::array<uint8_t,kKeySize>& k, const size_t len);
-            static void derive(const std::array<uint8_t,kKeySize>& k, const uint32_t offset, const size_t len, std::string &out);
-            static std::string derive(const std::array<uint8_t,kKeySize>& k, const uint32_t offset, const size_t len);
+            static void derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out);
+
+            template <size_t N> static inline void derive(Key<kKeySize>&& k, const uint32_t offset, std::array<uint8_t, N> &out);
+
+            
             
             // Again, avoid any assignement of Cipher objects
             Prg& operator=(const Prg& h) = delete;
@@ -86,9 +88,9 @@ namespace sse
             PrgImpl *prg_imp_; // opaque pointer
         };
 
-        template <size_t N> void Prg::derive(const std::array<uint8_t,kKeySize>& k, const uint32_t offset, std::array<uint8_t, N> &out)
+        template <size_t N> void Prg::derive(Key<kKeySize>&& k, const uint32_t offset, std::array<uint8_t, N> &out)
         {
-            derive(k.data(), offset, N, out.data());
+            derive(std::move(k), offset, N, out.data());
         }
 
     }

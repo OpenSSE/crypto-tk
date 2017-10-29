@@ -99,7 +99,7 @@ TEST(prg, consistency_1)
         std::string out1, out2;
         
         out1 = prg.derive(32);
-        out2 = sse::crypto::Prg::derive(k_cp,16,16);
+        out2 = sse::crypto::Prg::derive(k_cp.data(),16,16);
         
         ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
@@ -120,7 +120,7 @@ TEST(prg, consistency_2)
         std::string out1, out2;
         
         out1 = prg.derive(31);
-        out2 = sse::crypto::Prg::derive(k_cp,16,15);
+        out2 = sse::crypto::Prg::derive(k_cp.data(),16,15);
         
         ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
@@ -129,13 +129,20 @@ TEST(prg, consistency_2)
 TEST(prg, consistency_3)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
-    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp{{0x00}};
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp1{{0x00}}, k_cp2{{0x00}};
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp3{{0x00}}, k_cp4{{0x00}};
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp5{{0x00}}, k_cp6{{0x00}};
 
     for (size_t i = 0; i < TEST_COUNT; i++) {
                 
         sse::crypto::random_bytes(k);
-        k_cp = k;
-        
+        k_cp1 = k;
+        k_cp2 = k;
+        k_cp3 = k;
+        k_cp4 = k;
+        k_cp5 = k;
+        k_cp6 = k;
+
         sse::crypto::Prg prg(k.data());
         
         std::string out1, out2, out3, out4, out5, out6;
@@ -145,12 +152,12 @@ TEST(prg, consistency_3)
         uint8_t out_bytes[30];
         
         out1 = prg.derive(64);
-        out2 = sse::crypto::Prg::derive(k_cp,16,64-16);
-        sse::crypto::Prg::derive(k_cp.data(),64,out3);
-        sse::crypto::Prg::derive(k_cp,64,out4);
-        out5 = sse::crypto::Prg::derive(k_cp,64);
-        sse::crypto::Prg::derive(k_cp,15,10, out6);
-        sse::crypto::Prg::derive(k_cp.data(),6,58, out_arr.data());
+        out2 = sse::crypto::Prg::derive(k_cp1.data(),16,64-16);
+        sse::crypto::Prg::derive(k_cp2.data(),64,out3);
+        sse::crypto::Prg::derive(k_cp3.data(),64,out4);
+        out5 = sse::crypto::Prg::derive(k_cp4.data(),64);
+        sse::crypto::Prg::derive(k_cp5.data(),15,10, out6);
+        sse::crypto::Prg::derive(k_cp6.data(),6,58, out_arr.data());
       
         prg.derive(18,46,out8);
         prg.derive(34, 30, out_bytes);
@@ -172,13 +179,17 @@ TEST(prg, consistency_3)
 TEST(prg, exceptions)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+    sse::crypto::Key<sse::crypto::Prg::kKeySize> key;
     sse::crypto::Prg prg(k.data());
 
     std::string out;
     
     ASSERT_THROW(prg.derive(0, out), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::Prg::derive(k.data(),0, out), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::Prg::derive((const uint8_t*)NULL,10, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Prg::derive(std::move(key),0, out), std::invalid_argument);
+    
+    sse::crypto::Prg::derive(std::move(key),1, out);
+    // key should have been emptied by the previous line
+    ASSERT_THROW(sse::crypto::Prg::derive(std::move(key),10, out), std::invalid_argument);
     
     ASSERT_THROW(sse::crypto::Prg p(NULL), std::invalid_argument);
 }

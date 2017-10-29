@@ -132,8 +132,8 @@ namespace sse
             out = std::string((char *)data, len);
             
             // erase the buffer
-            memset(data, 0, len);
-            
+            sodium_memzero(data, len);
+
             delete [] data;
         }
         
@@ -150,8 +150,8 @@ namespace sse
             std::string out = std::string((char *)data, len);
             
             // erase the buffer
-            memset(data, 0, len);
-            
+            sodium_memzero(data, len);
+
             delete [] data;
             return out;
         }
@@ -164,8 +164,8 @@ namespace sse
             out = std::string((char *)data, len);
             
             // erase the buffer
-            memset(data, 0, len);
-            
+            sodium_memzero(data, len);
+
             delete [] data;
         }
 
@@ -177,8 +177,8 @@ namespace sse
             std::string out = std::string((char *)data, len);
             
             // erase the buffer
-            memset(data, 0, len);
-            
+            sodium_memzero(data, len);
+
             delete [] data;
             return out;
         }
@@ -259,28 +259,28 @@ namespace sse
                 aesni_ctr(block_len, block_offset, aes_enc_key_.data(), tmp);
 
                 memcpy(out, tmp+extra_len, len);
-                memset(tmp, 0x00, block_len*AES_BLOCK_SIZE);
+                sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
 
                 delete [] tmp;
             }
 #else
-            unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
-            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
-            
+            volatile unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
+            sodium_memzero(in, block_len*AES_BLOCK_SIZE);
+
             unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
 
             for (size_t i = block_offset; i < max_block_index; i++) {
                 ((size_t*)in)[2*(i-block_offset)] = i;
             }
             
-            memset(out, 0, len);
+            sodium_memzero(out, len);
             
             for (size_t i = 0; i < block_len; i++) {
                 AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, reinterpret_cast<const aes_key_st*>(aes_enc_key_.data()));
             }
             
             memcpy(out, tmp+extra_len, len);
-            memset(tmp, 0x00, block_len*AES_BLOCK_SIZE);
+            sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
             
             delete [] tmp;
             delete [] in;
@@ -296,7 +296,7 @@ namespace sse
             out = std::string((char *)data, len);
             
             // erase the buffer
-            memset(data, 0, len);
+            sodium_memzero(data, len);
 
             delete [] data;
         }
@@ -309,8 +309,8 @@ namespace sse
             out = std::string((char *)data, len);
             
             // erase the buffer
-            memset(data, 0, len);
-            
+            sodium_memzero(data, len);
+
             delete [] data;
         }
         
@@ -349,8 +349,8 @@ namespace sse
                 aesni_ctr(block_len, block_offset, local_key.data(), tmp);
                 
                 memcpy(out, tmp+extra_len, len);
-                memset(tmp, 0x00, block_len*AES_BLOCK_SIZE);
-                
+                sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
+
                 delete [] tmp;
             }
 #else
@@ -363,24 +363,24 @@ namespace sse
             }
 
             unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
-            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
-            
+            sodium_memzero(in, block_len*AES_BLOCK_SIZE);
+
             unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
             
             for (size_t i = block_offset; i < max_block_index; i++) {
                 ((size_t*)in)[2*(i-block_offset)] = i;
             }
             
-            memset(out, 0, len);
-            
+            sodium_memzero(out, len);
+
             for (size_t i = 0; i < block_len; i++) {
                 AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
             }
             
             memcpy(out, tmp+extra_len, len);
-            memset(tmp, 0x00, block_len*AES_BLOCK_SIZE);
-            memset(&aes_enc_key, 0x00, sizeof(key_type));
-            
+
+            sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
+            sodium_memzero(&aes_enc_key, sizeof(key_type));
             
             delete [] tmp;
             delete [] in;

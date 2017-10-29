@@ -21,6 +21,7 @@
 #include "cipher.hpp"
 
 #include "random.hpp"
+#include "sodium/utils.h"
 
 #include <cstring>
 #include <exception>
@@ -109,7 +110,7 @@ Cipher::CipherImpl::CipherImpl(const uint8_t* k)
 Cipher::CipherImpl::~CipherImpl() 
 { 
 	// erase subkeys
-	memset(&aes_enc_key_, 0x00, sizeof(AES_KEY));
+    sodium_memzero(&aes_enc_key_, sizeof(AES_KEY));
 }
 
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))
@@ -129,7 +130,7 @@ void Cipher::CipherImpl::gen_subkeys(const unsigned char *userKey)
 
 void Cipher::CipherImpl::reset_iv()
 {
-	memset(iv_, 0x00, kIVSize);
+    sodium_memzero(iv_, kIVSize);
 }
 
 void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
@@ -144,22 +145,23 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
 	
     unsigned char enc_iv[AES_BLOCK_SIZE];
     unsigned char ecount[AES_BLOCK_SIZE];
-    memset(ecount, 0x00, AES_BLOCK_SIZE);
+    sodium_memzero(ecount, AES_BLOCK_SIZE);
 	
 	unsigned int num = 0;
 	
 	memcpy(out, iv_, kIVSize); // copy iv first
 
-	if(kIVSize != AES_BLOCK_SIZE)
-		memset(enc_iv, 0, AES_BLOCK_SIZE);
-	
+    if(kIVSize != AES_BLOCK_SIZE){
+		sodium_memzero(enc_iv, AES_BLOCK_SIZE);
+    }
+    
 	memcpy(enc_iv+AES_BLOCK_SIZE-kIVSize, iv_, kIVSize);
 	
 	// now append the ciphertext
     AES_ctr128_encrypt(in, out+kIVSize, len, &aes_enc_key_, enc_iv, ecount, &num);
 	
 	// erase ecount to avoid (partial) recovery of the last block
-	memset(ecount, 0x00, AES_BLOCK_SIZE);
+	sodium_memzero(ecount, AES_BLOCK_SIZE);
 	
 	// decrement the block counter
 	remaining_block_count_ -= (len/16 +1);
@@ -174,7 +176,7 @@ void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)
     out = std::string((char *)data, len+kIVSize);
 
     // erase the buffer
-    memset(data, 0, len+kIVSize);
+    sodium_memzero(data, len+kIVSize);
     
     delete [] data;
 }
@@ -197,7 +199,7 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
   	AES_ctr128_encrypt(in+kIVSize, out, len-kIVSize, &aes_enc_key_, dec_iv, ecount, &num);
 	
 	// erase ecount to avoid (partial) recovery of the last block
-	memset(ecount, 0x00, AES_BLOCK_SIZE);
+	sodium_memzero(ecount, AES_BLOCK_SIZE);
 }
 
 void Cipher::CipherImpl::decrypt(const std::string &in, std::string &out)

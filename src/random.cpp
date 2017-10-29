@@ -21,6 +21,7 @@
 #include "random.hpp"
 
 #include "aesni/aesni.hpp"
+#include "sodium/utils.h"
 
 #include <cstring>
 #include <algorithm>
@@ -103,7 +104,7 @@ Drbg::DrbgImpl::DrbgImpl()
 Drbg::DrbgImpl::~DrbgImpl()
 {
 	// erase subkeys
-	memset(&aes_key_, 0x00, sizeof(AES_KEY));
+    sodium_memzero(&aes_key_, sizeof(AES_KEY));
 }
 
 void Drbg::DrbgImpl::reseed()
@@ -122,12 +123,14 @@ void Drbg::DrbgImpl::reseed()
 		// throw an exception
 		throw std::runtime_error("Unable to init AES subkeys");
 	}
-    memset(iv_, 0x00, AES_BLOCK_SIZE);
+    sodium_memzero(iv_, sizeof(AES_BLOCK_SIZE));
+
 #endif
 
 
 	// erase the key buffer
-	memset(key_buf, 0x00, 16);
+    sodium_memzero(key_buf, 16);
+
 	delete [] key_buf;
 	
 	remaining_bytes_ = kReseedBytesCount;

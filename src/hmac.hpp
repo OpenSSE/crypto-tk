@@ -82,116 +82,16 @@ namespace sse
                 }
             };
             
-//            HMac(const void* k, const uint8_t &len) :
-//            key_{}
-//            {
-//                if(len > kHMACKeySize)
-//                {
-//                    throw std::invalid_argument("Invalid key length: len > kKeySize");
-//                }
-//
-//                if(len < kMinKeySize)
-//                {
-//                    throw std::invalid_argument("Invalid key length: len < 16. Insecure key size");
-//                }
-//
-//                if(k == NULL)
-//                {
-//                    throw std::invalid_argument("Invalid key: key == NULL");
-//                }
-//
-//                uint8_t l = (kKeySize < len) ? kKeySize : len;
-//
-//                std::memset(key_.data(), 0x00, kKeySize);
-//                std::memcpy(key_.data(),k,l);
-//
-//                gen_padded_keys(key_);
-//            };
-            
-//            HMac(const std::string& k)
-//            {
-//                uint8_t l = (kKeySize < k.size()) ? kKeySize : k.size();
-//
-//                std::memset(key_.data(), 0x00, kKeySize);
-//                std::memcpy(key_.data(),k.data(),l);
-//
-//                gen_padded_keys(key_);
-//            }
-//
-//            HMac(const std::string& k, const uint8_t &len)
-//            {
-//                if(len > kKeySize)
-//                {
-//                    throw std::invalid_argument("Invalid key length: len > kKeySize");
-//                }
-//
-//                if(len == 0)
-//                {
-//                    throw std::invalid_argument("Invalid key length: len == 0");
-//                }
-//
-//                uint8_t l = (kKeySize < len) ? kKeySize : len;
-//
-//                std::memset(key_.data(), 0x00, kKeySize);
-//                std::memcpy(key_.data(),k.data(),l);
-//
-//                gen_padded_keys(key_);
-//            }
-//
-//            HMac(const std::array<uint8_t,kKeySize>& k) : key_(k)
-//            {
-//                gen_padded_keys(k);
-//            };
-//
-//            HMac(const HMac<H>& k) : key_(k.key_), o_key_(k.o_key_), i_key_(k.i_key_)
-//            {
-//
-//            };
-            
-            // Destructor.
-            // Set the content of the key to zero before destruction: remove all traces of the key in memory.
-            ~HMac()
-            {
-//                std::fill(key_.begin(), key_.end(), 0);
-//                std::fill(o_key_.begin(), o_key_.end(), 0);
-//                std::fill(i_key_.begin(), i_key_.end(), 0);
-            };
-            
-//            const std::array<uint8_t,kKeySize>& key() const
-//            {
-//                return key_;
-//            };
-//
-//            const uint8_t* key_data() const
-//            {
-//                return key_.data();
-//            };
             
             void hmac(const unsigned char* in, const size_t &length, unsigned char* out,  const size_t &out_len = kDigestSize) const;
             std::array<uint8_t, H::kDigestSize> hmac(const unsigned char* in, const size_t &length) const;
             std::array<uint8_t, H::kDigestSize> hmac(const std::string &s) const;
             
         private:
-//            void gen_padded_keys(const std::array<uint8_t,kKeySize> &in_key);
             
             Key<kKeySize> key_;
-//            std::array<uint8_t,kKeySize> key_;
-//            std::array<uint8_t,kKeySize> o_key_;
-//            std::array<uint8_t,kKeySize> i_key_;
-            
         };
         
-//        template <class H> void HMac<H>::gen_padded_keys(const std::array<uint8_t,kKeySize> &in_key)
-//        {
-//            memcpy(o_key_.data(), in_key.data(), kKeySize);
-//            memcpy(i_key_.data(), in_key.data(), kKeySize);
-//
-//            for(uint8_t i = 0; i < kKeySize; ++i)
-//            {
-//                o_key_[i] ^= 0x5c;
-//                i_key_[i] ^= 0x36;
-//            }
-//        }
         
         // HMac instantiation
         template <class H, uint16_t N> void HMac<H,N>::hmac(const unsigned char* in, const size_t &length, unsigned char* out, const size_t &out_len) const

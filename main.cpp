@@ -400,7 +400,7 @@ static void bench_prg()
     std::chrono::duration<double, std::nano> prg_time;
     auto begin_t = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < N_sample; i++) {
-        sse::crypto::Prg::derive(key, 0, out);
+        sse::crypto::Prg::derive(key.data(), 0, out);
         std::copy(out.begin(), out.begin()+16, key.begin());
     }
     auto end_t = std::chrono::high_resolution_clock::now();

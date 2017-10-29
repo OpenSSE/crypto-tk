@@ -264,8 +264,8 @@ namespace sse
                 delete [] tmp;
             }
 #else
-            volatile unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
-            sodium_memzero(in, block_len*AES_BLOCK_SIZE);
+            unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
+            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
 
             unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
 

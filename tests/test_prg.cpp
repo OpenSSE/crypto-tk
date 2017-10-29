@@ -176,6 +176,72 @@ TEST(prg, consistency_3)
     }
 }
 
+// small workaround to declare the content of this function as a friend
+// of the Key class, and access its content without having to import gtest
+// in the key.hpp header
+
+namespace tests {
+    void prg_test_key_derivation_consistency();
+    
+    void prg_test_key_derivation_consistency()
+    {
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp1{{0x00}}, k_cp2{{0x00}};
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp3{{0x00}};
+
+        for (size_t i = 0; i < TEST_COUNT; i++) {
+            
+            sse::crypto::random_bytes(k);
+            k_cp1 = k;
+            k_cp2 = k;
+            k_cp3 = k;
+
+            constexpr size_t derived_key_size = 16;
+            constexpr size_t n_derived_keys = 10;
+            constexpr size_t key_offset = 3;
+
+            std::array<uint8_t, (n_derived_keys+key_offset)*derived_key_size> out;
+            
+            
+            auto key_vec_static = sse::crypto::Prg::derive_keys<derived_key_size>(k.data(), n_derived_keys);
+            auto offet_key_vec_static = sse::crypto::Prg::derive_keys<derived_key_size>(k_cp1.data(), n_derived_keys, key_offset);
+
+            sse::crypto::Prg prg(k_cp3.data());
+            auto key_vec = prg.derive_keys<derived_key_size>(n_derived_keys);
+            auto offet_key_vec = prg.derive_keys<derived_key_size>(n_derived_keys, key_offset);
+
+            
+            sse::crypto::Prg::derive(k_cp2.data(),0,out);
+            
+            for (size_t j = 0; j < n_derived_keys; j++) {
+                key_vec[j].unlock();
+                key_vec_static[j].unlock();
+                ASSERT_TRUE(memcmp(key_vec[j].data(), out.data()+j*derived_key_size, derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(key_vec_static[j].data(), out.data()+j*derived_key_size, derived_key_size) == 0);
+                key_vec[j].lock();
+                key_vec_static[j].lock();
+            }
+            for (size_t j = 0; j < n_derived_keys; j++) {
+                offet_key_vec_static[j].unlock();
+                offet_key_vec[j].unlock();
+                ASSERT_TRUE(memcmp(offet_key_vec_static[j].data(), out.data()+(j+key_offset)*derived_key_size, derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(offet_key_vec[j].data(), out.data()+(j+key_offset)*derived_key_size, derived_key_size) == 0);
+                offet_key_vec_static[j].lock();
+                offet_key_vec[j].lock();
+            }
+        }
+        
+    }
+}
+
+TEST(prg, consistency_4)
+{
+    tests::prg_test_key_derivation_consistency();
+}
+
+
+
+
 TEST(prg, exceptions)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};

@@ -20,11 +20,15 @@
 
 #include <iostream>
 
+namespace tests {
+    void prg_test_key_derivation_consistency();
+}
+
 namespace sse {
     namespace crypto {
         
         void test_keys();
-
+        
         /** @class Key
          *  @brief A class for keys represented as byte strings.
          *
@@ -53,6 +57,7 @@ namespace sse {
             template <uint16_t NBYTES> friend class Prf;
             friend class Prg;
             
+            friend void tests::prg_test_key_derivation_consistency();
             
 //            friend class TdpImpl;
             

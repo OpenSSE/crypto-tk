@@ -324,7 +324,7 @@ namespace sse
                 throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
             }
             
-            Key<kKeySize> local_key(std::move(k));
+            Key<kKeySize> local_key(std::move(k)); // make sure the input key cannot be reused
             
             uint32_t extra_len = (offset % AES_BLOCK_SIZE);
             uint32_t block_offset = offset/AES_BLOCK_SIZE;

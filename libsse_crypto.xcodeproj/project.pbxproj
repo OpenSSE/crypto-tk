@@ -71,6 +71,7 @@
 		318C729C1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729D1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729E1C9730140040AEE7 /* tdp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 318C729A1C9730140040AEE7 /* tdp.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		31B548981FB3332A00E17DD3 /* sodium in Headers */ = {isa = PBXBuildFile; fileRef = 31B548971FB3332300E17DD3 /* sodium */; settings = {ATTRIBUTES = (Public, ); }; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
 		6CC2D4861C31889B00334ADD /* fpe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* fpe.cpp */; };
@@ -286,6 +287,7 @@
 		3185168D1D4BF45700A44AD7 /* aesni.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = aesni.hpp; sourceTree = "<group>"; };
 		318C72991C9730140040AEE7 /* tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tdp.cpp; sourceTree = "<group>"; };
 		318C729A1C9730140040AEE7 /* tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp.hpp; sourceTree = "<group>"; };
+		31B548971FB3332300E17DD3 /* sodium */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sodium; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6CC2D3FD1C3185D700334ADD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -495,6 +497,7 @@
 			isa = PBXGroup;
 			children = (
 				311400741F9D49DA0025DE3A /* sodium */,
+				31B548971FB3332300E17DD3 /* sodium */,
 				6CC2D4001C3185D700334ADD /* aez */,
 				6CC2D4031C3185D700334ADD /* build.scons */,
 				318516851D4BF3D700A44AD7 /* aesni */,
@@ -765,6 +768,7 @@
 				6CF4160B1CB4FF1D00C448D4 /* utils.hpp in Headers */,
 				3114008D1F9D4AA20025DE3A /* sse2_64_32.h in Headers */,
 				311400931F9D4B530025DE3A /* runtime.h in Headers */,
+				31B548981FB3332A00E17DD3 /* sodium in Headers */,
 				316F0D421D25600700F87904 /* prg.hpp in Headers */,
 				310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */,
 				311934B41D26B2360031804B /* block_hash.hpp in Headers */,

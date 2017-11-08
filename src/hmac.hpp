@@ -72,6 +72,11 @@ namespace sse
 
             HMac(Key<kKeySize>&& key) : key_(std::move(key))
             {
+                if(key_.is_empty())
+                {
+                    throw std::invalid_argument("Invalid key: key is empty");
+                }
+
             };
 
             HMac(uint8_t* const k) : key_(k)

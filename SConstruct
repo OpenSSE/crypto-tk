@@ -122,7 +122,8 @@ shared_lib = shared_lib_env.SharedLibrary(library_build_prefix+'/lib/sse_crypto'
 static_lib = lib_env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 
 headers = Glob('src/*.h') + Glob('src/*.hpp') + ['src/ppke/GMPpke.h']
-headers_lib = [lib_env.Install(library_build_prefix+'/include/sse/crypto', headers)]
+headers_sodium = Glob('src/sodium/*.h')
+headers_lib = [lib_env.Install(library_build_prefix+'/include/sse/crypto', headers), lib_env.Install(library_build_prefix+'/include/sse/crypto/sodium', headers_sodium)]
 
 env.Clean(headers_lib,[library_build_prefix+'/include'])
 

@@ -72,9 +72,9 @@ public:
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;
     template <size_t L>  std::array<uint8_t, NBYTES> prf(const std::array<uint8_t, L> &in) const;
 
-    template <size_t N>  Key<N> derive_key(const unsigned char* in, const size_t &length) const;
-    template <size_t N>  Key<N> derive_key(const std::string &s) const;
-    template <size_t N, size_t L>  Key<N> derive_key(const std::array<uint8_t, L> &in) const;
+    Key<NBYTES> derive_key(const unsigned char* in, const size_t &length) const;
+    Key<NBYTES> derive_key(const std::string &s) const;
+    template <size_t L>  Key<NBYTES> derive_key(const std::array<uint8_t, L> &in) const;
 //	void prf(const unsigned char* in, const size_t &length, unsigned char* out) const;
 private:
 	
@@ -137,22 +137,20 @@ template<size_t L>
 
 // derive a key using the PRF
 
-template <uint16_t NBYTES>
-template <size_t N>  Key<N> Prf<NBYTES>::derive_key(const unsigned char* in, const size_t &length) const
+template <uint16_t NBYTES> Key<NBYTES> Prf<NBYTES>::derive_key(const unsigned char* in, const size_t &length) const
 {
-    return Key<N>(prf(in, length).data());
+    return Key<NBYTES>(prf(in, length).data());
+}
+
+template <uint16_t NBYTES> Key<NBYTES> Prf<NBYTES>::derive_key(const std::string &s) const
+{
+    return Key<NBYTES>(prf(s).data());
 }
 
 template <uint16_t NBYTES>
-template <size_t N>  Key<N> Prf<NBYTES>::derive_key(const std::string &s) const
+template <size_t L>  Key<NBYTES> Prf<NBYTES>::derive_key(const std::array<uint8_t, L> &in) const
 {
-    return Key<N>(prf(s).data());
-}
-
-template <uint16_t NBYTES>
-template <size_t N, size_t L>  Key<N> Prf<NBYTES>::derive_key(const std::array<uint8_t, L> &in) const
-{
-    return Key<N>(prf(in).data());
+    return Key<NBYTES>(prf(in).data());
 }
 
    

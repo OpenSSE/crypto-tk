@@ -72,6 +72,7 @@
 		318C729D1C9730140040AEE7 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
 		318C729E1C9730140040AEE7 /* tdp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 318C729A1C9730140040AEE7 /* tdp.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		31B548981FB3332A00E17DD3 /* sodium in Headers */ = {isa = PBXBuildFile; fileRef = 31B548971FB3332300E17DD3 /* sodium */; settings = {ATTRIBUTES = (Public, ); }; };
+		31B5489A1FB336AE00E17DD3 /* test_prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31B548991FB336AE00E17DD3 /* test_prf.cpp */; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
 		6CC2D4861C31889B00334ADD /* fpe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* fpe.cpp */; };
@@ -288,6 +289,7 @@
 		318C72991C9730140040AEE7 /* tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tdp.cpp; sourceTree = "<group>"; };
 		318C729A1C9730140040AEE7 /* tdp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp.hpp; sourceTree = "<group>"; };
 		31B548971FB3332300E17DD3 /* sodium */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sodium; sourceTree = "<group>"; };
+		31B548991FB336AE00E17DD3 /* test_prf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_prf.cpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6CC2D3FD1C3185D700334ADD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -730,6 +732,7 @@
 				6CC2D4681C3185D700334ADD /* test_ecmh.cpp */,
 				6CC2D46A1C3185D700334ADD /* test_fpe.cpp */,
 				6CC2D46C1C3185D700334ADD /* test_hmac.cpp */,
+				31B548991FB336AE00E17DD3 /* test_prf.cpp */,
 				315D453A1C98909A00590A01 /* test_tdp.cpp */,
 				316F0D431D2565CB00F87904 /* test_prg.cpp */,
 				311934B61D27F1F00031804B /* test_block_hash.cpp */,
@@ -988,6 +991,7 @@
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
 				3163D3991ED56BEA00A7FCD9 /* aesni.cpp in Sources */,
 				3114008F1F9D4B480025DE3A /* runtime.c in Sources */,
+				31B5489A1FB336AE00E17DD3 /* test_prf.cpp in Sources */,
 				3185168E1D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */,
 				311934B11D26B2360031804B /* block_hash.cpp in Sources */,

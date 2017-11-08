@@ -22,6 +22,7 @@
 
 namespace tests {
     void prg_test_key_derivation_consistency();
+    template <size_t N> void test_key_derivation_consistency(size_t input_size);
 }
 
 namespace sse {
@@ -58,7 +59,8 @@ namespace sse {
             friend class Prg;
             
             friend void tests::prg_test_key_derivation_consistency();
-            
+            template <size_t L> friend void tests::test_key_derivation_consistency(size_t input_size);
+
 //            friend class TdpImpl;
             
         public:

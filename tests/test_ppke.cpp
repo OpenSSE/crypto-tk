@@ -588,7 +588,8 @@ TEST(puncturable, correctness)
         master_key[i] = 1 << i;
     }
     
-    sse::crypto::PuncturableEncryption encryptor(master_key);
+    sse::crypto::punct::master_key_type key(master_key.data());
+    sse::crypto::PuncturableEncryption encryptor(std::move(key));
 
     typedef uint64_t M_type;
     

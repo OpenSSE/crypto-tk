@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "key.hpp"
+
 #include <string>
 #include <array>
 #include <vector>
@@ -39,7 +41,7 @@ namespace sse
             typedef std::vector<key_share_type> punctured_key_type;
             
             const static size_t kMasterKeySize = 32;
-            typedef std::array<uint8_t, kMasterKeySize> master_key_type;
+            typedef Key<kMasterKeySize> master_key_type;
             
             const static size_t kCiphertextSize = 90;
             typedef std::array<uint8_t, kCiphertextSize> ciphertext_type;
@@ -65,7 +67,7 @@ namespace sse
         {
         public:
             
-            PuncturableEncryption(punct::master_key_type& key);
+            PuncturableEncryption(punct::master_key_type&& key);
             ~PuncturableEncryption();
             
             punct::ciphertext_type encrypt(const uint64_t m, const punct::tag_type &tag);

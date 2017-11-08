@@ -424,7 +424,7 @@ static void ppke()
     sse::crypto::GmppkePrivateKey sk;
     sse::crypto::GmppkeSecretParameters sp;
     
-    ppke.keygen(master_key, pk, sk, sp);
+    ppke.keygen(sse::crypto::Key<32>(master_key.data()), pk, sk, sp);
     
     typedef uint64_t M_type;
 
@@ -556,7 +556,7 @@ static void deterministic_key_ppke()
     sse::crypto::GmppkePrivateKey sk;
     sse::crypto::GmppkeSecretParameters sp;
     
-    ppke.keygen(master_key, pk, sk, sp);
+    ppke.keygen(sse::crypto::Key<32>(master_key.data()), pk, sk, sp);
     
     typedef uint64_t M_type;
     

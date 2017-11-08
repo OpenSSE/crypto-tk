@@ -169,4 +169,9 @@ TEST(hmac, consistency)
 TEST(hmac, exception)
 { 
     ASSERT_THROW(HMAC_SHA512<25> hmac(NULL), std::invalid_argument);
+    
+
+    sse::crypto::Key<25> k1;
+    sse::crypto::Key<25> k2(std::move(k1));
+    ASSERT_THROW(HMAC_SHA512<25> hmac(std::move(k1)), std::invalid_argument);
 }

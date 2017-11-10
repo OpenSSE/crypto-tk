@@ -18,8 +18,6 @@
 #include <new>
 #include <functional>
 
-#include <iostream>
-
 namespace tests {
     template <size_t K_SIZE>    void prg_test_key_derivation_consistency();
     template <size_t N>         void test_key_derivation_consistency(size_t input_size);
@@ -198,7 +196,6 @@ namespace sse {
 
             Key& operator=(Key<N>&& other)
             {
-                std::cout << "Move" << std::endl;
                 if (this != &other)
                 {
                     if (content_ != NULL) {

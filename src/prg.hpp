@@ -80,7 +80,8 @@ namespace sse
             static std::string derive(Key<kKeySize>&& k, const size_t len);
             static std::string derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len);
 
-            
+            template <size_t K> Key<K> derive_key( const uint16_t key_offset);
+
             template <size_t K> std::vector<Key<K> > derive_keys(const uint16_t n_keys, const uint16_t key_offset);
             template <size_t K> inline std::vector<Key<K> > derive_keys(const uint16_t n_keys)
             {
@@ -96,7 +97,9 @@ namespace sse
             {
                 derive(std::move(k), offset, N, out.data());
             }
-            
+
+            template <size_t K> static Key<K> derive_key(Key<kKeySize>&& k, const uint16_t key_offset);
+
             template <size_t K> static std::vector<Key<K> > derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset);
             template <size_t K> inline static std::vector<Key<K> > derive_keys(Key<kKeySize>&& k, const uint16_t n_keys)
             {
@@ -108,6 +111,38 @@ namespace sse
             class PrgImpl; // not defined in the header
             PrgImpl *prg_imp_; // opaque pointer
         };
+
+        template <size_t K> Key<K> Prg::derive_key(const uint16_t key_offset)
+        {
+            static_assert(K < SIZE_MAX, "K is too large: K < SIZE_MAX");
+            
+            if (key_offset > (size_t) 0U && K >= (size_t) SIZE_MAX / key_offset) {
+                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX.");
+            }
+            
+            auto fill_callback = [this,key_offset](uint8_t* key_content)
+            {
+                this->derive(key_offset*K,K,key_content);
+            };
+            
+            return Key<K>(fill_callback);
+        }
+
+        template <size_t K> Key<K> Prg::derive_key(Key<Prg::kKeySize>&& k, const uint16_t key_offset)
+        {
+            static_assert(K < SIZE_MAX, "K is too large: K < SIZE_MAX");
+            
+            if (key_offset > (size_t) 0U && K >= (size_t) SIZE_MAX / key_offset) {
+                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX.");
+            }
+            
+            auto fill_callback = [&k,key_offset](uint8_t* key_content)
+            {
+                derive(std::move(k),key_offset*K,K,key_content);
+            };
+            
+            return Key<K>(fill_callback);
+        }
 
         template <size_t K> std::vector<Key<K> > Prg::derive_keys(const uint16_t n_keys, const uint16_t key_offset)
         {

@@ -21,8 +21,8 @@
 #include <iostream>
 
 namespace tests {
-    void prg_test_key_derivation_consistency();
-    template <size_t N> void test_key_derivation_consistency(size_t input_size);
+    template <size_t K_SIZE>    void prg_test_key_derivation_consistency();
+    template <size_t N>         void test_key_derivation_consistency(size_t input_size);
 }
 
 namespace sse {
@@ -58,8 +58,8 @@ namespace sse {
             template <uint16_t NBYTES> friend class Prf;
             friend class Prg;
             
-            friend void tests::prg_test_key_derivation_consistency();
-            template <size_t L> friend void tests::test_key_derivation_consistency(size_t input_size);
+            template <size_t K_SIZE>    friend void tests::prg_test_key_derivation_consistency();
+            template <size_t L>         friend void tests::test_key_derivation_consistency(size_t input_size);
 
 //            friend class TdpImpl;
             

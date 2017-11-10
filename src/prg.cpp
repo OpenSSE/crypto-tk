@@ -218,9 +218,10 @@ namespace sse
 
 #endif /* USE_AESNI */
             
+            Key<Prg::PrgImpl::kAESSubKeySize> returned_key(fill_callback);
             key.lock();
             
-            return Key<Prg::PrgImpl::kAESSubKeySize>(fill_callback);
+            return returned_key;
         }
 
         void Prg::PrgImpl::derive(const size_t len, unsigned char* out) const

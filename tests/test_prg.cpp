@@ -181,22 +181,24 @@ TEST(prg, consistency_3)
 // in the key.hpp header
 
 namespace tests {
-    void prg_test_key_derivation_consistency();
+    template <size_t K_SIZE> void prg_test_key_derivation_consistency();
     
-    void prg_test_key_derivation_consistency()
+    template <size_t K_SIZE> void prg_test_key_derivation_consistency()
     {
         std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
         std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp1{{0x00}}, k_cp2{{0x00}};
-        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp3{{0x00}};
-
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp3{{0x00}}, k_cp4{{0x00}};
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_loc;
+        
         for (size_t i = 0; i < TEST_COUNT; i++) {
             
             sse::crypto::random_bytes(k);
             k_cp1 = k;
             k_cp2 = k;
             k_cp3 = k;
+            k_cp4 = k;
 
-            constexpr size_t derived_key_size = 16;
+            constexpr size_t derived_key_size = K_SIZE;
             constexpr size_t n_derived_keys = 10;
             constexpr size_t key_offset = 3;
 
@@ -214,10 +216,14 @@ namespace tests {
             sse::crypto::Prg::derive(k_cp2.data(),0,out);
             
             for (size_t j = 0; j < n_derived_keys; j++) {
+                k_loc = k_cp4;
+                
                 key_vec[j].unlock();
                 key_vec_static[j].unlock();
                 ASSERT_TRUE(memcmp(key_vec[j].data(), out.data()+j*derived_key_size, derived_key_size) == 0);
                 ASSERT_TRUE(memcmp(key_vec_static[j].data(), out.data()+j*derived_key_size, derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(key_vec_static[j].data(), prg.derive_key<derived_key_size>(j).unlock_get(), derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(key_vec_static[j].data(), sse::crypto::Prg::derive_key<derived_key_size>(k_loc.data(),j).unlock_get(), derived_key_size) == 0);
                 key_vec[j].lock();
                 key_vec_static[j].lock();
             }
@@ -236,7 +242,9 @@ namespace tests {
 
 TEST(prg, consistency_4)
 {
-    tests::prg_test_key_derivation_consistency();
+    tests::prg_test_key_derivation_consistency<16>();
+    tests::prg_test_key_derivation_consistency<18>();
+    tests::prg_test_key_derivation_consistency<32>();
 }
 
 

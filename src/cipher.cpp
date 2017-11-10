@@ -46,13 +46,9 @@ public:
 
     CipherImpl() = delete;
 	
-	CipherImpl(const std::array<uint8_t,kKeySize>& k);
-	CipherImpl(const uint8_t* k);
+	CipherImpl(Key<kKeySize>&& k);
 	
 	~CipherImpl();
-
-	void gen_subkeys(const unsigned char *userKey);
-	void reset_iv();
 
 	void encrypt(const unsigned char* in, const size_t &len, unsigned char* out);
 	void encrypt(const std::string &in, std::string &out);
@@ -61,20 +57,15 @@ public:
 
 
 private:	
-	AES_KEY aes_enc_key_;
+	Key<sizeof(AES_KEY)> aes_enc_key_;
 	
 	unsigned char iv_[kIVSize];
 	uint64_t remaining_block_count_;
 };
 	
 
-Cipher::Cipher(const std::array<uint8_t,kKeySize>& k) : cipher_imp_(new CipherImpl(k))
+    Cipher::Cipher(Key<kKeySize>&& k) : cipher_imp_(new CipherImpl(std::move(k)))
 {	
-}
-
-Cipher::Cipher(const uint8_t* k) : cipher_imp_(new CipherImpl(k))
-{
-	
 }
 
 Cipher::~Cipher() 
@@ -93,45 +84,34 @@ void Cipher::decrypt(const std::string &in, std::string &out)
 
 // Cipher implementation
 
-Cipher::CipherImpl::CipherImpl(const std::array<uint8_t,kKeySize>& k)
-    : aes_enc_key_{}, remaining_block_count_(0)
-{	
-	gen_subkeys(k.data());
-	reset_iv();
-}
+#define MIN(a,b) (((a) > (b)) ? (b) : (a))
 
-Cipher::CipherImpl::CipherImpl(const uint8_t* k)
-    : aes_enc_key_{}, remaining_block_count_(0)
+// Compute maximum number of blocks that can be encrypted with the same key
+// This number comes from the security reduction of CTR mode (2^48 blocks at most to retain 32 bits of security)
+// and from the IV length (not more than 2^(8*kIVSize) different IVs)
+
+Cipher::CipherImpl::CipherImpl(Key<kKeySize>&& k)
+    : remaining_block_count_( ((uint64_t) 1) << MIN(48,8*kIVSize) )
 {
-	gen_subkeys(k);
-	reset_iv();
+    
+    auto callback = [&k](uint8_t* key_content){
+        if (AES_set_encrypt_key(k.unlock_get(), 128, reinterpret_cast<AES_KEY*>(key_content)) != 0)
+        {
+            // throw an exception
+            throw std::runtime_error("Unable to init AES subkeys");
+        }
+    };
+    
+    aes_enc_key_ = Key<sizeof(AES_KEY)>(callback);
+    k.lock();
+
+    sodium_memzero(iv_, kIVSize);
 }
 
 Cipher::CipherImpl::~CipherImpl() 
 { 
-	// erase subkeys
-    sodium_memzero(&aes_enc_key_, sizeof(AES_KEY));
 }
 
-#define MIN(a,b) (((a) > (b)) ? (b) : (a))
-void Cipher::CipherImpl::gen_subkeys(const unsigned char *userKey)
-{
-	if (AES_set_encrypt_key(userKey, 128, &aes_enc_key_) != 0)
-	{
-		// throw an exception
-		throw std::runtime_error("Unable to init AES subkeys");
-	}
-	
-	// Compute maximum number of blocks that can be encrypted with the same key
-	// This number comes from the security reduction of CTR mode (2^48 blocks at most to retain 32 bits of security)
-	// and from the IV length (not more than 2^(8*kIVSize) different IVs) 
-	remaining_block_count_ = ((uint64_t) 1) << MIN(48,8*kIVSize); 
-}
-
-void Cipher::CipherImpl::reset_iv()
-{
-    sodium_memzero(iv_, kIVSize);
-}
 
 void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
@@ -158,8 +138,10 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
 	memcpy(enc_iv+AES_BLOCK_SIZE-kIVSize, iv_, kIVSize);
 	
 	// now append the ciphertext
-    AES_ctr128_encrypt(in, out+kIVSize, len, &aes_enc_key_, enc_iv, ecount, &num);
+    AES_ctr128_encrypt(in, out+kIVSize, len, reinterpret_cast<const AES_KEY*>(aes_enc_key_.unlock_get()), enc_iv, ecount, &num);
 	
+    aes_enc_key_.lock();
+    
 	// erase ecount to avoid (partial) recovery of the last block
 	sodium_memzero(ecount, AES_BLOCK_SIZE);
 	
@@ -196,8 +178,10 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
 	memcpy(dec_iv+AES_BLOCK_SIZE-kIVSize, in, kIVSize); // copy iv first
 	
 	// now append the ciphertext
-  	AES_ctr128_encrypt(in+kIVSize, out, len-kIVSize, &aes_enc_key_, dec_iv, ecount, &num);
+  	AES_ctr128_encrypt(in+kIVSize, out, len-kIVSize, reinterpret_cast<const AES_KEY*>(aes_enc_key_.unlock_get()), dec_iv, ecount, &num);
 	
+    aes_enc_key_.lock();
+    
 	// erase ecount to avoid (partial) recovery of the last block
 	sodium_memzero(ecount, AES_BLOCK_SIZE);
 }

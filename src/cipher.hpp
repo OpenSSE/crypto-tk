@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "key.hpp"
+
 #include <cstdint>
 
 #include <array>
@@ -53,8 +55,7 @@ public:
 	Cipher(Cipher&& c) = delete;
 	
 	
-	Cipher(const std::array<uint8_t,kKeySize>& k);
-	Cipher(const uint8_t* k);
+	Cipher(Key<kKeySize>&& k);
 	
 	~Cipher();
 

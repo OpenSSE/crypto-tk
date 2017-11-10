@@ -183,6 +183,23 @@ namespace sse {
                 }
                 return *this;
             }
+            
+            /**
+             *  @brief Erase the key
+             *
+             *  Erases the current key content, and set the content to NULL.
+             *
+             *
+             */
+
+            void erase()
+            {
+                if (content_ != NULL) {
+                    sodium_free(content_);
+                    content_ = NULL;
+                    is_locked_ = true;
+                }
+            }
 
         private:
             /**

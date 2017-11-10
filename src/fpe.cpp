@@ -140,7 +140,7 @@ Fpe::FpeImpl::FpeImpl(Key<kKeySize>&& k)
     };
     
     aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
-    k.lock();
+    k.erase();
 }
 	
 void Fpe::FpeImpl::encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out)

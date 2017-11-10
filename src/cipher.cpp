@@ -103,7 +103,7 @@ Cipher::CipherImpl::CipherImpl(Key<kKeySize>&& k)
     };
     
     aes_enc_key_ = Key<sizeof(AES_KEY)>(callback);
-    k.lock();
+    k.erase();
 
     sodium_memzero(iv_, kIVSize);
 }

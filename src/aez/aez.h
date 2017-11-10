@@ -31,16 +31,16 @@ typedef struct {
     block I[3];    /* 1I,2I,4I */
     block J[3];    /* 1J,2J,4J */
     block L;
-    block delta3_cache;
+//    block delta3_cache;
 } aez_ctx_t;
 
 
 
 void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx);
-void aez_encrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+void aez_encrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
                  const char *ad, unsigned adbytes, unsigned abytes,
                  const char *src, unsigned bytes, char *dst);
-int aez_decrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+int aez_decrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
                  const char *ad, unsigned adbytes, unsigned abytes,
                  const char *src, unsigned bytes, char *dst);
 

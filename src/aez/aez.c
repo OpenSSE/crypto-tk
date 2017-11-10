@@ -81,7 +81,7 @@ static __m128i double_block(__m128i bl) {
     return _mm_xor_si128(bl,tmp);
 }
 
-static __m128i aes(__m128i *key, __m128i in, __m128i first_key) {
+static __m128i aes(const __m128i *key, __m128i in, __m128i first_key) {
     in = vxor(in, first_key);
     in = _mm_aesenc_si128 (in,key[0]);
     in = _mm_aesenc_si128 (in,key[3]);
@@ -243,7 +243,7 @@ void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx) {
     ctx->I[2] = bswap16(tmp = double_block(tmp));
     ctx->J[1] = bswap16(tmp = double_block(bswap16(ctx->J[0])));
     ctx->J[2] = bswap16(tmp = double_block(tmp));
-    ctx->delta3_cache = zero;
+//    ctx->delta3_cache = zero;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -258,6 +258,8 @@ static block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char
     block L2 = bswap16(tmp = double_block(bswap16(L)));
     block L4 = bswap16(tmp = double_block(tmp));
     
+    block delta3 = zero;
+
     /* Process abytes and nonce */
     offset = vxor(L,J8);
     tmp = zero_set_byte((char)(8*abytes),15);
@@ -269,9 +271,8 @@ static block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char
     
     if (adbytes==0) {
         offset = L4;
-        ctx->delta3_cache = aes4(vxor(offset,loadu(pad+32)),J,I,L,offset);
+        delta3 = aes4(vxor(offset,loadu(pad+32)),J,I,L,offset);
     } else if (ad) {
-        block delta3 = zero;
         offset = vxor(L4, J8);
         while (adbytes >= 8*16) {
             o0 = offset;
@@ -322,9 +323,8 @@ static block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char
             tmp = one_zero_pad(load(ad),16-adbytes);
             delta3 = vxor(delta3,aes4(vxor(tmp,L4), J, I, L, L4));
         }
-        ctx->delta3_cache = delta3;
     }
-    return vxor(sum,ctx->delta3_cache);
+    return vxor(sum,delta3);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -660,14 +660,14 @@ static int cipher_aez_tiny(aez_ctx_t *ctx, block t, int d, const char *src, unsi
 
 /* ------------------------------------------------------------------------- */
 
-void aez_encrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+void aez_encrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
                  const char *ad, unsigned adbytes, unsigned abytes,
                  const char *src, unsigned bytes, char *dst) {
     
     block t = aez_hash(ctx, n, nbytes, ad, adbytes, abytes);
     if (bytes==0) {
         unsigned i;
-        t = aes((block*)ctx, t, vxor(ctx->J[0], ctx->J[1]));
+        t = aes((const block*)ctx, t, vxor(ctx->J[0], ctx->J[1]));
         for (i=0; i<abytes; i++) dst[i] = ((char*)&t)[i];
     } else if (bytes+abytes < 32)
         cipher_aez_tiny(ctx, t, 0, src, bytes, abytes, dst);
@@ -677,7 +677,7 @@ void aez_encrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
 
 /* ------------------------------------------------------------------------- */
 
-int aez_decrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
+int aez_decrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
                 const char *ad, unsigned adbytes, unsigned abytes,
                 const char *src, unsigned bytes, char *dst) {
     

@@ -38,10 +38,7 @@ TEST(fpe, correctness) {
         string in_enc = sse::crypto::random_string(i);
         string out_enc, out_dec;
         
-        array<uint8_t,sse::crypto::Fpe::kKeySize> k;
-        sse::crypto::random_bytes(k);
-        
-        sse::crypto::Fpe fpe(k);
+        sse::crypto::Fpe fpe;
         fpe.encrypt(in_enc, out_enc);
         
         ASSERT_EQ(in_enc.length(), out_enc.length());

@@ -43,7 +43,7 @@ public:
 
 	FpeImpl();
 	
-	FpeImpl(const std::array<uint8_t,kKeySize>& k);
+	FpeImpl(Key<kKeySize>&& k);
 	
 	// ~FpeImpl();
 
@@ -54,10 +54,7 @@ public:
 
 
 private:
-	void setup(const unsigned char* k);
-		
-	aez_ctx_t aez_ctx_;
-	
+    Key<sizeof(aez_ctx_t)> aez_ctx_;
 };
 
 Fpe::Fpe() : fpe_imp_(new FpeImpl())
@@ -65,7 +62,7 @@ Fpe::Fpe() : fpe_imp_(new FpeImpl())
 	
 }
 	
-Fpe::Fpe(const std::array<uint8_t,kKeySize>& k) : fpe_imp_(new FpeImpl(k))
+Fpe::Fpe(Key<kKeySize>&& k) : fpe_imp_(new FpeImpl(std::move(k)))
 {	
 }
 
@@ -127,22 +124,23 @@ uint64_t Fpe::decrypt_64(const uint64_t &in)
 }
 
 Fpe::FpeImpl::FpeImpl()
-    : aez_ctx_{}
 {
-	unsigned char k[kKeySize];
-	random_bytes(kKeySize, k);
-	setup((unsigned char*)k);
+    auto callback = [](uint8_t* key_content){
+        Key<kKeySize> r_key;
+        aez_setup((unsigned char*)r_key.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
+    };
+    
+    aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
 }
 
-Fpe::FpeImpl::FpeImpl(const std::array<uint8_t,kKeySize>& k)
-    : aez_ctx_{}
+Fpe::FpeImpl::FpeImpl(Key<kKeySize>&& k)
 {
-	setup((const unsigned char*)k.data());
-}
-
-void Fpe::FpeImpl::setup(const unsigned char* k)
-{
-	aez_setup(k, 48, &aez_ctx_);
+    auto callback = [&k](uint8_t* key_content){
+        aez_setup((unsigned char*)k.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
+    };
+    
+    aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
+    k.lock();
 }
 	
 void Fpe::FpeImpl::encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out)
@@ -151,7 +149,7 @@ void Fpe::FpeImpl::encrypt(const unsigned char* in, const unsigned int &len, uns
 							0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00};
-	aez_encrypt(&aez_ctx_, iv, 16,
+	aez_encrypt(reinterpret_cast<const aez_ctx_t*>(aez_ctx_.unlock_get()), iv, 16,
 	                 NULL, 0, 0,
 	                 (const char *)in, len, (char *)out);
 }
@@ -178,9 +176,11 @@ void Fpe::FpeImpl::decrypt(const unsigned char* in, const unsigned int &len,  un
 							0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00};
-	aez_decrypt(&aez_ctx_, iv, 16,
-	                 NULL, 0, 0,
-	                 (const char *)in, len, (char *)out);
+	aez_decrypt(reinterpret_cast<const aez_ctx_t*>(aez_ctx_.unlock_get()),
+                    iv, 16, NULL, 0, 0,
+                    (const char *)in, len, (char *)out);
+    
+    aez_ctx_.lock();
 }
 
 void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)

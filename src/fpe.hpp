@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "key.hpp"
+
 #include <cstdint>
 
 #include <array>
@@ -51,7 +53,7 @@ public:
 	Fpe(Fpe&& c) = delete;
 	
 	
-	Fpe(const std::array<uint8_t,kKeySize>& k);
+	Fpe(Key<kKeySize>&& k);
 	
 	~Fpe();
 

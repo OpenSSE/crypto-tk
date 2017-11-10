@@ -55,7 +55,8 @@ namespace sse {
             template <class Hash, uint16_t key_size> friend class HMac;
             template <uint16_t NBYTES> friend class Prf;
             friend class Prg;
-            
+            friend class Fpe;
+
             template <size_t K_SIZE>    friend void tests::prg_test_key_derivation_consistency();
             template <size_t L>         friend void tests::test_key_derivation_consistency(size_t input_size);
 
@@ -115,35 +116,6 @@ namespace sse {
                 
                 memcpy(content_, key, N); // copy the content of the input key
                 sodium_memzero(key, N); // erase the content of the input key
-                
-                int err = sodium_mprotect_noaccess(content_);
-                if (err == -1 && errno != ENOSYS) {
-                    throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
-                }
-                is_locked_ = true;
-            }
-
-            /**
-             *  @brief Constructor
-             *
-             *  Initializes the key using a callback given as input.
-             *
-             *  @param init_callback    The callback used to fill the key. It takes an uint8_t
-             *  pointer as argument, with will point to the key content
-             *
-             *  @exception std::bad_alloc           Memory cannot be allocated.
-             *  @exception std::runtime_error       Memory could not be protected.
-             */
-            Key(const std::function<void(uint8_t*)> &init_callback)
-            {
-                content_ = static_cast<uint8_t*>(sodium_malloc(N));
-                
-                if(content_ == NULL)
-                {
-                    throw std::bad_alloc::bad_alloc(); /* LCOV_EXCL_LINE */
-                }
-                
-                init_callback(content_); // use the callback to fill the key
                 
                 int err = sodium_mprotect_noaccess(content_);
                 if (err == -1 && errno != ENOSYS) {
@@ -212,7 +184,35 @@ namespace sse {
             }
 
         private:
-            
+            /**
+             *  @brief Constructor
+             *
+             *  Initializes the key using a callback given as input.
+             *
+             *  @param init_callback    The callback used to fill the key. It takes an uint8_t
+             *  pointer as argument, with will point to the key content
+             *
+             *  @exception std::bad_alloc           Memory cannot be allocated.
+             *  @exception std::runtime_error       Memory could not be protected.
+             */
+            Key(const std::function<void(uint8_t*)> &init_callback)
+            {
+                content_ = static_cast<uint8_t*>(sodium_malloc(N));
+                
+                if(content_ == NULL)
+                {
+                    throw std::bad_alloc::bad_alloc(); /* LCOV_EXCL_LINE */
+                }
+                
+                init_callback(content_); // use the callback to fill the key
+                
+                int err = sodium_mprotect_noaccess(content_);
+                if (err == -1 && errno != ENOSYS) {
+                    throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
+                }
+                is_locked_ = true;
+            }
+
             /**
              *  @brief Locks the key
              *

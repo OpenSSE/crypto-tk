@@ -21,12 +21,12 @@
 #include "block_hash.hpp"
 
 #include "aesni/aesni.hpp"
-#include "sodium/utils.h"
 
 #include <cstring>
 
 #include <array>
 #include <openssl/aes.h>
+#include <sodium/utils.h>
 
 #include <iostream>
 #include <iomanip>

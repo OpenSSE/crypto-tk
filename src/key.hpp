@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "sodium/utils.h"
 #include "random.hpp"
 
 #include <cstdint>
@@ -17,6 +16,8 @@
 
 #include <new>
 #include <functional>
+
+#include <sodium/utils.h>
 
 namespace tests {
     template <size_t K_SIZE>    void prg_test_key_derivation_consistency();

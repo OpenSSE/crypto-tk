@@ -23,7 +23,6 @@
 
 #include "key.hpp"
 
-#include "sodium/utils.h"
 
 #include <cstdint>
 
@@ -31,6 +30,7 @@
 #include <string>
 #include <vector>
 
+#include <sodium/utils.h>
 
 namespace sse
 {

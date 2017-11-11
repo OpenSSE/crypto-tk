@@ -21,7 +21,6 @@
 #include "cipher.hpp"
 
 #include "random.hpp"
-#include "sodium/utils.h"
 
 #include <cstring>
 #include <exception>
@@ -29,6 +28,7 @@
 #include <iomanip>
 
 #include <openssl/aes.h>
+#include <sodium/utils.h>
 
 namespace sse
 {

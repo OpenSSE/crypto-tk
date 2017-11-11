@@ -22,11 +22,11 @@
 
 #include "random.hpp"
 #include "key.hpp"
-#include "sodium/utils.h"
 
 #include <cstdint>
 #include <cstring>
 
+#include <sodium/utils.h>
 #include <string>
 #include <array>
 #include <iostream>

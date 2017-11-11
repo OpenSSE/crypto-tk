@@ -21,13 +21,13 @@
 #include "random.hpp"
 
 #include "aesni/aesni.hpp"
-#include "sodium/utils.h"
 
 #include <cstring>
 #include <algorithm>
 #include <array>
 #include <fstream>
 
+#include <sodium/utils.h>
 #include <openssl/aes.h>
 
 namespace sse

@@ -42,7 +42,7 @@ env.Append(CCFLAGS=['-Wall', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat
 env.Append(CXXFLAGS=['-Weffc++','-Woverloaded-virtual',  '-Wsign-promo', '-Wstrict-overflow=5'])
 
 
-env.Append(LIBS = ['crypto','gmp'])
+env.Append(LIBS = ['crypto','gmp','sodium'])
 
 
 static_relic = ARGUMENTS.get('static_relic', 0)
@@ -125,8 +125,7 @@ shared_lib = shared_lib_env.SharedLibrary(library_build_prefix+'/lib/sse_crypto'
 static_lib = lib_env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 
 headers = Glob('src/*.h') + Glob('src/*.hpp') + ['src/ppke/GMPpke.h']
-headers_sodium = Glob('src/sodium/*.h')
-headers_lib = [lib_env.Install(library_build_prefix+'/include/sse/crypto', headers), lib_env.Install(library_build_prefix+'/include/sse/crypto/sodium', headers_sodium)]
+headers_lib = [lib_env.Install(library_build_prefix+'/include/sse/crypto', headers)]
 
 env.Clean(headers_lib,[library_build_prefix+'/include'])
 

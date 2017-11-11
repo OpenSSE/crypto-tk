@@ -49,6 +49,9 @@
 		313CD48E1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
 		313CD48F1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
 		313CD4901EC9034B0058A0C5 /* puncturable_enc.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 313CD48C1EC9034B0058A0C5 /* puncturable_enc.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		314863CF1FB71E9E009FE78B /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
+		314863D01FB71E9E009FE78B /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
+		314863D11FB71E9E009FE78B /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
 		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		3163D3941ED33C8E00A7FCD9 /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */; };
 		3163D3991ED56BEA00A7FCD9 /* aesni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3981ED56BEA00A7FCD9 /* aesni.cpp */; };
@@ -272,6 +275,7 @@
 		313CD4511EC719DD0058A0C5 /* test_ppke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_ppke.cpp; sourceTree = "<group>"; };
 		313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = puncturable_enc.cpp; sourceTree = "<group>"; };
 		313CD48C1EC9034B0058A0C5 /* puncturable_enc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = puncturable_enc.hpp; sourceTree = "<group>"; };
+		314863CE1FB71E9E009FE78B /* key.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = key.cpp; sourceTree = "<group>"; };
 		315D453A1C98909A00590A01 /* test_tdp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_tdp.cpp; sourceTree = "<group>"; };
 		3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "gtest-all.cc"; sourceTree = "<group>"; };
 		3163D3931ED33C8E00A7FCD9 /* gtest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gtest.h; sourceTree = "<group>"; };
@@ -525,6 +529,7 @@
 				318C72991C9730140040AEE7 /* tdp.cpp */,
 				318C729A1C9730140040AEE7 /* tdp.hpp */,
 				311400971F9E628C0025DE3A /* key.hpp */,
+				314863CE1FB71E9E009FE78B /* key.cpp */,
 				316F0D3D1D25600700F87904 /* prg.cpp */,
 				316F0D3E1D25600700F87904 /* prg.hpp */,
 				311934AF1D26B2360031804B /* block_hash.cpp */,
@@ -996,6 +1001,7 @@
 				6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */,
 				311934B11D26B2360031804B /* block_hash.cpp in Sources */,
 				6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */,
+				314863CF1FB71E9E009FE78B /* key.cpp in Sources */,
 				310C2BDF1EC0B59700E80B3A /* relic_api.cpp in Sources */,
 				311934B81D27F1F00031804B /* test_block_hash.cpp in Sources */,
 				6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */,
@@ -1039,6 +1045,7 @@
 				3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */,
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
 				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
+				314863D01FB71E9E009FE78B /* key.cpp in Sources */,
 				6CC2D4B81C318F2E00334ADD /* main.cpp in Sources */,
 				310C2BEC1EC0B99300E80B3A /* GMPpke.cpp in Sources */,
 				3114007A1F9D49DA0025DE3A /* utils.c in Sources */,
@@ -1086,6 +1093,7 @@
 				318516901D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4D91C31940B00334ADD /* sha512_sse4.asm in Sources */,
 				3163D3A61ED5A50100A7FCD9 /* blake2s-common.c in Sources */,
+				314863D11FB71E9E009FE78B /* key.cpp in Sources */,
 				310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */,
 				6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */,
 				6CC2D4ED1C31942700334ADD /* GLS254.cpp in Sources */,

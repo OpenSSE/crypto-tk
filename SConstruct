@@ -74,13 +74,16 @@ else:
 
 gcov = ARGUMENTS.get('gcov', 0)
 if int(gcov):
-    env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage'])
-    env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage'])
+    env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline','-Wno-ignored-optimization-argument'])
+    env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline'])
 
 
 no_aes_ni = ARGUMENTS.get('no_aesni', 0)
 if int(no_aes_ni):
     env.Append(CCFLAGS = ['-D', 'NO_AESNI'])
+
+if 'check' in COMMAND_LINE_TARGETS:
+    env.Append(CXXFLAGS=['-D', 'CHECK_TEMPLATE_INSTANTIATION'])
 
 
 def run_test(target, source, env):

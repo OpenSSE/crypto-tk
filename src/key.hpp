@@ -330,6 +330,27 @@ namespace sse {
             
             
         };
+        
+        extern template class Key<16>;
+        extern template class Key<32>;
+        extern template class Key<48>;
+        extern template class Key<112>;
+        extern template class Key<176>;
+        extern template class Key<244>;
+        
+#ifdef CHECK_TEMPLATE_INSTANTIATION
+        /* To avoid file duplication in GCov */
+        
+        extern template class Key<1>;
+        extern template class Key<10>;
+        extern template class Key<18>;
+        extern template class Key<20>;
+        extern template class Key<25>;
+        extern template class Key<128>;
+        extern template class Key<1024>;
+#endif
+
     }
 }
+
 

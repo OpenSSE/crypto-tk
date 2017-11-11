@@ -44,6 +44,14 @@ using namespace std;
 
 template <uint16_t N> using HMAC_SHA512 = sse::crypto::HMac<sse::crypto::hash::sha512,N>;
 
+#ifdef CHECK_TEMPLATE_INSTANTIATION
+/* To avoid file duplication in GCov */
+extern template class sse::crypto::Key<20>;
+extern template class sse::crypto::Key<25>;
+extern template class sse::crypto::Key<128>;
+extern template class sse::crypto::Key<HMAC_SHA512<25>::kHMACKeySize>;
+#endif
+
 //bool hmac_tests()
 //{
 //	return hmac_test_case_1() && hmac_test_case_2() && hmac_test_case_3() && hmac_test_case_4();

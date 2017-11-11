@@ -44,7 +44,7 @@ namespace crypto
 class Cipher
 {
 public:
-	static constexpr uint8_t kKeySize = 32;
+	static constexpr uint8_t kKeySize = 16;
 
 	Cipher() = delete;
 	

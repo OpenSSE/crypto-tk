@@ -82,12 +82,7 @@ namespace sse
 
             template <size_t K> Key<K> derive_key( const uint16_t key_offset);
 
-            template <size_t K> std::vector<Key<K> > derive_keys(const uint16_t n_keys, const uint16_t key_offset);
-            template <size_t K> inline std::vector<Key<K> > derive_keys(const uint16_t n_keys)
-            {
-                return derive_keys<K>(n_keys, 0);
-            };
-
+            template <size_t K> std::vector<Key<K> > derive_keys(const uint16_t n_keys, const uint16_t key_offset = 0);
             
             /* Static functions */
             
@@ -100,11 +95,7 @@ namespace sse
 
             template <size_t K> static Key<K> derive_key(Key<kKeySize>&& k, const uint16_t key_offset);
 
-            template <size_t K> static std::vector<Key<K> > derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset);
-            template <size_t K> inline static std::vector<Key<K> > derive_keys(Key<kKeySize>&& k, const uint16_t n_keys)
-            {
-                return Prg::derive_keys<K>(std::move(k), n_keys, 0);
-            };
+            template <size_t K> static std::vector<Key<K> > derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset = 0);
 
 
         private:
@@ -213,11 +204,9 @@ namespace sse
 namespace sse { \
 namespace crypto { \
 extern template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys, const uint16_t key_offset); \
-extern template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys); \
 extern template Key<N> Prg::derive_key( const uint16_t key_offset); \
 extern template Key<N> Prg::derive_key(Key<kKeySize>&& k, const uint16_t key_offset); \
-extern template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset); \
-extern template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys); \
+extern template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset = 0); \
 } \
 }
 
@@ -225,11 +214,9 @@ extern template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const u
 namespace sse { \
 namespace crypto { \
 template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys, const uint16_t key_offset); \
-template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys); \
 template Key<N> Prg::derive_key( const uint16_t key_offset); \
 template Key<N> Prg::derive_key(Key<kKeySize>&& k, const uint16_t key_offset); \
-template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset); \
-template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys); \
+template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset = 0); \
 } \
 }
 

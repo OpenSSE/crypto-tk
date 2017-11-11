@@ -14,6 +14,7 @@
 
 #include "util.h"
 
+#include "key.hpp"
 #include "prf.hpp"
 #include "hmac.hpp"
 #include "hash.hpp"
@@ -28,6 +29,8 @@ constexpr static size_t kTagSize = 16;
 constexpr unsigned int kPPKEStatisticalSecurity = 32;
 constexpr static size_t kPPKEPrfOutputSize = relicxx::PairingGroup::kPrfOutputSize;
 
+typedef sse::crypto::HMac<sse::crypto::Hash,12*FP_BYTES> PPKE_HKDF;
+    
 typedef std::array<uint8_t, kTagSize> tag_type;
 
 std::string tag2string(const tag_type& tag);
@@ -258,7 +261,7 @@ public:
     ~Gmppke() {};
     
     void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
-    void keygen(const std::array<uint8_t, kPRFKeySize> &prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
+    void keygen(Key<kPRFKeySize> &&prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     void keygen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     
     void paramgen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, GmppkeSecretParameters &sp) const;
@@ -275,39 +278,80 @@ public:
     {
         const relicxx::ZR s = group.randomZR();
         GmmppkeCT<T> ct = blind(pk,s,tag);
+
+        auto arr = tag;
         
-        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag.data(),tag.size());
-        
+        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(arr.data());
+
         std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
         group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
-        
+
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
-        
+
         ct.ct1 = mask^M;
         return ct;
-        
+
     }
-    
+
+//    template <typename T>
+//    GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const tag_type & tag) const
+//    {
+//        const relicxx::ZR s = group.randomZR();
+//        GmmppkeCT<T> ct = blind(pk,s,tag);
+//
+//        std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
+//        group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
+//
+//        T mask;
+//        PPKE_HKDF hkdf(gt_blind_bytes.data());
+//        hkdf.hmac(tag.data(), tag.size(), (uint8_t*) &mask, sizeof(mask));
+//
+//        ct.ct1 = mask^M;
+//        return ct;
+//
+//    }
+
     template <typename T>
     GmmppkeCT<T> encrypt(const GmppkeSecretParameters & sp,const T & M,const tag_type & tag) const
     {
         const relicxx::ZR s = group.randomZR();
         GmmppkeCT<T> ct = blind(sp,s,tag);
-        
-        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(tag.data(),tag.size());
-        
+
+        auto arr = tag;
+        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(arr.data());
+
         std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
         group.exp(group.generatorGT(), sp.alpha*sp.beta*s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
-        
+
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*) &mask, sizeof(mask));
-        
+
         ct.ct1 = mask^M;
         return ct;
-        
+
     }
-    
+
+//    template <typename T>
+//    GmmppkeCT<T> encrypt(const GmppkeSecretParameters & sp,const T & M,const tag_type & tag) const
+//    {
+//        const relicxx::ZR s = group.randomZR();
+//        GmmppkeCT<T> ct = blind(sp,s,tag);
+//
+//
+//        std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
+//        group.exp(group.generatorGT(), sp.alpha*sp.beta*s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
+//
+//        PPKE_HKDF hkdf(gt_blind_bytes.data());
+//
+//        T mask;
+//        hkdf.hmac(tag.data(), tag.size(), (uint8_t*) &mask, sizeof(mask));
+//
+//        ct.ct1 = mask^M;
+//        return ct;
+//
+//    }
+
     template <typename T>
     T decrypt(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
@@ -326,20 +370,35 @@ public:
         
         return true;
     }
+
     //For testing purposes only
     template <typename T>
     T decrypt_unchecked(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
     {
         std::vector<uint8_t> gt_blind_bytes = recoverBlind(sk,ct).getBytes(false);
-        
-        auto hkdf = sse::crypto::HMac<sse::crypto::Hash>(ct.tag.data(), ct.tag.size());
-        
+
+        auto arr = ct.tag;
+        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(arr.data());
+
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*)&mask, sizeof(mask));
-        
+
         return mask^ct.ct1;
     }
-    
+
+//    template <typename T>
+//    T decrypt_unchecked(const GmppkePrivateKey & sk, const GmmppkeCT<T> & ct ) const
+//    {
+//        std::vector<uint8_t> gt_blind_bytes = recoverBlind(sk,ct).getBytes(false);
+//
+//        T mask;
+//
+//        PPKE_HKDF hkdf(gt_blind_bytes.data());
+//        hkdf.hmac(ct.tag.data(), ct.tag.size(), (uint8_t*)&mask, sizeof(mask));
+//
+//        return mask^ct.ct1;
+//    }
+
     
     GmppkePrivateKeyShare sk0Gen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d) const;
     GmppkePrivateKeyShare skShareGen(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const GmppkeSecretParameters &sp, size_t d, const tag_type& tag) const;

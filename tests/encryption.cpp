@@ -46,7 +46,7 @@ TEST(encryption, correctness)
 	array<uint8_t,sse::crypto::Cipher::kKeySize> k;
 	k.fill(0x00);
 	
-	sse::crypto::Cipher cipher(k);
+	sse::crypto::Cipher cipher(k.data());
 	cipher.encrypt(in_enc, out_enc);
 	
 	string in_dec = string(out_enc);
@@ -56,29 +56,9 @@ TEST(encryption, correctness)
     ASSERT_EQ(in_enc, out_dec);
 }
 
-TEST(encryption, correctness_array_key)
-{
-    string in_enc = "This is a test input.";
-    string out_enc, out_dec;
-    
-    array<uint8_t,sse::crypto::Cipher::kKeySize> k;
-    k.fill(0x00);
-    
-    sse::crypto::Cipher cipher(k.data());
-    cipher.encrypt(in_enc, out_enc);
-    
-    string in_dec = string(out_enc);
-    
-    cipher.decrypt(in_dec, out_dec);
-    
-    ASSERT_EQ(in_enc, out_dec);
-}
-
 
 TEST(encryption, exception)
 {
-    ASSERT_THROW(sse::crypto::Cipher cipher_null(NULL), std::runtime_error);
-
     string in_enc = "";
     string out_enc, out_dec;
     

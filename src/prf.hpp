@@ -23,6 +23,7 @@
 #include "random.hpp"
 #include "hmac.hpp"
 #include "hash.hpp"
+#include "key.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -50,38 +51,30 @@ namespace crypto
 template <uint16_t NBYTES> class Prf
 {
 public:
-	typedef HMac<Hash> PrfBase;
 	static constexpr uint8_t kKeySize = 32;
-		
-    static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too small for the hash block size");
+    typedef HMac<Hash,kKeySize> PrfBase;
+
+    static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too large for the hash block size");
     
-    Prf() : base_(random_bytes<uint8_t,kKeySize>().data(), kKeySize)
+    Prf() : base_(random_bytes<uint8_t,kKeySize>().data())
 	{
 	}
     
-	Prf(const std::array<uint8_t,kKeySize>& k) : base_(k.data(), kKeySize)
-	{	
-	}
-
-	Prf(const Prf<NBYTES>& p) : base_(p.base_)
-	{		
-	}
+    Prf(Key<kKeySize>&& key) : base_(std::move(key))
+    {
+        key.lock();
+    }
 
 	// Destructor.
 	~Prf() {}; 
-
-	std::array<uint8_t,kKeySize> key() const
-	{
-        std::array<uint8_t,kKeySize> k;
-        std::copy(base_.key().begin(), base_.key().begin()+kKeySize, k.begin());
-		return k;
-	};
 	
 	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;
-    
-    
     template <size_t L>  std::array<uint8_t, NBYTES> prf(const std::array<uint8_t, L> &in) const;
+
+    Key<NBYTES> derive_key(const unsigned char* in, const size_t &length) const;
+    Key<NBYTES> derive_key(const std::string &s) const;
+    template <size_t L>  Key<NBYTES> derive_key(const std::array<uint8_t, L> &in) const;
 //	void prf(const unsigned char* in, const size_t &length, unsigned char* out) const;
 private:
 	
@@ -121,8 +114,8 @@ template <uint16_t NBYTES> std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const un
 //        throw std::runtime_error("Invalid output length: NBYTES > Hash::kDigestSize");
     }else if(NBYTES <= Hash::kDigestSize){
 		// only need one output bloc of PrfBase.
-
-        std::copy_n(base_.hmac(in, length).begin(), NBYTES, result.begin());
+        std::array<uint8_t, Hash::kDigestSize> hmac_out(std::move(base_.hmac(in, length)));
+        std::copy_n(hmac_out.begin(), NBYTES, result.begin());
 	}
 	
 	
@@ -142,12 +135,25 @@ template<size_t L>
     return prf((const unsigned char*)in.data() , L);
 }
 
-// Convienience function to return the PRF result in a raw array
-//template <uint8_t NBYTES> void Prf<NBYTES>::prf(const unsigned char* in, const size_t &length, unsigned char* out) const
-//{
-//	base_.hmac(in, length, out);
-//}
+// derive a key using the PRF
 
+template <uint16_t NBYTES> Key<NBYTES> Prf<NBYTES>::derive_key(const unsigned char* in, const size_t &length) const
+{
+    return Key<NBYTES>(prf(in, length).data());
+}
+
+template <uint16_t NBYTES> Key<NBYTES> Prf<NBYTES>::derive_key(const std::string &s) const
+{
+    return Key<NBYTES>(prf(s).data());
+}
+
+template <uint16_t NBYTES>
+template <size_t L>  Key<NBYTES> Prf<NBYTES>::derive_key(const std::array<uint8_t, L> &in) const
+{
+    return Key<NBYTES>(prf(in).data());
+}
+
+   
 
 } // namespace crypto
 } // namespace sse

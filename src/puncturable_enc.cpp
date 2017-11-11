@@ -16,31 +16,6 @@ namespace sse
     
     namespace crypto
     {
-//        static relicxx::relicResourceHandle *handle__;
-//        class PpkeHandler
-//        {
-//        public:
-//            PpkeHandler() /*handle_(true),*/ 
-//            {
-//                if (handle__ == NULL) {
-//                    handle__ = new relicxx::relicResourceHandle(true);
-//                }
-//            }
-//            
-//            ~PpkeHandler()
-//            {
-//            }
-//            
-//            
-//            const Gmppke& get_ppke() const { return ppke_; }
-//            
-//        private:
-////            const relicxx::relicResourceHandle handle_;
-//            const sse::crypto::Gmppke ppke_;
-//        };
-//        
-//        
-//        PpkeHandler ppke_handler__;
 
 #define PPKE ppke_
         
@@ -50,7 +25,7 @@ namespace sse
         class PuncturableEncryption::PEncImpl
         {
         public:
-            PEncImpl(const punct::master_key_type& key);
+            PEncImpl(punct::master_key_type&& key);
             
             punct::ciphertext_type encrypt(const uint64_t m, const punct::tag_type &tag);
             punct::key_share_type initial_keyshare(const size_t d);
@@ -66,7 +41,7 @@ namespace sse
         };
         
 
-        PuncturableEncryption::PEncImpl::PEncImpl(const punct::master_key_type& key) : master_prf_(key)
+        PuncturableEncryption::PEncImpl::PEncImpl(punct::master_key_type&& key) : master_prf_(std::move(key))
         {
             PPKE.paramgen(master_prf_, sp_);
         }
@@ -100,7 +75,7 @@ namespace sse
             return ks_bytes;
         }
 
-        PuncturableEncryption::PuncturableEncryption(const punct::master_key_type& key) : penc_imp_(new PEncImpl(key))
+        PuncturableEncryption::PuncturableEncryption(punct::master_key_type&& key) : penc_imp_(new PEncImpl(std::move(key)))
         {
         }
         

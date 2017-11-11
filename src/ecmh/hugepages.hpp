@@ -33,6 +33,8 @@ struct munmap_deleter {
 template <class T>
 using unique_hugepage_ptr = std::unique_ptr<T,hugepages_detail::munmap_deleter>;
 
+    /* LCOV_EXCL_START */
+
 // Mark as inline so that this can be header-only
 // Note: this is a rather crude implementation that should eventually be replaced with something more robust
 inline std::pair<size_t,size_t> check_huge_page_allocation(void *ptr, size_t len) {
@@ -101,6 +103,7 @@ inline std::pair<size_t,size_t> check_huge_page_allocation(void *ptr, size_t len
 
   return std::make_pair(min_amount, max_amount);
 }
+    /* LCOV_EXCL_STOP */
 
 template <class T>
 unique_hugepage_ptr<T[]> allocate_hugepage_array(size_t n, bool verify = false) {

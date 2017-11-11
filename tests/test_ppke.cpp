@@ -354,17 +354,17 @@ TEST(relic, pairing)
 
 TEST(ppke, serialization)
 {
-    std::array<uint8_t, sse::crypto::Gmppke::kPRFKeySize> master_key;
-    sse::crypto::random_bytes(master_key);
-    
-    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf(master_key);
+//    std::array<uint8_t, sse::crypto::Gmppke::kPRFKeySize> master_key;
+//    sse::crypto::random_bytes(master_key);
+
+    sse::crypto::Prf<sse::crypto::kPPKEPrfOutputSize> key_prf;
     
     sse::crypto::Gmppke ppke;
     sse::crypto::GmppkePublicKey pk;
     sse::crypto::GmppkePrivateKey sk;
     sse::crypto::GmppkeSecretParameters sp;
     
-    ppke.keygen(master_key, pk, sk, sp);
+    ppke.keygen(key_prf, pk, sk, sp);
     
     typedef uint64_t M_type;
     
@@ -405,7 +405,7 @@ TEST(ppke, serialization)
     keyshares[0].writeBytes(share_data.data());
 
     sse::crypto::GmppkePrivateKeyShare serialized_share(share_data.data());
-    
+
     ASSERT_EQ(keyshares[0], serialized_share);
 
 
@@ -588,7 +588,8 @@ TEST(puncturable, correctness)
         master_key[i] = 1 << i;
     }
     
-    sse::crypto::PuncturableEncryption encryptor(master_key);
+    sse::crypto::punct::master_key_type key(master_key.data());
+    sse::crypto::PuncturableEncryption encryptor(std::move(key));
 
     typedef uint64_t M_type;
     

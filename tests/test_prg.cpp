@@ -30,15 +30,21 @@
 
 #define TEST_COUNT 100
 
+#ifdef CHECK_TEMPLATE_INSTANTIATION
+/* To avoid file duplication in GCov */
+
+INSTANTIATE_PRG_TEMPLATE_EXTERN(10)
+INSTANTIATE_PRG_TEMPLATE_EXTERN(18)
+
+#endif
+
 TEST(prg, offset_1)
 {
-    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
         
-        sse::crypto::random_bytes(k);
-        
-        sse::crypto::Prg prg(k);
+        sse::crypto::Key<sse::crypto::Prg::kKeySize> k;
+        sse::crypto::Prg prg(std::move(k));
         
         std::string out1, out2;
         
@@ -51,13 +57,11 @@ TEST(prg, offset_1)
 }
 TEST(prg, offset_2)
 {
-    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
-        sse::crypto::random_bytes(k);
-        
-        sse::crypto::Prg prg(k);
-        
+        sse::crypto::Key<sse::crypto::Prg::kKeySize> k;
+        sse::crypto::Prg prg(std::move(k));
+
         std::string out1, out2;
         
         out1 = prg.derive(32);
@@ -69,13 +73,11 @@ TEST(prg, offset_2)
 
 TEST(prg, offset_3)
 {
-    std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
-        sse::crypto::random_bytes(k);
-        
-        sse::crypto::Prg prg(k);
-        
+        sse::crypto::Key<sse::crypto::Prg::kKeySize> k;
+        sse::crypto::Prg prg(std::move(k));
+
         std::string out1, out2, out3, out4;
         
         out1 = prg.derive(33);
@@ -93,17 +95,19 @@ TEST(prg, offset_3)
 TEST(prg, consistency_1)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
-    
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp{{0x00}};
+
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
         sse::crypto::random_bytes(k);
+        k_cp = k;
         
-        sse::crypto::Prg prg(k);
+        sse::crypto::Prg prg(k.data());
         
         std::string out1, out2;
         
         out1 = prg.derive(32);
-        out2 = sse::crypto::Prg::derive(k,16,16);
+        out2 = sse::crypto::Prg::derive(k_cp.data(),16,16);
         
         ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
@@ -112,17 +116,19 @@ TEST(prg, consistency_1)
 TEST(prg, consistency_2)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
-    
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp{{0x00}};
+
     for (size_t i = 0; i < TEST_COUNT; i++) {
         
         sse::crypto::random_bytes(k);
-        
-        sse::crypto::Prg prg(k);
+        k_cp = k;
+
+        sse::crypto::Prg prg(k.data());
         
         std::string out1, out2;
         
         out1 = prg.derive(31);
-        out2 = sse::crypto::Prg::derive(k,16,15);
+        out2 = sse::crypto::Prg::derive(k_cp.data(),16,15);
         
         ASSERT_TRUE(std::equal(out2.begin(), out2.end(), out1.begin()+16));
     }
@@ -131,31 +137,38 @@ TEST(prg, consistency_2)
 TEST(prg, consistency_3)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp1{{0x00}}, k_cp2{{0x00}};
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp3{{0x00}}, k_cp4{{0x00}};
+    std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp5{{0x00}}, k_cp6{{0x00}};
 
     for (size_t i = 0; i < TEST_COUNT; i++) {
                 
         sse::crypto::random_bytes(k);
-        
-        sse::crypto::Prg prg(k);
-        sse::crypto::Prg prg2(k.data());
+        k_cp1 = k;
+        k_cp2 = k;
+        k_cp3 = k;
+        k_cp4 = k;
+        k_cp5 = k;
+        k_cp6 = k;
+
+        sse::crypto::Prg prg(k.data());
         
         std::string out1, out2, out3, out4, out5, out6;
-        std::string out7, out8, out10;
+        std::string out8, out10;
         
         std::array<uint8_t, 58> out_arr;
         uint8_t out_bytes[30];
         
         out1 = prg.derive(64);
-        out2 = sse::crypto::Prg::derive(k,16,64-16);
-        sse::crypto::Prg::derive(k.data(),64,out3);
-        sse::crypto::Prg::derive(k,64,out4);
-        out5 = sse::crypto::Prg::derive(k,64);
-        sse::crypto::Prg::derive(k,15,10, out6);
-        sse::crypto::Prg::derive(k.data(),6,58, out_arr.data());
+        out2 = sse::crypto::Prg::derive(k_cp1.data(),16,64-16);
+        sse::crypto::Prg::derive(k_cp2.data(),64,out3);
+        sse::crypto::Prg::derive(k_cp3.data(),64,out4);
+        out5 = sse::crypto::Prg::derive(k_cp4.data(),64);
+        sse::crypto::Prg::derive(k_cp5.data(),15,10, out6);
+        sse::crypto::Prg::derive(k_cp6.data(),6,58, out_arr.data());
       
-        prg2.derive(64,out7);
-        prg2.derive(18,46,out8);
-        prg2.derive(34, 30, out_bytes);
+        prg.derive(18,46,out8);
+        prg.derive(34, 30, out_bytes);
         
         ASSERT_EQ(out2, std::string(out1.begin()+16, out1.end()));
         ASSERT_EQ(out1, out3);
@@ -165,23 +178,117 @@ TEST(prg, consistency_3)
         ASSERT_EQ(std::string(out_arr.begin(), out_arr.end()),
                   std::string(out1.begin()+6, out1.begin()+6+58));
         
-        ASSERT_EQ(out1, out7);
         ASSERT_EQ(out8, std::string(out1.begin()+18, out1.end()));
         ASSERT_EQ(std::string((char*)out_bytes, 30), std::string(out1.begin()+34, out1.end()));
 
     }
 }
 
+// small workaround to declare the content of this function as a friend
+// of the Key class, and access its content without having to import gtest
+// in the key.hpp header
+
+namespace tests {
+    template <size_t K_SIZE> void prg_test_key_derivation_consistency();
+    
+    template <size_t K_SIZE> void prg_test_key_derivation_consistency()
+    {
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp1{{0x00}}, k_cp2{{0x00}};
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp3{{0x00}}, k_cp4{{0x00}};
+        std::array<uint8_t,sse::crypto::Prg::kKeySize> k_loc;
+        
+        // check that calls to derive_keys with 0 as input returns empty vectors
+        {
+            sse::crypto::Key<sse::crypto::Prg::kKeySize> key, k1, k2;
+            sse::crypto::Prg prg(std::move(key));
+            
+            ASSERT_EQ(prg.derive_keys<16>(0, 0).size(), 0);
+            ASSERT_EQ(prg.derive_keys<32>(0).size(), 0);
+            ASSERT_EQ(sse::crypto::Prg::derive_keys<16>(std::move(k1),0, 0).size(), 0);
+            ASSERT_EQ(sse::crypto::Prg::derive_keys<32>(std::move(k2),0).size(), 0);
+        }
+        
+        constexpr size_t n_derived_keys_max = TEST_COUNT+1 ;
+
+        for (size_t i = 0; i < TEST_COUNT; i++) {
+            
+            sse::crypto::random_bytes(k);
+            k_cp1 = k;
+            k_cp2 = k;
+            k_cp3 = k;
+            k_cp4 = k;
+
+            constexpr size_t derived_key_size = K_SIZE;
+            size_t n_derived_keys = i+1 ;
+            constexpr size_t key_offset = 3;
+
+            std::array<uint8_t, (n_derived_keys_max+key_offset)*derived_key_size> out;
+            
+            
+            auto key_vec_static = sse::crypto::Prg::derive_keys<derived_key_size>(k.data(), n_derived_keys);
+            auto offet_key_vec_static = sse::crypto::Prg::derive_keys<derived_key_size>(k_cp1.data(), n_derived_keys, key_offset);
+
+            sse::crypto::Prg prg(k_cp3.data());
+            auto key_vec = prg.derive_keys<derived_key_size>(n_derived_keys);
+            auto offet_key_vec = prg.derive_keys<derived_key_size>(n_derived_keys, key_offset);
+
+            
+            // check that the number of derived keys is OK
+            ASSERT_EQ(key_vec_static.size(), n_derived_keys);
+            ASSERT_EQ(offet_key_vec_static.size(), n_derived_keys);
+            ASSERT_EQ(key_vec.size(), n_derived_keys);
+            ASSERT_EQ(offet_key_vec.size(), n_derived_keys);
+
+            sse::crypto::Prg::derive(k_cp2.data(),0,out);
+            
+            for (size_t j = 0; j < n_derived_keys; j++) {
+                k_loc = k_cp4;
+                
+                key_vec[j].unlock();
+                key_vec_static[j].unlock();
+                ASSERT_TRUE(memcmp(key_vec[j].data(), out.data()+j*derived_key_size, derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(key_vec_static[j].data(), out.data()+j*derived_key_size, derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(key_vec_static[j].data(), prg.derive_key<derived_key_size>(j).unlock_get(), derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(key_vec_static[j].data(), sse::crypto::Prg::derive_key<derived_key_size>(k_loc.data(),j).unlock_get(), derived_key_size) == 0);
+                key_vec[j].lock();
+                key_vec_static[j].lock();
+            }
+            for (size_t j = 0; j < n_derived_keys; j++) {
+                offet_key_vec_static[j].unlock();
+                offet_key_vec[j].unlock();
+                ASSERT_TRUE(memcmp(offet_key_vec_static[j].data(), out.data()+(j+key_offset)*derived_key_size, derived_key_size) == 0);
+                ASSERT_TRUE(memcmp(offet_key_vec[j].data(), out.data()+(j+key_offset)*derived_key_size, derived_key_size) == 0);
+                offet_key_vec_static[j].lock();
+                offet_key_vec[j].lock();
+            }
+        }
+        
+    }
+}
+
+TEST(prg, consistency_4)
+{
+    tests::prg_test_key_derivation_consistency<16>();
+    tests::prg_test_key_derivation_consistency<18>();
+    tests::prg_test_key_derivation_consistency<32>();
+}
+
 TEST(prg, exceptions)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
-    sse::crypto::Prg prg(k);
+    sse::crypto::Key<sse::crypto::Prg::kKeySize> key;
+    sse::crypto::Prg prg(k.data());
 
     std::string out;
     
     ASSERT_THROW(prg.derive(0, out), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::Prg::derive(k.data(),0, out), std::invalid_argument);
-    ASSERT_THROW(sse::crypto::Prg::derive((const uint8_t*)NULL,10, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Prg::derive(std::move(key),0, out), std::invalid_argument);
     
+    sse::crypto::Prg::derive(std::move(key),1, out);
+    // key should have been emptied by the previous line
+    ASSERT_THROW(sse::crypto::Prg::derive(std::move(key),10, out), std::invalid_argument);
+    ASSERT_THROW(sse::crypto::Prg::derive_keys<10>(std::move(key),10), std::invalid_argument);
+
     ASSERT_THROW(sse::crypto::Prg p(NULL), std::invalid_argument);
 }

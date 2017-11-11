@@ -22,6 +22,7 @@
 #pragma once
 
 #include "prf.hpp"
+#include "key.hpp"
 
 #include <cstdint>
 
@@ -63,8 +64,8 @@ public:
     std::string sample() const;
     std::array<uint8_t, kMessageSize> sample_array() const;
     
-    std::string generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
-    std::array<uint8_t, kMessageSize> generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
+    std::string generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
     std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
     std::array<uint8_t, kMessageSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
 
@@ -96,8 +97,8 @@ public:
     std::string sample() const;
     std::array<uint8_t, kMessageSize> sample_array() const;
 
-    std::string generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
-    std::array<uint8_t, kMessageSize> generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
+    std::string generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
     std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
     std::array<uint8_t, kMessageSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
 
@@ -133,8 +134,8 @@ public:
     
     std::string sample() const;
     std::array<uint8_t, kMessageSize> sample_array() const;
-    std::string generate(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
-    std::array<uint8_t, kMessageSize> generate_array(const std::array<uint8_t, Prf<Tdp::kRSAPrgSize>::kKeySize>& key, const std::string& seed) const;
+    std::string generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
+    std::array<uint8_t, kMessageSize> generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
     std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
     std::array<uint8_t, kMessageSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
 

@@ -81,7 +81,7 @@ static __m128i double_block(__m128i bl) {
     return _mm_xor_si128(bl,tmp);
 }
 
-static __m128i aes(__m128i *key, __m128i in, __m128i first_key) {
+static __m128i aes(const __m128i *key, __m128i in, __m128i first_key) {
     in = vxor(in, first_key);
     in = _mm_aesenc_si128 (in,key[0]);
     in = _mm_aesenc_si128 (in,key[3]);
@@ -243,21 +243,22 @@ void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx) {
     ctx->I[2] = bswap16(tmp = double_block(tmp));
     ctx->J[1] = bswap16(tmp = double_block(bswap16(ctx->J[0])));
     ctx->J[2] = bswap16(tmp = double_block(tmp));
-    ctx->delta3_cache = zero;
+//    ctx->delta3_cache = zero;
 }
 
 /* ------------------------------------------------------------------------- */
 
 /* !! Warning !! Only handles nbytes <= 16 and abytes <= 16 */
-static block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char *ad,
-               unsigned adbytes, unsigned abytes) {
-    block o0, o1, o2, o3, o4, o5, o6, o7, sum, offset, tmp;
+static block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, unsigned abytes) {
+    block sum, offset, tmp;
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0];
     block Jfordoubling = double_block(bswap16(ctx->J[2]));  /* 8J */
     block J8 = bswap16(Jfordoubling);
     block L2 = bswap16(tmp = double_block(bswap16(L)));
     block L4 = bswap16(tmp = double_block(tmp));
     
+    block delta3 = zero;
+
     /* Process abytes and nonce */
     offset = vxor(L,J8);
     tmp = zero_set_byte((char)(8*abytes),15);
@@ -267,64 +268,10 @@ static block aez_hash(aez_ctx_t *ctx, const char *n, unsigned nbytes, const char
     tmp = one_zero_pad(load_partial(n,nbytes),16-nbytes);
     sum = vxor(sum, aes4(vxor(offset,tmp),J,I,L,offset));
     
-    if (adbytes==0) {
-        offset = L4;
-        ctx->delta3_cache = aes4(vxor(offset,loadu(pad+32)),J,I,L,offset);
-    } else if (ad) {
-        block delta3 = zero;
-        offset = vxor(L4, J8);
-        while (adbytes >= 8*16) {
-            o0 = offset;
-            o1 = vxor(o0,ctx->J[0]);
-            o2 = vxor(o0,ctx->J[1]);
-            o3 = vxor(o1,ctx->J[1]);
-            o4 = vxor(o0,ctx->J[2]);
-            o5 = vxor(o1,ctx->J[2]);
-            o6 = vxor(o2,ctx->J[2]);
-            o7 = vxor(o3,ctx->J[2]);
-            offset = vxor(L4, bswap16(Jfordoubling = double_block(Jfordoubling)));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+  0),o0), J, I, L, o0));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 16),o1), J, I, L, o1));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 32),o2), J, I, L, o2));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 48),o3), J, I, L, o3));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 64),o4), J, I, L, o4));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 80),o5), J, I, L, o5));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 96),o6), J, I, L, o6));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+112),o7), J, I, L, o7));
-            adbytes-=8*16; ad+=8*16;
-        }
-        if (adbytes >= 4*16) {
-            o0 = offset;
-            o1 = vxor(o0,ctx->J[0]);
-            o2 = vxor(o0,ctx->J[1]);
-            o3 = vxor(o1,ctx->J[1]);
-            offset = vxor(o0,ctx->J[2]);
-            delta3 = vxor(delta3, aes4(vxor(load(ad+  0),o0), J, I, L, o0));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 16),o1), J, I, L, o1));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 32),o2), J, I, L, o2));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 48),o3), J, I, L, o3));
-            adbytes-=4*16; ad+=4*16;
-        }
-        if (adbytes >= 2*16) {
-            o0 = offset;
-            o1 = vxor(o0,ctx->J[0]);
-            offset = vxor(o0,ctx->J[1]);
-            delta3 = vxor(delta3, aes4(vxor(load(ad+  0),o0), J, I, L, o0));
-            delta3 = vxor(delta3, aes4(vxor(load(ad+ 16),o1), J, I, L, o1));
-            adbytes-=2*16; ad+=2*16;
-        }
-        if (adbytes >= 1*16) {
-            o0 = offset;
-            delta3 = vxor(delta3, aes4(vxor(load(ad+  0),o0), J, I, L, o0));
-            adbytes-=1*16; ad+=1*16;
-        }
-        if (adbytes) {
-            tmp = one_zero_pad(load(ad),16-adbytes);
-            delta3 = vxor(delta3,aes4(vxor(tmp,L4), J, I, L, L4));
-        }
-        ctx->delta3_cache = delta3;
-    }
-    return vxor(sum,ctx->delta3_cache);
+    offset = L4;
+    delta3 = aes4(vxor(offset,loadu(pad+32)),J,I,L,offset);
+
+    return vxor(sum,delta3);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -660,14 +607,14 @@ static int cipher_aez_tiny(aez_ctx_t *ctx, block t, int d, const char *src, unsi
 
 /* ------------------------------------------------------------------------- */
 
-void aez_encrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
-                 const char *ad, unsigned adbytes, unsigned abytes,
+void aez_encrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
+                 unsigned abytes,
                  const char *src, unsigned bytes, char *dst) {
     
-    block t = aez_hash(ctx, n, nbytes, ad, adbytes, abytes);
+    block t = aez_hash(ctx, n, nbytes, abytes);
     if (bytes==0) {
         unsigned i;
-        t = aes((block*)ctx, t, vxor(ctx->J[0], ctx->J[1]));
+        t = aes((const block*)ctx, t, vxor(ctx->J[0], ctx->J[1]));
         for (i=0; i<abytes; i++) dst[i] = ((char*)&t)[i];
     } else if (bytes+abytes < 32)
         cipher_aez_tiny(ctx, t, 0, src, bytes, abytes, dst);
@@ -677,13 +624,13 @@ void aez_encrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
 
 /* ------------------------------------------------------------------------- */
 
-int aez_decrypt(aez_ctx_t *ctx, const char *n, unsigned nbytes,
-                const char *ad, unsigned adbytes, unsigned abytes,
+int aez_decrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
+                unsigned abytes,
                 const char *src, unsigned bytes, char *dst) {
     
     block t;
     if (bytes < abytes) return -1;
-    t = aez_hash(ctx, n, nbytes, ad, adbytes, abytes);
+    t = aez_hash(ctx, n, nbytes, abytes);
     if (bytes==abytes) {
         block claimed = zero_pad(load_partial(src,abytes), 16-abytes);
         t = zero_pad(aes((block*)ctx, t, vxor(ctx->J[0], ctx->J[1])), 16-abytes);

@@ -23,7 +23,9 @@ before_install:
   # - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   - wget -q http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.gz; tar xf boost_1_60_0.tar.gz ; mv boost_1_60_0/boost src/.
   - ./install_relic.sh
+  - ./install_libsodium.sh
   - gem install coveralls-lcov
+  - sudo ldconfig
  
 script:
   - scons check static_relic=1 no_aesni=1

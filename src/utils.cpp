@@ -11,10 +11,10 @@
 
 #include "ppke/relic_wrapper/relic_api.h"
 
+#include <pthread.h>
+
 #include <openssl/crypto.h>
 #include <sodium/core.h>
-
-#include <thread>
 
 struct CRYPTO_dynlock_value
 {

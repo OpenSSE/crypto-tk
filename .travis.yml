@@ -25,6 +25,7 @@ before_install:
   - ./install_relic.sh
   - ./install_libsodium.sh
   - gem install coveralls-lcov
+  - sudo ldconfig
  
 script:
   - scons check static_relic=1 no_aesni=1

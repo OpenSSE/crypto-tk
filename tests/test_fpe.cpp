@@ -55,7 +55,9 @@ TEST(fpe, correctness) {
 TEST(fpe, consistency_32) {
     
     for (size_t i = 1; i <= 100; i++) {
-        sse::crypto::Fpe fpe;
+        array<uint8_t, 48> key;
+
+        sse::crypto::Fpe fpe(key.data());
         
         array<uint8_t, sizeof(uint32_t)> arr_32;
         

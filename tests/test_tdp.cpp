@@ -233,9 +233,9 @@ TEST(tdp, multiple_inverse_1)
         for (size_t j = 0; j < INV_MULT_COUNT; j++) {
             v = tdp_inv.invert(v);
         }
-        ASSERT_EQ(goal, v);
         ASSERT_EQ(goal, w);
         ASSERT_EQ(goal, std::string(goal_arr.begin(), goal_arr.end()));
+        ASSERT_EQ(goal, v);
     }
 }
 

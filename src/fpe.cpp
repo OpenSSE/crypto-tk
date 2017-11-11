@@ -160,7 +160,7 @@ void Fpe::FpeImpl::encrypt(const std::string &in, std::string &out)
 
     if(len > UINT_MAX)
     {
-        throw std::runtime_error("The maximum input length of Format Preserving Encryption is UINT_MAX");
+        throw std::runtime_error("The maximum input length of Format Preserving Encryption is UINT_MAX"); /* LCOV_EXCL_LINE */
     }
 
     unsigned char *data = new unsigned char[len];
@@ -189,7 +189,7 @@ void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
 
     if(len > UINT_MAX)
     {
-        throw std::runtime_error("The maximum input length of Format Preserving Encryption is UINT_MAX");
+        throw std::runtime_error("The maximum input length of Format Preserving Encryption is UINT_MAX"); /* LCOV_EXCL_LINE */
     }
     
     unsigned char *data = new unsigned char[len];

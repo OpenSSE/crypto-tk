@@ -190,6 +190,19 @@ namespace tests {
         std::array<uint8_t,sse::crypto::Prg::kKeySize> k_cp3{{0x00}}, k_cp4{{0x00}};
         std::array<uint8_t,sse::crypto::Prg::kKeySize> k_loc;
         
+        // check that calls to derive_keys with 0 as input returns empty vectors
+        {
+            sse::crypto::Key<sse::crypto::Prg::kKeySize> key, k1, k2;
+            sse::crypto::Prg prg(std::move(key));
+            
+            ASSERT_EQ(prg.derive_keys<16>(0, 0).size(), 0);
+            ASSERT_EQ(prg.derive_keys<32>(0).size(), 0);
+            ASSERT_EQ(sse::crypto::Prg::derive_keys<16>(std::move(k1),0, 0).size(), 0);
+            ASSERT_EQ(sse::crypto::Prg::derive_keys<32>(std::move(k2),0).size(), 0);
+        }
+        
+        constexpr size_t n_derived_keys_max = TEST_COUNT+1 ;
+
         for (size_t i = 0; i < TEST_COUNT; i++) {
             
             sse::crypto::random_bytes(k);
@@ -199,10 +212,10 @@ namespace tests {
             k_cp4 = k;
 
             constexpr size_t derived_key_size = K_SIZE;
-            constexpr size_t n_derived_keys = 10;
+            size_t n_derived_keys = i+1 ;
             constexpr size_t key_offset = 3;
 
-            std::array<uint8_t, (n_derived_keys+key_offset)*derived_key_size> out;
+            std::array<uint8_t, (n_derived_keys_max+key_offset)*derived_key_size> out;
             
             
             auto key_vec_static = sse::crypto::Prg::derive_keys<derived_key_size>(k.data(), n_derived_keys);
@@ -213,6 +226,12 @@ namespace tests {
             auto offet_key_vec = prg.derive_keys<derived_key_size>(n_derived_keys, key_offset);
 
             
+            // check that the number of derived keys is OK
+            ASSERT_EQ(key_vec_static.size(), n_derived_keys);
+            ASSERT_EQ(offet_key_vec_static.size(), n_derived_keys);
+            ASSERT_EQ(key_vec.size(), n_derived_keys);
+            ASSERT_EQ(offet_key_vec.size(), n_derived_keys);
+
             sse::crypto::Prg::derive(k_cp2.data(),0,out);
             
             for (size_t j = 0; j < n_derived_keys; j++) {
@@ -247,9 +266,6 @@ TEST(prg, consistency_4)
     tests::prg_test_key_derivation_consistency<32>();
 }
 
-
-
-
 TEST(prg, exceptions)
 {
     std::array<uint8_t,sse::crypto::Prg::kKeySize> k{{0x00}};
@@ -264,6 +280,7 @@ TEST(prg, exceptions)
     sse::crypto::Prg::derive(std::move(key),1, out);
     // key should have been emptied by the previous line
     ASSERT_THROW(sse::crypto::Prg::derive(std::move(key),10, out), std::invalid_argument);
-    
+    ASSERT_THROW(sse::crypto::Prg::derive_keys<10>(std::move(key),10), std::invalid_argument);
+
     ASSERT_THROW(sse::crypto::Prg p(NULL), std::invalid_argument);
 }

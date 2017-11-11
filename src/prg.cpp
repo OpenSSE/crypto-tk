@@ -234,7 +234,7 @@ namespace sse
         void Prg::PrgImpl::derive(const uint32_t offset, const size_t len, unsigned char* out) const
         {
             if (len == 0) {
-                throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
+                throw std::invalid_argument("The minimum number of bytes to derive is 1.");
             }
             
             uint32_t extra_len = (offset % AES_BLOCK_SIZE);
@@ -322,7 +322,7 @@ namespace sse
                 throw std::invalid_argument("PRG input key is empty");
             }
             if (len == 0) {
-                throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
+                throw std::invalid_argument("The minimum number of bytes to derive is 1.");
             }
             
             Key<kKeySize> local_key(std::move(k)); // make sure the input key cannot be reused
@@ -389,6 +389,13 @@ namespace sse
             local_key.unlock();
         }
 
+
     }
 
 }
+
+/* Instantiate some of the useful template sizes */
+
+INSTANTIATE_PRG_TEMPLATE(16)
+INSTANTIATE_PRG_TEMPLATE(32)
+

@@ -164,7 +164,7 @@ inline void TdpImpl::set_rsa_key(RSA* k)
 {
     if(k == NULL)
     {
-        throw std::invalid_argument("Invalid input: k == NULL.");
+        throw std::invalid_argument("Invalid input: k == NULL."); /* LCOV_EXCL_LINE */
     }
 
     rsa_key_ = k;

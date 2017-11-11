@@ -78,14 +78,6 @@ namespace sse
                 }
 
             };
-
-            HMac(uint8_t* const k) : key_(k)
-            {
-                if(k == NULL)
-                {
-                    throw std::invalid_argument("Invalid key: key == NULL");
-                }
-            };
             
             
             void hmac(const unsigned char* in, const size_t &length, unsigned char* out,  const size_t &out_len = kDigestSize) const;

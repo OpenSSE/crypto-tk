@@ -117,7 +117,7 @@ namespace sse
             static_assert(K < SIZE_MAX, "K is too large: K < SIZE_MAX");
             
             if (key_offset > (size_t) 0U && K >= (size_t) SIZE_MAX / key_offset) {
-                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX.");
+                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX."); /* LCOV_EXCL_LINE */
             }
             
             auto fill_callback = [this,key_offset](uint8_t* key_content)
@@ -133,7 +133,7 @@ namespace sse
             static_assert(K < SIZE_MAX, "K is too large: K < SIZE_MAX");
             
             if (key_offset > (size_t) 0U && K >= (size_t) SIZE_MAX / key_offset) {
-                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX.");
+                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX."); /* LCOV_EXCL_LINE */
             }
             
             auto fill_callback = [&k,key_offset](uint8_t* key_content)
@@ -147,13 +147,16 @@ namespace sse
         template <size_t K> std::vector<Key<K> > Prg::derive_keys(const uint16_t n_keys, const uint16_t key_offset)
         {
             if (n_keys > (size_t) 0U && K >= (size_t) SIZE_MAX / n_keys) {
-                throw std::invalid_argument("Too many keys to derive. n_keys*K >= SIZE_MAX.");
+                throw std::invalid_argument("Too many keys to derive. n_keys*K >= SIZE_MAX."); /* LCOV_EXCL_LINE */
             }
             if (key_offset > (size_t) 0U && K >= (size_t) SIZE_MAX / key_offset) {
-                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX.");
+                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX."); /* LCOV_EXCL_LINE */
             }
             
-            
+            if (n_keys == 0) {
+                return std::vector<Key<K> >(); // return empty vector
+            }
+
             uint8_t* key_buffer = (uint8_t*)sodium_allocarray(n_keys, K);
             
             this->derive(key_offset*K, n_keys*K, key_buffer);
@@ -179,10 +182,10 @@ namespace sse
                 return std::vector<Key<K> >(); // return empty vector
             }
             if (n_keys > (size_t) 0U && K >= (size_t) SIZE_MAX / n_keys) {
-                throw std::invalid_argument("Too many keys to derive. n_keys*K >= SIZE_MAX.");
+                throw std::invalid_argument("Too many keys to derive. n_keys*K >= SIZE_MAX."); /* LCOV_EXCL_LINE */
             }
             if (key_offset > (size_t) 0U && K >= (size_t) SIZE_MAX / key_offset) {
-                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX.");
+                throw std::invalid_argument("Key offset too large. key_offset*K >= SIZE_MAX."); /* LCOV_EXCL_LINE */
             }
 
             
@@ -200,6 +203,37 @@ namespace sse
             
             return derived_keys;
         }
-
+        
     }
 }
+
+/* Instantiation declaration of some of the templates */
+
+#define INSTANTIATE_PRG_TEMPLATE_EXTERN(N) \
+namespace sse { \
+namespace crypto { \
+extern template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys, const uint16_t key_offset); \
+extern template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys); \
+extern template Key<N> Prg::derive_key( const uint16_t key_offset); \
+extern template Key<N> Prg::derive_key(Key<kKeySize>&& k, const uint16_t key_offset); \
+extern template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset); \
+extern template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys); \
+} \
+}
+
+#define INSTANTIATE_PRG_TEMPLATE(N) \
+namespace sse { \
+namespace crypto { \
+template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys, const uint16_t key_offset); \
+template std::vector<Key<N> > Prg::derive_keys(const uint16_t n_keys); \
+template Key<N> Prg::derive_key( const uint16_t key_offset); \
+template Key<N> Prg::derive_key(Key<kKeySize>&& k, const uint16_t key_offset); \
+template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys, const uint16_t key_offset); \
+template std::vector<Key<N> > Prg::derive_keys(Key<kKeySize>&& k, const uint16_t n_keys); \
+} \
+}
+
+
+INSTANTIATE_PRG_TEMPLATE_EXTERN(16)
+INSTANTIATE_PRG_TEMPLATE_EXTERN(32)
+

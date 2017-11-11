@@ -28,15 +28,6 @@
 
 #include "gtest/gtest.h"
 
-#ifdef CHECK_TEMPLATE_INSTANTIATION
-/* To avoid file duplication in GCov */
-extern template class sse::crypto::Key<1>;
-extern template class sse::crypto::Key<10>;
-extern template class sse::crypto::Key<20>;
-extern template class sse::crypto::Key<128>;
-extern template class sse::crypto::Key<1024>;
-#endif
-
 using namespace std;
 namespace tests {
 

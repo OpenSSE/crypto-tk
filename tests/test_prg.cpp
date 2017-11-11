@@ -36,16 +36,6 @@
 INSTANTIATE_PRG_TEMPLATE_EXTERN(10)
 INSTANTIATE_PRG_TEMPLATE_EXTERN(18)
 
-/* To avoid file duplication in GCov */
-
-extern template class sse::crypto::Key<1>;
-extern template class sse::crypto::Key<10>;
-extern template class sse::crypto::Key<18>;
-extern template class sse::crypto::Key<20>;
-extern template class sse::crypto::Key<25>;
-extern template class sse::crypto::Key<128>;
-extern template class sse::crypto::Key<1024>;
-
 #endif
 
 TEST(prg, offset_1)

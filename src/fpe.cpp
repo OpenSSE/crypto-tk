@@ -150,7 +150,7 @@ void Fpe::FpeImpl::encrypt(const unsigned char* in, const unsigned int &len, uns
 							0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00};
 	aez_encrypt(reinterpret_cast<const aez_ctx_t*>(aez_ctx_.unlock_get()), iv, 16,
-	                 NULL, 0, 0,
+	                 0,
 	                 (const char *)in, len, (char *)out);
 }
 
@@ -177,7 +177,7 @@ void Fpe::FpeImpl::decrypt(const unsigned char* in, const unsigned int &len,  un
 							0x00, 0x00, 0x00, 0x00, 
 							0x00, 0x00, 0x00, 0x00};
 	aez_decrypt(reinterpret_cast<const aez_ctx_t*>(aez_ctx_.unlock_get()),
-                    iv, 16, NULL, 0, 0,
+                    iv, 16, 0,
                     (const char *)in, len, (char *)out);
     
     aez_ctx_.lock();

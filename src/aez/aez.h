@@ -38,10 +38,10 @@ typedef struct {
 
 void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx);
 void aez_encrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
-                 const char *ad, unsigned adbytes, unsigned abytes,
+                 unsigned abytes,
                  const char *src, unsigned bytes, char *dst);
 int aez_decrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
-                 const char *ad, unsigned adbytes, unsigned abytes,
+                 unsigned abytes,
                  const char *src, unsigned bytes, char *dst);
 
 #ifdef __cplusplus

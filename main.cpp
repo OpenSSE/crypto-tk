@@ -47,7 +47,16 @@
 
 #include "src/key.hpp"
 
+#include "src/mbedtls/bignum.h"
+#include "src/mbedtls/rsa.h"
+
 using namespace std;
+
+int mbedTLS_rng_wrap(void *arg, unsigned char *out, size_t len)
+{
+    sse::crypto::random_bytes(len, out);
+    return 0;
+}
 
 extern "C" void sha512_avx(const void* M, void* D, uint64_t L);;
 extern "C" void sha512_rorx(const void* M, void* D, uint64_t L);;
@@ -319,38 +328,51 @@ static void tdp()
     cout << endl;
 }
 
-static void bench_mult_invert_tdp()
+static void bench_rsa()
 {
-    for (size_t i = 1; i < 100; i++) {
+    for (size_t i = 1; i < 20; i++) {
         sse::crypto::TdpInverse tdp_inv;
         
-        string pk = tdp_inv.public_key();
+//        string pk = tdp_inv.public_key();
         
-        sse::crypto::Tdp tdp(pk);
-        size_t mult_count = i;
+//        sse::crypto::Tdp tdp(pk);
         
-        string sample = tdp_inv.sample();
-        string goal, v;
+        string v1 = tdp_inv.sample(), v2;
         
-        auto begin_mult = std::chrono::high_resolution_clock::now();
-        goal = tdp_inv.invert_mult(sample, mult_count);
-        auto end_mult = std::chrono::high_resolution_clock::now();
-        
-        std::chrono::duration<double, std::milli> time_mult = end_mult - begin_mult;
-        std::cout << "Mult " << mult_count << ": " << time_mult.count() << " ms" << std::endl;
+        auto begin_tdp = std::chrono::high_resolution_clock::now();
+        v2 = tdp_inv.invert(v1);
+        auto end_tdp_priv = std::chrono::high_resolution_clock::now();
+        v2 = tdp_inv.eval(v1);
+        auto end_tdp_pub = std::chrono::high_resolution_clock::now();
 
+        std::chrono::duration<double, std::milli> time_tdp_priv = end_tdp_priv - begin_tdp;
+        std::chrono::duration<double, std::milli> time_tdp_pub = end_tdp_pub - end_tdp_priv;
+        std::cout << "OpenSSL (private): " << time_tdp_priv.count() << " ms" << std::endl;
+        std::cout << "OpenSSL (public): " << time_tdp_pub.count() << " ms" << std::endl;
+
+        mbedtls_rsa_context rsa;
+        mbedtls_rsa_init( &rsa, 0, 0 );
+
+        mbedtls_rsa_gen_key(&rsa, mbedTLS_rng_wrap, NULL, 2048, 0x10001L);
+        mbedtls_mpi a;
+        unsigned char a_buffer[256], b_buffer[256];
         
-        v = sample;
-        auto begin_iter = std::chrono::high_resolution_clock::now();
+        mbedtls_mpi_init(&a);
+        mbedtls_mpi_fill_random( &a, 256, mbedTLS_rng_wrap, NULL );
+        mbedtls_mpi_mod_mpi(&a,&a,&rsa.N);
+        mbedtls_mpi_write_binary(&a, a_buffer, 256);
+        
+        auto begin_mbed = std::chrono::high_resolution_clock::now();
+        mbedtls_rsa_private( &rsa, mbedTLS_rng_wrap, NULL, a_buffer, b_buffer );
+        auto end_mbed_priv = std::chrono::high_resolution_clock::now();
+        mbedtls_rsa_public( &rsa, a_buffer, b_buffer );
+        auto end_mbed_pub = std::chrono::high_resolution_clock::now();
 
-        for (size_t j = 0; j < mult_count; j++) {
-            v = tdp_inv.invert(v);
-        }
-        auto end_iter = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> time_mbed_priv = end_mbed_priv - begin_mbed;
+        std::chrono::duration<double, std::milli> time_mbed_pub = end_mbed_pub - end_mbed_priv;
+        std::cout << "mbedTLS (private): " << time_mbed_priv.count() << " ms" << std::endl;
+        std::cout << "mbedTLS (public): " << time_mbed_pub.count() << " ms" << std::endl;
 
-        std::chrono::duration<double, std::milli> time_iter = end_iter - begin_iter;
-        std::cout << "Iter " << mult_count << ": " << time_iter.count() << " ms" << std::endl;
-        std::cout << std::endl;
     }
 
 }
@@ -709,8 +731,9 @@ int main( int argc, char* argv[] ) {
     sse::crypto::init_crypto_lib();
     
 //    sse::crypto::test_keys();
-    relic();
-    
+    bench_rsa();
+//    tdp();
+
     sse::crypto::cleanup_crypto_lib();
     
     return 0;

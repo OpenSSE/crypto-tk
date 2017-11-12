@@ -90,7 +90,7 @@
  *
  * Uncomment if the CPU supports SSE2 (IA-32 specific).
  */
-//#define MBEDTLS_HAVE_SSE2
+#define MBEDTLS_HAVE_SSE2
 
 /**
  * \def MBEDTLS_HAVE_TIME

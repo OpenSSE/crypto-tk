@@ -25,6 +25,8 @@
 
 #include "gtest/gtest.h"
 
+#include <openssl/bn.h>
+
 using namespace std;
 int mbedTLS_rng_wrap(void *arg, unsigned char *out, size_t len)
 {
@@ -89,7 +91,7 @@ TEST(mbedTLS, bignum)
 "F5A3B2A5D33605AEBBCCBA7FEB9F2D2F" \
 "A74206CEC169D74BF5A8C50D6F48EA08"
 
-#define MBED_RSA_TEST_COUNT 500
+#define MBED_RSA_TEST_COUNT 100
 
 #define ASSERT_MPI(f) ASSERT_EQ(f,0)
 
@@ -123,19 +125,19 @@ TEST(mbedTLS, basic_rsa)
 
     for (size_t t_count = 0; t_count < MBED_RSA_TEST_COUNT; t_count++) {
 
-    ASSERT_MPI( mbedtls_mpi_fill_random( &a, KEY_LEN, mbedTLS_rng_wrap, NULL ) );
-    ASSERT_MPI( mbedtls_mpi_mod_mpi(&a,&a,&rsa.N) );
+        ASSERT_MPI( mbedtls_mpi_fill_random( &a, KEY_LEN, mbedTLS_rng_wrap, NULL ) );
+        ASSERT_MPI( mbedtls_mpi_mod_mpi(&a,&a,&rsa.N) );
 
-    ASSERT_MPI( mbedtls_mpi_write_binary(&a, a_buffer, KEY_LEN) );
+        ASSERT_MPI( mbedtls_mpi_write_binary(&a, a_buffer, KEY_LEN) );
 
 
-	ASSERT_MPI( mbedtls_rsa_public( &rsa, a_buffer, b_buffer ) );
-	ASSERT_MPI( mbedtls_rsa_private( &rsa, mbedTLS_rng_wrap, NULL, b_buffer, c_buffer ));
+        ASSERT_MPI( mbedtls_rsa_public( &rsa, a_buffer, b_buffer ) );
+        ASSERT_MPI( mbedtls_rsa_private( &rsa, mbedTLS_rng_wrap, NULL, b_buffer, c_buffer ));
 
-    ASSERT_MPI( mbedtls_mpi_read_binary( &c, c_buffer, KEY_LEN ) );
+        ASSERT_MPI( mbedtls_mpi_read_binary( &c, c_buffer, KEY_LEN ) );
 
-    ASSERT_EQ(mbedtls_mpi_cmp_mpi(&a, &c),0);
-
+        ASSERT_EQ(mbedtls_mpi_cmp_mpi(&a, &c),0);
+        
     }
 
 cleanup:
@@ -145,3 +147,58 @@ cleanup:
     ASSERT_EQ(ret,0);
 }
 
+#define OPEN_SSL_COMPAT_TEST_COUNT 500
+
+#define OPEN_SSL_COMPAT_BIT_COUNT 2048
+#define OPEN_SSL_COMPAT_BYTE_COUNT (OPEN_SSL_COMPAT_BIT_COUNT+7)/8
+
+TEST(mbedTLS, open_ssl_bn_to_mpi)
+{
+    srandom(static_cast<int>(time(NULL)));
+    
+    uint8_t buffer[OPEN_SSL_COMPAT_BYTE_COUNT];
+    BIGNUM *y = BN_new();
+    mbedtls_mpi z;
+    mbedtls_mpi_init(&z);
+
+    for (size_t t = 0; t < OPEN_SSL_COMPAT_TEST_COUNT; t++) {
+        // generate a random number of BIT_COUNT bits
+        // the most significant bit can be 0
+        BN_pseudo_rand(y, OPEN_SSL_COMPAT_BIT_COUNT, -1, 0);
+        // bn2bin returns a BIG endian array, so be careful ...
+        ASSERT_GE(OPEN_SSL_COMPAT_BYTE_COUNT, BN_num_bytes(y));
+        size_t pos = OPEN_SSL_COMPAT_BYTE_COUNT - BN_num_bytes(y);
+        // set the leading bytes to 0
+        memset(buffer, 0, OPEN_SSL_COMPAT_BYTE_COUNT);
+        BN_bn2bin(y, buffer+pos);
+
+        // read the buffer in a mbedTLS bignum
+        
+        ASSERT_MPI( mbedtls_mpi_read_binary( &z, buffer, OPEN_SSL_COMPAT_BYTE_COUNT ) );
+
+        for (int i = 0; i < OPEN_SSL_COMPAT_BIT_COUNT; i++) {
+            ASSERT_TRUE(BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(&z,i));
+        }
+    }
+}
+
+TEST(mbedTLS, mpi_to_open_ssl_bn)
+{
+    srandom(static_cast<int>(time(NULL)));
+    
+    uint8_t buffer[OPEN_SSL_COMPAT_BYTE_COUNT];
+    BIGNUM *y = BN_new();
+    mbedtls_mpi z;
+    mbedtls_mpi_init(&z);
+
+    for (size_t t = 0; t < OPEN_SSL_COMPAT_TEST_COUNT; t++) {
+        mbedtls_mpi_fill_random( &z, OPEN_SSL_COMPAT_BYTE_COUNT, mbedTLS_rng_wrap, NULL );
+        mbedtls_mpi_write_binary(&z, buffer, OPEN_SSL_COMPAT_BYTE_COUNT);
+
+        BN_bin2bn(buffer, OPEN_SSL_COMPAT_BYTE_COUNT, y);
+
+        for (int i = 0; i < OPEN_SSL_COMPAT_BIT_COUNT; i++) {
+            ASSERT_TRUE(BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(&z,i));
+        }
+    }
+}

@@ -28,10 +28,25 @@
 #include <iostream>
 #include <iomanip>
 
+#define SSE_CRYPTO_TDP_IMPL_MBEDTLS 1
+#define SSE_CRYPTO_TDP_IMPL_OPENSSL 2
+
+#define SSE_CRYPTO_TDP_IMPL SSE_CRYPTO_TDP_IMPL_OPENSSL
+
+#if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
+
 #include <openssl/rsa.h>
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
+
+#else
+
+#include "mbedtls/bignum.h"
+#include "mbedtls/rsa.h"
+
+#endif
+
 
 namespace sse
 {
@@ -43,9 +58,10 @@ namespace crypto
 static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize, "Constants kMessageSize of Tdp and TdpInverse do not match");
 
 #define RSA_MODULUS_SIZE TdpInverse::kMessageSize*8
-#define RSA_PK RSA_3
-
     
+#define RSA_PK 0x10001L // RSA_F4 for OpenSSL
+    
+
 class TdpImpl
 {
 public:
@@ -56,10 +72,13 @@ public:
     
     virtual ~TdpImpl();
     
-    
+#if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
     RSA* get_rsa_key() const;
     void set_rsa_key(RSA* k);
-    uint rsa_size() const;
+#else
+    
+#endif
+   uint rsa_size() const;
     
     std::string public_key() const;
     
@@ -77,7 +96,11 @@ public:
 protected:
     TdpImpl();
 
-    RSA *rsa_key_;
+#if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
+    RSA* rsa_key_;
+#else
+    mbedtls_rsa_context* rsa_key_;
+#endif
 };
 
 class TdpInverseImpl : public TdpImpl
@@ -96,7 +119,11 @@ public:
     void invert_mult(const std::string &in, std::string &out, uint32_t order) const;
     
 private:
+#if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
     BIGNUM *phi_, *p_1_, *q_1_;
+#else
+    
+#endif
 };
 
 class TdpMultPoolImpl : public TdpImpl
@@ -113,7 +140,12 @@ public:
     uint8_t maximum_order() const;
     uint8_t pool_size() const;
 private:
+#if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
     RSA **keys_;
+#else
+    mbedtls_rsa_context* keys_;
+#endif
+
     uint8_t keys_count_;
 };
 
@@ -134,7 +166,7 @@ TdpImpl::TdpImpl(const std::string& pk) : rsa_key_(NULL)
 #pragma GCC diagnostic pop
     
     // read the key from the BIO
-    rsa_key_ = PEM_read_bio_RSAPublicKey(mem,NULL,NULL,NULL);
+    rsa_key_ = PEM_read_bio_RSA_PUBKEY(mem,NULL,NULL,NULL);
 
     if(rsa_key_ == NULL)
     {
@@ -189,7 +221,7 @@ std::string TdpImpl::public_key() const
     BIO *bio = BIO_new(BIO_s_mem());
     
     // write the key to the buffer
-    ret = PEM_write_bio_RSAPublicKey(bio, rsa_key_);
+    ret = PEM_write_bio_RSA_PUBKEY(bio, rsa_key_);
 
     if(ret != 1)
     {

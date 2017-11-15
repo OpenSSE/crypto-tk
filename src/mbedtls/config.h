@@ -1352,7 +1352,7 @@
  *
  * Comment this macro to disable support for server name indication in SSL
  */
-#define MBEDTLS_SSL_SERVER_NAME_INDICATION
+//#define MBEDTLS_SSL_SERVER_NAME_INDICATION
 
 /**
  * \def MBEDTLS_SSL_TRUNCATED_HMAC
@@ -1361,7 +1361,7 @@
  *
  * Comment this macro to disable support for truncated HMAC in SSL
  */
-#define MBEDTLS_SSL_TRUNCATED_HMAC
+//#define MBEDTLS_SSL_TRUNCATED_HMAC
 
 /**
  * \def MBEDTLS_THREADING_ALT
@@ -1432,7 +1432,7 @@
  *
  * Comment to skip keyUsage checking for both CA and leaf certificates.
  */
-#define MBEDTLS_X509_CHECK_KEY_USAGE
+//#define MBEDTLS_X509_CHECK_KEY_USAGE
 
 /**
  * \def MBEDTLS_X509_CHECK_EXTENDED_KEY_USAGE
@@ -1445,7 +1445,7 @@
  *
  * Comment to skip extendedKeyUsage checking for certificates.
  */
-#define MBEDTLS_X509_CHECK_EXTENDED_KEY_USAGE
+//#define MBEDTLS_X509_CHECK_EXTENDED_KEY_USAGE
 
 /**
  * \def MBEDTLS_X509_RSASSA_PSS_SUPPORT
@@ -1755,7 +1755,7 @@
  *
  * Uncomment to enable generic cipher wrappers.
  */
-#define MBEDTLS_CIPHER_C
+//#define MBEDTLS_CIPHER_C
 
 /**
  * \def MBEDTLS_CMAC_C
@@ -1977,7 +1977,7 @@
  *
  * Uncomment to enable the HMAC_DRBG random number geerator.
  */
-#define MBEDTLS_HMAC_DRBG_C
+//#define MBEDTLS_HMAC_DRBG_C
 
 /**
  * \def MBEDTLS_MD_C
@@ -1989,7 +1989,7 @@
  *
  * Uncomment to enable generic message digest wrappers.
  */
-#define MBEDTLS_MD_C
+//#define MBEDTLS_MD_C
 
 /**
  * \def MBEDTLS_MD2_C
@@ -2355,7 +2355,7 @@
  *
  * Requires: MBEDTLS_CIPHER_C
  */
-#define MBEDTLS_SSL_TICKET_C
+//#define MBEDTLS_SSL_TICKET_C
 
 /**
  * \def MBEDTLS_SSL_CLI_C
@@ -2472,7 +2472,7 @@
  *
  * This module is required for the X.509 parsing modules.
  */
-#define MBEDTLS_X509_USE_C
+//#define MBEDTLS_X509_USE_C
 
 /**
  * \def MBEDTLS_X509_CRT_PARSE_C
@@ -2488,7 +2488,7 @@
  *
  * This module is required for X.509 certificate parsing.
  */
-#define MBEDTLS_X509_CRT_PARSE_C
+//#define MBEDTLS_X509_CRT_PARSE_C
 
 /**
  * \def MBEDTLS_X509_CRL_PARSE_C
@@ -2502,7 +2502,7 @@
  *
  * This module is required for X.509 CRL parsing.
  */
-#define MBEDTLS_X509_CRL_PARSE_C
+//#define MBEDTLS_X509_CRL_PARSE_C
 
 /**
  * \def MBEDTLS_X509_CSR_PARSE_C
@@ -2516,7 +2516,7 @@
  *
  * This module is used for reading X.509 certificate request.
  */
-#define MBEDTLS_X509_CSR_PARSE_C
+//#define MBEDTLS_X509_CSR_PARSE_C
 
 /**
  * \def MBEDTLS_X509_CREATE_C
@@ -2529,7 +2529,7 @@
  *
  * This module is the basis for creating X.509 certificates and CSRs.
  */
-#define MBEDTLS_X509_CREATE_C
+//#define MBEDTLS_X509_CREATE_C
 
 /**
  * \def MBEDTLS_X509_CRT_WRITE_C
@@ -2542,7 +2542,7 @@
  *
  * This module is required for X.509 certificate creation.
  */
-#define MBEDTLS_X509_CRT_WRITE_C
+//#define MBEDTLS_X509_CRT_WRITE_C
 
 /**
  * \def MBEDTLS_X509_CSR_WRITE_C
@@ -2555,7 +2555,7 @@
  *
  * This module is required for X.509 certificate request writing.
  */
-#define MBEDTLS_X509_CSR_WRITE_C
+//#define MBEDTLS_X509_CSR_WRITE_C
 
 /**
  * \def MBEDTLS_XTEA_C

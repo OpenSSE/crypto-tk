@@ -10,6 +10,7 @@
 
 #include "pk.h"
 #include "asn1write.h"
+//#include "oid.h"
 
 #include <string.h>
 
@@ -113,8 +114,12 @@ int mbedtls_rsa_write_pubkey_der( mbedtls_rsa_context *key, unsigned char *buf, 
 {
     int ret;
     unsigned char *c;
-    size_t len = 0, par_len = 0, oid_len;
-    const char *oid;
+    size_t len = 0, par_len = 0;
+    
+    //#warning WORKAROUND
+    // we want to avoid using the oid functions, so the oid is hardcoded here
+    size_t oid_len = 9;
+    const char oid[10] = {0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, '\0'};
     
     c = buf + size;
     
@@ -134,15 +139,13 @@ int mbedtls_rsa_write_pubkey_der( mbedtls_rsa_context *key, unsigned char *buf, 
     MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_len( &c, buf, len ) );
     MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_tag( &c, buf, MBEDTLS_ASN1_BIT_STRING ) );
     
-#warning WORKAROUND
-    oid_len = 1;
-    oid = "\x01";
-    //    if( ( ret = mbedtls_oid_get_oid_by_pk_alg( mbedtls_pk_get_type( key ),
-    //                                       &oid, &oid_len ) ) != 0 )
-    //    {
-    //        return( ret );
-    //    }
-    
+// Previous implementation used to retrieve the oid
+//        if( ( ret = mbedtls_oid_get_oid_by_pk_alg( MBEDTLS_PK_RSA,
+//                                           &oid, &oid_len ) ) != 0 )
+//        {
+//            return( ret );
+//        }
+
     MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_algorithm_identifier( &c, buf, oid, oid_len,
                                                                        par_len ) );
     

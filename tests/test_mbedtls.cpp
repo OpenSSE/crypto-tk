@@ -26,9 +26,8 @@
 
 #include "gtest/gtest.h"
 
-#include <openssl/bn.h>
-#include <openssl/bio.h>
 #include <openssl/rsa.h>
+#include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 
@@ -323,26 +322,24 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.Q, openssl_sk_rsa->q));
 
 
-//        // public key
-//        memset(buf, 0, sizeof(buf));
-//        ASSERT_EQ( mbedtls_rsa_write_pubkey_pem( &mbedtls_rsa, buf, sizeof( buf )), 0 );
-//
-//        std::string pk = std::string((char*)buf);
-//        std::cout << pk << std::endl;
-//
-//        // create the OpenSSL key from the buffer
-//        mem = BIO_new_mem_buf(((void*)pk.data()), (int)pk.length());
-//        openssl_pk_rsa = PEM_read_bio_RSAPublicKey(mem, NULL, NULL, NULL);
-//        ASSERT_FALSE(openssl_pk_rsa == NULL);
-//
-//
-//        // close and destroy the BIO
-//        BIO_set_close(mem, BIO_NOCLOSE);
-//        BIO_free(mem);
-//
-//        // check that the public element are identical
-//        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.N, openssl_pk_rsa->n));
-//        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.E, openssl_pk_rsa->e));
+        // public key
+        memset(buf, 0, sizeof(buf));
+        ASSERT_EQ( mbedtls_rsa_write_pubkey_pem( &mbedtls_rsa, buf, sizeof( buf )), 0 );
+
+
+        // create the OpenSSL key from the buffer
+        mem = BIO_new_mem_buf(buf, (int) strlen((char*)buf));
+        openssl_pk_rsa = PEM_read_bio_RSA_PUBKEY(mem, NULL, NULL, NULL);
+        ASSERT_FALSE(openssl_pk_rsa == NULL);
+
+
+        // close and destroy the BIO
+        BIO_set_close(mem, BIO_NOCLOSE);
+        BIO_free(mem);
+
+        // check that the public element are identical
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.N, openssl_pk_rsa->n));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.E, openssl_pk_rsa->e));
 
    }
 }

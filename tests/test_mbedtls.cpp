@@ -27,6 +27,10 @@
 #include "gtest/gtest.h"
 
 #include <openssl/bn.h>
+#include <openssl/bio.h>
+#include <openssl/rsa.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
 
 using namespace std;
 int mbedTLS_rng_wrap(void *arg, unsigned char *out, size_t len)
@@ -148,62 +152,6 @@ cleanup:
     ASSERT_EQ(ret,0);
 }
 
-#define OPEN_SSL_COMPAT_TEST_COUNT 500
-
-#define OPEN_SSL_COMPAT_BIT_COUNT 2048
-#define OPEN_SSL_COMPAT_BYTE_COUNT (OPEN_SSL_COMPAT_BIT_COUNT+7)/8
-
-TEST(mbedTLS, open_ssl_bn_to_mpi)
-{
-    srandom(static_cast<int>(time(NULL)));
-    
-    uint8_t buffer[OPEN_SSL_COMPAT_BYTE_COUNT];
-    BIGNUM *y = BN_new();
-    mbedtls_mpi z;
-    mbedtls_mpi_init(&z);
-
-    for (size_t t = 0; t < OPEN_SSL_COMPAT_TEST_COUNT; t++) {
-        // generate a random number of BIT_COUNT bits
-        // the most significant bit can be 0
-        BN_pseudo_rand(y, OPEN_SSL_COMPAT_BIT_COUNT, -1, 0);
-        // bn2bin returns a BIG endian array, so be careful ...
-        ASSERT_GE(OPEN_SSL_COMPAT_BYTE_COUNT, BN_num_bytes(y));
-        size_t pos = OPEN_SSL_COMPAT_BYTE_COUNT - BN_num_bytes(y);
-        // set the leading bytes to 0
-        memset(buffer, 0, OPEN_SSL_COMPAT_BYTE_COUNT);
-        BN_bn2bin(y, buffer+pos);
-
-        // read the buffer in a mbedTLS bignum
-        
-        ASSERT_MPI( mbedtls_mpi_read_binary( &z, buffer, OPEN_SSL_COMPAT_BYTE_COUNT ) );
-
-        for (int i = 0; i < OPEN_SSL_COMPAT_BIT_COUNT; i++) {
-            ASSERT_TRUE(BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(&z,i));
-        }
-    }
-}
-
-TEST(mbedTLS, mpi_to_open_ssl_bn)
-{
-    srandom(static_cast<int>(time(NULL)));
-    
-    uint8_t buffer[OPEN_SSL_COMPAT_BYTE_COUNT];
-    BIGNUM *y = BN_new();
-    mbedtls_mpi z;
-    mbedtls_mpi_init(&z);
-
-    for (size_t t = 0; t < OPEN_SSL_COMPAT_TEST_COUNT; t++) {
-        mbedtls_mpi_fill_random( &z, OPEN_SSL_COMPAT_BYTE_COUNT, mbedTLS_rng_wrap, NULL );
-        mbedtls_mpi_write_binary(&z, buffer, OPEN_SSL_COMPAT_BYTE_COUNT);
-
-        BN_bin2bn(buffer, OPEN_SSL_COMPAT_BYTE_COUNT, y);
-
-        for (int i = 0; i < OPEN_SSL_COMPAT_BIT_COUNT; i++) {
-            ASSERT_TRUE(BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(&z,i));
-        }
-    }
-}
-
 TEST(mbedTLS, key_serialization)
 {
     int ret = 0;
@@ -234,7 +182,8 @@ TEST(mbedTLS, key_serialization)
 
     
     MBEDTLS_MPI_CHK( mbedtls_rsa_write_key_pem( &rsa, buf, sizeof( buf )) );
-    MBEDTLS_MPI_CHK( mbedtls_rsa_parse_key( &rsa_cp, buf, sizeof( buf ), 0, 0));
+    // must include the \0 character in the string length
+    MBEDTLS_MPI_CHK( mbedtls_rsa_parse_key( &rsa_cp, buf, strlen((char*) buf)+1, 0, 0));
 
     // check that we parsed everthing correctly
     ASSERT_EQ(mbedtls_rsa_check_pubkey(&rsa_cp), 0);
@@ -253,7 +202,8 @@ TEST(mbedTLS, key_serialization)
     
     // serialize the PK
     MBEDTLS_MPI_CHK( mbedtls_rsa_write_pubkey_pem( &rsa, buf, sizeof( buf )) );
-    MBEDTLS_MPI_CHK( mbedtls_rsa_parse_public_key( &rsa_pk, buf, sizeof( buf ) ));
+    // must include the \0 character in the string length
+    MBEDTLS_MPI_CHK( mbedtls_rsa_parse_public_key( &rsa_pk, buf, strlen((char*)buf)+1 ));
 
     // check the public key
     ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.N, &rsa_pk.N) == 0);
@@ -264,4 +214,216 @@ cleanup:
     mbedtls_rsa_free( &rsa_cp );
     mbedtls_rsa_free( &rsa_pk );
     ASSERT_EQ(ret,0);
+}
+
+
+#define OPEN_SSL_BN_COMPAT_TEST_COUNT 500
+
+#define OPEN_SSL_COMPAT_BIT_COUNT 2048
+#define OPEN_SSL_COMPAT_BYTE_COUNT (OPEN_SSL_COMPAT_BIT_COUNT+7)/8
+
+TEST(mbedTLS, open_ssl_bn_to_mpi)
+{
+    srandom(static_cast<int>(time(NULL)));
+    
+    uint8_t buffer[OPEN_SSL_COMPAT_BYTE_COUNT];
+    BIGNUM *y = BN_new();
+    mbedtls_mpi z;
+    mbedtls_mpi_init(&z);
+    
+    for (size_t t = 0; t < OPEN_SSL_BN_COMPAT_TEST_COUNT; t++) {
+        // generate a random number of BIT_COUNT bits
+        // the most significant bit can be 0
+        BN_pseudo_rand(y, OPEN_SSL_COMPAT_BIT_COUNT, -1, 0);
+        // bn2bin returns a BIG endian array, so be careful ...
+        ASSERT_GE(OPEN_SSL_COMPAT_BYTE_COUNT, BN_num_bytes(y));
+        size_t pos = OPEN_SSL_COMPAT_BYTE_COUNT - BN_num_bytes(y);
+        // set the leading bytes to 0
+        memset(buffer, 0, OPEN_SSL_COMPAT_BYTE_COUNT);
+        BN_bn2bin(y, buffer+pos);
+        
+        // read the buffer in a mbedTLS bignum
+        
+        ASSERT_MPI( mbedtls_mpi_read_binary( &z, buffer, OPEN_SSL_COMPAT_BYTE_COUNT ) );
+        
+        for (int i = 0; i < OPEN_SSL_COMPAT_BIT_COUNT; i++) {
+            ASSERT_TRUE(BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(&z,i));
+        }
+    }
+}
+
+TEST(mbedTLS, mpi_to_open_ssl_bn)
+{
+    srandom(static_cast<int>(time(NULL)));
+    
+    uint8_t buffer[OPEN_SSL_COMPAT_BYTE_COUNT];
+    BIGNUM *y = BN_new();
+    mbedtls_mpi z;
+    mbedtls_mpi_init(&z);
+    
+    for (size_t t = 0; t < OPEN_SSL_BN_COMPAT_TEST_COUNT; t++) {
+        mbedtls_mpi_fill_random( &z, OPEN_SSL_COMPAT_BYTE_COUNT, mbedTLS_rng_wrap, NULL );
+        mbedtls_mpi_write_binary(&z, buffer, OPEN_SSL_COMPAT_BYTE_COUNT);
+        
+        BN_bin2bn(buffer, OPEN_SSL_COMPAT_BYTE_COUNT, y);
+        
+        for (int i = 0; i < OPEN_SSL_COMPAT_BIT_COUNT; i++) {
+            ASSERT_TRUE(BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(&z,i));
+        }
+    }
+}
+
+static bool cpm_mpi_bn(mbedtls_mpi* x, BIGNUM* y)
+{
+    bool res = true;
+    for (int i = 0; i < std::max<size_t>(BN_num_bits(y), mbedtls_mpi_bitlen(x)); i++) {
+        res &= (BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(x,i));
+    }
+    return res;
+}
+
+#define OPEN_SSL_KEY_COMPAT_TEST_COUNT 20
+TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
+{
+    for (size_t t = 0; t < OPEN_SSL_KEY_COMPAT_TEST_COUNT; t++) {
+
+        mbedtls_rsa_context mbedtls_rsa;
+        mbedtls_rsa_init( &mbedtls_rsa, 0, 0 );
+        RSA* openssl_sk_rsa;
+        RSA* openssl_pk_rsa;
+        BIO *mem;
+        EVP_PKEY* evpkey;
+        unsigned char buf[5000];
+
+        mbedtls_rsa_gen_key(&mbedtls_rsa, mbedTLS_rng_wrap, NULL, KEY_LEN*8, 0x10001L);
+
+        // private key
+
+        // write the mbedTLS key in a buffer
+        ASSERT_EQ(mbedtls_rsa_write_key_pem( &mbedtls_rsa, buf, sizeof( buf )), 0);
+
+        // create the OpenSSL key from the buffer
+        mem = BIO_new_mem_buf(buf, (int)strlen((char*)buf));
+        evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
+
+        ASSERT_FALSE(evpkey == NULL);
+        openssl_sk_rsa = EVP_PKEY_get1_RSA(evpkey);
+
+        // close and destroy the BIO
+        BIO_set_close(mem, BIO_NOCLOSE);
+        BIO_free(mem);
+        mem = NULL;
+
+        EVP_PKEY_free(evpkey);
+
+        // check that the keys are identical
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.N, openssl_sk_rsa->n));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.E, openssl_sk_rsa->e));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.P, openssl_sk_rsa->p));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.Q, openssl_sk_rsa->q));
+
+
+//        // public key
+//        memset(buf, 0, sizeof(buf));
+//        ASSERT_EQ( mbedtls_rsa_write_pubkey_pem( &mbedtls_rsa, buf, sizeof( buf )), 0 );
+//
+//        std::string pk = std::string((char*)buf);
+//        std::cout << pk << std::endl;
+//
+//        // create the OpenSSL key from the buffer
+//        mem = BIO_new_mem_buf(((void*)pk.data()), (int)pk.length());
+//        openssl_pk_rsa = PEM_read_bio_RSAPublicKey(mem, NULL, NULL, NULL);
+//        ASSERT_FALSE(openssl_pk_rsa == NULL);
+//
+//
+//        // close and destroy the BIO
+//        BIO_set_close(mem, BIO_NOCLOSE);
+//        BIO_free(mem);
+//
+//        // check that the public element are identical
+//        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.N, openssl_pk_rsa->n));
+//        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.E, openssl_pk_rsa->e));
+
+   }
+}
+
+TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
+{
+
+    for (size_t t = 0; t < OPEN_SSL_KEY_COMPAT_TEST_COUNT; t++) {
+        
+        mbedtls_rsa_context mbedtls_rsa_sk;
+        mbedtls_rsa_context mbedtls_rsa_pk;
+        mbedtls_rsa_init( &mbedtls_rsa_sk, 0, 0 );
+        mbedtls_rsa_init( &mbedtls_rsa_pk, 0, 0 );
+        RSA* openssl_rsa = RSA_new();
+        EVP_PKEY* evpkey;
+        unsigned char buf[5000];
+        
+        unsigned long e = 0x10001;
+        BIGNUM *bne = NULL;
+        bne = BN_new();
+        
+        ASSERT_EQ(BN_set_word(bne, e), 1);
+        ASSERT_EQ(RSA_generate_key_ex(openssl_rsa, KEY_LEN*8, bne, NULL), 1);
+        
+        // private key
+        // create an EVP encapsulation
+        evpkey = EVP_PKEY_new();
+        ASSERT_EQ(EVP_PKEY_set1_RSA(evpkey, openssl_rsa), 1);
+        
+        // initialize a buffer
+        BIO *bio = BIO_new(BIO_s_mem());
+        
+        // write the openssl key to the buffer
+        ASSERT_EQ(PEM_write_bio_PKCS8PrivateKey(bio, evpkey, NULL, NULL, 0, NULL, NULL),1);
+        
+        // put the buffer in a C string
+        size_t len = BIO_ctrl_pending(bio);
+        ASSERT_LE(len+1, sizeof(buf));
+        
+        ASSERT_NE(BIO_read(bio, buf, (int)len), 0);
+        
+        EVP_PKEY_free(evpkey);
+        BIO_free_all(bio);
+        
+        // create an mbedTLS key from the buffer
+        ASSERT_EQ(mbedtls_rsa_parse_key( &mbedtls_rsa_sk, buf, strlen((char*) buf)+1, 0, 0), 0);
+        
+        
+        // check that the keys are identical
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.N, openssl_rsa->n));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.P, openssl_rsa->p));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.Q, openssl_rsa->q));
+
+        // public key
+        // create an EVP encapsulation
+        
+        // initialize a buffer
+        bio = BIO_new(BIO_s_mem());
+        
+        // write the openssl key to the buffer
+        ASSERT_EQ(PEM_write_bio_RSA_PUBKEY(bio, openssl_rsa),1);
+        
+        // put the buffer in a C string
+        len = BIO_ctrl_pending(bio);
+        ASSERT_LE(len+1, sizeof(buf));
+        
+        ASSERT_NE(BIO_read(bio, buf, (int)len), 0);
+        
+        BIO_free_all(bio);
+        
+        std::string v(reinterpret_cast<const char*>(buf), len);
+//        std::cout << v << std::endl;
+        
+        // create an mbedTLS key from the buffer
+        ASSERT_EQ(mbedtls_rsa_parse_public_key( &mbedtls_rsa_pk, buf, strlen((char*) buf)+1), 0);
+        
+        
+        // check that the keys are identical
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.N, openssl_rsa->n));
+        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
+
+    }
 }

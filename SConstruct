@@ -104,7 +104,7 @@ def smart_concat(l1, l2):
 bld = Builder(action = run_test)
 env.Append(BUILDERS = {'Test' :  bld})
 
-objects = SConscript('src/build.scons', exports='env', variant_dir='build', duplicate=0)
+objects = SConscript('src/build.scons', exports=['env','smart_concat'], variant_dir='build', duplicate=0)
 
 Clean(objects, 'build')
 
@@ -137,7 +137,7 @@ Clean('lib', 'library')
 test_env = env.Clone()
 test_env.Append(LIBS = ['pthread'])
 
-test_objects = SConscript('tests/build.scons', exports='test_env', variant_dir='build_test', duplicate=0)
+test_objects = SConscript('tests/build.scons', exports=['test_env','smart_concat'], variant_dir='build_test', duplicate=0)
 
 Clean(test_objects, 'build_test')
 

@@ -20,6 +20,7 @@
 
 #include "../src/mbedtls/bignum.h"
 #include "../src/mbedtls/rsa.h"
+#include "../src/mbedtls/rsa_io.h"
 #include "../src/random.hpp"
 
 
@@ -201,4 +202,66 @@ TEST(mbedTLS, mpi_to_open_ssl_bn)
             ASSERT_TRUE(BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(&z,i));
         }
     }
+}
+
+TEST(mbedTLS, key_serialization)
+{
+    int ret = 0;
+    mbedtls_rsa_context rsa;
+    mbedtls_rsa_context rsa_cp;
+    mbedtls_rsa_context rsa_pk;
+    unsigned char buf[5000];
+    
+    mbedtls_rsa_init( &rsa, 0, 0 );
+    mbedtls_rsa_init( &rsa_cp, 0, 0 );
+    mbedtls_rsa_init( &rsa_pk, 0, 0 );
+
+    rsa.len = KEY_LEN;
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.N , 16, RSA_N  ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.E , 16, RSA_E  ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.D , 16, RSA_D  ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.P , 16, RSA_P  ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.Q , 16, RSA_Q  ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.DP, 16, RSA_DP ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.DQ, 16, RSA_DQ ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_read_string( &rsa.QP, 16, RSA_QP ) );
+    
+    // check that everything is in order to proceed
+    ASSERT_EQ(mbedtls_rsa_check_pubkey(&rsa), 0);
+    ASSERT_EQ(mbedtls_rsa_check_privkey(&rsa), 0);
+    
+    ASSERT_EQ(rsa.len, KEY_LEN);
+
+    
+    MBEDTLS_MPI_CHK( mbedtls_rsa_write_key_pem( &rsa, buf, sizeof( buf )) );
+    MBEDTLS_MPI_CHK( mbedtls_rsa_parse_key( &rsa_cp, buf, sizeof( buf ), 0, 0));
+
+    // check that we parsed everthing correctly
+    ASSERT_EQ(mbedtls_rsa_check_pubkey(&rsa_cp), 0);
+    ASSERT_EQ(mbedtls_rsa_check_privkey(&rsa_cp), 0);
+
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.N, &rsa_cp.N) == 0);
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.E, &rsa_cp.E) == 0);
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.D, &rsa_cp.D) == 0);
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.P, &rsa_cp.P) == 0);
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.Q, &rsa_cp.Q) == 0);
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.DP, &rsa_cp.DP) == 0);
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.DQ, &rsa_cp.DQ) == 0);
+
+    // erase the buffer
+    memset(buf, 0x00, sizeof(buf));
+    
+    // serialize the PK
+    MBEDTLS_MPI_CHK( mbedtls_rsa_write_pubkey_pem( &rsa, buf, sizeof( buf )) );
+    MBEDTLS_MPI_CHK( mbedtls_rsa_parse_public_key( &rsa_pk, buf, sizeof( buf ) ));
+
+    // check the public key
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.N, &rsa_pk.N) == 0);
+    ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.E, &rsa_pk.E) == 0);
+
+cleanup:
+    mbedtls_rsa_free( &rsa );
+    mbedtls_rsa_free( &rsa_cp );
+    mbedtls_rsa_free( &rsa_pk );
+    ASSERT_EQ(ret,0);
 }

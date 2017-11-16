@@ -1340,7 +1340,8 @@ TdpMultPoolImpl::TdpMultPoolImpl(const TdpMultPoolImpl& pool_impl)
     keys_ = new mbedtls_rsa_context[keys_count_];
 
     for (uint8_t i = 0; i < keys_count_; i++) {
-        
+        mbedtls_rsa_init(&keys_[i],0,0);
+
         mbedtls_rsa_copy(&keys_[i], &pool_impl.keys_[i]);
         
         

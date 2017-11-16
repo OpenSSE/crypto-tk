@@ -82,5 +82,12 @@ namespace crypto
         
         return out;
 	}
+    
+    inline int mbedTLS_rng_wrap(void *arg, unsigned char *out, size_t len)
+    {
+        random_bytes(len, out);
+        return 0;
+    }
+
 }
 }

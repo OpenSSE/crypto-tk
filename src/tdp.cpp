@@ -818,44 +818,73 @@ void TdpImpl::eval(const std::string &in, std::string &out) const
     out = std::string(out_array.begin(), out_array.end());
 }
 
+//std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::eval(const std::array<uint8_t, kMessageSpaceSize> &in) const
+//{
+//    std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
+//
+//
+//    if(in.size() != rsa_size())
+//    {
+//        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long."); /* LCOV_EXCL_LINE */
+//    }
+//
+//    int ret;
+//    unsigned char *rsa_in = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()+1));
+//    unsigned char *rsa_out = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()+1));
+//
+//    memcpy(rsa_in, in.data(), rsa_size());
+//    rsa_in[rsa_size()] = '\0';
+////        memcpy(rsa_in, in.data(), rsa_size());
+////        rsa_out[rsa_size()] = '\0';
+//
+//    ret = mbedtls_rsa_public(&rsa_key_, rsa_in, rsa_out);
+//    if (ret != 0) {
+//        throw std::runtime_error("Error when computing the RSA public operation"); /* LCOV_EXCL_LINE */
+//    }
+//
+//
+//    memcpy(out.data(), rsa_out, rsa_size());
+//
+//    return out;
+//}
 
 std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::eval(const std::array<uint8_t, kMessageSpaceSize> &in) const
 {
     std::array<uint8_t, TdpImpl::kMessageSpaceSize> out;
-    
-    
+
+
     if(in.size() != rsa_size())
     {
         throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long."); /* LCOV_EXCL_LINE */
     }
-    
+
     int ret;
     mbedtls_mpi x;
     mbedtls_mpi_init(&x);
 
     // deserialize the integer
     ret = mbedtls_mpi_read_binary( &x, in.data(), in.size() );
-    
+
     if (ret != 0) {
         throw std::runtime_error("Unable to read the TDP input"); /* LCOV_EXCL_LINE */
     }
-    
+
     // in case we were given an input larger than the RSA modulus
-//    ret = mbedtls_mpi_mod_mpi(&x,&x,&rsa_key_.N);
-//    if (ret != 0) {
-//        throw std::runtime_error("Error when reducing the RSA input mod N"); /* LCOV_EXCL_LINE */
-//    }
-    
+    ret = mbedtls_mpi_mod_mpi(&x,&x,&rsa_key_.N);
+    if (ret != 0) {
+        throw std::runtime_error("Error when reducing the RSA input mod N"); /* LCOV_EXCL_LINE */
+    }
+
     // calling mbedtls_rsa_public is not ideal here as it would require us to re-serialize the input
-    
+
 #if defined(MBEDTLS_THREADING_C)
     if( mbedtls_mutex_lock( &rsa_key_->mutex ) != 0 )
         throw std::runtime_error("Unable to lock the RSA context"); /* LCOV_EXCL_LINE */
 #endif
-    
+
     ret = mbedtls_mpi_exp_mod( &x, &x, &rsa_key_.E, &rsa_key_.N, &rsa_key_.RN );
-    
-    
+
+
 #if defined(MBEDTLS_THREADING_C)
     if( mbedtls_mutex_unlock( &rsa_key_->mutex ) != 0 )
         throw std::runtime_error("Unable to unlock the RSA context"); /* LCOV_EXCL_LINE */
@@ -864,9 +893,9 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::eval(const std::array<u
     if (ret != 0) {
         throw std::runtime_error("Error during the modular exponentiation"); /* LCOV_EXCL_LINE */
     }
-    
+
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
-    
+
     return out;
 }
 
@@ -887,13 +916,20 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpImpl::sample_array() const
     
     int ret = 0;
     
-    ret = mbedtls_mpi_fill_random( &x, rsa_size(), mbedTLS_rng_wrap, NULL );
+    ret = mbedtls_mpi_fill_random( &x, Tdp::kRSAPrgSize, mbedTLS_rng_wrap, NULL );
     
     if (ret != 0) {
         throw std::runtime_error("Error during random TDP message generation"); /* LCOV_EXCL_LINE */
 
     }
     
+    ret = mbedtls_mpi_mod_mpi(&x, &x, &rsa_key_.N);
+    
+    if (ret != 0) {
+        throw std::runtime_error("Error modulo computation"); /* LCOV_EXCL_LINE */
+        
+    }
+
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
 
     return out;
@@ -1113,6 +1149,35 @@ std::array<uint8_t, TdpImpl::kMessageSpaceSize> TdpInverseImpl::invert(const std
     return out;
 }
 
+// returns X = A^E mod N, even when N is even
+// CAUTION!!!!: be aware that a timing attack would reveal E,
+// contrary to mbedtls_mpi_exp_mod
+static int insecure_mod_exp(mbedtls_mpi* X, const mbedtls_mpi* A, const uint64_t E,  const mbedtls_mpi* N)
+{
+    int ret = 0;
+    mbedtls_mpi_lset(X, 1);
+    mbedtls_mpi base;
+    mbedtls_mpi_init(&base);
+    
+    uint64_t exp = E;
+    
+    mbedtls_mpi_copy(&base, A);
+    mbedtls_mpi_mod_mpi(&base, &base, N);
+    
+    while (exp > 0) {
+        if (exp%2 == 1) {
+            mbedtls_mpi_mul_mpi(X, X, &base);
+            mbedtls_mpi_mod_mpi(X, X, N);
+        }
+        exp >>= 1;
+        mbedtls_mpi_mul_mpi(&base, &base, &base);
+        mbedtls_mpi_mod_mpi(&base, &base, N);
+    }
+    
+    mbedtls_mpi_free(&base);
+    return ret;
+}
+
 std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const
 {
     // we have to reimplement everything by hand here
@@ -1143,7 +1208,7 @@ std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mu
     mbedtls_mpi_init(&y_q);
     mbedtls_mpi_init(&h);
     mbedtls_mpi_init(&y);
-
+    
     // deserialize the integer
     ret = mbedtls_mpi_read_binary( &x, in.data(), in.size() );
     
@@ -1152,7 +1217,7 @@ std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mu
     //    if (ret != 0) {
     //        throw std::runtime_error("Error when reducing the RSA input mod N"); /* LCOV_EXCL_LINE */
     //    }
-
+    
     if (ret != 0) {
         throw std::runtime_error("Unable to read the TDP input"); /* LCOV_EXCL_LINE */
     }
@@ -1164,39 +1229,48 @@ std::array<uint8_t, TdpInverseImpl::kMessageSpaceSize> TdpInverseImpl::invert_mu
     if( mbedtls_mutex_lock( &rsa_key_->mutex ) != 0 )
         throw std::runtime_error("Unable to lock the RSA context"); /* LCOV_EXCL_LINE */
 #endif
+    
+    // there is an issue with the following code:
+    // mbedTLS mpi library does not allow for a modular exponentiation
+    // where the module is even. And we were actually relying on that
+    // to compute the adjusted exponent
+    //    mbedtls_mpi_exp_mod(&d_p, &rsa_key_.DP, &mpi_order, &p_1_, NULL);
+    //    mbedtls_mpi_exp_mod(&d_q, &rsa_key_.DQ, &mpi_order, &q_1_, NULL);
 
-    mbedtls_mpi_exp_mod(&d_p, &rsa_key_.DP, &mpi_order, &p_1_, NULL);
-    mbedtls_mpi_exp_mod(&d_q, &rsa_key_.DQ, &mpi_order, &q_1_, NULL);
-
+    // instead, we implemented the insecure_mod_exp function
+    // it is definitely less secure than mbedtls_mpi_exp_mod
+    // but it works with even modulis
+    insecure_mod_exp(&d_p, &rsa_key_.DP, order, &p_1_);
+    insecure_mod_exp(&d_q, &rsa_key_.DQ, order, &q_1_);
     
     mbedtls_mpi_exp_mod(&y_p, &x, &d_p,&rsa_key_.P, &rsa_key_.RP);
     mbedtls_mpi_exp_mod(&y_q, &x, &d_q,&rsa_key_.Q, &rsa_key_.RQ);
-
+    
     /*
      * Y = (YP - YQ) * (Q^-1 mod P) mod P
      */
-
-   mbedtls_mpi_sub_mpi( &y, &y_p, &y_q );
-   mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.QP );
-   mbedtls_mpi_mod_mpi( &y, &y_p, &rsa_key_.P );
+    
+    mbedtls_mpi_sub_mpi( &y, &y_p, &y_q );
+    mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.QP );
+    mbedtls_mpi_mod_mpi( &y, &y_p, &rsa_key_.P );
     
     /*
      * Y = YQ + Y * Q
      */
-   mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.Q);
-   mbedtls_mpi_add_mpi(&y, &y_q, &y_p);
-
-////    BN_mod_sub(h, y_p, y_q, get_rsa_key()->p, ctx);
-//    mbedtls_mpi_sub_mpi(&h, &y_p, &y_q);
-//    mbedtls_mpi_mod_mpi(&h, &h, &rsa_key_.P);
-//
-////    BN_mod_mul(h, h, get_rsa_key()->iqmp, get_rsa_key()->p, ctx);
-//    mbedtls_mpi_mul_mpi(&h, &h, &rsa_key_.QP);
-//    mbedtls_mpi_mod_mpi(&h, &h, &rsa_key_.P);
-//
-//
-//    mbedtls_mpi_mul_mpi(&y, &h, &rsa_key_.Q);
-//    mbedtls_mpi_add_mpi(&y, &y, &y_q);
+    mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.Q);
+    mbedtls_mpi_add_mpi(&y, &y_q, &y_p);
+    
+    ////    BN_mod_sub(h, y_p, y_q, get_rsa_key()->p, ctx);
+    //    mbedtls_mpi_sub_mpi(&h, &y_p, &y_q);
+    //    mbedtls_mpi_mod_mpi(&h, &h, &rsa_key_.P);
+    //
+    ////    BN_mod_mul(h, h, get_rsa_key()->iqmp, get_rsa_key()->p, ctx);
+    //    mbedtls_mpi_mul_mpi(&h, &h, &rsa_key_.QP);
+    //    mbedtls_mpi_mod_mpi(&h, &h, &rsa_key_.P);
+    //
+    //
+    //    mbedtls_mpi_mul_mpi(&y, &h, &rsa_key_.Q);
+    //    mbedtls_mpi_add_mpi(&y, &y, &y_q);
     
     
     // calling mbedtls_rsa_public is not ideal here as it would require us to re-serialize the input

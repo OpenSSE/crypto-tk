@@ -208,6 +208,8 @@ TEST(mbedTLS, key_serialization)
     ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.N, &rsa_pk.N) == 0);
     ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.E, &rsa_pk.E) == 0);
 
+    ASSERT_EQ(mbedtls_rsa_check_pub_priv(&rsa_pk, &rsa), 0);
+
 cleanup:
     mbedtls_rsa_free( &rsa );
     mbedtls_rsa_free( &rsa_cp );

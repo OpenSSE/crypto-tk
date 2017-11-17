@@ -19,6 +19,8 @@
 //
 
 #include "../src/tdp.hpp"
+#include "../src/tdp_impl/tdp_impl_openssl.hpp"
+#include "../src/tdp_impl/tdp_impl_mbedtls.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -28,27 +30,66 @@
 
 using namespace std;
 
-#define TEST_COUNT 30
+#define TDP_TEST_COUNT 5 // low test count as we are only testing glue code
+
+// number of test for standard correctness (pk operation first, then sk)
+#define TDP_IMPL_CORRECTNESS_TEST_COUNT 30
+// number of test for inverted standard correctness (sk operation first, then pk)
+#define TDP_IMPL_INV_CORRECTNESS_TEST_COUNT 30
 #define POOL_COUNT 20
 #define INV_MULT_COUNT 100
 
-TEST(tdp, correctness)
+// static_if does not exist, so we use a workaround using template specialization
+
+template <typename TDP,  typename TDP_INV, typename TDP_POOL, bool is_implementation>
+class conditional_tdp_test {
+public:
+    inline static std::string tdp_eval(const TDP& tdp, const std::string& in) {
+        return tdp.eval(in);
+    }
+
+    inline static std::string tdp_eval(const TDP_POOL& tdp_mult, const std::string& in) {
+        return tdp_mult.eval(in);
+    }
+
+};
+
+template <typename TDP,  typename TDP_INV, typename TDP_POOL>
+class conditional_tdp_test<TDP, TDP_INV, TDP_POOL, true> {
+public:
+    inline static std::string tdp_eval(const TDP& tdp, const std::string& in) {
+        return std::string();
+    }
+    
+    inline static std::string tdp_eval(const TDP_POOL& tdp_mult, const std::string& in) {
+        return std::string();
+    }
+
+};
+
+
+template <typename TDP, typename TDP_INV, typename TDP_POOL, bool is_implementation>
+static void test_tdp_impl_correctness(const size_t test_count)
 {
-    for (size_t i = 0; i < TEST_COUNT; i++) {
-        sse::crypto::TdpInverse tdp_inv;
+    using tdp_test = conditional_tdp_test<TDP, TDP_INV, TDP_POOL, is_implementation>;
+    
+    for (size_t i = 0; i < test_count; i++) {
+        TDP_INV tdp_inv;
         
         string pk = tdp_inv.public_key();
         
-        sse::crypto::Tdp tdp(pk);
-        sse::crypto::TdpMultPool tdp_mult(pk, 2);
-
+        TDP tdp(pk);
+        TDP_POOL tdp_mult(pk, 2);
+        
         
         auto sample = tdp.sample_array();
         string sample_string = std::string(sample.begin(), sample.end());
         
-        string enc = tdp.eval(sample_string);
-        string enc2;
-        tdp.eval(sample_string, enc2);
+        string enc, enc2;
+        tdp.eval(sample_string, enc);
+
+        
+        enc2 = tdp_test::tdp_eval(tdp,sample_string);
 
         std::array<uint8_t, sse::crypto::Tdp::kMessageSize> enc_arr = tdp.eval(sample);
         std::array<uint8_t, sse::crypto::Tdp::kMessageSize> enc_arr_inv = tdp_inv.eval(sample);
@@ -56,21 +97,27 @@ TEST(tdp, correctness)
         string enc_inv;
         tdp_inv.eval(sample_string, enc_inv);
         
-        ASSERT_EQ(enc, enc2);
+        if(!is_implementation){
+            ASSERT_EQ(enc, enc2);
+        }
         ASSERT_EQ(enc, enc_inv);
         ASSERT_EQ(enc, std::string(enc_arr.begin(), enc_arr.end()));
         ASSERT_EQ(enc_arr, enc_arr_inv);
-
         
-        string enc_mult1 = tdp_mult.eval(sample_string);
-        string enc_mult2;
-        tdp_mult.eval(sample_string, enc_mult2);
-        ASSERT_EQ(enc_mult1, enc_mult2);
+        
+        string enc_mult1, enc_mult2;
+        tdp_mult.eval(sample_string, enc_mult1);
+        enc_mult2 = tdp_test::tdp_eval(tdp_mult,sample_string);
+        
+        if(!is_implementation){
+            ASSERT_EQ(enc_mult1, enc_mult2);
+        }
         ASSERT_EQ(enc_mult1, enc);
-
         
         
-        string dec = tdp_inv.invert(enc);
+        
+        string dec;
+        tdp_inv.invert(enc, dec);
         
         ASSERT_EQ(sample_string, dec);
         
@@ -78,79 +125,141 @@ TEST(tdp, correctness)
         std::array<uint8_t, sse::crypto::Tdp::kMessageSize> enc_array;
         ::copy(enc.begin(), enc.end(), enc_array.begin());
         std::array<uint8_t, sse::crypto::Tdp::kMessageSize> dec_array = tdp_inv.invert(enc_array);
-
+        
         ASSERT_EQ(sample, dec_array);
     }
-
-    for (size_t i = 0; i < TEST_COUNT; i++) {
-        sse::crypto::TdpInverse tdp_inv;
+    
+    for (size_t i = 0; i < test_count; i++) {
+        TDP_INV tdp_inv;
         
         string pk = tdp_inv.public_key();
         
-        sse::crypto::Tdp tdp(pk);
-        sse::crypto::TdpMultPool tdp_mult(pk, 2);
+        TDP tdp(pk);
+        TDP_POOL tdp_mult(pk, 2);
         
         
         string sample_string = tdp.sample();
         
-        string enc = tdp.eval(sample_string);
-        string enc2;
-        tdp.eval(sample_string, enc2);
-        
+        string enc, enc2;
+        tdp.eval(sample_string, enc);
+
+        enc2 = tdp_test::tdp_eval(tdp,sample_string);
+
         string enc_inv;
         tdp_inv.eval(sample_string, enc_inv);
         
-        ASSERT_EQ(enc, enc2);
+        if(!is_implementation){
+            ASSERT_EQ(enc, enc2);
+        }
         ASSERT_EQ(enc, enc_inv);
         
-        string enc_mult1 = tdp_mult.eval(sample_string);
-        string enc_mult2;
-        tdp_mult.eval(sample_string, enc_mult2);
-        ASSERT_EQ(enc_mult1, enc_mult2);
+        string enc_mult1, enc_mult2;
+        tdp_mult.eval(sample_string, enc_mult1);
+        enc_mult2 = tdp_test::tdp_eval(tdp_mult,sample_string);
+
+        
+        if(!is_implementation){
+            ASSERT_EQ(enc_mult1, enc_mult2);
+        }
         ASSERT_EQ(enc_mult1, enc);
         
         
         
-        string dec = tdp_inv.invert(enc);
-        
-        ASSERT_EQ(sample_string, dec);        
-    }
+        string dec;
+        tdp_inv.invert(enc, dec);
 
+        ASSERT_EQ(sample_string, dec);
+    }
 }
 
-TEST(tdp, inverse_correctness)
+
+
+
+template <typename TDP, typename TDP_INV, typename TDP_POOL, bool is_implementation>
+static void test_tdp_impl_inverse_correctness(const size_t test_count)
 {
-    for (size_t i = 0; i < TEST_COUNT; i++) {
-        sse::crypto::TdpInverse tdp_inv;
+    for (size_t i = 0; i < test_count; i++) {
+        TDP_INV tdp_inv;
         
         string pk = tdp_inv.public_key();
         
-        sse::crypto::Tdp tdp(pk);
+        TDP tdp(pk);
         
         auto sample_arr =  tdp_inv.sample_array();
         string sample = std::string(sample_arr.begin(), sample_arr.end());
         
         string v = sample;
+        string res;
         
-        ASSERT_EQ(v, tdp_inv.invert_mult(v,0));
+        tdp_inv.invert_mult(v, res, 0);
+        
+        ASSERT_EQ(v, res);
         
         for (size_t j = 0; j < i; j++) {
-            v = tdp_inv.invert(v);
+            tdp_inv.invert(v,v);
         }
         
         for (size_t j = 0; j < i; j++) {
-            v = tdp.eval(v);
+            tdp.eval(v,v);
         }
         
         
         ASSERT_EQ(sample, v);
     }
 }
+TEST(tdp_openssl_impl, correctness)
+{
+    test_tdp_impl_correctness<  sse::crypto::TdpImpl_OpenSSL,
+                                sse::crypto::TdpInverseImpl_OpenSSL,
+                                sse::crypto::TdpMultPoolImpl_OpenSSL,
+                                true>(TDP_IMPL_CORRECTNESS_TEST_COUNT);
+}
+
+TEST(tdp_mbedtls_impl, correctness)
+{
+    test_tdp_impl_correctness<  sse::crypto::TdpImpl_mbedTLS,
+                                sse::crypto::TdpInverseImpl_mbedTLS,
+                                sse::crypto::TdpMultPoolImpl_mbedTLS,
+                                true>(TDP_IMPL_CORRECTNESS_TEST_COUNT);
+}
+
+
+TEST(tdp, correctness)
+{
+    test_tdp_impl_correctness<  sse::crypto::Tdp,
+                                sse::crypto::TdpInverse,
+                                sse::crypto::TdpMultPool,
+                                false>(TDP_TEST_COUNT);
+}
+
+TEST(tdp_openssl_impl, inverse_correctness)
+{
+    test_tdp_impl_inverse_correctness<  sse::crypto::TdpImpl_OpenSSL,
+                                        sse::crypto::TdpInverseImpl_OpenSSL,
+                                        sse::crypto::TdpMultPoolImpl_OpenSSL,
+    true>(TDP_IMPL_INV_CORRECTNESS_TEST_COUNT);
+}
+
+TEST(tdp_mbedtls_impl, inverse_correctness)
+{
+    test_tdp_impl_inverse_correctness<  sse::crypto::TdpImpl_mbedTLS,
+                                        sse::crypto::TdpInverseImpl_mbedTLS,
+                                        sse::crypto::TdpMultPoolImpl_mbedTLS,
+    true>(TDP_IMPL_INV_CORRECTNESS_TEST_COUNT);
+}
+
+TEST(tdp, inverse_correctness)
+{
+    test_tdp_impl_inverse_correctness<  sse::crypto::Tdp,
+                                        sse::crypto::TdpInverse,
+                                        sse::crypto::TdpMultPool,
+                                        false>(TDP_TEST_COUNT);
+}
 
 
 TEST(tdp, multiple_eval)
 {
-    for (size_t i = 0; i < 2*TEST_COUNT/3; i++) {
+    for (size_t i = 0; i < 2*TDP_IMPL_CORRECTNESS_TEST_COUNT/3; i++) {
         sse::crypto::TdpInverse tdp_inv;
         
         string pk = tdp_inv.public_key();
@@ -179,7 +288,7 @@ TEST(tdp, multiple_eval)
         
     }
 
-    for (size_t i = 0; i < (TEST_COUNT-2*TEST_COUNT/3); i++) {
+    for (size_t i = 0; i < (TDP_IMPL_CORRECTNESS_TEST_COUNT-2*TDP_IMPL_CORRECTNESS_TEST_COUNT/3); i++) {
         sse::crypto::TdpInverse tdp_inv;
         
         string pk = tdp_inv.public_key();
@@ -211,7 +320,7 @@ TEST(tdp, multiple_eval)
 
 TEST(tdp, multiple_inverse_1)
 {
-    for (size_t i = 0; i < TEST_COUNT; i++) {
+    for (size_t i = 0; i < TDP_IMPL_CORRECTNESS_TEST_COUNT; i++) {
         sse::crypto::TdpInverse tdp_inv;
         
         string pk = tdp_inv.public_key();
@@ -270,7 +379,7 @@ TEST(tdp, copy)
     sse::crypto::TdpMultPool tdp_pool_assign(temp_inv_tdp.public_key(),2);
 
     
-    for (size_t i = 0; i < TEST_COUNT; i++) {
+    for (size_t i = 0; i < TDP_IMPL_CORRECTNESS_TEST_COUNT; i++) {
         sse::crypto::TdpInverse tdp_inv_orig;
         sse::crypto::TdpInverse tdp_inv_copy(tdp_inv_orig);
         sse::crypto::TdpInverse tdp_inv_sk_copy(tdp_inv_orig.private_key());
@@ -351,7 +460,7 @@ TEST(tdp, deterministic_generation)
     std::array<uint8_t, 32> key_prf = key;
     const sse::crypto::Prf<sse::crypto::Tdp::kRSAPrgSize> prf(sse::crypto::Key<32>(key_prf.data()));
     
-    for (size_t i = 0; i < TEST_COUNT; i++) {
+    for (size_t i = 0; i < TDP_IMPL_CORRECTNESS_TEST_COUNT; i++) {
         std::string seed = sse::crypto::random_string(128);
         std::array<uint8_t, 32> key_tmp = key;
 

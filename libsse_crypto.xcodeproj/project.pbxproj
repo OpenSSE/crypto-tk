@@ -103,6 +103,15 @@
 		319966B81FBC2E9800051179 /* rsa_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966B51FBC2E9800051179 /* rsa_io.c */; };
 		319966B91FBC2E9800051179 /* rsa_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966B51FBC2E9800051179 /* rsa_io.c */; };
 		319966BA1FBC2E9800051179 /* rsa_io.h in Headers */ = {isa = PBXBuildFile; fileRef = 319966B61FBC2E9800051179 /* rsa_io.h */; };
+		319966C61FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C21FBEE9D400051179 /* tdp_impl_mbedtls.cpp */; };
+		319966C71FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C21FBEE9D400051179 /* tdp_impl_mbedtls.cpp */; };
+		319966C81FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C21FBEE9D400051179 /* tdp_impl_mbedtls.cpp */; };
+		319966C91FBEE9D500051179 /* tdp_impl_mbedtls.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 319966C31FBEE9D400051179 /* tdp_impl_mbedtls.hpp */; };
+		319966CA1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */; };
+		319966CB1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */; };
+		319966CC1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */; };
+		319966CD1FBEE9D500051179 /* tdp_impl_openssl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 319966C51FBEE9D400051179 /* tdp_impl_openssl.hpp */; };
+		319966CF1FBEF1CA00051179 /* tdp_impl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 319966CE1FBEF1CA00051179 /* tdp_impl.hpp */; };
 		31B5489A1FB336AE00E17DD3 /* test_prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31B548991FB336AE00E17DD3 /* test_prf.cpp */; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
@@ -333,6 +342,11 @@
 		319966B31FB8BCF400051179 /* test_mbedtls.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_mbedtls.cpp; sourceTree = "<group>"; };
 		319966B51FBC2E9800051179 /* rsa_io.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rsa_io.c; sourceTree = "<group>"; };
 		319966B61FBC2E9800051179 /* rsa_io.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rsa_io.h; sourceTree = "<group>"; };
+		319966C21FBEE9D400051179 /* tdp_impl_mbedtls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tdp_impl_mbedtls.cpp; sourceTree = "<group>"; };
+		319966C31FBEE9D400051179 /* tdp_impl_mbedtls.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp_impl_mbedtls.hpp; sourceTree = "<group>"; };
+		319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tdp_impl_openssl.cpp; sourceTree = "<group>"; };
+		319966C51FBEE9D400051179 /* tdp_impl_openssl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp_impl_openssl.hpp; sourceTree = "<group>"; };
+		319966CE1FBEF1CA00051179 /* tdp_impl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tdp_impl.hpp; sourceTree = "<group>"; };
 		31B548991FB336AE00E17DD3 /* test_prf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_prf.cpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -528,6 +542,18 @@
 			path = aesni;
 			sourceTree = "<group>";
 		};
+		319966C11FBEE9D400051179 /* tdp_impl */ = {
+			isa = PBXGroup;
+			children = (
+				319966CE1FBEF1CA00051179 /* tdp_impl.hpp */,
+				319966C21FBEE9D400051179 /* tdp_impl_mbedtls.cpp */,
+				319966C31FBEE9D400051179 /* tdp_impl_mbedtls.hpp */,
+				319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */,
+				319966C51FBEE9D400051179 /* tdp_impl_openssl.hpp */,
+			);
+			path = tdp_impl;
+			sourceTree = "<group>";
+		};
 		6CC2D3F01C31843D00334ADD = {
 			isa = PBXGroup;
 			children = (
@@ -571,6 +597,7 @@
 				6CC2D4611C3185D700334ADD /* set_hash.hpp */,
 				318C72991C9730140040AEE7 /* tdp.cpp */,
 				318C729A1C9730140040AEE7 /* tdp.hpp */,
+				319966C11FBEE9D400051179 /* tdp_impl */,
 				311400971F9E628C0025DE3A /* key.hpp */,
 				314863CE1FB71E9E009FE78B /* key.cpp */,
 				316F0D3D1D25600700F87904 /* prg.cpp */,
@@ -815,6 +842,7 @@
 				6CC2D4CB1C3193E900334ADD /* hash.hpp in Headers */,
 				318C729E1C9730140040AEE7 /* tdp.hpp in Headers */,
 				6CC2D4CD1C3193E900334ADD /* prf.hpp in Headers */,
+				319966CF1FBEF1CA00051179 /* tdp_impl.hpp in Headers */,
 				6CC2D4CC1C3193E900334ADD /* hmac.hpp in Headers */,
 				6CC2D4C71C3193E200334ADD /* cipher.hpp in Headers */,
 				6CC2D4CF1C3193E900334ADD /* random.hpp in Headers */,
@@ -849,6 +877,7 @@
 				6CC2D4E21C31941500334ADD /* blake2s-load-sse41.h in Headers */,
 				6CC2D4FA1C31942F00334ADD /* GF2m.hpp in Headers */,
 				6CC2D4EE1C31942700334ADD /* GLS254.hpp in Headers */,
+				319966C91FBEE9D500051179 /* tdp_impl_mbedtls.hpp in Headers */,
 				6CC2D4F41C31942F00334ADD /* compute_linear_operation_table.hpp in Headers */,
 				319966A61FB8A88900051179 /* pk_internal.h in Headers */,
 				6CC2D5141C31945000334ADD /* logical.hpp in Headers */,
@@ -886,6 +915,7 @@
 				3199669F1FB8A72D00051179 /* config.h in Headers */,
 				6CC2D5001C31943300334ADD /* GF2.hpp in Headers */,
 				6CC2D4DC1C31941000334ADD /* blake2b-load-sse41.h in Headers */,
+				319966CD1FBEE9D500051179 /* tdp_impl_openssl.hpp in Headers */,
 				6CC2D4DF1C31941000334ADD /* blake2b.hpp in Headers */,
 				6CC2D4F81C31942F00334ADD /* GF2_127_63.hpp in Headers */,
 				6CC2D4FE1C31943300334ADD /* apply_linear_table_transform.hpp in Headers */,
@@ -1080,9 +1110,11 @@
 				6CC2D4911C318B1B00334ADD /* test_hmac.cpp in Sources */,
 				310C2BE61EC0B6D800E80B3A /* util.cpp in Sources */,
 				6CC2D4861C31889B00334ADD /* fpe.cpp in Sources */,
+				319966C61FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */,
 				3163D3A41ED5A50100A7FCD9 /* blake2s-common.c in Sources */,
 				310C2BEA1EC0B8F100E80B3A /* GMPpke.cpp in Sources */,
 				3199668E1FB8A72D00051179 /* asn1parse.c in Sources */,
+				319966CA1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */,
 				3199668B1FB8A72D00051179 /* rsa.c in Sources */,
 				319966921FB8A72D00051179 /* pkwrite.c in Sources */,
@@ -1102,6 +1134,7 @@
 				316F0D401D25600700F87904 /* prg.cpp in Sources */,
 				3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */,
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
+				319966CB1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
 				314863D01FB71E9E009FE78B /* key.cpp in Sources */,
 				3199668C1FB8A72D00051179 /* rsa.c in Sources */,
@@ -1110,6 +1143,7 @@
 				3199669D1FB8A72D00051179 /* pem.c in Sources */,
 				310C2BEC1EC0B99300E80B3A /* GMPpke.cpp in Sources */,
 				3185168F1D4BF45700A44AD7 /* aesni.cpp in Sources */,
+				319966C71FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */,
 				319966B11FB8AE7200051179 /* pk_wrap.c in Sources */,
 				319966B81FBC2E9800051179 /* rsa_io.c in Sources */,
 				6CC2D4A01C318F2500334ADD /* sha512_sse4.asm in Sources */,
@@ -1147,6 +1181,7 @@
 				3199668A1FB8A72D00051179 /* asn1write.c in Sources */,
 				3163D3A11ED5A11A00A7FCD9 /* blake2b-common.c in Sources */,
 				6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */,
+				319966C81FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */,
 				3199669E1FB8A72D00051179 /* pem.c in Sources */,
 				6CC2D4D21C3193FA00334ADD /* aez.c in Sources */,
 				319966B21FB8AE7200051179 /* pk_wrap.c in Sources */,
@@ -1162,6 +1197,7 @@
 				318516901D4BF45700A44AD7 /* aesni.cpp in Sources */,
 				6CC2D4D91C31940B00334ADD /* sha512_sse4.asm in Sources */,
 				3163D3A61ED5A50100A7FCD9 /* blake2s-common.c in Sources */,
+				319966CC1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				314863D11FB71E9E009FE78B /* key.cpp in Sources */,
 				310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */,
 				6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */,

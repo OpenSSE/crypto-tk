@@ -39,9 +39,6 @@ namespace sse
         public:
             static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
             
-//            virtual TdpImpl(const std::string& pk) = 0;
-//            virtual TdpImpl(const TdpImpl& tdp) = 0;
-            
             virtual ~TdpImpl(){};
             
             virtual size_t rsa_size() const = 0;
@@ -64,9 +61,6 @@ namespace sse
         class TdpInverseImpl : virtual public TdpImpl
         {
         public:
-//            virtual TdpInverseImpl() = 0;
-//            virtual TdpInverseImpl(const std::string& sk) = 0;
-//            virtual TdpInverseImpl(const TdpInverseImpl& tdp) = 0;
             virtual ~TdpInverseImpl(){};
             
             virtual std::string private_key() const = 0;
@@ -79,10 +73,7 @@ namespace sse
         
         class TdpMultPoolImpl : virtual public TdpImpl
         {
-        public:
-//            virtual TdpMultPoolImpl(const std::string& sk, const uint8_t size) = 0;
-//            virtual TdpMultPoolImpl(const TdpMultPoolImpl& pool_impl) = 0;
-            
+        public:          
             virtual ~TdpMultPoolImpl(){};
             
             virtual std::array<uint8_t, TdpImpl::kMessageSpaceSize> eval_pool(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const = 0;

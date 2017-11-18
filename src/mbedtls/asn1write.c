@@ -39,6 +39,9 @@
 #define mbedtls_free       free
 #endif
 
+// Do not check coverage for ASN.1
+/* LCOV_EXCL_START */
+
 int mbedtls_asn1_write_len( unsigned char **p, unsigned char *start, size_t len )
 {
     if( len < 0x80 )
@@ -387,4 +390,7 @@ mbedtls_asn1_named_data *mbedtls_asn1_store_named_data( mbedtls_asn1_named_data 
 
     return( cur );
 }
+
+/* LCOV_EXCL_STOP */
+
 #endif /* MBEDTLS_ASN1_WRITE_C */

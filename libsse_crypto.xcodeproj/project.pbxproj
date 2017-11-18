@@ -70,9 +70,6 @@
 		3199668F1FB8A72D00051179 /* asn1parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966781FB8A72C00051179 /* asn1parse.c */; };
 		319966901FB8A72D00051179 /* asn1parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966781FB8A72C00051179 /* asn1parse.c */; };
 		319966911FB8A72D00051179 /* bignum.h in Headers */ = {isa = PBXBuildFile; fileRef = 319966791FB8A72C00051179 /* bignum.h */; };
-		319966921FB8A72D00051179 /* pkwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = 3199667A1FB8A72C00051179 /* pkwrite.c */; };
-		319966931FB8A72D00051179 /* pkwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = 3199667A1FB8A72C00051179 /* pkwrite.c */; };
-		319966941FB8A72D00051179 /* pkwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = 3199667A1FB8A72C00051179 /* pkwrite.c */; };
 		319966951FB8A72D00051179 /* pk.h in Headers */ = {isa = PBXBuildFile; fileRef = 3199667B1FB8A72C00051179 /* pk.h */; };
 		319966961FB8A72D00051179 /* pkparse.c in Sources */ = {isa = PBXBuildFile; fileRef = 3199667C1FB8A72C00051179 /* pkparse.c */; };
 		319966971FB8A72D00051179 /* pkparse.c in Sources */ = {isa = PBXBuildFile; fileRef = 3199667C1FB8A72C00051179 /* pkparse.c */; };
@@ -323,7 +320,6 @@
 		319966771FB8A72C00051179 /* rsa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rsa.c; sourceTree = "<group>"; };
 		319966781FB8A72C00051179 /* asn1parse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = asn1parse.c; sourceTree = "<group>"; };
 		319966791FB8A72C00051179 /* bignum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bignum.h; sourceTree = "<group>"; };
-		3199667A1FB8A72C00051179 /* pkwrite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pkwrite.c; sourceTree = "<group>"; };
 		3199667B1FB8A72C00051179 /* pk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pk.h; sourceTree = "<group>"; };
 		3199667C1FB8A72C00051179 /* pkparse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pkparse.c; sourceTree = "<group>"; };
 		3199667D1FB8A72C00051179 /* rsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rsa.h; sourceTree = "<group>"; };
@@ -515,7 +511,6 @@
 				3199667B1FB8A72C00051179 /* pk.h */,
 				3199667C1FB8A72C00051179 /* pkparse.c */,
 				319966AF1FB8AE7200051179 /* pk_wrap.c */,
-				3199667A1FB8A72C00051179 /* pkwrite.c */,
 				319966771FB8A72C00051179 /* rsa.c */,
 				3199667D1FB8A72C00051179 /* rsa.h */,
 				319966B51FBC2E9800051179 /* rsa_io.c */,
@@ -1117,7 +1112,6 @@
 				319966CA1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */,
 				3199668B1FB8A72D00051179 /* rsa.c in Sources */,
-				319966921FB8A72D00051179 /* pkwrite.c in Sources */,
 				6CC2D4901C318B1B00334ADD /* test_fpe.cpp in Sources */,
 				313CD48D1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				6CC2D4921C318B3500334ADD /* sha512.cpp in Sources */,
@@ -1159,7 +1153,6 @@
 				319966971FB8A72D00051179 /* pkparse.c in Sources */,
 				318C729C1C9730140040AEE7 /* tdp.cpp in Sources */,
 				6CC2D4AC1C318F2500334ADD /* fpe.cpp in Sources */,
-				319966931FB8A72D00051179 /* pkwrite.c in Sources */,
 				6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				6CC2D4AE1C318F2500334ADD /* GF2_127_63.cpp in Sources */,
 				319966AD1FB8AA1C00051179 /* base64.c in Sources */,
@@ -1175,7 +1168,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				319966A41FB8A72D00051179 /* pk.c in Sources */,
-				319966941FB8A72D00051179 /* pkwrite.c in Sources */,
 				318C729D1C9730140040AEE7 /* tdp.cpp in Sources */,
 				310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */,
 				3199668A1FB8A72D00051179 /* asn1write.c in Sources */,

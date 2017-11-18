@@ -116,12 +116,12 @@ int mbedtls_mpi_grow( mbedtls_mpi *X, size_t nblimbs )
     mbedtls_mpi_uint *p;
 
     if( nblimbs > MBEDTLS_MPI_MAX_LIMBS )
-        return( MBEDTLS_ERR_MPI_ALLOC_FAILED );
+        return( MBEDTLS_ERR_MPI_ALLOC_FAILED ); /* LCOV_EXCL_LINE */
 
     if( X->n < nblimbs )
     {
         if( ( p = (mbedtls_mpi_uint*)mbedtls_calloc( nblimbs, ciL ) ) == NULL )
-            return( MBEDTLS_ERR_MPI_ALLOC_FAILED );
+            return( MBEDTLS_ERR_MPI_ALLOC_FAILED ); /* LCOV_EXCL_LINE */
 
         if( X->p != NULL )
         {
@@ -137,6 +137,7 @@ int mbedtls_mpi_grow( mbedtls_mpi *X, size_t nblimbs )
     return( 0 );
 }
 
+/* LCOV_EXCL_START */
 /*
  * Resize down as much as possible,
  * while keeping at least the specified number of limbs
@@ -173,7 +174,7 @@ int mbedtls_mpi_shrink( mbedtls_mpi *X, size_t nblimbs )
 
     return( 0 );
 }
-
+/* LCOV_EXCL_STOP */
 /*
  * Copy the contents of Y into X
  */
@@ -220,6 +221,8 @@ void mbedtls_mpi_swap( mbedtls_mpi *X, mbedtls_mpi *Y )
     memcpy(  Y, &T, sizeof( mbedtls_mpi ) );
 }
 
+
+/* LCOV_EXCL_START */
 /*
  * Conditionally assign X = Y, without leaking information
  * about whether the assignment was made or not.
@@ -283,6 +286,8 @@ int mbedtls_mpi_safe_cond_swap( mbedtls_mpi *X, mbedtls_mpi *Y, unsigned char sw
 cleanup:
     return( ret );
 }
+
+/* LCOV_EXCL_STOP */
 
 /*
  * Set value from integer
@@ -459,6 +464,7 @@ int mbedtls_mpi_read_string( mbedtls_mpi *X, int radix, const char *s )
     }
     else
     {
+        /* LCOV_EXCL_START */ // almost always written in base 16
         MBEDTLS_MPI_CHK( mbedtls_mpi_lset( X, 0 ) );
 
         for( i = 0; i < slen; i++ )
@@ -481,6 +487,7 @@ int mbedtls_mpi_read_string( mbedtls_mpi *X, int radix, const char *s )
                 MBEDTLS_MPI_CHK( mbedtls_mpi_sub_int( X, &T, d ) );
             }
         }
+        /* LCOV_EXCL_STOP */
     }
 
 cleanup:
@@ -489,6 +496,8 @@ cleanup:
 
     return( ret );
 }
+
+/* LCOV_EXCL_START */
 
 /*
  * Helper to write the digits high-order first
@@ -593,78 +602,7 @@ cleanup:
     return( ret );
 }
 
-#if defined(MBEDTLS_FS_IO)
-/*
- * Read X from an opened file
- */
-int mbedtls_mpi_read_file( mbedtls_mpi *X, int radix, FILE *fin )
-{
-    mbedtls_mpi_uint d;
-    size_t slen;
-    char *p;
-    /*
-     * Buffer should have space for (short) label and decimal formatted MPI,
-     * newline characters and '\0'
-     */
-    char s[ MBEDTLS_MPI_RW_BUFFER_SIZE ];
-
-    memset( s, 0, sizeof( s ) );
-    if( fgets( s, sizeof( s ) - 1, fin ) == NULL )
-        return( MBEDTLS_ERR_MPI_FILE_IO_ERROR );
-
-    slen = strlen( s );
-    if( slen == sizeof( s ) - 2 )
-        return( MBEDTLS_ERR_MPI_BUFFER_TOO_SMALL );
-
-    if( slen > 0 && s[slen - 1] == '\n' ) { slen--; s[slen] = '\0'; }
-    if( slen > 0 && s[slen - 1] == '\r' ) { slen--; s[slen] = '\0'; }
-
-    p = s + slen;
-    while( p-- > s )
-        if( mpi_get_digit( &d, radix, *p ) != 0 )
-            break;
-
-    return( mbedtls_mpi_read_string( X, radix, p + 1 ) );
-}
-
-/*
- * Write X into an opened file (or stdout if fout == NULL)
- */
-int mbedtls_mpi_write_file( const char *p, const mbedtls_mpi *X, int radix, FILE *fout )
-{
-    int ret;
-    size_t n, slen, plen;
-    /*
-     * Buffer should have space for (short) label and decimal formatted MPI,
-     * newline characters and '\0'
-     */
-    char s[ MBEDTLS_MPI_RW_BUFFER_SIZE ];
-
-    memset( s, 0, sizeof( s ) );
-
-    MBEDTLS_MPI_CHK( mbedtls_mpi_write_string( X, radix, s, sizeof( s ) - 2, &n ) );
-
-    if( p == NULL ) p = "";
-
-    plen = strlen( p );
-    slen = strlen( s );
-    s[slen++] = '\r';
-    s[slen++] = '\n';
-
-    if( fout != NULL )
-    {
-        if( fwrite( p, 1, plen, fout ) != plen ||
-            fwrite( s, 1, slen, fout ) != slen )
-            return( MBEDTLS_ERR_MPI_FILE_IO_ERROR );
-    }
-    else
-        mbedtls_printf( "%s%s", p, s );
-
-cleanup:
-
-    return( ret );
-}
-#endif /* MBEDTLS_FS_IO */
+/* LCOV_EXCL_STOP */
 
 /*
  * Import X from unsigned binary data, big endian
@@ -2216,6 +2154,8 @@ int mbedtls_mpi_gen_prime( mbedtls_mpi *X, size_t nbits, int dh_flag,
     }
     else
     {
+        /* LCOV_EXCL_START */
+
         /*
          * An necessary condition for Y and X = 2Y + 1 to be prime
          * is X = 2 mod 3 (which is equivalent to Y = 2 mod 3).
@@ -2259,6 +2199,8 @@ int mbedtls_mpi_gen_prime( mbedtls_mpi *X, size_t nbits, int dh_flag,
             MBEDTLS_MPI_CHK( mbedtls_mpi_add_int(  X,  X, 12 ) );
             MBEDTLS_MPI_CHK( mbedtls_mpi_add_int( &Y, &Y, 6  ) );
         }
+        
+        /* LCOV_EXCL_STOP */
     }
 
 cleanup:
@@ -2280,6 +2222,8 @@ static const int gcd_pairs[GCD_PAIR_COUNT][3] =
     { 1764, 868, 28 },
     { 768454923, 542167814, 1 }
 };
+
+/* LCOV_EXCL_START */ // do not cover test functions
 
 /*
  * Checkup routine
@@ -2441,6 +2385,7 @@ cleanup:
 
     return( ret );
 }
+/* LCOV_EXCL_STOP */
 
 #endif /* MBEDTLS_SELF_TEST */
 

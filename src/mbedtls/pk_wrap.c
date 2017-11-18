@@ -45,6 +45,7 @@
 
 #include <limits.h>
 
+/* LCOV_EXCL_START */
 
 #if defined(MBEDTLS_RSA_C)
 static int rsa_can_do( mbedtls_pk_type_t type )
@@ -105,5 +106,6 @@ const mbedtls_pk_info_t mbedtls_rsa_info = {
 };
 #endif /* MBEDTLS_RSA_C */
 
+/* LCOV_EXCL_STOP */
 
 #endif /* MBEDTLS_PK_C */

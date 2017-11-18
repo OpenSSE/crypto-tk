@@ -43,6 +43,10 @@
 #define mbedtls_free       free
 #endif
 
+
+// Do not check coverage for ASN.1
+/* LCOV_EXCL_START */
+
 /* Implementation that should never be optimized out by the compiler */
 static void mbedtls_zeroize( void *v, size_t n ) {
     volatile unsigned char *p = (unsigned char*)v; while( n-- ) *p++ = 0;
@@ -389,5 +393,7 @@ mbedtls_asn1_named_data *mbedtls_asn1_find_named_data( mbedtls_asn1_named_data *
 
     return( list );
 }
+
+/* LCOV_EXCL_STOP */
 
 #endif /* MBEDTLS_ASN1_PARSE_C */

@@ -179,35 +179,6 @@ static inline size_t mbedtls_pk_get_len( const mbedtls_pk_context *ctx )
 }
 
 /**
- * \brief           Check if a public-private pair of keys matches.
- *
- * \param pub       Context holding a public key.
- * \param prv       Context holding a private (and public) key.
- *
- * \return          0 on success or MBEDTLS_ERR_PK_BAD_INPUT_DATA
- */
-int mbedtls_pk_check_pair( const mbedtls_pk_context *pub, const mbedtls_pk_context *prv );
-
-/**
- * \brief           Export debug information
- *
- * \param ctx       Context to use
- * \param items     Place to write debug items
- *
- * \return          0 on success or MBEDTLS_ERR_PK_BAD_INPUT_DATA
- */
-int mbedtls_pk_debug( const mbedtls_pk_context *ctx, mbedtls_pk_debug_item *items );
-
-/**
- * \brief           Access the type name
- *
- * \param ctx       Context to use
- *
- * \return          Type name on success, or "invalid PK"
- */
-const char * mbedtls_pk_get_name( const mbedtls_pk_context *ctx );
-
-/**
  * \brief           Get the key type
  *
  * \param ctx       Context to use
@@ -260,101 +231,7 @@ int mbedtls_pk_parse_key( mbedtls_pk_context *ctx,
 int mbedtls_pk_parse_public_key( mbedtls_pk_context *ctx,
                          const unsigned char *key, size_t keylen );
 
-#if defined(MBEDTLS_FS_IO)
-/** \ingroup pk_module */
-/**
- * \brief           Load and parse a private key
- *
- * \param ctx       key to be initialized
- * \param path      filename to read the private key from
- * \param password  password to decrypt the file (can be NULL)
- *
- * \note            On entry, ctx must be empty, either freshly initialised
- *                  with mbedtls_pk_init() or reset with mbedtls_pk_free(). If you need a
- *                  specific key type, check the result with mbedtls_pk_can_do().
- *
- * \note            The key is also checked for correctness.
- *
- * \return          0 if successful, or a specific PK or PEM error code
- */
-int mbedtls_pk_parse_keyfile( mbedtls_pk_context *ctx,
-                      const char *path, const char *password );
-
-/** \ingroup pk_module */
-/**
- * \brief           Load and parse a public key
- *
- * \param ctx       key to be initialized
- * \param path      filename to read the public key from
- *
- * \note            On entry, ctx must be empty, either freshly initialised
- *                  with mbedtls_pk_init() or reset with mbedtls_pk_free(). If
- *                  you need a specific key type, check the result with
- *                  mbedtls_pk_can_do().
- *
- * \note            The key is also checked for correctness.
- *
- * \return          0 if successful, or a specific PK or PEM error code
- */
-int mbedtls_pk_parse_public_keyfile( mbedtls_pk_context *ctx, const char *path );
-#endif /* MBEDTLS_FS_IO */
 #endif /* MBEDTLS_PK_PARSE_C */
-
-#if defined(MBEDTLS_PK_WRITE_C)
-/**
- * \brief           Write a private key to a PKCS#1 or SEC1 DER structure
- *                  Note: data is written at the end of the buffer! Use the
- *                        return value to determine where you should start
- *                        using the buffer
- *
- * \param ctx       private to write away
- * \param buf       buffer to write to
- * \param size      size of the buffer
- *
- * \return          length of data written if successful, or a specific
- *                  error code
- */
-int mbedtls_pk_write_key_der( mbedtls_pk_context *ctx, unsigned char *buf, size_t size );
-
-/**
- * \brief           Write a public key to a SubjectPublicKeyInfo DER structure
- *                  Note: data is written at the end of the buffer! Use the
- *                        return value to determine where you should start
- *                        using the buffer
- *
- * \param ctx       public key to write away
- * \param buf       buffer to write to
- * \param size      size of the buffer
- *
- * \return          length of data written if successful, or a specific
- *                  error code
- */
-int mbedtls_pk_write_pubkey_der( mbedtls_pk_context *ctx, unsigned char *buf, size_t size );
-
-#if defined(MBEDTLS_PEM_WRITE_C)
-/**
- * \brief           Write a public key to a PEM string
- *
- * \param ctx       public key to write away
- * \param buf       buffer to write to
- * \param size      size of the buffer
- *
- * \return          0 if successful, or a specific error code
- */
-int mbedtls_pk_write_pubkey_pem( mbedtls_pk_context *ctx, unsigned char *buf, size_t size );
-
-/**
- * \brief           Write a private key to a PKCS#1 or SEC1 PEM string
- *
- * \param ctx       private to write away
- * \param buf       buffer to write to
- * \param size      size of the buffer
- *
- * \return          0 if successful, or a specific error code
- */
-int mbedtls_pk_write_key_pem( mbedtls_pk_context *ctx, unsigned char *buf, size_t size );
-#endif /* MBEDTLS_PEM_WRITE_C */
-#endif /* MBEDTLS_PK_WRITE_C */
 
 /*
  * WARNING: Low-level functions. You probably do not want to use these unless

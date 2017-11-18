@@ -99,68 +99,6 @@ int mbedtls_pk_setup( mbedtls_pk_context *ctx, const mbedtls_pk_info_t *info )
     return( 0 );
 }
 
-/*
- * Check public-private key pair
- */
-int mbedtls_pk_check_pair( const mbedtls_pk_context *pub, const mbedtls_pk_context *prv )
-{
-    if( pub == NULL || pub->pk_info == NULL ||
-        prv == NULL || prv->pk_info == NULL ||
-        prv->pk_info->check_pair_func == NULL )
-    {
-        return( MBEDTLS_ERR_PK_BAD_INPUT_DATA );
-    }
-
-    if( prv->pk_info->type == MBEDTLS_PK_RSA_ALT )
-    {
-        if( pub->pk_info->type != MBEDTLS_PK_RSA )
-            return( MBEDTLS_ERR_PK_TYPE_MISMATCH );
-    }
-    else
-    {
-        if( pub->pk_info != prv->pk_info )
-            return( MBEDTLS_ERR_PK_TYPE_MISMATCH );
-    }
-
-    return( prv->pk_info->check_pair_func( pub->pk_ctx, prv->pk_ctx ) );
-}
-
-/*
- * Get key size in bits
- */
-size_t mbedtls_pk_get_bitlen( const mbedtls_pk_context *ctx )
-{
-    if( ctx == NULL || ctx->pk_info == NULL )
-        return( 0 );
-
-    return( ctx->pk_info->get_bitlen( ctx->pk_ctx ) );
-}
-
-/*
- * Export debug information
- */
-int mbedtls_pk_debug( const mbedtls_pk_context *ctx, mbedtls_pk_debug_item *items )
-{
-    if( ctx == NULL || ctx->pk_info == NULL )
-        return( MBEDTLS_ERR_PK_BAD_INPUT_DATA );
-
-    if( ctx->pk_info->debug_func == NULL )
-        return( MBEDTLS_ERR_PK_TYPE_MISMATCH );
-
-    ctx->pk_info->debug_func( ctx->pk_ctx, items );
-    return( 0 );
-}
-
-/*
- * Access the PK type name
- */
-const char *mbedtls_pk_get_name( const mbedtls_pk_context *ctx )
-{
-    if( ctx == NULL || ctx->pk_info == NULL )
-        return( "invalid PK" );
-
-    return( ctx->pk_info->name );
-}
 
 /*
  * Access the PK type

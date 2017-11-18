@@ -41,6 +41,9 @@
 #endif /* MBEDTLS_PLATFORM_C */
 #endif /* MBEDTLS_SELF_TEST */
 
+// Do not check coverage for ASN.1
+/* LCOV_EXCL_START */
+
 static const unsigned char base64_enc_map[64] =
 {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
@@ -289,5 +292,7 @@ int mbedtls_base64_self_test( int verbose )
 }
 
 #endif /* MBEDTLS_SELF_TEST */
+
+/* LCOV_EXCL_STOP */
 
 #endif /* MBEDTLS_BASE64_C */

@@ -583,7 +583,7 @@ int mbedtls_rsa_copy( mbedtls_rsa_context *dst, const mbedtls_rsa_context *src )
 
 cleanup:
     if( ret != 0 )
-        mbedtls_rsa_free( dst );
+        mbedtls_rsa_free( dst ); /* LCOV_EXCL_LINE */
 
     return( ret );
 }

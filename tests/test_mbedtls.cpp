@@ -432,6 +432,105 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
     }
 }
 
+TEST(mbedTLS, rsa_errors)
+{
+    static constexpr size_t TEST_KEY_LENGTH = 64;
+    mbedtls_rsa_context rsa;
+    int ret = 0;
+    
+    mbedtls_rsa_init(&rsa, 0, 0);
+    
+    ret = mbedtls_rsa_gen_key(&rsa, NULL, NULL, 0, 0);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_BAD_INPUT_DATA);
+
+    ret = mbedtls_rsa_gen_key(&rsa, mbedTLS_rng_wrap, NULL, 129, 4);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_BAD_INPUT_DATA);
+
+    // Generate a key for real
+    ret = mbedtls_rsa_gen_key(&rsa, mbedTLS_rng_wrap, NULL, TEST_KEY_LENGTH*8, 5);
+    ASSERT_EQ(ret, 0);
+    
+    ret = mbedtls_rsa_check_pubkey(&rsa);
+    ASSERT_EQ(ret, 0);
+
+    mbedtls_mpi a;
+    mbedtls_mpi_init(&a);
+    unsigned char a_buffer[TEST_KEY_LENGTH], b_buffer[TEST_KEY_LENGTH];
+    
+    ASSERT_MPI( mbedtls_mpi_write_binary(&a, a_buffer, TEST_KEY_LENGTH) );
+    
+    
+    ASSERT_MPI( mbedtls_rsa_public( &rsa, a_buffer, b_buffer ) );
+
+    mbedtls_mpi_copy(&a, &rsa.N);
+    mbedtls_mpi_add_int(&a, &a, 59);
+
+    ASSERT_MPI( mbedtls_mpi_write_binary(&a, a_buffer, TEST_KEY_LENGTH) );
+
+    ret = mbedtls_rsa_public( &rsa, a_buffer, b_buffer );
+    ASSERT_EQ(ret, MBEDTLS_ERR_MPI_BAD_INPUT_DATA+MBEDTLS_ERR_RSA_PUBLIC_FAILED);
+    
+    ret = mbedtls_rsa_private(&rsa, NULL, NULL, a_buffer, b_buffer);
+    ASSERT_EQ(ret, MBEDTLS_ERR_MPI_BAD_INPUT_DATA+MBEDTLS_ERR_RSA_PRIVATE_FAILED);
+
+    // Now, modify the key to test if the checks fail
+    
+    mbedtls_mpi_uint* tmp;
+    mbedtls_mpi tmp_mpi;
+    mbedtls_mpi_init(&tmp_mpi);
+    mbedtls_mpi_lset(&tmp_mpi, 4);
+    
+    mbedtls_rsa_context rsa_cp;
+    mbedtls_rsa_init(&rsa_cp, 0, 0);
+    mbedtls_rsa_copy(&rsa_cp, &rsa);
+    
+    tmp = rsa.P.p;
+    rsa.P.p = NULL;
+    ret = mbedtls_rsa_check_privkey(&rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+
+    ret = mbedtls_rsa_check_pub_priv(&rsa_cp, &rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+
+    ret = mbedtls_rsa_private(&rsa, NULL, NULL, NULL, NULL);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_BAD_INPUT_DATA);
+
+    rsa.P.p = tmp;
+
+    
+    mbedtls_mpi_swap(&tmp_mpi, &rsa.P);
+    ret = mbedtls_rsa_check_privkey(&rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+    mbedtls_mpi_swap(&tmp_mpi, &rsa.P);
+
+    tmp = rsa.N.p;
+    rsa.N.p = NULL;
+    ret = mbedtls_rsa_check_privkey(&rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+    ret = mbedtls_rsa_check_pubkey(&rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+    rsa.N.p = tmp;
+
+    rsa.N.p[0] ^= (uint)0x01;
+    ret = mbedtls_rsa_check_pubkey(&rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+    rsa.N.p[0] ^= (uint)0x01;
+    
+    mbedtls_mpi_lset(&rsa_cp.E, 9);
+    ret = mbedtls_rsa_check_pub_priv(&rsa_cp, &rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+
+    mbedtls_mpi_lset(&rsa.E, 1);
+    ret = mbedtls_rsa_check_pubkey(&rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+
+
+    mbedtls_mpi_lset(&rsa.N, 3);
+    ret = mbedtls_rsa_check_pubkey(&rsa);
+    ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+
+}
+
 TEST(mbedTLS, pem_errors)
 {
     ASSERT_EQ(mbedtls_base64_self_test(0), 0);

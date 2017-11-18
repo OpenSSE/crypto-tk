@@ -163,8 +163,8 @@ cleanup:
 
     if( ret != 0 )
     {
-        mbedtls_rsa_free( ctx );
-        return( MBEDTLS_ERR_RSA_KEY_GEN_FAILED + ret );
+        mbedtls_rsa_free( ctx ); /* LCOV_EXCL_LINE */
+        return( MBEDTLS_ERR_RSA_KEY_GEN_FAILED + ret ); /* LCOV_EXCL_LINE */
     }
 
     return( 0 );
@@ -251,8 +251,8 @@ cleanup:
     if( ret == MBEDTLS_ERR_RSA_KEY_CHECK_FAILED )
         return( ret );
 
-    if( ret != 0 )
-        return( MBEDTLS_ERR_RSA_KEY_CHECK_FAILED + ret );
+    if( ret != 0 ) /* LCOV_EXCL_LINE */
+        return( MBEDTLS_ERR_RSA_KEY_CHECK_FAILED + ret ); /* LCOV_EXCL_LINE */
 
     return( 0 );
 }
@@ -346,7 +346,7 @@ static int rsa_prepare_blinding( mbedtls_rsa_context *ctx,
     /* Unblinding value: Vf = random number, invertible mod N */
     do {
         if( count++ > 10 )
-            return( MBEDTLS_ERR_RSA_RNG_FAILED );
+            return( MBEDTLS_ERR_RSA_RNG_FAILED ); /* LCOV_EXCL_LINE */
 
         MBEDTLS_MPI_CHK( mbedtls_mpi_fill_random( &ctx->Vf, ctx->len - 1, f_rng, p_rng ) );
         MBEDTLS_MPI_CHK( mbedtls_mpi_gcd( &ctx->Vi, &ctx->Vf, &ctx->N ) );

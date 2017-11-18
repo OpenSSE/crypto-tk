@@ -59,7 +59,7 @@ int mbedtls_pem_read_buffer( mbedtls_pem_context *ctx, const char *header, const
                      const unsigned char *data, const unsigned char *pwd,
                      size_t pwdlen, size_t *use_len )
 {
-    int ret, enc;
+    int ret;
     size_t len;
     unsigned char *buf;
     const unsigned char *s1, *s2, *end;
@@ -93,8 +93,6 @@ int mbedtls_pem_read_buffer( mbedtls_pem_context *ctx, const char *header, const
     if( *end == '\n' ) end++;
     *use_len = end - data;
 
-    enc = 0;
-
     if( s2 - s1 >= 22 && memcmp( s1, "Proc-Type: 4,ENCRYPTED", 22 ) == 0 )
     {
         return( MBEDTLS_ERR_PEM_FEATURE_UNAVAILABLE );
@@ -109,18 +107,12 @@ int mbedtls_pem_read_buffer( mbedtls_pem_context *ctx, const char *header, const
         return( MBEDTLS_ERR_PEM_INVALID_DATA + ret );
 
     if( ( buf = mbedtls_calloc( 1, len ) ) == NULL )
-        return( MBEDTLS_ERR_PEM_ALLOC_FAILED );
+        return( MBEDTLS_ERR_PEM_ALLOC_FAILED ); /* LCOV_EXCL_LINE */
 
     if( ( ret = mbedtls_base64_decode( buf, len, &len, s1, s2 - s1 ) ) != 0 )
     {
-        mbedtls_free( buf );
-        return( MBEDTLS_ERR_PEM_INVALID_DATA + ret );
-    }
-
-    if( enc != 0 )
-    {
-        mbedtls_free( buf );
-        return( MBEDTLS_ERR_PEM_FEATURE_UNAVAILABLE );
+        mbedtls_free( buf ); /* LCOV_EXCL_LINE */
+        return( MBEDTLS_ERR_PEM_INVALID_DATA + ret ); /* LCOV_EXCL_LINE */
     }
 
     ctx->buf = buf;
@@ -157,13 +149,13 @@ int mbedtls_pem_write_buffer( const char *header, const char *footer,
     }
 
     if( ( encode_buf = mbedtls_calloc( 1, use_len ) ) == NULL )
-        return( MBEDTLS_ERR_PEM_ALLOC_FAILED );
+        return( MBEDTLS_ERR_PEM_ALLOC_FAILED ); /* LCOV_EXCL_LINE */
 
     if( ( ret = mbedtls_base64_encode( encode_buf, use_len, &use_len, der_data,
                                der_len ) ) != 0 )
     {
-        mbedtls_free( encode_buf );
-        return( ret );
+        mbedtls_free( encode_buf ); /* LCOV_EXCL_LINE */
+        return( ret ); /* LCOV_EXCL_LINE */
     }
 
     memcpy( p, header, strlen( header ) );

@@ -21,6 +21,11 @@
 #include "../src/mbedtls/bignum.h"
 #include "../src/mbedtls/rsa.h"
 #include "../src/mbedtls/rsa_io.h"
+#include "../src/mbedtls/pk.h"
+#include "../src/mbedtls/pem.h"
+#include "../src/mbedtls/asn1.h"
+#include "../src/mbedtls/base64.h"
+
 #include "../src/random.hpp"
 
 
@@ -425,4 +430,73 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
 
     }
+}
+
+TEST(mbedTLS, pem_errors)
+{
+    ASSERT_EQ(mbedtls_base64_self_test(0), 0);
+    
+    std::string empty_key = "";
+    std::string no_header_key = "toto";
+    
+    mbedtls_pk_context pk_ctx;
+    mbedtls_pk_init(&pk_ctx);
+    
+    int ret = 0;
+    
+    mbedtls_pem_context pem_ctx;
+    mbedtls_pem_init(&pem_ctx);
+    
+    size_t use_len;
+    ret = mbedtls_pem_read_buffer(NULL, NULL, NULL, NULL, NULL, 0, NULL);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_BAD_INPUT_DATA);
+    
+    ret = mbedtls_pem_read_buffer(&pem_ctx, "toto", "titi", (const unsigned char*)"toto", NULL, 0, NULL);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT);
+    
+    ret = mbedtls_pem_read_buffer(&pem_ctx, "toto", "titi", (const unsigned char*)"tototiti", NULL, 0, NULL);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT);
+    
+    ret = mbedtls_pem_read_buffer(&pem_ctx, "toto", "titi", (const unsigned char*)"toto\ntiti", NULL, 0, &use_len);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_INVALID_DATA);
+    
+    ret = mbedtls_pem_read_buffer(&pem_ctx, "toto", "titi", (const unsigned char*)"toto\nProc-Type: 4,ENCRYPTED\ntiti", NULL, 0, &use_len);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_FEATURE_UNAVAILABLE);
+    
+    ret = mbedtls_pem_read_buffer(&pem_ctx, "toto", "titi", (const unsigned char*)"toto\nSome content\ntiti", NULL, 0, &use_len);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_INVALID_DATA + MBEDTLS_ERR_BASE64_INVALID_CHARACTER);
+    
+    ret = mbedtls_pem_read_buffer(&pem_ctx, "toto", "titi", (const unsigned char*)"toto\ndG90bw==\ntiti", NULL, 0, &use_len);
+    ASSERT_EQ(ret, 0);
+    
+    std::string der_content = "Sample content";
+    unsigned char buffer[5000];
+    size_t o_len;
+ 
+    // Test write functions
+    
+    ret = mbedtls_pem_write_buffer("header", "footer", (const unsigned char*)der_content.c_str(), der_content.size(), buffer, 4, &o_len);
+    ASSERT_EQ(ret, MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL);
+
+    ret = mbedtls_pem_write_buffer("header", "footer", (const unsigned char*)der_content.c_str(), der_content.size(), buffer, 2000, &o_len);
+    ASSERT_EQ(ret, 0);
+
+}
+
+TEST(mbedTLS, pk_parse_errors)
+{
+    std::string empty_key = "";
+    std::string no_header_key = "toto";
+    
+    mbedtls_pk_context pk_ctx;
+    mbedtls_pk_init(&pk_ctx);
+
+    int ret = 0;
+    
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(empty_key.c_str()), empty_key.length());
+    ASSERT_EQ(ret, MBEDTLS_ERR_PK_KEY_INVALID_FORMAT+MBEDTLS_ERR_ASN1_OUT_OF_DATA);
+
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(no_header_key.c_str()), no_header_key.length()+1);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PK_KEY_INVALID_FORMAT+MBEDTLS_ERR_ASN1_UNEXPECTED_TAG);
+
 }

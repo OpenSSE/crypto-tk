@@ -1282,6 +1282,7 @@
 					"-maes",
 					"-msse4",
 					"-DAESNI_OPENSSL_UNDO",
+					"-DWITH_OPENSSL",
 				);
 				OTHER_LDFLAGS = (
 					"-lcrypto",
@@ -1353,6 +1354,7 @@
 					"-maes",
 					"-msse4",
 					"-DAESNI_OPENSSL_UNDO",
+					"-DWITH_OPENSSL",
 				);
 				OTHER_LDFLAGS = (
 					"-lcrypto",

@@ -104,6 +104,14 @@ def smart_concat(l1, l2):
 bld = Builder(action = run_test)
 env.Append(BUILDERS = {'Test' :  bld})
 
+
+conf = Configure( env )
+
+if conf.CheckLib( 'crypto' ):
+    conf.env.Append( CPPFLAGS = '-DWITH_OPENSSL' )
+env = conf.Finish()
+
+
 objects = SConscript('src/build.scons', exports=['env','smart_concat'], variant_dir='build', duplicate=0)
 
 Clean(objects, 'build')

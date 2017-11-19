@@ -18,6 +18,9 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#ifdef WITH_OPENSSL
+#pragma message "Use OpenSSL"
+
 #include "tdp_impl_openssl.hpp"
 
 #include "prf.hpp"
@@ -617,3 +620,4 @@ uint8_t TdpMultPoolImpl_OpenSSL::pool_size() const
 
 }
 }
+#endif

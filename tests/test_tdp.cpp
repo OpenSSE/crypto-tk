@@ -580,6 +580,7 @@ static void test_tdp_impl_exceptions()
 }
 
 // Instantiate all the previous test templates
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, correctness)
 {
     test_tdp_impl_correctness<  sse::crypto::TdpImpl_OpenSSL,
@@ -587,6 +588,7 @@ TEST(tdp_openssl_impl, correctness)
                                 sse::crypto::TdpMultPoolImpl_OpenSSL,
                                 true>(TDP_IMPL_CORRECTNESS_TEST_COUNT);
 }
+#endif
 
 TEST(tdp_mbedtls_impl, correctness)
 {
@@ -605,6 +607,7 @@ TEST(tdp, correctness)
                                 false>(TDP_TEST_COUNT);
 }
 
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, inverse_correctness)
 {
     test_tdp_impl_inverse_correctness<  sse::crypto::TdpImpl_OpenSSL,
@@ -612,6 +615,7 @@ TEST(tdp_openssl_impl, inverse_correctness)
                                         sse::crypto::TdpMultPoolImpl_OpenSSL,
     true>(TDP_IMPL_INV_CORRECTNESS_TEST_COUNT);
 }
+#endif
 
 TEST(tdp_mbedtls_impl, inverse_correctness)
 {
@@ -630,6 +634,7 @@ TEST(tdp, inverse_correctness)
 }
 
 
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, multiple_eval)
 {
     test_tdp_impl_multiple_eval<    sse::crypto::TdpImpl_OpenSSL,
@@ -638,6 +643,7 @@ TEST(tdp_openssl_impl, multiple_eval)
                                     true>(TDP_IMPL_MULT_EVAL_TEST_COUNT/2,
                                           TDP_IMPL_MULT_EVAL_TEST_COUNT-TDP_IMPL_MULT_EVAL_TEST_COUNT/2);
 }
+#endif
 
 TEST(tdp_mbedtls_impl, multiple_eval)
 {
@@ -657,6 +663,7 @@ TEST(tdp, multiple_eval)
                                            TDP_TEST_COUNT-TDP_TEST_COUNT/2);
 }
 
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, multiple_inverse_1)
 {
     test_tdp_impl_multiple_inverse_1<    sse::crypto::TdpImpl_OpenSSL,
@@ -664,6 +671,7 @@ TEST(tdp_openssl_impl, multiple_inverse_1)
     sse::crypto::TdpMultPoolImpl_OpenSSL,
     true>(TDP_IMPL_MULT_INV_1_TEST_COUNT);
 }
+#endif
 
 TEST(tdp_mbedtls_impl, multiple_inverse_1)
 {
@@ -681,6 +689,7 @@ TEST(tdp, multiple_inverse_1)
     false>(TDP_TEST_COUNT);
 }
 
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, multiple_inverse_2)
 {
     test_tdp_impl_multiple_inverse_2<    sse::crypto::TdpImpl_OpenSSL,
@@ -688,6 +697,7 @@ TEST(tdp_openssl_impl, multiple_inverse_2)
     sse::crypto::TdpMultPoolImpl_OpenSSL,
     true>(TDP_IMPL_MULT_INV_2_TEST_COUNT);
 }
+#endif
 
 TEST(tdp_mbedtls_impl, multiple_inverse_2)
 {
@@ -705,6 +715,7 @@ TEST(tdp, multiple_inverse_2)
     false>(TDP_TEST_COUNT);
 }
 
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, copy)
 {
     test_tdp_impl_copy< sse::crypto::TdpImpl_OpenSSL,
@@ -712,6 +723,7 @@ TEST(tdp_openssl_impl, copy)
                         sse::crypto::TdpMultPoolImpl_OpenSSL,
                         true>(TDP_IMPL_MULT_INV_2_TEST_COUNT);
 }
+#endif
 
 TEST(tdp_mbedtls_impl, copy)
 {
@@ -730,6 +742,7 @@ TEST(tdp, copy)
 }
 
 
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, deterministic_generation)
 {
     test_tdp_impl_deterministic_generation< sse::crypto::TdpImpl_OpenSSL,
@@ -737,6 +750,7 @@ TEST(tdp_openssl_impl, deterministic_generation)
     sse::crypto::TdpMultPoolImpl_OpenSSL,
     true>(TDP_IMPL_DET_GEN_TEST_COUNT);
 }
+#endif
 
 TEST(tdp_mbedtls_impl, deterministic_generation)
 {
@@ -755,6 +769,7 @@ TEST(tdp, deterministic_generation)
 }
 
 
+#ifdef WITH_OPENSSL
 TEST(tdp_openssl_impl, exceptions)
 {
     test_tdp_impl_exceptions< sse::crypto::TdpImpl_OpenSSL,
@@ -762,6 +777,7 @@ TEST(tdp_openssl_impl, exceptions)
     sse::crypto::TdpMultPoolImpl_OpenSSL,
     true>();
 }
+#endif
 
 TEST(tdp_mbedtls_impl, exceptions)
 {

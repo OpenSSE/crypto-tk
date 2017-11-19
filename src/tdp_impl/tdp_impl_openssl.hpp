@@ -21,6 +21,8 @@
 
 #pragma once
 
+#ifdef WITH_OPENSSL
+
 #include "tdp_impl.hpp"
 #include "prf.hpp"
 #include "key.hpp"
@@ -112,3 +114,4 @@ namespace crypto
 
 }
 }
+#endif

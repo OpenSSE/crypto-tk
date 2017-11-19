@@ -598,4 +598,79 @@ TEST(mbedTLS, pk_parse_errors)
     ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(no_header_key.c_str()), no_header_key.length()+1);
     ASSERT_EQ(ret, MBEDTLS_ERR_PK_KEY_INVALID_FORMAT+MBEDTLS_ERR_ASN1_UNEXPECTED_TAG);
 
+    std::string valid_header_key = "-----BEGIN PUBLIC KEY-----\ntoto\n-----END PUBLIC KEY-----";
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(valid_header_key.c_str()), valid_header_key.length()+1);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PK_KEY_INVALID_FORMAT+MBEDTLS_ERR_ASN1_UNEXPECTED_TAG);
+
+    std::string valid_pk = "-----BEGIN PUBLIC KEY-----\n\
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqytJJjL3mxJ5WioPpC+c\
+oe7V0Ljb0iXsVle3YdEbBYIjlP5QGNbS/xDrOsdwhQiDdhQsEM2d9MX8sEd1Pefz\
+noMtCNhepy25yB56pJktRcyuu9fEv0kbEmF10Ix44gIW+qjM7hQkvDzyVoESuUph\
+rBYg+lSxUs+RJj1A5bLLxfC9oIcCnWn2WPFLcWLbZbATYR2fzoZ/L1EaFBgivF1i\
+kftbWV3fgGzYX3EiMs9GdWYQDXdxz3VnDgUZjNYCs1Nv9DHmQWXZkIK+cPeDaHqU\
+smAf74RZRdCAh9vp8f642UWwf/8KpojCUFGdPPc0Y/5MboNhM7eHuGC55y58P5/X\
+owIDAQAB\n\
+-----END PUBLIC KEY-----";
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(valid_pk.c_str()), valid_pk.length()+1);
+    ASSERT_EQ(ret, 0);
+
+    mbedtls_pk_free(&pk_ctx);
+    mbedtls_pk_init(&pk_ctx);
+
+    std::string invalid_pk_alg = "-----BEGIN PUBLIC KEY-----\n\
+MIEBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqytJJjL3mxJ5WioPpC+c\
+oe7V0Ljb0iXsVle3YdEbBYIjlP5QGNbS/xDrOsdwhQiDdhQsEM2d9MX8sEd1Pefz\
+noMtCNhepy25yB56pJktRcyuu9fEv0kbEmF10Ix44gIW+qjM7hQkvDzyVoESuUph\
+rBYg+lSxUs+RJj1A5bLLxfC9oIcCnWn2WPFLcWLbZbATYR2fzoZ/L1EaFBgivF1i\
+kftbWV3fgGzYX3EiMs9GdWYQDXdxz3VnDgUZjNYCs1Nv9DHmQWXZkIK+cPeDaHqU\
+smAf74RZRdCAh9vp8f642UWwf/8KpojCUFGdPPc0Y/5MboNhM7eHuGC55y58P5/X\
+owIDAQAB\n\
+-----END PUBLIC KEY-----";
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(invalid_pk_alg.c_str()), invalid_pk_alg.length()+1);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PK_INVALID_ALG + MBEDTLS_ERR_ASN1_UNEXPECTED_TAG);
+    
+    
+    mbedtls_pk_free(&pk_ctx);
+    mbedtls_pk_init(&pk_ctx);
+    std::string unknown_alg_pk = "-----BEGIN PUBLIC KEY-----\n\
+MIIBIjANBgkrhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqytJJjL3mxJ5WioPpC+c\
+oe7V0Ljb0iXsVle3YdEbBYIjlP5QGNbS/xDrOsdwhQiDdhQsEM2d9MX8sEd1Pefz\
+noMtCNhepy25yB56pJktRcyuu9fEv0kbEmF10Ix44gIW+qjM7hQkvDzyVoESuUph\
+rBYg+lSxUs+RJj1A5bLLxfC9oIcCnWn2WPFLcWLbZbATYR2fzoZ/L1EaFBgivF1i\
+kftbWV3fgGzYX3EiMs9GdWYQDXdxz3VnDgUZjNYCs1Nv9DHmQWXZkIK+cPeDaHqU\
+smAf74RZRdCAh9vp8f642UWwf/8KpojCUFGdPPc0Y/5MboNhM7eHuGC55y58P5/X\
+owIDAQAB\n\
+-----END PUBLIC KEY-----";
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(unknown_alg_pk.c_str()), unknown_alg_pk.length()+1);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PK_UNKNOWN_PK_ALG);
+
+    mbedtls_pk_free(&pk_ctx);
+    mbedtls_pk_init(&pk_ctx);
+    std::string invalid_alg_pk = "-----BEGIN PUBLIC KEY-----\n\
+MIIBIjANBgkqhkiG9w0BAQEGAAOCAQ8AMIIBCgKCAQEAqytJJjL3mxJ5WioPpC+c\
+oe7V0Ljb0iXsVle3YdEbBYIjlP5QGNbS/xDrOsdwhQiDdhQsEM2d9MX8sEd1Pefz\
+noMtCNhepy25yB56pJktRcyuu9fEv0kbEmF10Ix44gIW+qjM7hQkvDzyVoESuUph\
+rBYg+lSxUs+RJj1A5bLLxfC9oIcCnWn2WPFLcWLbZbATYR2fzoZ/L1EaFBgivF1i\
+kftbWV3fgGzYX3EiMs9GdWYQDXdxz3VnDgUZjNYCs1Nv9DHmQWXZkIK+cPeDaHqU\
+smAf74RZRdCAh9vp8f642UWwf/8KpojCUFGdPPc0Y/5MboNhM7eHuGC55y58P5/X\
+owIDAQAB\n\
+-----END PUBLIC KEY-----";
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(invalid_alg_pk.c_str()), invalid_alg_pk.length()+1);
+ASSERT_EQ(ret, MBEDTLS_ERR_PK_INVALID_ALG);
+
+    
+    mbedtls_pk_free(&pk_ctx);
+    mbedtls_pk_init(&pk_ctx);
+    std::string null_bitstring_pk = "-----BEGIN PUBLIC KEY-----\n\
+MIIBIjANBgkqhkiG9w0BAQEFAASCAQ8AMIIBCgKCAQEAqytJJjL3mxJ5WioPpC+c\
+oe7V0Ljb0iXsVle3YdEbBYIjlP5QGNbS/xDrOsdwhQiDdhQsEM2d9MX8sEd1Pefz\
+noMtCNhepy25yB56pJktRcyuu9fEv0kbEmF10Ix44gIW+qjM7hQkvDzyVoESuUph\
+rBYg+lSxUs+RJj1A5bLLxfC9oIcCnWn2WPFLcWLbZbATYR2fzoZ/L1EaFBgivF1i\
+kftbWV3fgGzYX3EiMs9GdWYQDXdxz3VnDgUZjNYCs1Nv9DHmQWXZkIK+cPeDaHqU\
+smAf74RZRdCAh9vp8f642UWwf/8KpojCUFGdPPc0Y/5MboNhM7eHuGC55y58P5/X\
+owIDAQAB\n\
+-----END PUBLIC KEY-----";
+    ret = mbedtls_pk_parse_public_key(&pk_ctx,reinterpret_cast<const unsigned char*>(null_bitstring_pk.c_str()), null_bitstring_pk.length()+1);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PK_INVALID_PUBKEY + MBEDTLS_ERR_ASN1_UNEXPECTED_TAG);
+
 }

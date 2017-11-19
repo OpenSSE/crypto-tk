@@ -108,6 +108,9 @@ static int pk_get_pk_alg( unsigned char **p,
 
 #warning WORKAROUND
     *pk_alg = MBEDTLS_PK_RSA;
+    if( alg_oid.len != 9 || memcmp(alg_oid.p, "\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01", alg_oid.len) != 0 )
+        return( MBEDTLS_ERR_PK_UNKNOWN_PK_ALG );
+
 //    if( mbedtls_oid_get_pk_alg( &alg_oid, pk_alg ) != 0 )
 //        return( MBEDTLS_ERR_PK_UNKNOWN_PK_ALG );
 
@@ -157,10 +160,10 @@ int mbedtls_pk_parse_subpubkey( unsigned char **p, const unsigned char *end,
                 MBEDTLS_ERR_ASN1_LENGTH_MISMATCH );
 
     if( ( pk_info = mbedtls_pk_info_from_type( pk_alg ) ) == NULL )
-        return( MBEDTLS_ERR_PK_UNKNOWN_PK_ALG );
+        return( MBEDTLS_ERR_PK_UNKNOWN_PK_ALG ); /* LCOV_EXCL_LINE */ // An algorithm different from RSA would have been detected earlier
 
     if( ( ret = mbedtls_pk_setup( pk, pk_info ) ) != 0 )
-        return( ret );
+        return( ret ); /* LCOV_EXCL_LINE */
 
 #if defined(MBEDTLS_RSA_C)
     if( pk_alg == MBEDTLS_PK_RSA )
@@ -168,7 +171,7 @@ int mbedtls_pk_parse_subpubkey( unsigned char **p, const unsigned char *end,
         ret = pk_get_rsapubkey( p, end, mbedtls_pk_rsa( *pk ) );
     } else
 #endif /* MBEDTLS_RSA_C */
-        ret = MBEDTLS_ERR_PK_UNKNOWN_PK_ALG;
+        ret = MBEDTLS_ERR_PK_UNKNOWN_PK_ALG; /* LCOV_EXCL_LINE */ // An algorithm different from RSA would have been detected earlier
 
     if( ret == 0 && *p != end )
         ret = MBEDTLS_ERR_PK_INVALID_PUBKEY
@@ -380,9 +383,9 @@ int mbedtls_pk_parse_key( mbedtls_pk_context *pk,
         return( ret );
     }
     else if( ret == MBEDTLS_ERR_PEM_PASSWORD_MISMATCH )
-        return( MBEDTLS_ERR_PK_PASSWORD_MISMATCH );
+        return( MBEDTLS_ERR_PK_PASSWORD_MISMATCH ); /* LCOV_EXCL_LINE */
     else if( ret == MBEDTLS_ERR_PEM_PASSWORD_REQUIRED )
-        return( MBEDTLS_ERR_PK_PASSWORD_REQUIRED );
+        return( MBEDTLS_ERR_PK_PASSWORD_REQUIRED ); /* LCOV_EXCL_LINE */
     else if( ret != MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT )
         return( ret );
 #endif /* MBEDTLS_RSA_C */
@@ -477,8 +480,8 @@ int mbedtls_pk_parse_public_key( mbedtls_pk_context *ctx,
     }
     else if( ret != MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT )
     {
-        mbedtls_pem_free( &pem );
-        return( ret );
+        mbedtls_pem_free( &pem ); /* LCOV_EXCL_LINE */
+        return( ret ); /* LCOV_EXCL_LINE */
     }
 #endif /* MBEDTLS_PEM_PARSE_C */
     p = (unsigned char *) key;

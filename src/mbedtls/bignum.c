@@ -418,7 +418,7 @@ static int mpi_get_digit( mbedtls_mpi_uint *d, int radix, char c )
     if( c >= 0x61 && c <= 0x66 ) *d = c - 0x57;
 
     if( *d >= (mbedtls_mpi_uint) radix )
-        return( MBEDTLS_ERR_MPI_INVALID_CHARACTER );
+        return( MBEDTLS_ERR_MPI_INVALID_CHARACTER ); /* LCOV_EXCL_LINE */
 
     return( 0 );
 }
@@ -443,7 +443,7 @@ int mbedtls_mpi_read_string( mbedtls_mpi *X, int radix, const char *s )
     if( radix == 16 )
     {
         if( slen > MPI_SIZE_T_MAX >> 2 )
-            return( MBEDTLS_ERR_MPI_BAD_INPUT_DATA );
+            return( MBEDTLS_ERR_MPI_BAD_INPUT_DATA ); /* LCOV_EXCL_LINE */
 
         n = BITS_TO_LIMBS( slen << 2 );
 
@@ -464,7 +464,6 @@ int mbedtls_mpi_read_string( mbedtls_mpi *X, int radix, const char *s )
     }
     else
     {
-        /* LCOV_EXCL_START */ // almost always written in base 16
         MBEDTLS_MPI_CHK( mbedtls_mpi_lset( X, 0 ) );
 
         for( i = 0; i < slen; i++ )
@@ -487,7 +486,6 @@ int mbedtls_mpi_read_string( mbedtls_mpi *X, int radix, const char *s )
                 MBEDTLS_MPI_CHK( mbedtls_mpi_sub_int( X, &T, d ) );
             }
         }
-        /* LCOV_EXCL_STOP */
     }
 
 cleanup:
@@ -1180,9 +1178,9 @@ static mbedtls_mpi_uint mbedtls_int_div_int( mbedtls_mpi_uint u1,
      */
     if( 0 == d || u1 >= d )
     {
-        if (r != NULL) *r = ~0;
+        if (r != NULL) *r = ~0; /* LCOV_EXCL_LINE */
 
-        return ( ~0 );
+        return ( ~0 ); /* LCOV_EXCL_LINE */
     }
 
 #if defined(MBEDTLS_HAVE_UDBL)
@@ -1193,7 +1191,7 @@ static mbedtls_mpi_uint mbedtls_int_div_int( mbedtls_mpi_uint u1,
         quotient = ( (mbedtls_t_udbl) 1 << biL ) - 1;
 
     if( r != NULL )
-        *r = (mbedtls_mpi_uint)( dividend - (quotient * d ) );
+        *r = (mbedtls_mpi_uint)( dividend - (quotient * d ) ); /* LCOV_EXCL_LINE */
 
     return (mbedtls_mpi_uint) quotient;
 #else
@@ -1492,7 +1490,7 @@ static int mpi_montmul( mbedtls_mpi *A, const mbedtls_mpi *B, const mbedtls_mpi 
     mbedtls_mpi_uint u0, u1, *d;
 
     if( T->n < N->n + 1 || T->p == NULL )
-        return( MBEDTLS_ERR_MPI_BAD_INPUT_DATA );
+        return( MBEDTLS_ERR_MPI_BAD_INPUT_DATA ); /* LCOV_EXCL_LINE */
 
     memset( T->p, 0, T->n * ciL );
 

@@ -37,7 +37,7 @@
 #include <openssl/pem.h>
 
 using namespace std;
-int mbedTLS_rng_wrap(void *arg, unsigned char *out, size_t len)
+static int mbedTLS_rng_wrap(void *arg, unsigned char *out, size_t len)
 {
     sse::crypto::random_bytes(len, out);
     return 0;
@@ -376,7 +376,7 @@ TEST(mbedTLS, mpi_to_open_ssl_bn)
 static bool cpm_mpi_bn(mbedtls_mpi* x, BIGNUM* y)
 {
     bool res = true;
-    for (int i = 0; i < std::max<size_t>(BN_num_bits(y), mbedtls_mpi_bitlen(x)); i++) {
+    for (size_t i = 0; i < std::max<size_t>(BN_num_bits(y), mbedtls_mpi_bitlen(x)); i++) {
         res &= (BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(x,i));
     }
     return res;
@@ -410,7 +410,7 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         openssl_sk_rsa = EVP_PKEY_get1_RSA(evpkey);
 
         // close and destroy the BIO
-        BIO_set_close(mem, BIO_NOCLOSE);
+        ASSERT_EQ(BIO_set_close(mem, BIO_NOCLOSE), 1);
         BIO_free(mem);
         mem = NULL;
 
@@ -435,7 +435,7 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
 
 
         // close and destroy the BIO
-        BIO_set_close(mem, BIO_NOCLOSE);
+        ASSERT_EQ(BIO_set_close(mem, BIO_NOCLOSE), 1);
         BIO_free(mem);
 
         // check that the public element are identical

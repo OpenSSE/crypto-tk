@@ -106,13 +106,17 @@ static int pk_get_pk_alg( unsigned char **p,
     if( ( ret = mbedtls_asn1_get_alg( p, end, &alg_oid, params ) ) != 0 )
         return( MBEDTLS_ERR_PK_INVALID_ALG + ret );
 
-#warning WORKAROUND
-    *pk_alg = MBEDTLS_PK_RSA;
+    // WORKAROUND
+    // In the original mbedTLS, we have the following lines
+    //    if( mbedtls_oid_get_pk_alg( &alg_oid, pk_alg ) != 0 )
+    //        return( MBEDTLS_ERR_PK_UNKNOWN_PK_ALG );
+    //
+    // which we replace by
+    
     if( alg_oid.len != 9 || memcmp(alg_oid.p, "\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01", alg_oid.len) != 0 )
         return( MBEDTLS_ERR_PK_UNKNOWN_PK_ALG );
+    *pk_alg = MBEDTLS_PK_RSA;
 
-//    if( mbedtls_oid_get_pk_alg( &alg_oid, pk_alg ) != 0 )
-//        return( MBEDTLS_ERR_PK_UNKNOWN_PK_ALG );
 
     /*
      * No parameters with RSA (only for EC)

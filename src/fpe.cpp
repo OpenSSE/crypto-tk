@@ -127,7 +127,7 @@ Fpe::FpeImpl::FpeImpl()
 {
     auto callback = [](uint8_t* key_content){
         Key<kKeySize> r_key;
-        aez_setup((unsigned char*)r_key.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
+        aez_setup((const unsigned char*)r_key.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
     };
     
     aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
@@ -136,7 +136,7 @@ Fpe::FpeImpl::FpeImpl()
 Fpe::FpeImpl::FpeImpl(Key<kKeySize>&& k)
 {
     auto callback = [&k](uint8_t* key_content){
-        aez_setup((unsigned char*)k.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
+        aez_setup((const unsigned char*)k.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
     };
     
     aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);

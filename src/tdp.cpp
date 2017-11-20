@@ -31,11 +31,25 @@
 #include <iomanip>
 
 #define SSE_CRYPTO_TDP_IMPL_MBEDTLS 1
-#define SSE_CRYPTO_TDP_IMPL_OPENSSL 2
 
-#define SSE_CRYPTO_TDP_IMPL SSE_CRYPTO_TDP_IMPL_MBEDTLS
+#ifdef WITH_OPENSSL
+    #define SSE_CRYPTO_TDP_IMPL_OPENSSL 2
+#endif
+
+/*
+ * The default TDP implementation used mbedTLS
+ * To use OpenSSL, uncomment the following line and
+ * replace SSE_CRYPTO_TDP_IMPL_MBEDTLS by SSE_CRYPTO_TDP_IMPL_OPENSSL
+ * or pass the option -DSSE_CRYPTO_TDP_IMPL=SSE_CRYPTO_TDP_IMPL_OPENSSL
+ * to the compiler
+ */
+//#define SSE_CRYPTO_TDP_IMPL SSE_CRYPTO_TDP_IMPL_MBEDTLS
 
 #if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
+
+#ifndef WITH_OPENSSL
+    #error "OpenSSL is not in use."
+#endif
 
 #include "tdp_impl/tdp_impl_openssl.hpp"
 

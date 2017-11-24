@@ -23,16 +23,19 @@
 #include "prf.hpp"
 #include "random.hpp"
 
+
+#include "mbedtls/bignum.h"
+#include "mbedtls/rsa.h"
+#include "mbedtls/rsa_io.h"
+
+#include <sodium/utils.h>
+
 #include <cstring>
 #include <exception>
 #include <iostream>
 #include <iomanip>
 
 
-
-#include "mbedtls/bignum.h"
-#include "mbedtls/rsa.h"
-#include "mbedtls/rsa_io.h"
 
 
 
@@ -47,6 +50,23 @@ namespace crypto
     
 #define RSA_PK 0x10001L // RSA_F4 for OpenSSL
     
+    
+static void zeroize_rsa(mbedtls_rsa_context* rsa)
+{
+    mbedtls_mpi_lset(&rsa->N, 0);
+    mbedtls_mpi_lset(&rsa->E, 0);
+    
+    mbedtls_mpi_lset(&rsa->D, 0);
+    mbedtls_mpi_lset(&rsa->P, 0);
+    mbedtls_mpi_lset(&rsa->Q, 0);
+    mbedtls_mpi_lset(&rsa->DP, 0);
+    mbedtls_mpi_lset(&rsa->DQ, 0);
+    mbedtls_mpi_lset(&rsa->QP, 0);
+    mbedtls_mpi_lset(&rsa->RN, 0);
+    mbedtls_mpi_lset(&rsa->RQ, 0);
+    mbedtls_mpi_lset(&rsa->Vi, 0);
+    mbedtls_mpi_lset(&rsa->Vf, 0);
+}
     
 // mbedTLS implementation of the trapdoor permutation
 
@@ -109,6 +129,7 @@ inline size_t TdpImpl_mbedTLS::rsa_size() const
 
 TdpImpl_mbedTLS::~TdpImpl_mbedTLS()
 {
+    zeroize_rsa(&rsa_key_);
     mbedtls_rsa_free(&rsa_key_);
 }
 
@@ -124,6 +145,8 @@ std::string TdpImpl_mbedTLS::public_key() const
     }
     std::string v(reinterpret_cast<const char*>(buf));
     
+    sodium_memzero(buf, sizeof(buf));
+
     return v;
 }
 
@@ -142,37 +165,12 @@ void TdpImpl_mbedTLS::eval(const std::string &in, std::string &out) const
     auto out_array = eval(in_array);
     
     out = std::string(out_array.begin(), out_array.end());
-}
+    
+    
+    sodium_memzero(in_array.data(), in_array.size());
+    sodium_memzero(out_array.data(), out_array.size());
 
-//std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::eval(const std::array<uint8_t, kMessageSpaceSize> &in) const
-//{
-//    std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> out;
-//
-//
-//    if(in.size() != rsa_size())
-//    {
-//        throw std::runtime_error("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long."); /* LCOV_EXCL_LINE */
-//    }
-//
-//    int ret;
-//    unsigned char *rsa_in = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()+1));
-//    unsigned char *rsa_out = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()+1));
-//
-//    memcpy(rsa_in, in.data(), rsa_size());
-//    rsa_in[rsa_size()] = '\0';
-////        memcpy(rsa_in, in.data(), rsa_size());
-////        rsa_out[rsa_size()] = '\0';
-//
-//    ret = mbedtls_rsa_public(&rsa_key_, rsa_in, rsa_out);
-//    if (ret != 0) {
-//        throw std::runtime_error("Error when computing the RSA public operation"); /* LCOV_EXCL_LINE */
-//    }
-//
-//
-//    memcpy(out.data(), rsa_out, rsa_size());
-//
-//    return out;
-//}
+}
 
 std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::eval(const std::array<uint8_t, kMessageSpaceSize> &in) const
 {
@@ -221,7 +219,8 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::eval(co
     }
 
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
-
+    mbedtls_mpi_lset(&x, 0); // erase the temporary variable
+    
     return out;
 }
 
@@ -230,7 +229,11 @@ std::string TdpImpl_mbedTLS::sample() const
 {
     std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> tmp = sample_array();
     
-    return std::string(tmp.begin(), tmp.end());
+    std::string out(tmp.begin(), tmp.end());
+    
+    sodium_memzero(tmp.data(), tmp.size());
+    
+    return out;
 }
 
 std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::sample_array() const
@@ -257,6 +260,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::sample_
     }
 
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
+    mbedtls_mpi_lset(&x, 0);
 
     return out;
 }
@@ -265,7 +269,11 @@ std::string TdpImpl_mbedTLS::generate(const Prf<Tdp::kRSAPrgSize>& prg, const st
 {
     std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> tmp = generate_array(prg, seed);
     
-    return std::string(tmp.begin(), tmp.end());
+    std::string out(tmp.begin(), tmp.end());
+    
+    sodium_memzero(tmp.data(), tmp.size());
+    
+    return out;
 }
 
 std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
@@ -294,6 +302,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generat
     }
 
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
+    mbedtls_mpi_lset(&x, 0);
     
     return out;
 }
@@ -302,7 +311,11 @@ std::string TdpImpl_mbedTLS::generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key
 {
     std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> tmp = generate_array(std::move(key), seed);
     
-    return std::string(tmp.begin(), tmp.end());
+    std::string out(tmp.begin(), tmp.end());
+    
+    sodium_memzero(tmp.data(), tmp.size());
+
+    return out;
 }
 
 std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
@@ -419,6 +432,10 @@ TdpInverseImpl_mbedTLS::TdpInverseImpl_mbedTLS(const TdpInverseImpl_mbedTLS& tdp
 
 TdpInverseImpl_mbedTLS::~TdpInverseImpl_mbedTLS()
 {
+    mbedtls_mpi_lset(&p_1_, 0);
+    mbedtls_mpi_lset(&q_1_, 0);
+    mbedtls_mpi_lset(&phi_, 0);
+
     mbedtls_mpi_free(&p_1_);
     mbedtls_mpi_free(&q_1_);
     mbedtls_mpi_free(&phi_);
@@ -436,6 +453,8 @@ std::string TdpInverseImpl_mbedTLS::private_key() const
     }
     std::string v(reinterpret_cast<const char*>(buf));
     
+    sodium_memzero(buf, sizeof( buf ));
+
     return v;
 }
 
@@ -459,6 +478,8 @@ void TdpInverseImpl_mbedTLS::invert(const std::string &in, std::string &out) con
     }
     
     out = std::string((char*)rsa_out,rsa_size());
+    
+    sodium_memzero(rsa_out, rsa_size());
 }
 
 std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mbedTLS::invert(const std::array<uint8_t, kMessageSpaceSize> &in) const
@@ -525,14 +546,13 @@ std::array<uint8_t, TdpInverseImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mb
     int ret;
     mbedtls_mpi x, mpi_order, d_p, d_q;
     mbedtls_mpi y_p, y_q;
-    mbedtls_mpi h, y;
+    mbedtls_mpi y;
     mbedtls_mpi_init(&x);
     mbedtls_mpi_init(&mpi_order);
     mbedtls_mpi_init(&d_p);
     mbedtls_mpi_init(&d_q);
     mbedtls_mpi_init(&y_p);
     mbedtls_mpi_init(&y_q);
-    mbedtls_mpi_init(&h);
     mbedtls_mpi_init(&y);
     
     // deserialize the integer
@@ -606,12 +626,21 @@ std::array<uint8_t, TdpInverseImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mb
         throw std::runtime_error("Unable to unlock the RSA context"); /* LCOV_EXCL_LINE */
 #endif
     
+    // erase the temporary variables
+    mbedtls_mpi_lset(&x, 0);
+    mbedtls_mpi_lset(&d_p, 0);
+    mbedtls_mpi_lset(&d_q, 0);
+    mbedtls_mpi_lset(&y_p, 0);
+    mbedtls_mpi_lset(&y_q, 0);
+    mbedtls_mpi_lset(&mpi_order, 0);
+
     if (ret != 0) {
         throw std::runtime_error("Error during the modular exponentiation"); /* LCOV_EXCL_LINE */
     }
     
     mbedtls_mpi_write_binary(&y, out.data(), out.size());
-    
+    mbedtls_mpi_lset(&y, 0); // erase the temporary variable
+
     return out;
 }
 
@@ -624,6 +653,8 @@ void TdpInverseImpl_mbedTLS::invert_mult(const std::string &in, std::string &out
     auto out_array = invert_mult(in_array, order);
     
     out = std::string(out_array.begin(), out_array.end());
+    
+    sodium_memzero(out_array.data(), out_array.size());
 }
 
 
@@ -681,6 +712,7 @@ TdpMultPoolImpl_mbedTLS::TdpMultPoolImpl_mbedTLS(const TdpMultPoolImpl_mbedTLS& 
 TdpMultPoolImpl_mbedTLS::~TdpMultPoolImpl_mbedTLS()
 {
     for (uint8_t i = 0; i < keys_count_; i++) {
+        zeroize_rsa(&keys_[i]);
         mbedtls_rsa_free(&keys_[i]);
     }
     delete [] keys_;
@@ -746,6 +778,8 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpMultPoolImpl_mbedTLS:
     
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
     
+    mbedtls_mpi_lset(&x, 0);
+
     return out;
 }
 
@@ -764,6 +798,7 @@ void TdpMultPoolImpl_mbedTLS::eval_pool(const std::string &in, std::string &out,
     
     out = std::string(a_out.begin(), a_out.end());
     
+    sodium_memzero(a_out.data(), a_out.size());
 }
 
 uint8_t TdpMultPoolImpl_mbedTLS::maximum_order() const

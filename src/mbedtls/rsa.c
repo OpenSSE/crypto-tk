@@ -532,14 +532,27 @@ cleanup:
         return( MBEDTLS_ERR_THREADING_MUTEX_ERROR );
 #endif
 
+    // erase the temporary variable
+    mbedtls_mpi_lset(&T, 0);
+    mbedtls_mpi_lset(&T1, 0);
+    mbedtls_mpi_lset(&T2, 0);
+    mbedtls_mpi_lset(&P1, 0);
+    mbedtls_mpi_lset(&Q1, 0);
+    mbedtls_mpi_lset(&R, 0);
+
     mbedtls_mpi_free( &T ); mbedtls_mpi_free( &T1 ); mbedtls_mpi_free( &T2 );
     mbedtls_mpi_free( &P1 ); mbedtls_mpi_free( &Q1 ); mbedtls_mpi_free( &R );
 
     if( f_rng != NULL )
     {
 #if defined(MBEDTLS_RSA_NO_CRT)
+        mbedtls_mpi_lset(&D_blind, 0);
+        
         mbedtls_mpi_free( &D_blind );
 #else
+        mbedtls_mpi_lset(&DP_blind, 0);
+        mbedtls_mpi_lset(&DP_blind, 0);
+
         mbedtls_mpi_free( &DP_blind );
         mbedtls_mpi_free( &DQ_blind );
 #endif

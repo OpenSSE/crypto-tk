@@ -60,16 +60,10 @@ env.Append(CCFLAGS=['-Wall', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat
 env.Append(CXXFLAGS=['-Weffc++','-Woverloaded-virtual',  '-Wsign-promo', '-Wstrict-overflow=5'])
 
 
-env['AS'] = ['yasm']
-env.Append(ASFLAGS = ['-D', 'LINUX'])
-
 if env['PLATFORM'] == 'darwin':
-    env.Append(ASFLAGS = ['-f', 'macho64'])
     # Add the OpenSSL include path from Homebrew
     env.Append(CPPPATH=['/usr/local/opt/openssl/include'])
     env.Append(LIBPATH=['/usr/local/opt/openssl/lib'])
-else:
-    env.Append(ASFLAGS = ['-f', 'x64', '-f', 'elf64'])
 
 
 env.Append(LIBS = ['crypto','gmp','sodium'])

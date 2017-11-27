@@ -51,8 +51,8 @@ You can also replace the `-DARITH=gmp` option by `-DARITH=x64-asm-254` (for bett
 
 ### Compiler/Assembler
 
-`libsse_crypto` needs a compiler supporting C++14, and the [yasm](http://yasm.tortall.net) assembler. 
-It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3, and yasm 1.2.0 for the assembler, and on Mac OS X.12 using clang 9.0.0 and yasm 1.3.0.
+`libsse_crypto` needs a compiler supporting C++14. 
+It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3, and on Mac OS X.12 using clang 9.0.0.
 
 ### Setting up your system
 Here is what is necessary to set your system up from scratch, and build `libsse_crypto` (you will need to build RELIC first though).
@@ -62,7 +62,7 @@ Here is what is necessary to set your system up from scratch, and build `libsse_
 ```sh
  $ [sudo] add-apt-repository ppa:ubuntu-toolchain-r/test
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons g++-4.9 libtool yasm libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential scons g++-4.9 libtool libssl-dev libgmp-dev 
 ```
 
 To set GCC 4.9 as the compiler, you have two options. Either set the environment variables `CC` and `CXX` to `gcc-4.9` and `g++-4.9` respectively, or edit the file `config.scons` to include the following lines:
@@ -81,7 +81,7 @@ If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respec
 
 ```sh
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons libtool yasm libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential scons libtool libssl-dev libgmp-dev 
 ```
 
 You can then install the Boost and libsodium as for Ubuntu 14.
@@ -97,7 +97,7 @@ If you still haven't, you should get [Homebrew](http://brew.sh/).
 You will actually need it to install dependencies: 
 
 ```sh
- $ brew install yasm scons cmake openssl gmp boost libsodium
+ $ brew install scons cmake openssl gmp boost libsodium
 ```
 
 You will only need to install RELIC, which can be done following the instructions found above, or use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh`, or `install_relic_x64_asm.sh` depending on the arithmetic you prefer.

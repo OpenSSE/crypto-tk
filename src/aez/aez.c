@@ -36,7 +36,7 @@
  */
 
 #include "aez.h"
-#include "../hash/blake2b/blake2b-common.h"
+#include <sodium/crypto_generichash_blake2b.h>
 
 #include <string.h>
 
@@ -231,10 +231,10 @@ void aez_setup(const unsigned char *key, unsigned keylen, aez_ctx_t *ctx) {
         ctx->J[0] = loadu(key+16);
         ctx->L    = loadu(key+32);
     } else {
-        unsigned char tmp_ctx[64];
-        blake2b_hash(key, keylen, tmp_ctx);
-        memcpy(ctx,tmp_ctx,48); /* Puts IJL into ctx */
-        memset(tmp_ctx,0x00,64);
+        crypto_generichash_blake2b((unsigned char*) ctx, 48, key, keylen, NULL, 0);
+
+//        memcpy(ctx,tmp_ctx,48); /* Puts IJL into ctx */
+//        memset(tmp_ctx,0x00,64);
         ctx->J[0] = ctx->I[1];                  /* Rearrange.        */
         ctx->L    = ctx->I[2];
     }

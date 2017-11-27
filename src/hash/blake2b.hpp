@@ -30,7 +30,7 @@ namespace crypto
 namespace hash
 {
 
-struct sha512
+struct blake2b
 	{
 		
 		constexpr static size_t kDigestSize = 64;

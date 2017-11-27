@@ -28,7 +28,7 @@
 
 #include "../src/hash.hpp"
 #include "../src/hash/sha512.hpp"
-#include "../src/hash/blake2b/blake2b.hpp"
+#include "../src/hash/blake2b.hpp"
 
 #include "blake2_kat.h"
 

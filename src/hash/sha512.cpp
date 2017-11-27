@@ -37,7 +37,7 @@ namespace crypto
 namespace hash
 {
 	
-void sha512::hash(const unsigned char *in, const size_t &len, unsigned char *digest)
+void sha512::hash(const unsigned char *in, const size_t len, unsigned char *digest)
 {
     crypto_hash_sha512(digest, in, len);
 }

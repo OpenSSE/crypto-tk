@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		310B644E1FCCC3420015FBEE /* blake2b.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310B644C1FCCC3410015FBEE /* blake2b.cpp */; };
+		310B644F1FCCC3420015FBEE /* blake2b.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310B644C1FCCC3410015FBEE /* blake2b.cpp */; };
+		310B64501FCCC3420015FBEE /* blake2b.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310B644C1FCCC3410015FBEE /* blake2b.cpp */; };
+		310B64511FCCC3420015FBEE /* blake2b.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 310B644D1FCCC3410015FBEE /* blake2b.hpp */; };
 		310C2BD51EC0B59700E80B3A /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BCD1EC0B59700E80B3A /* common.h */; };
 		310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
 		310C2BDB1EC0B59700E80B3A /* relic_api.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BD11EC0B59700E80B3A /* relic_api.h */; };
@@ -38,9 +42,6 @@
 		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		3163D3941ED33C8E00A7FCD9 /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */; };
 		3163D3991ED56BEA00A7FCD9 /* aesni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3981ED56BEA00A7FCD9 /* aesni.cpp */; };
-		3163D39E1ED59FC400A7FCD9 /* blake2b-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */; };
-		3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */; };
-		3163D3A11ED5A11A00A7FCD9 /* blake2b-common.c in Sources */ = {isa = PBXBuildFile; fileRef = 3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */; };
 		316F0D3F1D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D401D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D411D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
@@ -147,11 +148,6 @@
 		6CC2D4D31C3193FA00334ADD /* aez.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4021C3185D700334ADD /* aez.h */; };
 		6CC2D4D41C31940400334ADD /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
 		6CC2D4D51C31940400334ADD /* sha512.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4591C3185D700334ADD /* sha512.hpp */; };
-		6CC2D4DA1C31941000334ADD /* blake2-config.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4451C3185D700334ADD /* blake2-config.h */; };
-		6CC2D4DB1C31941000334ADD /* blake2b-load-sse2.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4461C3185D700334ADD /* blake2b-load-sse2.h */; };
-		6CC2D4DC1C31941000334ADD /* blake2b-load-sse41.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4471C3185D700334ADD /* blake2b-load-sse41.h */; };
-		6CC2D4DD1C31941000334ADD /* blake2b-round.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4481C3185D700334ADD /* blake2b-round.h */; };
-		6CC2D4DF1C31941000334ADD /* blake2b.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D44A1C3185D700334ADD /* blake2b.hpp */; };
 		6CC2D4E71C31941D00334ADD /* ctr_drbg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4281C3185D700334ADD /* ctr_drbg.hpp */; };
 		6CC2D4E81C31941D00334ADD /* hugepages.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42B1C3185D700334ADD /* hugepages.hpp */; };
 		6CC2D4E91C31942100334ADD /* array_view.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4081C3185D700334ADD /* array_view.hpp */; };
@@ -262,6 +258,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		310B644C1FCCC3410015FBEE /* blake2b.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = blake2b.cpp; sourceTree = "<group>"; };
+		310B644D1FCCC3410015FBEE /* blake2b.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = blake2b.hpp; sourceTree = "<group>"; };
 		310C2BCD1EC0B59700E80B3A /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		310C2BD01EC0B59700E80B3A /* GMPpke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GMPpke.cpp; sourceTree = "<group>"; };
 		310C2BD11EC0B59700E80B3A /* relic_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = relic_api.h; sourceTree = "<group>"; };
@@ -281,8 +279,6 @@
 		3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "gtest-all.cc"; sourceTree = "<group>"; };
 		3163D3931ED33C8E00A7FCD9 /* gtest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gtest.h; sourceTree = "<group>"; };
 		3163D3981ED56BEA00A7FCD9 /* aesni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aesni.cpp; sourceTree = "<group>"; };
-		3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "blake2b-common.c"; sourceTree = "<group>"; };
-		3163D39F1ED59FF500A7FCD9 /* blake2b-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "blake2b-common.h"; sourceTree = "<group>"; };
 		3163D3A81ED5ABA400A7FCD9 /* blake2_kat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = blake2_kat.h; sourceTree = "<group>"; };
 		316F0D3D1D25600700F87904 /* prg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = prg.cpp; sourceTree = "<group>"; };
 		316F0D3E1D25600700F87904 /* prg.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = prg.hpp; sourceTree = "<group>"; };
@@ -380,11 +376,6 @@
 		6CC2D4401C3185D700334ADD /* static_repeat.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = static_repeat.hpp; sourceTree = "<group>"; };
 		6CC2D4411C3185D700334ADD /* fpe.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = fpe.cpp; sourceTree = "<group>"; };
 		6CC2D4421C3185D700334ADD /* fpe.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = fpe.hpp; sourceTree = "<group>"; };
-		6CC2D4451C3185D700334ADD /* blake2-config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "blake2-config.h"; sourceTree = "<group>"; };
-		6CC2D4461C3185D700334ADD /* blake2b-load-sse2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "blake2b-load-sse2.h"; sourceTree = "<group>"; };
-		6CC2D4471C3185D700334ADD /* blake2b-load-sse41.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "blake2b-load-sse41.h"; sourceTree = "<group>"; };
-		6CC2D4481C3185D700334ADD /* blake2b-round.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "blake2b-round.h"; sourceTree = "<group>"; };
-		6CC2D44A1C3185D700334ADD /* blake2b.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = blake2b.hpp; sourceTree = "<group>"; };
 		6CC2D4581C3185D700334ADD /* sha512.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sha512.cpp; sourceTree = "<group>"; };
 		6CC2D4591C3185D700334ADD /* sha512.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sha512.hpp; sourceTree = "<group>"; };
 		6CC2D45A1C3185D700334ADD /* hash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hash.cpp; sourceTree = "<group>"; };
@@ -709,25 +700,12 @@
 		6CC2D4431C3185D700334ADD /* hash */ = {
 			isa = PBXGroup;
 			children = (
-				6CC2D4441C3185D700334ADD /* blake2b */,
+				310B644C1FCCC3410015FBEE /* blake2b.cpp */,
+				310B644D1FCCC3410015FBEE /* blake2b.hpp */,
 				6CC2D4581C3185D700334ADD /* sha512.cpp */,
 				6CC2D4591C3185D700334ADD /* sha512.hpp */,
 			);
 			path = hash;
-			sourceTree = "<group>";
-		};
-		6CC2D4441C3185D700334ADD /* blake2b */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D4451C3185D700334ADD /* blake2-config.h */,
-				6CC2D4461C3185D700334ADD /* blake2b-load-sse2.h */,
-				6CC2D4471C3185D700334ADD /* blake2b-load-sse41.h */,
-				6CC2D4481C3185D700334ADD /* blake2b-round.h */,
-				3163D39D1ED59FC400A7FCD9 /* blake2b-common.c */,
-				3163D39F1ED59FF500A7FCD9 /* blake2b-common.h */,
-				6CC2D44A1C3185D700334ADD /* blake2b.hpp */,
-			);
-			path = blake2b;
 			sourceTree = "<group>";
 		};
 		6CC2D4621C3185D700334ADD /* tests */ = {
@@ -796,6 +774,7 @@
 				6CC2D4E91C31942100334ADD /* array_view.hpp in Headers */,
 				6CC2D5081C31944100334ADD /* ECMH.hpp in Headers */,
 				6CC2D50A1C31944500334ADD /* operation_helpers.hpp in Headers */,
+				310B64511FCCC3420015FBEE /* blake2b.hpp in Headers */,
 				3114009B1F9E628C0025DE3A /* key.hpp in Headers */,
 				6CC2D4D51C31940400334ADD /* sha512.hpp in Headers */,
 				6CC2D4F91C31942F00334ADD /* GF2_254.hpp in Headers */,
@@ -812,7 +791,6 @@
 				6CC2D4EB1C31942700334ADD /* add.hpp in Headers */,
 				6CC2D50F1C31945000334ADD /* assign_endian.hpp in Headers */,
 				6CC2D4E71C31941D00334ADD /* ctr_drbg.hpp in Headers */,
-				6CC2D4DB1C31941000334ADD /* blake2b-load-sse2.h in Headers */,
 				6CC2D5131C31945000334ADD /* is_resizable_container.hpp in Headers */,
 				6CC2D4EF1C31942700334ADD /* Point.hpp in Headers */,
 				6CC2D4FB1C31942F00334ADD /* invert_blinded.hpp in Headers */,
@@ -834,21 +812,17 @@
 				6CC2D5011C31943300334ADD /* limb.hpp in Headers */,
 				6CC2D50E1C31944A00334ADD /* thread_safety.hpp in Headers */,
 				6CC2D5091C31944100334ADD /* MuHash.hpp in Headers */,
-				6CC2D4DA1C31941000334ADD /* blake2-config.h in Headers */,
 				319966BA1FBC2E9800051179 /* rsa_io.h in Headers */,
 				318516911D4BF45700A44AD7 /* aesni.hpp in Headers */,
 				6CC2D4F01C31942700334ADD /* sw.hpp in Headers */,
 				6CC2D5021C31943300334ADD /* limb_ops.hpp in Headers */,
 				3199669F1FB8A72D00051179 /* config.h in Headers */,
 				6CC2D5001C31943300334ADD /* GF2.hpp in Headers */,
-				6CC2D4DC1C31941000334ADD /* blake2b-load-sse41.h in Headers */,
 				319966CD1FBEE9D500051179 /* tdp_impl_openssl.hpp in Headers */,
-				6CC2D4DF1C31941000334ADD /* blake2b.hpp in Headers */,
 				6CC2D4F81C31942F00334ADD /* GF2_127_63.hpp in Headers */,
 				6CC2D4FE1C31943300334ADD /* apply_linear_table_transform.hpp in Headers */,
 				6CC2D5151C31945000334ADD /* print.hpp in Headers */,
 				6CC2D5121C31945000334ADD /* is_byte.hpp in Headers */,
-				6CC2D4DD1C31941000334ADD /* blake2b-round.h in Headers */,
 				3199669B1FB8A72D00051179 /* asn1.h in Headers */,
 				6CC2D4F31C31942F00334ADD /* batch_invert.hpp in Headers */,
 				6CC2D5161C31945000334ADD /* print_fwd.hpp in Headers */,
@@ -996,6 +970,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				319966A21FB8A72D00051179 /* pk.c in Sources */,
+				310B644E1FCCC3420015FBEE /* blake2b.cpp in Sources */,
 				6CC2D48D1C318B1B00334ADD /* encryption.cpp in Sources */,
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
 				319966881FB8A72D00051179 /* asn1write.c in Sources */,
@@ -1023,7 +998,6 @@
 				319966B71FBC2E9800051179 /* rsa_io.c in Sources */,
 				313CD4531EC719DD0058A0C5 /* test_ppke.cpp in Sources */,
 				318C729B1C9730140040AEE7 /* tdp.cpp in Sources */,
-				3163D39E1ED59FC400A7FCD9 /* blake2b-common.c in Sources */,
 				6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */,
 				311934B51D27172A0031804B /* test_prg.cpp in Sources */,
 				319966B41FB8BCF400051179 /* test_mbedtls.cpp in Sources */,
@@ -1052,7 +1026,7 @@
 				6CC2D49E1C318F2500334ADD /* set_hash.cpp in Sources */,
 				319966891FB8A72D00051179 /* asn1write.c in Sources */,
 				316F0D401D25600700F87904 /* prg.cpp in Sources */,
-				3163D3A01ED5A11900A7FCD9 /* blake2b-common.c in Sources */,
+				310B644F1FCCC3420015FBEE /* blake2b.cpp in Sources */,
 				6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */,
 				319966CB1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				311934B21D26B2360031804B /* block_hash.cpp in Sources */,
@@ -1092,7 +1066,6 @@
 				318C729D1C9730140040AEE7 /* tdp.cpp in Sources */,
 				310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */,
 				3199668A1FB8A72D00051179 /* asn1write.c in Sources */,
-				3163D3A11ED5A11A00A7FCD9 /* blake2b-common.c in Sources */,
 				6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				319966C81FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */,
 				3199669E1FB8A72D00051179 /* pem.c in Sources */,
@@ -1107,6 +1080,7 @@
 				6CC2D4C61C3193E200334ADD /* cipher.cpp in Sources */,
 				319966901FB8A72D00051179 /* asn1parse.c in Sources */,
 				318516901D4BF45700A44AD7 /* aesni.cpp in Sources */,
+				310B64501FCCC3420015FBEE /* blake2b.cpp in Sources */,
 				319966CC1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				314863D11FB71E9E009FE78B /* key.cpp in Sources */,
 				310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */,

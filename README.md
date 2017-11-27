@@ -21,23 +21,12 @@ This is code for a **research project**. It **should not be used in practice**: 
 
 ## Building
 
-Building is done through [SConstruct](http://www.scons.org). 
-Three targets can be built:
+Building is done through [SConstruct](http://www.scons.org).
+ 
 
-* `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features). It is the default target.
-
-* `check`: unit tests. It uses [Google Test](https://github.com/google/googletest).
-
-* `lib`: the compiled library. It produces both the static and the shared versions of `libsse_crypto`, copied in the directory `library/lib`, together with the headers in `library/include`. If possible, unit tests are run before constructing the library.
-
-
-To build the library, just enter in your terminal
-``scons lib ``.
 ### Dependencies
 
 `libsse_crypto` uses the following dependencies
-
-* [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The code has been compiled and tested using OpenSSL 1.0.2.
 
 * [Boost](http://www.boost.org/) Only headers from Boost are needed to build the library. As the incremental set hashing code relies on the [Endian](http://www.boost.org/doc/libs/release/libs/endian/) library, release older than 1.58 are necessary.
 
@@ -52,10 +41,66 @@ make install
 ```
 You can also replace the `-DARITH=gmp` option by `-DARITH=x64-asm-254` (for better performance) or `-DARITH=easy` (to get rid of the gmp dependency). Note that the first two depend on [gmp](https://gmplib.org).
 
-### Compiler
 
-`libsse_crypto` needs a compiler supporting C++14. It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3 and on Mac OS X.10 using clang 7.0.0
+#### Optional Dependencies
 
+* [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The trapdoor permutation is based on RSA, and `libsse_crypto` can use OpenSSL to implement RSA. The code has been compiled and tested using OpenSSL 1.0.2.
+
+### Compiler/Assembler
+
+`libsse_crypto` needs a compiler supporting C++14, and the [yasm](http://yasm.tortall.net) assembler. 
+It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3, and yasm 1.2.0 for the assembler, and on Mac OS X.12 using clang 9.0.0 and yasm 1.3.0.
+
+### Targets
+
+Three targets can be built:
+
+* `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features). It is the default target, which can be built using only `scons`. 
+
+* `check`: unit tests. It uses [Google Test](https://github.com/google/googletest).
+
+* `lib`: the compiled library. It produces both the static and the shared versions of `libsse_crypto`, copied in the directory `library/lib`, together with the headers in `library/include`. If possible, unit tests are run before constructing the library.
+
+
+To build the library, just enter in your terminal
+``scons lib``.
+
+### Building Configuration and Options 
+
+The building script takes several options and can be easily configured to fit your system and your needs.
+
+#### Configuration
+
+The SConstruct files default values might not fit your system. For example, you might want to choose a specific C++ compiler.
+You can easily change these default values without modifying the SConstruct file itself. Instead, create a file called `config.scons` and change the values in this file. For example, say you want to use clang instead of your default gcc compiler and you placed the headers and shared library for RELIC in some directories that are not in the compiler's include path, say
+`~/relic/include` and `~/relic/lib`. Then you can use the following configuration file:
+
+```python
+Import('*')
+
+env['CC'] = 'clang'
+env['CXX'] = 'clang++'
+
+env.Append(CPPPATH=['~/relic/include'])
+env.Append(LIBPATH=['~/relic/lib'])
+```
+
+The `config.scons` will automatically be included by the main SConstruct script, and the options taken into account.
+
+
+#### Options
+
+The scons script takes the following options:
+
+*  `no_aesni`: toggle the use of Intel's AES NI, which, when available, offer a huge speed up to the computation of AES. `no_aesni=1` disables the instructions. They are enabled by default.
+
+*  `rsa_impl`: choose the RSA implementation. Available options are `rsa_impl=mbedTLS` and `rsa_impl=OpenSSL`. `mbedTLS` is the default option, and corresponds to the embedded implementation. `OpenSSL` requires OpenSSL's `libcrypto` to be available.
+
+*  `static_relic`: choose to link between the static or the dynamic version of RELIC. This options is needed because RELIC's build script names the static library `relic_s` instead of `relic`. Use `static_relic=0` to link against the dynamic library, and `static_relic=1` for the static one. Uses the dynamic library by default.
+
+*  `gcov`: `gcov=1` toggles on the flags needed for code coverage. Disabled by default.
+
+*  `run_check`: By default, when the `check` target is built, the tests are automatically run upon successful compilation. The option `run_check=0` disables this behavior.
 
 ## Contributors
 
@@ -65,6 +110,8 @@ It is directly available from its [GitHub repo](https://github.com/jbms/ecmh). T
 The implementation of the Blake2 hash functions has been written by [Samuel Neves](https://eden.dei.uc.pt/~sneves/).
 
 SHA512 implementations are from Intel (x86 optimized assembly, using SSE4, AVX or AVX2) and ARM (C implementation from [mbed TLS](https://tls.mbed.org)).
+
+An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbed TLS](https://tls.mbed.org))
 
 The puncturable encryption code has been originally written by [Ian Miers](http://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
 

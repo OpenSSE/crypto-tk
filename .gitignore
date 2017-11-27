@@ -39,5 +39,3 @@ xcshareddata
 # Code coverage
 *.gcda
 *.gcno
-gcov
-coverage.info

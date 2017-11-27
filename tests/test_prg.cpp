@@ -31,7 +31,7 @@
 #define TEST_COUNT 100
 
 #ifdef CHECK_TEMPLATE_INSTANTIATION
-/* To avoid file duplication in GCov */
+/* To avoid file duplication in code coverage report */
 
 INSTANTIATE_PRG_TEMPLATE_EXTERN(10)
 INSTANTIATE_PRG_TEMPLATE_EXTERN(18)

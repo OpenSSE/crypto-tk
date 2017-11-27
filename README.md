@@ -147,24 +147,25 @@ The scons script takes the following options:
 
 *  `static_relic`: choose to link between the static or the dynamic version of RELIC. This options is needed because RELIC's build script names the static library `relic_s` instead of `relic`. Use `static_relic=0` to link against the dynamic library, and `static_relic=1` for the static one. Uses the dynamic library by default.
 
-*  `gcov`: `gcov=1` toggles on the flags needed for code coverage. Disabled by default.
+*  `coverage`: `coverage=1` toggles on the flags needed for code coverage. Disabled by default.
 
 *  `run_check`: By default, when the `check` target is built, the tests are automatically run upon successful compilation. The option `run_check=0` disables this behavior.
 
 ## Code coverage
 
-Code coverage is available using the `gcov=1` option in the building script. A report can be then generated the `gcov.sh` script (which uses lcov). 
+Code coverage is available using the `coverage=1` option in the building script. A report can be then generated the `coverage.sh` script (which uses lcov). 
 
 So to generate the code coverage for all the tests, first install lcov with
 `[sudo] apt-get install lcov` (on Ubuntu) or `brew install lcov` (on Mac OS). Then run
 
 ```sh
-$ scons check gcov=1
-$ ./gcov.sh
+$ scons check coverage=1
+$ cd coverage
+$ ./gen_coverage.sh && ./gen_report.sh
 ```
 
-The report will be available in the file `gcov/index.html`.
-
+The HTML report will be available in the `report` directory.
+To cleanup the `coverage` directory, run `./cleanup.sh`.
 
 ## Contributors
 

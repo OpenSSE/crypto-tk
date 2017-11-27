@@ -401,7 +401,7 @@ INSTANTIATE_PRG_TEMPLATE(32)
 
 #ifdef CHECK_TEMPLATE_INSTANTIATION
 #pragma message "Instantiate templates for unit tests and code coverage"
-/* To avoid file duplication in GCov */
+/* To avoid file duplication in code coverage report */
 
 INSTANTIATE_PRG_TEMPLATE(10)
 INSTANTIATE_PRG_TEMPLATE(18)

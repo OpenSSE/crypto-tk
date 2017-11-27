@@ -1,0 +1,5 @@
+*.html
+*.png
+*.css
+
+coverage.info

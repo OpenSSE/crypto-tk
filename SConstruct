@@ -109,8 +109,8 @@ if int(debug):
 else:
 	env.Append(CCFLAGS = ['-O2'])
 
-gcov = ARGUMENTS.get('gcov', 0) # activate coverage
-if int(gcov):
+coverage = ARGUMENTS.get('coverage', 0) # activate coverage
+if int(coverage):
     env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline','-Wno-ignored-optimization-argument'])
     env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline'])
 

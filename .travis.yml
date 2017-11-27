@@ -31,11 +31,10 @@ before_install:
  
 script:
   - scons check static_relic=1 no_aesni=1
-  - scons -Q -c check && scons check debug=1 gcov=1 static_relic=1
+  - scons -Q -c check && scons check debug=1 coverage=1 static_relic=1
 
 after_success:
-  - lcov --directory build -b . --capture --output-file coverage.info
-  - lcov --remove coverage.info 'tests/*' '/usr/*' '*boost*' --output-file coverage.info
-  # - lcov --remove coverage.info '/Applications/*' --output-file coverage.info # For Mac OS
-  - lcov --list coverage.info # debug before upload
-  - coveralls-lcov coverage.info
+  - cd coverage
+  - ./gen_coverage.sh # get the code coverage
+  - ./upload_report.sh # upload the report to coveralls
+  - cd ..

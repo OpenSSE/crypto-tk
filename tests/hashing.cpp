@@ -28,7 +28,6 @@
 
 #include "../src/hash.hpp"
 #include "../src/hash/sha512.hpp"
-#include "../src/hash/blake2s/blake2s.hpp"
 #include "../src/hash/blake2b/blake2b.hpp"
 
 #include "blake2_kat.h"
@@ -142,29 +141,6 @@ TEST(sha_512, test_vector_5)
     string out_string((char*)out.data(), sse::crypto::hash::sha512::kDigestSize);
     
     ASSERT_EQ(out_string, ref_string);
-}
-
-TEST(blake2,blake2s)
-{
-    // use the test vectors in header blake2_kat.h
-    constexpr size_t IN_LENGTH = 256;
-    constexpr size_t HASH_LENGTH = 256;
-    
-    uint8_t in[IN_LENGTH] = {0};
-    uint8_t hash[HASH_LENGTH] = {0};
-    
-    for (size_t i = 0; i < sizeof(in); ++i){
-        in[i] = i;
-    }
-
-    for (size_t i = 0; i < sizeof(in); ++i){
-        sse::crypto::hash::blake2s::hash(in, i, hash);
-        
-        string ref_string(reinterpret_cast<const char*>(blake2s_kat[i]), sse::crypto::hash::blake2s::kDigestSize);
-        string out_string((char*)hash, sse::crypto::hash::blake2s::kDigestSize);
-
-        ASSERT_EQ(ref_string, out_string);
-    }
 }
 
 TEST(blake2,blake2b)

@@ -21,9 +21,11 @@ env:
 before_install:
   - eval "${MATRIX_EVAL}"
   # - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - cd install_dependencies
   - ./install_boost.sh
   - ./install_relic.sh
   - ./install_libsodium.sh
+  - cd ..
   - gem install coveralls-lcov
   - sudo ldconfig
  

@@ -73,7 +73,7 @@ env['CXX'] = 'g++-4.9'
 ```
 
 Then, to install the three dependencies, you can either follow the instructions of their website (in particular for libsodium and Boost), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
-Hence, you can run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.15 and `./install_relic.sh` to install RELIC with the `easy` arithmetic.
+To do so, move to directory `install_dependencies`, and run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.15 and `./install_relic.sh` to install RELIC with the `easy` arithmetic.
 
 
 #### Ubuntu 16.04 LTS
@@ -98,6 +98,7 @@ You will actually need it to install dependencies:
  $ brew install yasm scons cmake openssl gmp boost libsodium
 ```
 
+You will only need to install RELIC, which can be done following the instructions found above, or using the `install_dependencies/install_relic.sh` script.
 
 ### Targets
 

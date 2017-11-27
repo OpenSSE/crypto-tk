@@ -73,7 +73,8 @@ env['CXX'] = 'g++-4.9'
 ```
 
 Then, to install the three dependencies, you can either follow the instructions of their website (in particular for libsodium and Boost), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
-To do so, move to directory `install_dependencies`, and run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.15 and `./install_relic.sh` to install RELIC with the `easy` arithmetic.
+To do so, move to directory `install_dependencies`, and run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.15 and `./install_relic_ubuntu_14_easy.sh` to install RELIC with the `easy` arithmetic.
+If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respectively `./install_relic_ubuntu_14_gmp.sh` and `./install_relic_ubuntu_14_x64_asm.sh`.
 
 
 #### Ubuntu 16.04 LTS
@@ -83,7 +84,8 @@ To do so, move to directory `install_dependencies`, and run `./install_boost.sh`
  $ [sudo] apt-get install build-essential scons libtool yasm libssl-dev libgmp-dev 
 ```
 
-You can then install the other dependencies as for Ubuntu 14.
+You can then install the Boost and libsodium as for Ubuntu 14.
+For RELIC, use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh`, or `install_relic_x64_asm.sh` depending on the arithmetic you prefer.
 
 #### Mac OS
 
@@ -98,7 +100,7 @@ You will actually need it to install dependencies:
  $ brew install yasm scons cmake openssl gmp boost libsodium
 ```
 
-You will only need to install RELIC, which can be done following the instructions found above, or using the `install_dependencies/install_relic.sh` script.
+You will only need to install RELIC, which can be done following the instructions found above, or use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh`, or `install_relic_x64_asm.sh` depending on the arithmetic you prefer.
 
 ### Targets
 

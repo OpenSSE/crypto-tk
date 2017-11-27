@@ -33,6 +33,7 @@ Building is done through [SConstruct](http://www.scons.org).
 * [Boost](http://www.boost.org/) Only headers from Boost are needed to build the library. As the incremental set hashing code relies on the [Endian](http://www.boost.org/doc/libs/release/libs/endian/) library, release older than 1.58 are necessary.
 
 * [RELIC](https://github.com/relic-toolkit/relic) Some features (puncturable encryption) are based on cryptographic pairings. These are implemented using the RELIC toolkit. RELIC has many compilation options. To install RELIC, you can do the following:
+
 ```sh
 git clone https://github.com/relic-toolkit/relic.git
 cd relic
@@ -61,7 +62,7 @@ Here is what is necessary to set your system up from scratch, and build `libsse_
 ```sh
  $ [sudo] add-apt-repository ppa:ubuntu-toolchain-r/test
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons g++-4.9 libtool yasm lcov libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential scons g++-4.9 libtool yasm libssl-dev libgmp-dev 
 ```
 
 To set GCC 4.9 as the compiler, you have two options. Either set the environment variables `CC` and `CXX` to `gcc-4.9` and `g++-4.9` respectively, or edit the file `config.scons` to include the following lines:
@@ -79,7 +80,7 @@ Hence, you can run `./install_boost.sh` to download and move the boost headers i
 
 ```sh
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons libtool yasm lcov libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential scons libtool yasm libssl-dev libgmp-dev 
 ```
 
 You can then install the other dependencies as for Ubuntu 14.
@@ -94,7 +95,7 @@ If you still haven't, you should get [Homebrew](http://brew.sh/).
 You will actually need it to install dependencies: 
 
 ```sh
- $ brew install yasm scons cmake lcov openssl gmp boost libsodium
+ $ brew install yasm scons cmake openssl gmp boost libsodium
 ```
 
 
@@ -148,6 +149,21 @@ The scons script takes the following options:
 *  `gcov`: `gcov=1` toggles on the flags needed for code coverage. Disabled by default.
 
 *  `run_check`: By default, when the `check` target is built, the tests are automatically run upon successful compilation. The option `run_check=0` disables this behavior.
+
+## Code coverage
+
+Code coverage is available using the `gcov=1` option in the building script. A report can be then generated the `gcov.sh` script (which uses lcov). 
+
+So to generate the code coverage for all the tests, first install lcov with
+`[sudo] apt-get install lcov` (on Ubuntu) or `brew install lcov` (on Mac OS). Then run
+
+```sh
+$ scons check gcov=1
+$ ./gcov.sh
+```
+
+The report will be available in the file `gcov/index.html`.
+
 
 ## Contributors
 

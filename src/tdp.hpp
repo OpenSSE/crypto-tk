@@ -50,7 +50,7 @@ class Tdp{
 public:
     static constexpr size_t kMessageSize = 256;
     static constexpr unsigned int kStatisticalSecurity = 64;
-    static constexpr size_t kRSAPrgSize = kMessageSize + kStatisticalSecurity;
+    static constexpr size_t kRSAPrgSize = kMessageSize + (kStatisticalSecurity+7)/8;
 
 	Tdp(const std::string& pk);
 

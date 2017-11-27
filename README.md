@@ -28,6 +28,8 @@ Building is done through [SConstruct](http://www.scons.org).
 
 `libsse_crypto` uses the following dependencies
 
+* [libsodium](https://download.libsodium.org/doc/)
+
 * [Boost](http://www.boost.org/) Only headers from Boost are needed to build the library. As the incremental set hashing code relies on the [Endian](http://www.boost.org/doc/libs/release/libs/endian/) library, release older than 1.58 are necessary.
 
 * [RELIC](https://github.com/relic-toolkit/relic) Some features (puncturable encryption) are based on cryptographic pairings. These are implemented using the RELIC toolkit. RELIC has many compilation options. To install RELIC, you can do the following:
@@ -50,6 +52,51 @@ You can also replace the `-DARITH=gmp` option by `-DARITH=x64-asm-254` (for bett
 
 `libsse_crypto` needs a compiler supporting C++14, and the [yasm](http://yasm.tortall.net) assembler. 
 It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3, and yasm 1.2.0 for the assembler, and on Mac OS X.12 using clang 9.0.0 and yasm 1.3.0.
+
+### Setting up your system
+Here is what is necessary to set your system up from scratch, and build `libsse_crypto` (you will need to build RELIC first though).
+
+#### Ubuntu 14.04 LTS
+
+```sh
+ $ [sudo] add-apt-repository ppa:ubuntu-toolchain-r/test
+ $ [sudo] apt-get update
+ $ [sudo] apt-get install build-essential scons g++-4.9 libtool yasm lcov libssl-dev libgmp-dev 
+```
+
+To set GCC 4.9 as the compiler, you have two options. Either set the environment variables `CC` and `CXX` to `gcc-4.9` and `g++-4.9` respectively, or edit the file `config.scons` to include the following lines:
+
+```python
+env['CC'] = 'gcc-4.9'
+env['CXX'] = 'g++-4.9'
+```
+
+Then, to install the three dependencies, you can either follow the instructions of their website (in particular for libsodium and Boost), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
+Hence, you can run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.15 and `./install_relic.sh` to install RELIC with the `easy` arithmetic.
+
+
+#### Ubuntu 16.04 LTS
+
+```sh
+ $ [sudo] apt-get update
+ $ [sudo] apt-get install build-essential scons libtool yasm lcov libssl-dev libgmp-dev 
+```
+
+You can then install the other dependencies as for Ubuntu 14.
+
+#### Mac OS
+
+```sh
+ $ [sudo] xcode-select --install
+```
+
+If you still haven't, you should get [Homebrew](http://brew.sh/). 
+You will actually need it to install dependencies: 
+
+```sh
+ $ brew install yasm scons cmake lcov openssl gmp boost libsodium
+```
+
 
 ### Targets
 

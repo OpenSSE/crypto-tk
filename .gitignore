@@ -15,7 +15,7 @@ check
 check_ci
 library
 
-# Ignore files downloaded by the CI
+# Ignore files downloaded when installing boost
 boost_1_60_0.tar.gz
 boost_1_60_0/
 src/boost

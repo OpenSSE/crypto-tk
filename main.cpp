@@ -38,7 +38,6 @@
 #include "src/hash/sha512.hpp"
 
 #include "src/tdp.hpp"
-#include "src/block_hash.hpp"
 #include "src/prg.hpp"
 
 #include "src/ppke/GMPpke.h"
@@ -375,41 +374,6 @@ static void bench_rsa()
 
     }
 
-}
-
-
-static void bench_hash_block()
-{
-    size_t N_sample = 1e7;
-    
-    sse::crypto::BlockHash::hash(std::array<uint8_t, 16>{ 0x00 });
-
-    std::chrono::duration<double, std::nano> bh_time;
-    for (size_t i = 0; i < N_sample; i++) {
-        size_t in[4] = {i, 2*i, 3*i ,4*i};
-        unsigned char out[16];
-        
-        auto begin_t = std::chrono::high_resolution_clock::now();
-        sse::crypto::BlockHash::hash((unsigned char*)in, out);
-        auto end_t = std::chrono::high_resolution_clock::now();
-        
-        bh_time += end_t - begin_t;
-    }
-
-    std::chrono::duration<double, std::nano> hash_time;
-    for (size_t i = 0; i < N_sample; i++) {
-        size_t in[4] = {i, 2*i, 3*i ,4*i};
-        std::string in_string((char *)in, 16);
-        
-        auto begin_t = std::chrono::high_resolution_clock::now();
-        std::string out = sse::crypto::Hash::hash(in_string);
-        auto end_t = std::chrono::high_resolution_clock::now();
-        
-        hash_time += end_t - begin_t;
-    }
-
-    std::cout << "Block Hash: " << bh_time.count() << std::endl;
-    std::cout << "Regular Hash: " << hash_time.count() << std::endl;
 }
 
 static void bench_prg()

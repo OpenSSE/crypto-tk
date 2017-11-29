@@ -20,25 +20,12 @@
 
 
 #include "prg.hpp"
-#include "aesni/aesni.hpp"
-
 
 #include <sodium/crypto_stream_chacha20.h>
-//#include <openssl/aes.h>
-//#include <openssl/modes.h>
 
 
 #include <cstring>
 
-#include <iostream>
-#include <iomanip>
-
-#define PUTU32(ct, st) { \
-    (ct)[0] = (uint8_t)((st) >> 24); (ct)[1] = (uint8_t)((st) >> 16); \
-    (ct)[2] = (uint8_t)((st) >>  8); (ct)[3] = (uint8_t)(st); }
-
-#define GETU32(pt) (((uint32_t)(pt)[0] << 24) ^ ((uint32_t)(pt)[1] << 16) ^ \
-                        ((uint32_t)(pt)[2] <<  8) ^ ((uint32_t)(pt)[3]))
 
 // ChaCha is not really a all-in-one stream cipher (like RC4/Trivium/Grain)
 // It is just a block cipher in counter mode
@@ -60,9 +47,7 @@ namespace sse
             PrgImpl() = delete;
             
             inline PrgImpl(Key<kKeySize>&& key);
-            
-//            inline ~PrgImpl();
-            
+                        
             inline void derive(const size_t len, std::string &out) const;
             inline void derive(const size_t len, unsigned char* out) const;
             

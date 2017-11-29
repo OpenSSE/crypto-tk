@@ -41,6 +41,35 @@ namespace sse
     
     namespace crypto
     {
+        
+        static void prg_derivation(const unsigned char* key, const uint32_t offset, const size_t len, unsigned char* out)
+        {
+            const uint32_t extra_len = (offset % CHACHA20_BLOCK_SIZE);
+            const uint32_t block_offset = offset/CHACHA20_BLOCK_SIZE;
+            const size_t max_block_index = (len+offset-1)/CHACHA20_BLOCK_SIZE + 1;
+            
+            const size_t block_len = max_block_index - block_offset;
+            
+            memset(out, 0, len);
+            
+            if (offset%CHACHA20_BLOCK_SIZE == 0) {
+                // things are aligned, good !
+                crypto_stream_chacha20_xor_ic(out, out, len, chacha_nonce, block_offset, key);
+            }else{
+                // we need to create a buffer
+                const size_t tmp_len = block_len*CHACHA20_BLOCK_SIZE;
+                unsigned char *tmp = new unsigned char[tmp_len];
+                memset(tmp, 0, tmp_len);
+                
+                crypto_stream_chacha20_xor_ic(tmp, tmp, tmp_len, chacha_nonce, block_offset, key);
+                
+                memcpy(out, tmp+extra_len, len);
+                sodium_memzero(tmp, tmp_len);
+                
+                delete [] tmp;
+            }
+        }
+        
         class Prg::PrgImpl
         {
         public:
@@ -187,36 +216,7 @@ namespace sse
                 throw std::invalid_argument("The minimum number of bytes to derive is 1.");
             }
             
-            uint32_t extra_len = (offset % CHACHA20_BLOCK_SIZE);
-            uint32_t block_offset = offset/CHACHA20_BLOCK_SIZE;
-            size_t max_block_index = (len+offset)/CHACHA20_BLOCK_SIZE;
-            
-            if ((len+offset)%CHACHA20_BLOCK_SIZE != 0) {
-                max_block_index++;
-            }
-            
-            size_t block_len = max_block_index - block_offset;
-
-            memset(out, 0, len);
-
-            key_.unlock();
-
-            if (offset%CHACHA20_BLOCK_SIZE == 0) {
-                // things are aligned, good !
-                crypto_stream_chacha20_xor_ic(out, out, len, chacha_nonce, block_offset, key_.data());
-            }else{
-                // we need to create a buffer
-                unsigned char *tmp = new unsigned char[block_len*CHACHA20_BLOCK_SIZE];
-                memset(tmp, 0, block_len*CHACHA20_BLOCK_SIZE);
-
-                crypto_stream_chacha20_xor_ic(tmp, tmp, block_len*CHACHA20_BLOCK_SIZE, chacha_nonce, block_offset, key_.data());
-
-                memcpy(out, tmp+extra_len, len);
-                sodium_memzero(tmp, block_len*CHACHA20_BLOCK_SIZE);
-
-                delete [] tmp;
-            }
-
+            prg_derivation (key_.unlock_get(), offset, len, out);
             key_.lock();
         }
 
@@ -258,35 +258,7 @@ namespace sse
             
             Key<kKeySize> local_key(std::move(k)); // make sure the input key cannot be reused
             
-            uint32_t extra_len = (offset % CHACHA20_BLOCK_SIZE);
-            uint32_t block_offset = offset/CHACHA20_BLOCK_SIZE;
-            size_t max_block_index = (len+offset)/CHACHA20_BLOCK_SIZE;
-            
-            if ((len+offset)%CHACHA20_BLOCK_SIZE != 0) {
-                max_block_index++;
-            }
-            
-            size_t block_len = max_block_index - block_offset;
-            
-            memset(out, 0, len);
-            
-            local_key.unlock();
-            
-            if (offset%CHACHA20_BLOCK_SIZE == 0) {
-                // things are aligned, good !
-                crypto_stream_chacha20_xor_ic(out, out, len, chacha_nonce, block_offset, local_key.data());
-            }else{
-                // we need to create a buffer
-                unsigned char *tmp = new unsigned char[block_len*CHACHA20_BLOCK_SIZE];
-                memset(tmp, 0, block_len*CHACHA20_BLOCK_SIZE);
-                
-                crypto_stream_chacha20_xor_ic(tmp, tmp, block_len*CHACHA20_BLOCK_SIZE, chacha_nonce, block_offset, local_key.data());
-                
-                memcpy(out, tmp+extra_len, len);
-                sodium_memzero(tmp, block_len*CHACHA20_BLOCK_SIZE);
-                
-                delete [] tmp;
-            }
+            prg_derivation (local_key.unlock_get(), offset, len, out);
             
             local_key.lock();
         }

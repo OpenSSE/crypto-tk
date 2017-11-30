@@ -92,6 +92,16 @@ void Cipher::decrypt(const std::string &in, std::string &out)
 	cipher_imp_->decrypt(in, out);
 }
 
+size_t Cipher::ciphertext_length(const size_t plaintext_len)
+{
+    return Cipher::CipherImpl::ciphertext_length(plaintext_len);
+}
+    
+size_t Cipher::plaintext_length(const size_t c_len)
+{
+    return Cipher::CipherImpl::plaintext_length(c_len);
+}
+
 // Cipher implementation
 
 #define MIN(a,b) (((a) > (b)) ? (b) : (a))
@@ -165,7 +175,7 @@ void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)
 void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
     if (len < ciphertext_length(0)) {
-        throw std::invalid_argument("The minimum number of bytes to decrypt is " + std::to_string(ciphertext_length(0)));
+        throw std::invalid_argument("The minimum number of bytes to decrypt is " + std::to_string(ciphertext_length(0))); /* LCOV_EXCL_LINE */
     }
 
     uint8_t chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];

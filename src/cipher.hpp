@@ -66,6 +66,10 @@ public:
 	Cipher& operator=(const Cipher& h) = delete;
 	Cipher& operator=(Cipher& h) = delete;
 	
+    
+    static size_t ciphertext_length(const size_t plaintext_len);
+    static size_t plaintext_length(const size_t c_len);
+
 private:	
 	class CipherImpl; // not defined in the header
 	CipherImpl *cipher_imp_; // opaque pointer

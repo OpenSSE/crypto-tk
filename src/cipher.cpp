@@ -22,27 +22,25 @@
 
 #include "random.hpp"
 
-#include <cstring>
 #include <exception>
-#include <iostream>
-#include <iomanip>
 
-#include <openssl/aes.h>
 #include <sodium/utils.h>
+#include <sodium/crypto_generichash_blake2b.h>
+#include <sodium/crypto_aead_chacha20poly1305.h>
 
 namespace sse
 {
 
 namespace crypto
 {
+    
+#define NONCE_SIZE crypto_generichash_blake2b_SALTBYTES
 
+static constexpr uint8_t hash_personal__[crypto_generichash_blake2b_PERSONALBYTES] = "encryption_key";
+    
 class Cipher::CipherImpl
 {
 public:
-		
-	// We use 48 bits IV. 
-	// This is enough to encrypt 2^48 blocks which is the security bound of counter mode
-	static constexpr uint8_t kIVSize = 6; 
 
     CipherImpl() = delete;
 	
@@ -50,17 +48,29 @@ public:
 	
 	~CipherImpl();
 
+    
+    inline static size_t ciphertext_length(const size_t plaintext_len)
+    {
+        return plaintext_len+NONCE_SIZE+crypto_aead_chacha20poly1305_IETF_ABYTES;
+    };
+    
+    inline static size_t plaintext_length(const size_t c_len)
+    {
+        if (c_len > NONCE_SIZE+crypto_aead_chacha20poly1305_IETF_ABYTES) {
+            return c_len-NONCE_SIZE-crypto_aead_chacha20poly1305_IETF_ABYTES;
+        }
+        return 0;
+    };
+    
 	void encrypt(const unsigned char* in, const size_t &len, unsigned char* out);
 	void encrypt(const std::string &in, std::string &out);
 	void decrypt(const unsigned char* in, const size_t &len, unsigned char* out);
 	void decrypt(const std::string &in, std::string &out);
 
 
-private:	
-	Key<sizeof(AES_KEY)> aes_enc_key_;
-	
-	unsigned char iv_[kIVSize];
-	uint64_t remaining_block_count_;
+private:
+    static_assert(crypto_generichash_blake2b_KEYBYTES == kKeySize, "Invalid Cipher key size");
+	Key<crypto_generichash_blake2b_KEYBYTES> key_;
 };
 	
 
@@ -91,113 +101,120 @@ void Cipher::decrypt(const std::string &in, std::string &out)
 // and from the IV length (not more than 2^(8*kIVSize) different IVs)
 
 Cipher::CipherImpl::CipherImpl(Key<kKeySize>&& k)
-    : remaining_block_count_( ((uint64_t) 1) << MIN(48,8*kIVSize) )
+    : key_(std::move(k))
 {
-    
-    auto callback = [&k](uint8_t* key_content){
-        if (AES_set_encrypt_key(k.unlock_get(), 128, reinterpret_cast<AES_KEY*>(key_content)) != 0)
-        {
-            // throw an exception
-            throw std::runtime_error("Unable to init AES subkeys");
-        }
-    };
-    
-    aes_enc_key_ = Key<sizeof(AES_KEY)>(callback);
-    k.erase();
-
-    sodium_memzero(iv_, kIVSize);
 }
 
 Cipher::CipherImpl::~CipherImpl() 
 { 
 }
 
-
 void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
     if (len == 0) {
         throw std::invalid_argument("The minimum number of bytes to encrypt is 1.");
     }
-	if(remaining_block_count_ < ((len/16)+1)){
-		// throw an exception
-		throw std::runtime_error("Too many blocks were encrypted with the same key. Encrypting using this key is now insecure."); /* LCOV_EXCL_LINE */
-	}
-	
-    unsigned char enc_iv[AES_BLOCK_SIZE];
-    unsigned char ecount[AES_BLOCK_SIZE];
-    sodium_memzero(ecount, AES_BLOCK_SIZE);
-	
-	unsigned int num = 0;
-	
-	memcpy(out, iv_, kIVSize); // copy iv first
+    
+    uint8_t chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
+    unsigned long long c_len = 0;
+    
+    // generate a random nonce, and place it at the beginning of the output
+    random_bytes(NONCE_SIZE, out);
+    
+    // unlock the master key
+    key_.unlock();
+    
+    // start by deriving a subkey from the master and the nonce
+    crypto_generichash_blake2b_salt_personal(chacha_key, sizeof(chacha_key),
+                                                 NULL, 0,
+                                                 key_.data(), kKeySize,
+                                                 out, hash_personal__);
 
-    if(kIVSize != AES_BLOCK_SIZE){
-		sodium_memzero(enc_iv, AES_BLOCK_SIZE);
-    }
     
-	memcpy(enc_iv+AES_BLOCK_SIZE-kIVSize, iv_, kIVSize);
-	
-	// now append the ciphertext
-    AES_ctr128_encrypt(in, out+kIVSize, len, reinterpret_cast<const AES_KEY*>(aes_enc_key_.unlock_get()), enc_iv, ecount, &num);
-	
-    aes_enc_key_.lock();
+    // re-lock the master key
+    key_.lock();
     
-	// erase ecount to avoid (partial) recovery of the last block
-	sodium_memzero(ecount, AES_BLOCK_SIZE);
-	
-	// decrement the block counter
-	remaining_block_count_ -= (len/16 +1);
+    // go for encryption with the derived key
+    crypto_aead_chacha20poly1305_ietf_encrypt(out+NONCE_SIZE, &c_len,
+                                              in, len,
+                                              NULL, 0,
+                                              NULL, out, chacha_key);
+    
+    
+    
+    
+    // delete the derived key
+    sodium_memzero(chacha_key, crypto_aead_chacha20poly1305_KEYBYTES);
 }
 
 void Cipher::CipherImpl::encrypt(const std::string &in, std::string &out)
 {
-	size_t len = in.size();
-    unsigned char *data = new unsigned char[len+kIVSize];
+    size_t len = in.size();
+	size_t c_len = ciphertext_length(len);
+    unsigned char *data = new unsigned char[c_len];
 
 	encrypt((const unsigned char*)in.data(), len, data);
-    out = std::string((char *)data, len+kIVSize);
+    out = std::string((char *)data, c_len);
 
     // erase the buffer
-    sodium_memzero(data, len+kIVSize);
+    sodium_memzero(data, c_len);
     
     delete [] data;
 }
 
 void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
-    unsigned char ecount[AES_BLOCK_SIZE];
-    unsigned char dec_iv[AES_BLOCK_SIZE];
-    memset(ecount, 0x00, AES_BLOCK_SIZE);
-    memset(dec_iv, 0x00, AES_BLOCK_SIZE);
-	
-	unsigned int num = 0;
-	
-	if(kIVSize != AES_BLOCK_SIZE)
-		memset(dec_iv, 0, AES_BLOCK_SIZE);
-	
-	memcpy(dec_iv+AES_BLOCK_SIZE-kIVSize, in, kIVSize); // copy iv first
-	
-	// now append the ciphertext
-  	AES_ctr128_encrypt(in+kIVSize, out, len-kIVSize, reinterpret_cast<const AES_KEY*>(aes_enc_key_.unlock_get()), dec_iv, ecount, &num);
-	
-    aes_enc_key_.lock();
+    if (len < ciphertext_length(0)) {
+        throw std::invalid_argument("The minimum number of bytes to decrypt is " + std::to_string(ciphertext_length(0)));
+    }
+
+    uint8_t chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
+    unsigned long long m_len = 0;
     
-	// erase ecount to avoid (partial) recovery of the last block
-	sodium_memzero(ecount, AES_BLOCK_SIZE);
+    // unlock the master key
+    key_.unlock();
+    
+    // start by deriving a subkey from the master and the nonce
+    crypto_generichash_blake2b_salt_personal(chacha_key, sizeof(chacha_key),
+                                             NULL, 0,
+                                             key_.data(), kKeySize,
+                                             in, hash_personal__);
+    
+    
+    // re-lock the master key
+    key_.lock();
+
+    // go for decryption with the derived key
+    int ret = crypto_aead_chacha20poly1305_ietf_decrypt(out, &m_len,
+                                                        NULL, in+NONCE_SIZE, len-NONCE_SIZE,
+                                                        NULL, 0,
+                                                        in, chacha_key);
+    
+    // delete the derived key
+    sodium_memzero(chacha_key, crypto_aead_chacha20poly1305_KEYBYTES);
+
+    if (ret == -1) { // invalid decryption
+        // erase the decrypted plaintext
+        sodium_memzero(out, m_len);
+        
+        throw std::runtime_error("Failed decryption. Invalid ciphertext");
+    }
 }
 
 void Cipher::CipherImpl::decrypt(const std::string &in, std::string &out)
 {
 	size_t len = in.size();
-
-    if (len <= kIVSize) {
+    
+    if (len <= NONCE_SIZE+crypto_aead_chacha20poly1305_IETF_ABYTES) {
         throw std::invalid_argument("The minimum number of bytes to decrypt is 1. The minimum length for a decryption input is kIVSize+1");
     }
+    
+    size_t p_len = plaintext_length(len);
 
-    unsigned char *data = new unsigned char[len-kIVSize];
+    unsigned char *data = new unsigned char[p_len];
 	decrypt((const unsigned char*)in.data(), len, data);
 
-    out = std::string((char *)data, len-kIVSize);
+    out = std::string((char *)data, p_len);
     delete [] data;
 }
 	

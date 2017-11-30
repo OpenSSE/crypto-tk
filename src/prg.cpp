@@ -25,6 +25,7 @@
 
 
 #include <cstring>
+#include <cassert>
 
 
 // ChaCha is not really a all-in-one stream cipher (like RC4/Trivium/Grain)
@@ -44,8 +45,8 @@ namespace sse
         
         static void prg_derivation(const unsigned char* key, const uint32_t offset, const size_t len, unsigned char* out)
         {
-            const uint32_t extra_len = (offset % CHACHA20_BLOCK_SIZE);
-            const uint32_t block_offset = offset/CHACHA20_BLOCK_SIZE;
+            const size_t mod_offset = (offset % CHACHA20_BLOCK_SIZE);
+            const size_t block_offset = offset/CHACHA20_BLOCK_SIZE;
             const size_t max_block_index = (len+offset-1)/CHACHA20_BLOCK_SIZE + 1;
             
             const size_t block_len = max_block_index - block_offset;
@@ -56,17 +57,29 @@ namespace sse
                 // things are aligned, good !
                 crypto_stream_chacha20_xor_ic(out, out, len, chacha_nonce, block_offset, key);
             }else{
-                // we need to create a buffer
-                const size_t tmp_len = block_len*CHACHA20_BLOCK_SIZE;
-                unsigned char *tmp = new unsigned char[tmp_len];
-                memset(tmp, 0, tmp_len);
-                
-                crypto_stream_chacha20_xor_ic(tmp, tmp, tmp_len, chacha_nonce, block_offset, key);
-                
-                memcpy(out, tmp+extra_len, len);
-                sodium_memzero(tmp, tmp_len);
-                
-                delete [] tmp;
+                unsigned char buffer[CHACHA20_BLOCK_SIZE];
+                memset(buffer, 0, CHACHA20_BLOCK_SIZE);
+
+                size_t prefix_len = CHACHA20_BLOCK_SIZE - mod_offset;
+                // start by generating the inner blocks
+                if(block_len>1) {
+                    const size_t tmp_len = len - prefix_len;
+                    crypto_stream_chacha20_xor_ic(out+prefix_len, out+prefix_len, tmp_len, chacha_nonce, block_offset+1, key);
+                }else{
+                    // The output is just the prefix
+                    // We must cut the output before the end of the block
+                    prefix_len = len;
+                }
+                // Now, we have to generate the first bytes of out
+                // These are the last out_offset bytes of the block index block_offset
+
+                crypto_stream_chacha20_xor_ic(buffer, buffer, CHACHA20_BLOCK_SIZE, chacha_nonce, block_offset, key);
+
+                // copy these last bytes
+                memcpy(out, buffer+mod_offset, prefix_len);
+
+                // zeroize the buffer
+                sodium_memzero(buffer, CHACHA20_BLOCK_SIZE);
             }
         }
         

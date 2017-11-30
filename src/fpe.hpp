@@ -21,6 +21,8 @@
 
 #pragma once
 
+#if __AES__ || __ARM_FEATURE_CRYPTO   /* Defined by gcc/clang when compiling for AES-NI */
+
 #include "key.hpp"
 
 #include <cstdint>
@@ -80,3 +82,7 @@ private:
 
 }
 }
+
+#else
+#error FPE requires support of the AES NI or ARM Crypto instructions
+#endif

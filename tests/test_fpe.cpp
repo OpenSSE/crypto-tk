@@ -18,6 +18,8 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#if __AES__ || __ARM_FEATURE_CRYPTO   /* Defined by gcc/clang when compiling for AES-NI */
+
 #include "../src/fpe.hpp"
 #include "../src/random.hpp"
 
@@ -112,3 +114,7 @@ TEST(fpe, consistency_64) {
         ASSERT_EQ(dec_64_s_1, string((char*) &dec_64_i, sizeof(uint64_t)));
     }
 }
+
+#else
+#warning FPE is disabled (requires suport of AES instructions)
+#endif

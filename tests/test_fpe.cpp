@@ -116,5 +116,5 @@ TEST(fpe, consistency_64) {
 }
 
 #else
-#warning FPE is disabled (requires suport of AES instructions)
+#warning FPE is disabled (requires support of AES instructions)
 #endif

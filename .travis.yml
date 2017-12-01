@@ -30,8 +30,7 @@ before_install:
   - sudo ldconfig
  
 script:
-  - scons check static_relic=1 no_aesni=1
-  - scons -Q -c check && scons check debug=1 coverage=1 static_relic=1
+  - scons check debug=1 coverage=1 static_relic=1
 
 after_success:
   - cd coverage

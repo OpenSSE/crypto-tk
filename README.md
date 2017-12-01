@@ -143,8 +143,6 @@ The `config.scons` will automatically be included by the main SConstruct script,
 
 The scons script takes the following options:
 
-*  `no_aesni`: toggle the use of Intel's AES NI, which, when available, offer a huge speed up to the computation of AES. `no_aesni=1` disables the instructions. They are enabled by default.
-
 *  `rsa_impl`: choose the RSA implementation. Available options are `rsa_impl=mbedTLS` and `rsa_impl=OpenSSL`. `mbedTLS` is the default option, and corresponds to the embedded implementation. `OpenSSL` requires OpenSSL's `libcrypto` to be available.
 
 *  `static_relic`: choose to link between the static or the dynamic version of RELIC. This options is needed because RELIC's build script names the static library `relic_s` instead of `relic`. Use `static_relic=0` to link against the dynamic library, and `static_relic=1` for the static one. Uses the dynamic library by default.

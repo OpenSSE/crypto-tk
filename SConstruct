@@ -109,10 +109,6 @@ if int(coverage):
     env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline'])
 
 
-no_aes_ni = ARGUMENTS.get('no_aesni', 0) # disable the code using AES NI
-if int(no_aes_ni):
-    env.Append(CCFLAGS = ['-D', 'NO_AESNI'])
-
 rsa_implementation = ARGUMENTS.get('rsa_impl', 'mbedTLS') # choose the RSA implementation in use
 if rsa_implementation.lower() != 'mbedTLS'.lower(): # mbedTLS is used by default
     if rsa_implementation.lower() == 'OpenSSL'.lower():

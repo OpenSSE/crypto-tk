@@ -138,7 +138,6 @@
 		6CC2D4D31C3193FA00334ADD /* aez.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4021C3185D700334ADD /* aez.h */; };
 		6CC2D4D41C31940400334ADD /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
 		6CC2D4D51C31940400334ADD /* sha512.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4591C3185D700334ADD /* sha512.hpp */; };
-		6CC2D4E71C31941D00334ADD /* ctr_drbg.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4281C3185D700334ADD /* ctr_drbg.hpp */; };
 		6CC2D4E81C31941D00334ADD /* hugepages.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42B1C3185D700334ADD /* hugepages.hpp */; };
 		6CC2D4E91C31942100334ADD /* array_view.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4081C3185D700334ADD /* array_view.hpp */; };
 		6CC2D4EA1C31942100334ADD /* is_contiguous.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4091C3185D700334ADD /* is_contiguous.hpp */; };
@@ -157,7 +156,6 @@
 		6CC2D4F71C31942F00334ADD /* GF2_127_63.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */; };
 		6CC2D4F81C31942F00334ADD /* GF2_127_63.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4221C3185D700334ADD /* GF2_127_63.hpp */; };
 		6CC2D4F91C31942F00334ADD /* GF2_254.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4231C3185D700334ADD /* GF2_254.hpp */; };
-		6CC2D4FA1C31942F00334ADD /* GF2m.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4241C3185D700334ADD /* GF2m.hpp */; };
 		6CC2D4FB1C31942F00334ADD /* invert_blinded.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4251C3185D700334ADD /* invert_blinded.hpp */; };
 		6CC2D4FC1C31942F00334ADD /* QuadraticExtension.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4261C3185D700334ADD /* QuadraticExtension.hpp */; };
 		6CC2D4FD1C31942F00334ADD /* solve_quadratic_blinded.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4271C3185D700334ADD /* solve_quadratic_blinded.hpp */; };
@@ -170,14 +168,8 @@
 		6CC2D5041C31943300334ADD /* polynomial_multiply.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41D1C3185D700334ADD /* polynomial_multiply.hpp */; };
 		6CC2D5051C31943300334ADD /* polynomial_reduce_127_63.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41E1C3185D700334ADD /* polynomial_reduce_127_63.hpp */; };
 		6CC2D5061C31943B00334ADD /* hash_expand.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42A1C3185D700334ADD /* hash_expand.hpp */; };
-		6CC2D5071C31944100334ADD /* AdHash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42D1C3185D700334ADD /* AdHash.hpp */; };
 		6CC2D5081C31944100334ADD /* ECMH.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4301C3185D700334ADD /* ECMH.hpp */; };
-		6CC2D5091C31944100334ADD /* MuHash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4311C3185D700334ADD /* MuHash.hpp */; };
 		6CC2D50A1C31944500334ADD /* operation_helpers.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42F1C3185D700334ADD /* operation_helpers.hpp */; };
-		6CC2D50B1C31944A00334ADD /* bn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4331C3185D700334ADD /* bn.hpp */; };
-		6CC2D50C1C31944A00334ADD /* error.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4341C3185D700334ADD /* error.hpp */; };
-		6CC2D50D1C31944A00334ADD /* evp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4351C3185D700334ADD /* evp.hpp */; };
-		6CC2D50E1C31944A00334ADD /* thread_safety.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4361C3185D700334ADD /* thread_safety.hpp */; };
 		6CC2D50F1C31945000334ADD /* assign_endian.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4381C3185D700334ADD /* assign_endian.hpp */; };
 		6CC2D5101C31945000334ADD /* division.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4391C3185D700334ADD /* division.hpp */; };
 		6CC2D5111C31945000334ADD /* enable_if.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43A1C3185D700334ADD /* enable_if.hpp */; };
@@ -334,21 +326,13 @@
 		6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GF2_127_63.cpp; sourceTree = "<group>"; };
 		6CC2D4221C3185D700334ADD /* GF2_127_63.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GF2_127_63.hpp; sourceTree = "<group>"; };
 		6CC2D4231C3185D700334ADD /* GF2_254.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GF2_254.hpp; sourceTree = "<group>"; };
-		6CC2D4241C3185D700334ADD /* GF2m.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GF2m.hpp; sourceTree = "<group>"; };
 		6CC2D4251C3185D700334ADD /* invert_blinded.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = invert_blinded.hpp; sourceTree = "<group>"; };
 		6CC2D4261C3185D700334ADD /* QuadraticExtension.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = QuadraticExtension.hpp; sourceTree = "<group>"; };
 		6CC2D4271C3185D700334ADD /* solve_quadratic_blinded.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = solve_quadratic_blinded.hpp; sourceTree = "<group>"; };
-		6CC2D4281C3185D700334ADD /* ctr_drbg.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ctr_drbg.hpp; sourceTree = "<group>"; };
 		6CC2D42A1C3185D700334ADD /* hash_expand.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hash_expand.hpp; sourceTree = "<group>"; };
 		6CC2D42B1C3185D700334ADD /* hugepages.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hugepages.hpp; sourceTree = "<group>"; };
-		6CC2D42D1C3185D700334ADD /* AdHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AdHash.hpp; sourceTree = "<group>"; };
 		6CC2D42F1C3185D700334ADD /* operation_helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = operation_helpers.hpp; sourceTree = "<group>"; };
 		6CC2D4301C3185D700334ADD /* ECMH.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ECMH.hpp; sourceTree = "<group>"; };
-		6CC2D4311C3185D700334ADD /* MuHash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MuHash.hpp; sourceTree = "<group>"; };
-		6CC2D4331C3185D700334ADD /* bn.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bn.hpp; sourceTree = "<group>"; };
-		6CC2D4341C3185D700334ADD /* error.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = error.hpp; sourceTree = "<group>"; };
-		6CC2D4351C3185D700334ADD /* evp.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = evp.hpp; sourceTree = "<group>"; };
-		6CC2D4361C3185D700334ADD /* thread_safety.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = thread_safety.hpp; sourceTree = "<group>"; };
 		6CC2D4381C3185D700334ADD /* assign_endian.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assign_endian.hpp; sourceTree = "<group>"; };
 		6CC2D4391C3185D700334ADD /* division.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = division.hpp; sourceTree = "<group>"; };
 		6CC2D43A1C3185D700334ADD /* enable_if.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = enable_if.hpp; sourceTree = "<group>"; };
@@ -547,11 +531,9 @@
 				6CC2D4071C3185D700334ADD /* array_view */,
 				6CC2D40A1C3185D700334ADD /* binary_elliptic_curve */,
 				6CC2D4121C3185D700334ADD /* binary_field */,
-				6CC2D4281C3185D700334ADD /* ctr_drbg.hpp */,
 				6CC2D4291C3185D700334ADD /* hash */,
 				6CC2D42B1C3185D700334ADD /* hugepages.hpp */,
 				6CC2D42C1C3185D700334ADD /* multiset_hash */,
-				6CC2D4321C3185D700334ADD /* openssl */,
 				6CC2D4371C3185D700334ADD /* utility */,
 			);
 			path = ecmh;
@@ -592,7 +574,6 @@
 				6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */,
 				6CC2D4221C3185D700334ADD /* GF2_127_63.hpp */,
 				6CC2D4231C3185D700334ADD /* GF2_254.hpp */,
-				6CC2D4241C3185D700334ADD /* GF2m.hpp */,
 				6CC2D4251C3185D700334ADD /* invert_blinded.hpp */,
 				6CC2D4261C3185D700334ADD /* QuadraticExtension.hpp */,
 				6CC2D4271C3185D700334ADD /* solve_quadratic_blinded.hpp */,
@@ -626,10 +607,8 @@
 		6CC2D42C1C3185D700334ADD /* multiset_hash */ = {
 			isa = PBXGroup;
 			children = (
-				6CC2D42D1C3185D700334ADD /* AdHash.hpp */,
 				6CC2D42E1C3185D700334ADD /* detail */,
 				6CC2D4301C3185D700334ADD /* ECMH.hpp */,
-				6CC2D4311C3185D700334ADD /* MuHash.hpp */,
 			);
 			path = multiset_hash;
 			sourceTree = "<group>";
@@ -640,17 +619,6 @@
 				6CC2D42F1C3185D700334ADD /* operation_helpers.hpp */,
 			);
 			path = detail;
-			sourceTree = "<group>";
-		};
-		6CC2D4321C3185D700334ADD /* openssl */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D4331C3185D700334ADD /* bn.hpp */,
-				6CC2D4341C3185D700334ADD /* error.hpp */,
-				6CC2D4351C3185D700334ADD /* evp.hpp */,
-				6CC2D4361C3185D700334ADD /* thread_safety.hpp */,
-			);
-			path = openssl;
 			sourceTree = "<group>";
 		};
 		6CC2D4371C3185D700334ADD /* utility */ = {
@@ -731,7 +699,6 @@
 				316F0D421D25600700F87904 /* prg.hpp in Headers */,
 				310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */,
 				319966A11FB8A72D00051179 /* pem.h in Headers */,
-				6CC2D50B1C31944A00334ADD /* bn.hpp in Headers */,
 				6CC2D5111C31945000334ADD /* enable_if.hpp in Headers */,
 				6CC2D4FF1C31943300334ADD /* field_operation_helpers.hpp in Headers */,
 				6CC2D5101C31945000334ADD /* division.hpp in Headers */,
@@ -747,11 +714,9 @@
 				3114009B1F9E628C0025DE3A /* key.hpp in Headers */,
 				6CC2D4D51C31940400334ADD /* sha512.hpp in Headers */,
 				6CC2D4F91C31942F00334ADD /* GF2_254.hpp in Headers */,
-				6CC2D50C1C31944A00334ADD /* error.hpp in Headers */,
 				6CC2D5051C31943300334ADD /* polynomial_reduce_127_63.hpp in Headers */,
 				6CC2D4D31C3193FA00334ADD /* aez.h in Headers */,
 				6CC2D5041C31943300334ADD /* polynomial_multiply.hpp in Headers */,
-				6CC2D4FA1C31942F00334ADD /* GF2m.hpp in Headers */,
 				6CC2D4EE1C31942700334ADD /* GLS254.hpp in Headers */,
 				319966C91FBEE9D500051179 /* tdp_impl_mbedtls.hpp in Headers */,
 				6CC2D4F41C31942F00334ADD /* compute_linear_operation_table.hpp in Headers */,
@@ -759,7 +724,6 @@
 				6CC2D5141C31945000334ADD /* logical.hpp in Headers */,
 				6CC2D4EB1C31942700334ADD /* add.hpp in Headers */,
 				6CC2D50F1C31945000334ADD /* assign_endian.hpp in Headers */,
-				6CC2D4E71C31941D00334ADD /* ctr_drbg.hpp in Headers */,
 				6CC2D5131C31945000334ADD /* is_resizable_container.hpp in Headers */,
 				6CC2D4EF1C31942700334ADD /* Point.hpp in Headers */,
 				6CC2D4FB1C31942F00334ADD /* invert_blinded.hpp in Headers */,
@@ -770,17 +734,13 @@
 				6CC2D4FC1C31942F00334ADD /* QuadraticExtension.hpp in Headers */,
 				6CC2D4F11C31942700334ADD /* sw_blinded.hpp in Headers */,
 				6CC2D4F61C31942F00334ADD /* generic_trace.hpp in Headers */,
-				6CC2D5071C31944100334ADD /* AdHash.hpp in Headers */,
 				6CC2D5061C31943B00334ADD /* hash_expand.hpp in Headers */,
 				319966911FB8A72D00051179 /* bignum.h in Headers */,
 				6CC2D4F21C31942F00334ADD /* assign_hash.hpp in Headers */,
-				6CC2D50D1C31944A00334ADD /* evp.hpp in Headers */,
 				319966991FB8A72D00051179 /* rsa.h in Headers */,
 				6CC2D4E81C31941D00334ADD /* hugepages.hpp in Headers */,
 				319966AB1FB8AA1C00051179 /* base64.h in Headers */,
 				6CC2D5011C31943300334ADD /* limb.hpp in Headers */,
-				6CC2D50E1C31944A00334ADD /* thread_safety.hpp in Headers */,
-				6CC2D5091C31944100334ADD /* MuHash.hpp in Headers */,
 				319966BA1FBC2E9800051179 /* rsa_io.h in Headers */,
 				6CC2D4F01C31942700334ADD /* sw.hpp in Headers */,
 				6CC2D5021C31943300334ADD /* limb_ops.hpp in Headers */,

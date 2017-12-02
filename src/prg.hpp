@@ -48,7 +48,7 @@ namespace sse
         class Prg
         {
         public:
-            static constexpr uint8_t kKeySize = 16;
+            static constexpr uint8_t kKeySize = 32;
             
             Prg() = delete;
             Prg(Key<kKeySize>&& k);

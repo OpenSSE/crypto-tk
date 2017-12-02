@@ -59,6 +59,9 @@ TEST(encryption, correctness)
 
 TEST(encryption, exception)
 {
+    ASSERT_EQ(sse::crypto::Cipher::plaintext_length(0), 0);
+    ASSERT_EQ(sse::crypto::Cipher::plaintext_length(sse::crypto::Cipher::ciphertext_length(10)), 10);
+
     string in_enc = "";
     string out_enc, out_dec;
     
@@ -67,9 +70,12 @@ TEST(encryption, exception)
 
     sse::crypto::Cipher cipher(k.data());
 
-   ASSERT_THROW(cipher.encrypt(in_enc, out_enc), std::invalid_argument);
+    ASSERT_THROW(cipher.encrypt(in_enc, out_enc), std::invalid_argument);
     
     string in_dec = string(3,'a');
     
     ASSERT_THROW(cipher.decrypt(in_dec, out_dec), std::invalid_argument);
+    
+    in_dec = string(300,'a'); // long enough to be a 'valid' ciphertext
+    ASSERT_THROW(cipher.decrypt(in_dec, out_dec), std::runtime_error);
 }

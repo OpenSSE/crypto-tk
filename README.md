@@ -51,8 +51,8 @@ You can also replace the `-DARITH=gmp` option by `-DARITH=x64-asm-254` (for bett
 
 ### Compiler/Assembler
 
-`libsse_crypto` needs a compiler supporting C++14, and the [yasm](http://yasm.tortall.net) assembler. 
-It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3, and yasm 1.2.0 for the assembler, and on Mac OS X.12 using clang 9.0.0 and yasm 1.3.0.
+`libsse_crypto` needs a compiler supporting C++14. 
+It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3, and on Mac OS X.12 using clang 9.0.0.
 
 ### Setting up your system
 Here is what is necessary to set your system up from scratch, and build `libsse_crypto` (you will need to build RELIC first though).
@@ -62,7 +62,7 @@ Here is what is necessary to set your system up from scratch, and build `libsse_
 ```sh
  $ [sudo] add-apt-repository ppa:ubuntu-toolchain-r/test
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons g++-4.9 libtool yasm libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential scons g++-4.9 libtool libssl-dev libgmp-dev 
 ```
 
 To set GCC 4.9 as the compiler, you have two options. Either set the environment variables `CC` and `CXX` to `gcc-4.9` and `g++-4.9` respectively, or edit the file `config.scons` to include the following lines:
@@ -81,7 +81,7 @@ If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respec
 
 ```sh
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons libtool yasm libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential scons libtool libssl-dev libgmp-dev 
 ```
 
 You can then install the Boost and libsodium as for Ubuntu 14.
@@ -97,7 +97,7 @@ If you still haven't, you should get [Homebrew](http://brew.sh/).
 You will actually need it to install dependencies: 
 
 ```sh
- $ brew install yasm scons cmake openssl gmp boost libsodium
+ $ brew install scons cmake openssl gmp boost libsodium
 ```
 
 You will only need to install RELIC, which can be done following the instructions found above, or use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh`, or `install_relic_x64_asm.sh` depending on the arithmetic you prefer.
@@ -143,8 +143,6 @@ The `config.scons` will automatically be included by the main SConstruct script,
 
 The scons script takes the following options:
 
-*  `no_aesni`: toggle the use of Intel's AES NI, which, when available, offer a huge speed up to the computation of AES. `no_aesni=1` disables the instructions. They are enabled by default.
-
 *  `rsa_impl`: choose the RSA implementation. Available options are `rsa_impl=mbedTLS` and `rsa_impl=OpenSSL`. `mbedTLS` is the default option, and corresponds to the embedded implementation. `OpenSSL` requires OpenSSL's `libcrypto` to be available.
 
 *  `static_relic`: choose to link between the static or the dynamic version of RELIC. This options is needed because RELIC's build script names the static library `relic_s` instead of `relic`. Use `static_relic=0` to link against the dynamic library, and `static_relic=1` for the static one. Uses the dynamic library by default.
@@ -174,10 +172,6 @@ To cleanup the `coverage` directory, run `./cleanup.sh`.
 The code for the incremental (multi)set hash function has been written by Jeremy Maitin-Shepard.
 It is directly available from its [GitHub repo](https://github.com/jbms/ecmh). The source files of the `src/ecmh` directory are directly taken from this codebase and its dependencies, with some minor fixes or modifications to make the code compile using gcc.
 
-The implementation of the Blake2 hash functions has been written by [Samuel Neves](https://eden.dei.uc.pt/~sneves/).
-
-SHA512 implementations are from Intel (x86 optimized assembly, using SSE4, AVX or AVX2) and ARM (C implementation from [mbed TLS](https://tls.mbed.org)).
-
 An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbed TLS](https://tls.mbed.org))
 
 The puncturable encryption code has been originally written by [Ian Miers](http://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
@@ -187,10 +181,6 @@ Unless otherwise stated, the rest of the code has been written by [Raphael Bost]
 ## Licensing
 
 Even if it is not explicitly stated, the ECMH code by Jeremy Maitin-Shepard (*i.e.* the the `src/ecmh` directory) must be considered as licensed under GPL (personal communications with Jeremy).
-
-Blake2 implementations have been dedicated to the public domain (*cf.* [CC0 Public Domain Dedication](http://creativecommons.org/publicdomain/zero/1.0/)).
-
-Intel's assembly code for SHA512 is covered by the Intel Open Software License (*cf.* `open_software_license.txt`).
 
 mbed TLS is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 

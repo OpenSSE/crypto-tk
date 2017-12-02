@@ -17,9 +17,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
-#pragma once
 
-#include <cstddef>
+#include "blake2b.hpp"
+
+#include <sodium/crypto_generichash_blake2b.h>
+
+#include <cstdint>
+
+using namespace std;
+
+
 
 namespace sse
 {
@@ -29,16 +36,11 @@ namespace crypto
 
 namespace hash
 {
-
-struct sha512
-	{
-		
-		constexpr static size_t kDigestSize = 64;
-		constexpr static size_t kBlockSize = 128;
-		
-		static void hash(const unsigned char *in, const size_t len, unsigned char *out);
-
-	};	
+	
+void blake2b::hash(const unsigned char *in, const size_t len, unsigned char *digest)
+{
+    crypto_generichash_blake2b(digest, kDigestSize, in, len, NULL, 0);
+}
 
 }
 }

@@ -45,6 +45,8 @@ class Fpe{
 public:
 	static constexpr uint8_t kKeySize = 48;
 	
+    static bool is_available();
+    
 	Fpe();
 	// we should not be able to duplicate Fpe objects
 	Fpe(const Fpe& c) = delete;

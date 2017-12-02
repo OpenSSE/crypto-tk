@@ -60,16 +60,10 @@ env.Append(CCFLAGS=['-Wall', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat
 env.Append(CXXFLAGS=['-Weffc++','-Woverloaded-virtual',  '-Wsign-promo', '-Wstrict-overflow=5'])
 
 
-env['AS'] = ['yasm']
-env.Append(ASFLAGS = ['-D', 'LINUX'])
-
 if env['PLATFORM'] == 'darwin':
-    env.Append(ASFLAGS = ['-f', 'macho64'])
     # Add the OpenSSL include path from Homebrew
     env.Append(CPPPATH=['/usr/local/opt/openssl/include'])
     env.Append(LIBPATH=['/usr/local/opt/openssl/lib'])
-else:
-    env.Append(ASFLAGS = ['-f', 'x64', '-f', 'elf64'])
 
 
 env.Append(LIBS = ['crypto','gmp','sodium'])
@@ -114,10 +108,6 @@ if int(coverage):
     env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline','-Wno-ignored-optimization-argument'])
     env.Append(LINKFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline'])
 
-
-no_aes_ni = ARGUMENTS.get('no_aesni', 0) # disable the code using AES NI
-if int(no_aes_ni):
-    env.Append(CCFLAGS = ['-D', 'NO_AESNI'])
 
 rsa_implementation = ARGUMENTS.get('rsa_impl', 'mbedTLS') # choose the RSA implementation in use
 if rsa_implementation.lower() != 'mbedTLS'.lower(): # mbedTLS is used by default

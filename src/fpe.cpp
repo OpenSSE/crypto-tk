@@ -19,14 +19,16 @@
 //
 
 #include "fpe.hpp"
-#include "aez/aez.h"
 #include "random.hpp"
+
+#if __AES__ || __ARM_FEATURE_CRYPTO
+#include "aez/aez.h"
+#endif
 
 #include <limits.h>
 
 #include <cstring>
 #include <exception>
-#include <iostream>
 #include <iomanip>
 
 
@@ -36,36 +38,78 @@ namespace sse
 namespace crypto
 {
 
+#if __AES__ || __ARM_FEATURE_CRYPTO
+class Fpe::FpeImpl
+{
+public:
+    
+    
+    FpeImpl();
+    
+    FpeImpl(Key<kKeySize>&& k);
+    
+    void encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out);
+    void encrypt(const std::string &in, std::string &out);
+    void decrypt(const unsigned char* in, const unsigned int &len, unsigned char* out);
+    void decrypt(const std::string &in, std::string &out);
+    
+private:
+    Key<sizeof(aez_ctx_t)> aez_ctx_;
+};
+
+#else
+#warning FPE is not available without CPU support for AES instructions
+
 class Fpe::FpeImpl
 {
 public:
 		
 
-	FpeImpl();
+    FpeImpl(){};
 	
-	FpeImpl(Key<kKeySize>&& k);
+    FpeImpl(Key<kKeySize>&& k){};
 	
-	// ~FpeImpl();
-
-	void encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out);
-	void encrypt(const std::string &in, std::string &out);
-	void decrypt(const unsigned char* in, const unsigned int &len, unsigned char* out);
-	void decrypt(const std::string &in, std::string &out);
-
-
-private:
-    Key<sizeof(aez_ctx_t)> aez_ctx_;
+    void encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out){};
+    void encrypt(const std::string &in, std::string &out){};
+    void decrypt(const unsigned char* in, const unsigned int &len, unsigned char* out){};
+    void decrypt(const std::string &in, std::string &out){};
 };
+#endif /* __AES__ || __ARM_FEATURE_CRYPTO */
 
+bool Fpe::is_available()
+{
+#if __AES__ || __ARM_FEATURE_CRYPTO
+    return true;
+#else
+    return false;
+#endif
+
+}
+
+#if __AES__ || __ARM_FEATURE_CRYPTO
 Fpe::Fpe() : fpe_imp_(new FpeImpl())
 {
-	
 }
-	
-Fpe::Fpe(Key<kKeySize>&& k) : fpe_imp_(new FpeImpl(std::move(k)))
-{	
+#else
+Fpe::Fpe() : fpe_imp_(NULL)
+{
+    throw std::runtime_error("FPE is unavailable: libsse_crypto has been compiled without support for AES instructions.");
 }
+#endif
 
+    
+#if __AES__ || __ARM_FEATURE_CRYPTO
+Fpe::Fpe(Key<kKeySize>&& k) : fpe_imp_(new FpeImpl(std::move(k)))
+{
+}
+#else
+Fpe::Fpe(Key<kKeySize>&& k) : fpe_imp_(NULL)
+{
+    throw std::runtime_error("FPE is unavailable: libsse_crypto has been compiled without support for AES instructions.");
+}
+#endif
+    
+    
 Fpe::~Fpe() 
 { 
 	delete fpe_imp_;
@@ -122,6 +166,8 @@ uint64_t Fpe::decrypt_64(const uint64_t &in)
     fpe_imp_->decrypt((const unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
     return out;
 }
+
+#if __AES__ || __ARM_FEATURE_CRYPTO
 
 Fpe::FpeImpl::FpeImpl()
 {
@@ -200,6 +246,7 @@ void Fpe::FpeImpl::decrypt(const std::string &in, std::string &out)
     delete [] data;
 }
 
-	
+#endif /* __AES__ || __ARM_FEATURE_CRYPTO */
+    
 }
 }

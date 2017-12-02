@@ -13,9 +13,11 @@
 
 #include <pthread.h>
 
-#include <openssl/crypto.h>
 #include <sodium/core.h>
 
+#ifdef WITH_OPENSSL
+
+#include <openssl/crypto.h>
 struct CRYPTO_dynlock_value
 {
     pthread_mutex_t mutex;
@@ -109,6 +111,9 @@ static void dyn_destroy_function(struct CRYPTO_dynlock_value *l,
     free(l);
 }
 
+#endif
+
+
 namespace sse
 {
     
@@ -119,6 +124,7 @@ namespace sse
 
         static int init_locks(void)
         {
+#ifdef WITH_OPENSSL
             int i;
             
             /* static locks area */
@@ -136,11 +142,14 @@ namespace sse
             CRYPTO_set_dynlock_create_callback(&dyn_create_function);
             CRYPTO_set_dynlock_lock_callback(&dyn_lock_function);
             CRYPTO_set_dynlock_destroy_callback(&dyn_destroy_function);
+#endif
             return 0;
         }
         
         static int kill_locks(void)
         {
+#ifdef WITH_OPENSSL
+
             int i;
             
             if (mutex_buf == NULL) {
@@ -158,7 +167,8 @@ namespace sse
                 pthread_mutex_destroy(&mutex_buf[i]); 
             } 
             free(mutex_buf); 
-            mutex_buf = NULL; 
+            mutex_buf = NULL;
+#endif
             return 0;
         }
 
@@ -179,6 +189,7 @@ namespace sse
             }
             sodium_set_misuse_handler(sodium_misuse_handler);
         }
+        
         void cleanup_crypto_lib()
         {
             delete  __relic_handle;

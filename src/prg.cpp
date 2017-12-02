@@ -20,48 +20,76 @@
 
 
 #include "prg.hpp"
-#include "aesni/aesni.hpp"
 
-#include <openssl/aes.h>
-#include <openssl/modes.h>
+#include <sodium/crypto_stream_chacha20.h>
 
 
 #include <cstring>
+#include <cassert>
 
-#include <iostream>
-#include <iomanip>
 
-#define PUTU32(ct, st) { \
-    (ct)[0] = (uint8_t)((st) >> 24); (ct)[1] = (uint8_t)((st) >> 16); \
-    (ct)[2] = (uint8_t)((st) >>  8); (ct)[3] = (uint8_t)(st); }
+// ChaCha is not really a all-in-one stream cipher (like RC4/Trivium/Grain)
+// It is just a block cipher in counter mode
+// To improve the performance and be able to jump to the right offset,
+// we have to use the block size (64 bytes)
+#define CHACHA20_BLOCK_SIZE 64
 
-#define GETU32(pt) (((uint32_t)(pt)[0] << 24) ^ ((uint32_t)(pt)[1] << 16) ^ \
-                        ((uint32_t)(pt)[2] <<  8) ^ ((uint32_t)(pt)[3]))
+// static nonce
+static const uint8_t chacha_nonce [8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
 namespace sse
 {
     
     namespace crypto
     {
+        
+        static void prg_derivation(const unsigned char* key, const uint32_t offset, const size_t len, unsigned char* out)
+        {
+            const size_t mod_offset = (offset % CHACHA20_BLOCK_SIZE);
+            const size_t block_offset = offset/CHACHA20_BLOCK_SIZE;
+            const size_t max_block_index = (len+offset-1)/CHACHA20_BLOCK_SIZE + 1;
+            
+            const size_t block_len = max_block_index - block_offset;
+            
+            memset(out, 0, len);
+            
+            if (offset%CHACHA20_BLOCK_SIZE == 0) {
+                // things are aligned, good !
+                crypto_stream_chacha20_xor_ic(out, out, len, chacha_nonce, block_offset, key);
+            }else{
+                unsigned char buffer[CHACHA20_BLOCK_SIZE];
+                memset(buffer, 0, CHACHA20_BLOCK_SIZE);
+
+                size_t prefix_len = CHACHA20_BLOCK_SIZE - mod_offset;
+                // start by generating the inner blocks
+                if(block_len>1) {
+                    const size_t tmp_len = len - prefix_len;
+                    crypto_stream_chacha20_xor_ic(out+prefix_len, out+prefix_len, tmp_len, chacha_nonce, block_offset+1, key);
+                }else{
+                    // The output is just the prefix
+                    // We must cut the output before the end of the block
+                    prefix_len = len;
+                }
+                // Now, we have to generate the first bytes of out
+                // These are the last out_offset bytes of the block index block_offset
+
+                crypto_stream_chacha20_xor_ic(buffer, buffer, CHACHA20_BLOCK_SIZE, chacha_nonce, block_offset, key);
+
+                // copy these last bytes
+                memcpy(out, buffer+mod_offset, prefix_len);
+
+                // zeroize the buffer
+                sodium_memzero(buffer, CHACHA20_BLOCK_SIZE);
+            }
+        }
+        
         class Prg::PrgImpl
         {
         public:
-#if USE_AESNI
-            typedef aes_subkeys_type key_type;
-            static constexpr uint16_t kAESSubKeySize = (kNAESRound+1)*kAESBlockSize;
-
-#else
-            typedef AES_KEY key_type;
-            static constexpr uint16_t kAESSubKeySize = sizeof(AES_KEY);
-#endif
-            
-
             PrgImpl() = delete;
             
             inline PrgImpl(Key<kKeySize>&& key);
-            
-//            inline ~PrgImpl();
-            
+                        
             inline void derive(const size_t len, std::string &out) const;
             inline void derive(const size_t len, unsigned char* out) const;
             
@@ -72,13 +100,9 @@ namespace sse
             
             inline static void derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out);
             
-            static constexpr uint8_t kBlockSize = AES_BLOCK_SIZE;
-
-            static Key<kAESSubKeySize> gen_subkeys(Key<kKeySize>&& key);
-
         private:
      
-            Key<kAESSubKeySize> aes_enc_key_;
+            Key<kKeySize> key_;
         };
         
         
@@ -188,42 +212,10 @@ namespace sse
         // Prg implementation
         
         Prg::PrgImpl::PrgImpl(Key<kKeySize>&& key)
-        : aes_enc_key_(gen_subkeys(std::move(key)))
+        : key_(std::move(key))
         {
         }
         
-
-#define MIN(a,b) (((a) > (b)) ? (b) : (a))
-        
-        Key<Prg::PrgImpl::kAESSubKeySize> Prg::PrgImpl::gen_subkeys(Key<kKeySize>&& key)
-        {
-            key.unlock();
-            
-            const uint8_t *key_data = key.data();
-#if USE_AESNI
-            auto fill_callback = [key_data](uint8_t* subkeys_content)
-            {
-                aesni_derive_subkeys(key_data,subkeys_content);
-            };
-            
-#else
-            auto fill_callback = [key_data](uint8_t* subkeys_content)
-            {
-                if (AES_set_encrypt_key(key_data, 128,  reinterpret_cast<aes_key_st*>(subkeys_content)) != 0)
-                {
-                    // throw an exception
-                    throw std::runtime_error("Unable to init AES subkeys");
-                }
-            };
-
-#endif /* USE_AESNI */
-            
-            Key<Prg::PrgImpl::kAESSubKeySize> returned_key(fill_callback);
-            key.lock();
-            
-            return returned_key;
-        }
-
         void Prg::PrgImpl::derive(const size_t len, unsigned char* out) const
         {
             
@@ -237,56 +229,8 @@ namespace sse
                 throw std::invalid_argument("The minimum number of bytes to derive is 1.");
             }
             
-            uint32_t extra_len = (offset % AES_BLOCK_SIZE);
-            uint32_t block_offset = offset/AES_BLOCK_SIZE;
-            size_t max_block_index = (len+offset)/AES_BLOCK_SIZE;
-            
-            if ((len+offset)%AES_BLOCK_SIZE != 0) {
-                max_block_index++;
-            }
-            
-            size_t block_len = max_block_index - block_offset;
-
-            aes_enc_key_.unlock();
-#if USE_AESNI
-            if (offset%AES_BLOCK_SIZE == 0 && len%AES_BLOCK_SIZE == 0) {
-                // things are aligned, good !
-                
-                aesni_ctr(block_len, block_offset, aes_enc_key_.data(), out);
-                
-            }else{
-                // we need to create a buffer
-                unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
-                aesni_ctr(block_len, block_offset, aes_enc_key_.data(), tmp);
-
-                memcpy(out, tmp+extra_len, len);
-                sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
-
-                delete [] tmp;
-            }
-#else
-            unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
-            memset(in, 0x00, block_len*AES_BLOCK_SIZE);
-
-            unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
-
-            for (size_t i = block_offset; i < max_block_index; i++) {
-                ((size_t*)in)[2*(i-block_offset)] = i;
-            }
-            
-            sodium_memzero(out, len);
-            
-            for (size_t i = 0; i < block_len; i++) {
-                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, reinterpret_cast<const aes_key_st*>(aes_enc_key_.data()));
-            }
-            
-            memcpy(out, tmp+extra_len, len);
-            sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
-            
-            delete [] tmp;
-            delete [] in;
-#endif
-            aes_enc_key_.lock();
+            prg_derivation (key_.unlock_get(), offset, len, out);
+            key_.lock();
         }
 
         void Prg::PrgImpl::derive(const size_t len, std::string &out) const
@@ -327,66 +271,9 @@ namespace sse
             
             Key<kKeySize> local_key(std::move(k)); // make sure the input key cannot be reused
             
-            uint32_t extra_len = (offset % AES_BLOCK_SIZE);
-            uint32_t block_offset = offset/AES_BLOCK_SIZE;
-            size_t max_block_index = (len+offset)/AES_BLOCK_SIZE;
+            prg_derivation (local_key.unlock_get(), offset, len, out);
             
-            if ((len+offset)%AES_BLOCK_SIZE != 0) {
-                max_block_index++;
-            }
-            
-            size_t block_len = max_block_index - block_offset;
-            
-            local_key.unlock();
-#if USE_AESNI
-            if (offset%AES_BLOCK_SIZE == 0 && len%AES_BLOCK_SIZE == 0) {
-                // things are aligned, good !
-                
-                aesni_ctr(block_len, block_offset, local_key.data(), out);
-                
-            }else{
-                // we need to create a buffer
-                unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
-                aesni_ctr(block_len, block_offset, local_key.data(), tmp);
-                
-                memcpy(out, tmp+extra_len, len);
-                sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
-
-                delete [] tmp;
-            }
-#else
-            key_type aes_enc_key;
-
-            if (AES_set_encrypt_key(local_key.data(), 128, &aes_enc_key) != 0)
-            {
-                // throw an exception
-                throw std::runtime_error("Unable to init AES subkeys");
-            }
-
-            unsigned char *in = new unsigned char[block_len*AES_BLOCK_SIZE];
-            sodium_memzero(in, block_len*AES_BLOCK_SIZE);
-
-            unsigned char *tmp = new unsigned char[block_len*AES_BLOCK_SIZE];
-            
-            for (size_t i = block_offset; i < max_block_index; i++) {
-                ((size_t*)in)[2*(i-block_offset)] = i;
-            }
-            
-            sodium_memzero(out, len);
-
-            for (size_t i = 0; i < block_len; i++) {
-                AES_encrypt(in+i*AES_BLOCK_SIZE, tmp+i*AES_BLOCK_SIZE, &aes_enc_key);
-            }
-            
-            memcpy(out, tmp+extra_len, len);
-
-            sodium_memzero(tmp, block_len*AES_BLOCK_SIZE);
-            sodium_memzero(&aes_enc_key, sizeof(key_type));
-            
-            delete [] tmp;
-            delete [] in;
-#endif
-            local_key.unlock();
+            local_key.lock();
         }
 
 

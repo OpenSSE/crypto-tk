@@ -1,7 +1,7 @@
 Import('*')
 
 files = Glob('*.cpp') + Glob('*/*.cpp') + Glob('hash/*/*/*.cpp') + Glob('hash/*/*.cpp') + Glob('*/*.c') + Glob('ppke/*/*.c*') # + Glob('*/*/*.cpp')
-files += Glob('hash/*/*.asm') + Glob('hash/*/*.c')
+files += Glob('hash/*/*.c')
 objs = env.Object(files, CPPPATH = smart_concat(['.'], env.get('CPPPATH')))
 
 ecmh_files = ['ecmh/binary_field/GF2_127_63.cpp', 'ecmh/binary_elliptic_curve/GLS254.cpp']

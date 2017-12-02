@@ -21,7 +21,7 @@
 #include "hash.hpp"
 
 #include "hash/sha512.hpp"
-#include "hash/blake2b/blake2b.hpp"
+#include "hash/blake2b.hpp"
 
 #include <cstring>
 

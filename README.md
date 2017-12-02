@@ -172,10 +172,6 @@ To cleanup the `coverage` directory, run `./cleanup.sh`.
 The code for the incremental (multi)set hash function has been written by Jeremy Maitin-Shepard.
 It is directly available from its [GitHub repo](https://github.com/jbms/ecmh). The source files of the `src/ecmh` directory are directly taken from this codebase and its dependencies, with some minor fixes or modifications to make the code compile using gcc.
 
-The implementation of the Blake2 hash functions has been written by [Samuel Neves](https://eden.dei.uc.pt/~sneves/).
-
-SHA512 implementations are from Intel (x86 optimized assembly, using SSE4, AVX or AVX2) and ARM (C implementation from [mbed TLS](https://tls.mbed.org)).
-
 An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbed TLS](https://tls.mbed.org))
 
 The puncturable encryption code has been originally written by [Ian Miers](http://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
@@ -185,10 +181,6 @@ Unless otherwise stated, the rest of the code has been written by [Raphael Bost]
 ## Licensing
 
 Even if it is not explicitly stated, the ECMH code by Jeremy Maitin-Shepard (*i.e.* the the `src/ecmh` directory) must be considered as licensed under GPL (personal communications with Jeremy).
-
-Blake2 implementations have been dedicated to the public domain (*cf.* [CC0 Public Domain Dedication](http://creativecommons.org/publicdomain/zero/1.0/)).
-
-Intel's assembly code for SHA512 is covered by the Intel Open Software License (*cf.* `open_software_license.txt`).
 
 mbed TLS is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 

@@ -66,7 +66,7 @@ if env['PLATFORM'] == 'darwin':
     env.Append(LIBPATH=['/usr/local/opt/openssl/lib'])
 
 
-env.Append(LIBS = ['crypto','gmp','sodium'])
+env.Append(LIBS = ['gmp','sodium'])
 
 
 ## Load the configuration file
@@ -81,10 +81,11 @@ conf = Configure( env )
 
 if conf.CheckLib( 'crypto' ):
     conf.env.Append( CPPFLAGS = '-DWITH_OPENSSL' )
-    env['HAS_OPENSSL'] = True
+    conf.env.Append(LIBS = ['crypto'])
+    conf.env['HAS_OPENSSL'] = True
 else:
-    env['HAS_OPENSSL'] = False
-        
+    conf.env['HAS_OPENSSL'] = False
+
 env = conf.Finish()
 
 ## Read the arguments passed to the building script

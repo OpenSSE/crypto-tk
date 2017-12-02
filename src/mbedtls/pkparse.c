@@ -199,8 +199,13 @@ static int pk_parse_key_pkcs1_der( mbedtls_rsa_context *rsa,
     size_t len;
     unsigned char *p, *end;
 
+    // manually ignore const cast warning.
+    // fixing this would require a lot of change in the code
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
     p = (unsigned char *) key;
     end = p + keylen;
+#pragma GCC diagnostic pop
 
     /*
      * This function parses the RSAPrivateKey (PKCS#1)
@@ -279,8 +284,13 @@ static int pk_parse_key_pkcs8_unencrypted_der(
     int ret, version;
     size_t len;
     mbedtls_asn1_buf params;
+    // manually ignore const cast warning.
+    // fixing this would require a lot of change in the code
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
     unsigned char *p = (unsigned char *) key;
     unsigned char *end = p + keylen;
+#pragma GCC diagnostic pop
     mbedtls_pk_type_t pk_alg = MBEDTLS_PK_NONE;
     const mbedtls_pk_info_t *pk_info;
 
@@ -488,7 +498,10 @@ int mbedtls_pk_parse_public_key( mbedtls_pk_context *ctx,
         return( ret ); /* LCOV_EXCL_LINE */
     }
 #endif /* MBEDTLS_PEM_PARSE_C */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
     p = (unsigned char *) key;
+#pragma GCC diagnostic pop
 
     ret = mbedtls_pk_parse_subpubkey( &p, p + keylen, ctx );
 

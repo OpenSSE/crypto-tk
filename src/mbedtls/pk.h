@@ -89,7 +89,7 @@ typedef struct
 {
     mbedtls_pk_debug_type type;
     const char *name;
-    void *value;
+    const void *value;
 } mbedtls_pk_debug_item;
 
 /** Maximum number of item send for debugging, plus 1 */

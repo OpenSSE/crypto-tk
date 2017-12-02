@@ -376,10 +376,15 @@ TEST(mbedTLS, mpi_to_open_ssl_bn)
     }
 }
 
-static bool cpm_mpi_bn(mbedtls_mpi* x, BIGNUM* y)
+static bool cmp_mpi_bn(mbedtls_mpi* x, BIGNUM* y)
 {
+    if(mbedtls_mpi_bitlen(x) > std::numeric_limits<int>::max())
+    {
+        return false;
+    }
+    
     bool res = true;
-    for (size_t i = 0; i < std::max<size_t>(BN_num_bits(y), mbedtls_mpi_bitlen(x)); i++) {
+    for (int i = 0; i < std::max<int>(BN_num_bits(y), static_cast<int>(mbedtls_mpi_bitlen(x))); i++) {
         res &= (BN_is_bit_set(y,i) == mbedtls_mpi_get_bit(x,i));
     }
     return res;
@@ -420,10 +425,10 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         EVP_PKEY_free(evpkey);
 
         // check that the keys are identical
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.N, openssl_sk_rsa->n));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.E, openssl_sk_rsa->e));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.P, openssl_sk_rsa->p));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.Q, openssl_sk_rsa->q));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.N, openssl_sk_rsa->n));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.E, openssl_sk_rsa->e));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.P, openssl_sk_rsa->p));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.Q, openssl_sk_rsa->q));
 
 
         // public key
@@ -442,8 +447,8 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         BIO_free(mem);
 
         // check that the public element are identical
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.N, openssl_pk_rsa->n));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa.E, openssl_pk_rsa->e));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.N, openssl_pk_rsa->n));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.E, openssl_pk_rsa->e));
 
    }
 }
@@ -493,10 +498,10 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         
         
         // check that the keys are identical
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.N, openssl_rsa->n));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.P, openssl_rsa->p));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.Q, openssl_rsa->q));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.N, openssl_rsa->n));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.P, openssl_rsa->p));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.Q, openssl_rsa->q));
 
         // public key
         // create an EVP encapsulation
@@ -523,8 +528,8 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         
         
         // check that the keys are identical
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.N, openssl_rsa->n));
-        ASSERT_TRUE(cpm_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.N, openssl_rsa->n));
+        ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
 
     }
 }

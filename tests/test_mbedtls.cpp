@@ -31,10 +31,12 @@
 
 #include "gtest/gtest.h"
 
+#ifdef WITH_OPENSSL
 #include <openssl/rsa.h>
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
+#endif
 
 using namespace std;
 static int mbedTLS_rng_wrap(void *arg, unsigned char *out, size_t len)
@@ -316,6 +318,7 @@ cleanup:
     ASSERT_EQ(ret,0);
 }
 
+#ifdef WITH_OPENSSL
 
 #define OPEN_SSL_BN_COMPAT_TEST_COUNT 500
 
@@ -525,6 +528,7 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
 
     }
 }
+#endif
 
 TEST(mbedTLS, rsa_errors)
 {

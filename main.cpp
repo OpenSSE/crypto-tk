@@ -42,8 +42,6 @@
 
 #include "src/ppke/GMPpke.h"
 
-#include "src/aesni/aesni.hpp"
-
 #include "src/key.hpp"
 
 #include "src/mbedtls/bignum.h"

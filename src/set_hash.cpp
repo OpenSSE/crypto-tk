@@ -54,7 +54,7 @@ namespace crypto
 		
 	};
 
-typedef jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, sse::crypto::HashWrapper, false> MSH;
+using MSH = jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254, sse::crypto::HashWrapper, false>;
 
 class SetHash::SetHashImpl
 {

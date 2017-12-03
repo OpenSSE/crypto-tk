@@ -68,15 +68,15 @@ namespace crypto
 	
 #if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
     
-    
-    typedef TdpImpl_OpenSSL         TdpImpl_Current;
-    typedef TdpInverseImpl_OpenSSL  TdpInverseImpl_Current;
-    typedef TdpMultPoolImpl_OpenSSL TdpMultPoolImpl_Current;
+    using  TdpImpl_Current = TdpImpl_OpenSSL;
+    using  TdpInverseImpl_Current = TdpInverseImpl_OpenSSL;
+    using  TdpMultPoolImpl_Current = TdpMultPoolImpl_OpenSSL;
+
 #else
     
-    typedef TdpImpl_mbedTLS         TdpImpl_Current;
-    typedef TdpInverseImpl_mbedTLS  TdpInverseImpl_Current;
-    typedef TdpMultPoolImpl_mbedTLS TdpMultPoolImpl_Current;
+    using  TdpImpl_Current = TdpImpl_mbedTLS;
+    using  TdpInverseImpl_Current = TdpInverseImpl_mbedTLS;
+    using  TdpMultPoolImpl_Current = TdpMultPoolImpl_mbedTLS;
     
 #endif
 
@@ -94,7 +94,7 @@ Tdp::Tdp(const Tdp& t) : tdp_imp_(new TdpImpl_Current(*dynamic_cast<const TdpImp
 Tdp::~Tdp()
 {
     delete tdp_imp_;
-    tdp_imp_ = NULL;
+    tdp_imp_ = nullptr;
 }
 
 Tdp& Tdp::operator=(const Tdp& t)
@@ -182,7 +182,7 @@ TdpInverse& TdpInverse::operator=(const TdpInverse& t)
 TdpInverse::~TdpInverse()
 {
     delete tdp_inv_imp_;
-    tdp_inv_imp_ = NULL;
+    tdp_inv_imp_ = nullptr;
 }
 
 std::string TdpInverse::public_key() const
@@ -300,7 +300,7 @@ TdpMultPool& TdpMultPool::operator=(const TdpMultPool& t)
 TdpMultPool::~TdpMultPool()
 {
     delete tdp_pool_imp_;
-    tdp_pool_imp_ = NULL;
+    tdp_pool_imp_ = nullptr;
 }
 
 std::string TdpMultPool::public_key() const

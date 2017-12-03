@@ -46,7 +46,7 @@ public:
 	
 	CipherImpl(Key<kKeySize>&& k);
 	
-	~CipherImpl();
+	~CipherImpl() = default;
 
     
     inline static size_t ciphertext_length(const size_t plaintext_len)
@@ -115,10 +115,6 @@ Cipher::CipherImpl::CipherImpl(Key<kKeySize>&& k)
 {
 }
 
-Cipher::CipherImpl::~CipherImpl() 
-{ 
-}
-
 void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, unsigned char* out)
 {
     if (len == 0) {
@@ -136,7 +132,7 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
     
     // start by deriving a subkey from the master and the nonce
     crypto_generichash_blake2b_salt_personal(chacha_key, sizeof(chacha_key),
-                                                 NULL, 0,
+                                                 nullptr, 0,
                                                  key_.data(), kKeySize,
                                                  out, hash_personal__);
 
@@ -147,8 +143,8 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in, const size_t &len, uns
     // go for encryption with the derived key
     crypto_aead_chacha20poly1305_ietf_encrypt(out+NONCE_SIZE, &c_len,
                                               in, len,
-                                              NULL, 0,
-                                              NULL, out, chacha_key);
+                                              nullptr, 0,
+                                              nullptr, out, chacha_key);
     
     
     
@@ -186,7 +182,7 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
     
     // start by deriving a subkey from the master and the nonce
     crypto_generichash_blake2b_salt_personal(chacha_key, sizeof(chacha_key),
-                                             NULL, 0,
+                                             nullptr, 0,
                                              key_.data(), kKeySize,
                                              in, hash_personal__);
     
@@ -196,8 +192,8 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in, const size_t &len, uns
 
     // go for decryption with the derived key
     int ret = crypto_aead_chacha20poly1305_ietf_decrypt(out, &m_len,
-                                                        NULL, in+NONCE_SIZE, len-NONCE_SIZE,
-                                                        NULL, 0,
+                                                        nullptr, in+NONCE_SIZE, len-NONCE_SIZE,
+                                                        nullptr, 0,
                                                         in, chacha_key);
     
     // delete the derived key

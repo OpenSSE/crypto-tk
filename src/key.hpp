@@ -91,7 +91,7 @@ namespace sse {
                 
                 if( content_ == NULL)
                 {
-                    throw std::bad_alloc::bad_alloc(); /* LCOV_EXCL_LINE */
+                    throw std::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
                 
                 random_bytes(N, content_);
@@ -125,7 +125,7 @@ namespace sse {
                 
                 if(content_ == NULL)
                 {
-                    throw std::bad_alloc::bad_alloc(); /* LCOV_EXCL_LINE */
+                    throw std::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
                 
                 memcpy(content_, key, N); // copy the content of the input key
@@ -232,7 +232,7 @@ namespace sse {
                 
                 if(content_ == NULL)
                 {
-                    throw std::bad_alloc::bad_alloc(); /* LCOV_EXCL_LINE */
+                    throw std::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
                 
                 init_callback(content_); // use the callback to fill the key

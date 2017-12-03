@@ -35,7 +35,7 @@ struct CRYPTO_dynlock_value
     pthread_mutex_t mutex;
 };
 
-static pthread_mutex_t *mutex_buf = NULL;
+static pthread_mutex_t *mutex_buf = nullptr;
 
 /**
  * OpenSSL locking function.
@@ -60,7 +60,7 @@ static void locking_function(int mode, int n, const char *file, int line)
  *
  * @return    thread id
  */
-static unsigned long id_function(void)
+static unsigned long id_function()
 {
     return ((unsigned long) pthread_self());
 }
@@ -80,12 +80,12 @@ static struct CRYPTO_dynlock_value *dyn_create_function(const char *file, int li
     if (!value) {
         goto err;
     }
-    pthread_mutex_init(&value->mutex, NULL);
+    pthread_mutex_init(&value->mutex, nullptr);
     
     return value;
     
 err:
-    return (NULL);
+    return (nullptr);
 }
 
 /**
@@ -134,18 +134,18 @@ namespace sse
         
         static relicxx::relicResourceHandle *__relic_handle;
 
-        static int init_locks(void)
+        static int init_locks()
         {
 #ifdef WITH_OPENSSL
             int i;
             
             /* static locks area */
             mutex_buf = (pthread_mutex_t*)malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t));
-            if (mutex_buf == NULL) {
+            if (mutex_buf == nullptr) {
                 return (-1);
             }
             for (i = 0; i < CRYPTO_num_locks(); i++) {
-                pthread_mutex_init(&mutex_buf[i], NULL);
+                pthread_mutex_init(&mutex_buf[i], nullptr);
             }
             /* static locks callbacks */
             CRYPTO_set_locking_callback(locking_function);
@@ -158,28 +158,28 @@ namespace sse
             return 0;
         }
         
-        static int kill_locks(void)
+        static int kill_locks()
         {
 #ifdef WITH_OPENSSL
 
             int i;
             
-            if (mutex_buf == NULL) {
+            if (mutex_buf == nullptr) {
                 return (0);
             }
             
-            CRYPTO_set_dynlock_create_callback(NULL);
-            CRYPTO_set_dynlock_lock_callback(NULL);
-            CRYPTO_set_dynlock_destroy_callback(NULL);
+            CRYPTO_set_dynlock_create_callback(nullptr);
+            CRYPTO_set_dynlock_lock_callback(nullptr);
+            CRYPTO_set_dynlock_destroy_callback(nullptr);
             
-            CRYPTO_set_locking_callback(NULL);
-            CRYPTO_set_id_callback(NULL);
+            CRYPTO_set_locking_callback(nullptr);
+            CRYPTO_set_id_callback(nullptr);
             
             for (i = 0; i < CRYPTO_num_locks(); i++) {
                 pthread_mutex_destroy(&mutex_buf[i]); 
             } 
             free(mutex_buf); 
-            mutex_buf = NULL;
+            mutex_buf = nullptr;
 #endif
             return 0;
         }
@@ -205,7 +205,7 @@ namespace sse
         void cleanup_crypto_lib()
         {
             delete  __relic_handle;
-            __relic_handle = NULL;
+            __relic_handle = nullptr;
             
             kill_locks();
         }

@@ -25,7 +25,7 @@
 #include "aez/aez.h"
 #endif
 
-#include <limits.h>
+#include <climits>
 
 #include <cstring>
 #include <exception>

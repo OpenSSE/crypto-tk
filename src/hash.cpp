@@ -37,12 +37,12 @@ using hash_function = hash::blake2b;
 	
 void Hash::hash(const unsigned char *in, const size_t &len, unsigned char *out)
 {
-    if(in == NULL)
+    if(in == nullptr)
     {
         throw std::invalid_argument("in is NULL");
     }
     
-    if(out == NULL)
+    if(out == nullptr)
     {
         throw std::invalid_argument("out is NULL");
     }
@@ -59,12 +59,12 @@ void Hash::hash(const unsigned char *in, const size_t &len, const size_t &out_le
         throw std::invalid_argument("Invalid output length: out_len > kDigestSize");
     }
     
-    if(in == NULL)
+    if(in == nullptr)
     {
         throw std::invalid_argument("in is NULL");
     }
     
-    if(out == NULL)
+    if(out == nullptr)
     {
         throw std::invalid_argument("out is NULL");
     }

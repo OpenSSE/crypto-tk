@@ -18,10 +18,12 @@ bool generic_trace(Field const &F, typename Field::Element const &a) {
     square(F, cur_power, cur_power);
   }
 
-  if (is_zero(F, cur_sum))
+  if (is_zero(F, cur_sum)) {
     return false;
-  if (is_one(F, cur_sum))
+  }
+  if (is_one(F, cur_sum)) {
     return true;
+  }
   throw std::logic_error("trace result should be 0 or 1");
 }
 

@@ -23,13 +23,13 @@ template< class Dummy, bool C >
 struct enable_if_c_impl {};
 
 template< class Dummy >
-struct enable_if_c_impl< Dummy, true > { typedef enabler_type type; };
+struct enable_if_c_impl< Dummy, true > { using type = enabler_type; };
 
 template< class Dummy, bool C >
 struct disable_if_c_impl {};
 
 template< class Dummy >
-struct disable_if_c_impl< Dummy, false > { typedef enabler_type type; };
+struct disable_if_c_impl< Dummy, false > { using type = enabler_type; };
 
 template< class Dummy, class C >
 struct enable_if_impl : enable_if_c_impl< Dummy, C::value > {};
@@ -38,11 +38,11 @@ template< class Dummy, class C >
 struct disable_if_impl : disable_if_c_impl< Dummy, C::value > {};
 
 template< class... T >
-struct always_enabler_type { typedef enabler_type type; };
+struct always_enabler_type { using type = enabler_type; };
 
 template< class... T > struct always_true { static bool const value = true; };
 
-template< class... T > struct always_void { typedef void type; };
+template< class... T > struct always_void { using type = void; };
 
 } }
 

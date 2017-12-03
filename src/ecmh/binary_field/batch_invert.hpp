@@ -28,7 +28,7 @@ namespace binary_field {
   template <class Field,                                                                                                       \
             class OutputIterator,                                                                                              \
             class InputRange,                                                                                                  \
-            JBMS_ENABLE_IF_C(is_field<Field>::value &&enable_condition &&                                                      \
+            JBMS_ENABLE_IF_C(is_field<Field>::value &&(enable_condition) &&                                                      \
                                  std::is_same<typename Field::Element,                                                         \
                                               typename boost::range_value<std::remove_reference_t<InputRange>>::type>::value)> \
   void batch_##invert_fn(Field const &F, OutputIterator output_it, InputRange const &input) {                                  \

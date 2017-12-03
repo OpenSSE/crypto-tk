@@ -7,7 +7,7 @@
 namespace jbms {
 
 template <class Function, std::size_t... Is>
-inline void static_repeat(Function &&f, std::index_sequence<Is...>) {
+inline void static_repeat(Function &&f, std::index_sequence<Is...> /*unused*/) {
   auto l = { 0, (f(std::integral_constant<size_t,Is>{}),0)... };
   (void)l;
 }

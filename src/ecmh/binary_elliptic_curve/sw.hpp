@@ -97,8 +97,9 @@ struct Encoder {
     // t[2] = t * (1 + t) / (1 + t + t^2)
     multiply(F, derived_t[2], derived_t[1], t);
 
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i) {
       invert(F, derived_t_inv[i], derived_t[i]);
+    }
   }
 
   explicit Encoder(Curve const &curve)

@@ -266,7 +266,9 @@ template <class Curve>
 bool is_rational(Curve const &curve, LambdaProjectivePoint<Curve> const &P) {
   auto &&F =  curve.field();
 
-  if (is_infinity(curve, P)) return true;
+  if (is_infinity(curve, P)) {
+      return true;
+  }
   if (is_zero(F, P.x())) {
     if (is_zero(F, P.m())) {
       // special non-lambda point
@@ -424,8 +426,9 @@ std::string to_affine_hex(Curve const &curve, AffinePoint<Curve> const &point) {
 
 template <class Curve, class Point, JBMS_ENABLE_IF(is_lambda_point<Curve,Point>)>
 std::string to_affine_hex(Curve const &curve, Point const &point) {
-  if (is_infinity(curve, point))
+  if (is_infinity(curve, point)) {
     return "inf";
+  }
   AffinePoint<Curve> P;
   assign(curve, P, point);
   return to_affine_hex(curve, P);
@@ -435,12 +438,13 @@ std::string to_affine_hex(Curve const &curve, Point const &point) {
 
 template <class Curve>
 void assign_from_affine_hex(Curve const &curve, LambdaProjectivePoint<Curve> &P, std::string const &s) {
-  if (s == "inf")
+  if (s == "inf") {
     set_infinity(curve, P);
-  else {
+  } else {
     auto sep_it = std::find(s.begin(), s.end(), ' ');
-    if (sep_it == s.end())
+    if (sep_it == s.end()) {
       throw std::invalid_argument("Curve affine hex representation must contain a space");
+    }
 
     AffinePoint<Curve> Pa;
     assign_from_hex(curve.field(), Pa.x(), boost::make_iterator_range(s.begin(), sep_it));

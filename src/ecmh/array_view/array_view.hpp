@@ -111,7 +111,7 @@ public:
   array_view &operator=(array_view &&) = default;
 
   template <class Other, JBMS_ENABLE_IF(array_view_detail::is_constructible_from_range<T, Other>)>
-  array_view(Other &&other)
+  array_view(Other &&other) // NOLINT
       : begin_((value_type *)&*boost::begin(other)), end_((value_type *)&*boost::end(other)) {}
 
   constexpr pointer begin() const { return begin_; }

@@ -95,10 +95,11 @@ void add(Curve const &curve,
   } else if (is_infinity(curve, P)) {
     assign(curve, result, Q);
   } else if (is_zero(F, P.x())) {
-    if (is_zero(F, Q.x()))
+    if (is_zero(F, Q.x())) {
       set_infinity(curve, result);
-    else
+    } else {
       add_non_lambda_point(curve, result, Q);
+    }
   } else if (is_zero(F, Q.x())) {
     add_non_lambda_point(curve, result, P);
   } else {

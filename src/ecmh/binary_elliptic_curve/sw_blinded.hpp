@@ -94,10 +94,11 @@ void map(Curve const &curve,
          Encoder<Curve> const &encoder,
          LambdaAffinePoint<Curve> &result,
          typename Curve::Field::Element const &w) {
-  if (blinded)
+  if (blinded) {
     map_blinded(curve, encoder, result, w);
-  else
+  } else {
     map(curve, encoder, result, w);
+  }
 }
 
 template <class Curve,
@@ -166,10 +167,11 @@ template <bool blinded,
           JBMS_ENABLE_IF_C(std::is_same<typename Curve::Field::Element,
                                         typename boost::range_value<std::remove_reference_t<InputRange>>::type>::value)>
 void batch_map(Curve const &curve, Encoder<Curve> const &encoder, OutputIterator output_it, InputRange const &w_range) {
-  if (blinded)
+  if (blinded) {
     batch_map_blinded(curve, encoder, output_it, w_range);
-  else
+  } else {
     batch_map(curve, encoder, output_it, w_range);
+  }
 }
 
 

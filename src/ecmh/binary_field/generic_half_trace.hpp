@@ -10,8 +10,9 @@ namespace binary_field {
 template <class Field, JBMS_ENABLE_IF(is_field<Field>)>
 void generic_half_trace(Field const &F, typename Field::Element &result, typename Field::Element const &a) {
   int m = F.degree();
-  if (m % 2 != 1)
+  if (m % 2 != 1) {
     throw std::invalid_argument("generic_half_trace only valid for odd-degree binary fields");
+  }
   auto cur_power = a;
   set_zero(F, result);
 

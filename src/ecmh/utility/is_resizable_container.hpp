@@ -24,8 +24,9 @@ inline void ensure_container_size_equals(Container &&x, size_t n) {
 
 template <class Container, JBMS_DISABLE_IF(is_resizable_container<std::remove_reference_t<Container>>)>
 inline void ensure_container_size_equals(Container &&x, size_t n) {
-  if (x.size() != n)
+  if (x.size() != n) {
     throw std::invalid_argument("container must have correct length");
+  }
 }
 
 }

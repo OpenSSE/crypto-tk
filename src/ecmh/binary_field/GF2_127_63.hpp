@@ -26,7 +26,7 @@ inline void half_trace(GF2<127,63> const &F, BinaryPolynomial<127> &result, Bina
 namespace jbms {
 namespace binary_field {
 inline bool trace(GF2<127,63> const &F, BinaryPolynomial<127> const &x) {
-  return ((x.limbs[0][0] >> 0)) & 0x1;
+  return ((((x.limbs[0][0] >> 0)) & 0x1) != 0);
 }
 inline void set_trace_zero(GF2<127,63> const &F, BinaryPolynomial<127> &x) {
 x.limbs[0][0] ^= (word_t(trace(F, x)) << 0);

@@ -48,7 +48,7 @@ struct printer_specialization<std::pair<T,U>> {
 template <class... T>
 struct printer_specialization<std::tuple<T...>> {
   template <size_t... Is>
-  static void helper(std::ostream &os, std::tuple<T...> const &x, std::index_sequence<Is...>) {
+  static void helper(std::ostream &os, std::tuple<T...> const &x, std::index_sequence<Is...> /*unused*/) {
     os << "{ ";
     auto l = {
       ((os << (Is == 0 ? "" : ", ") << jbms::streamable(std::get<Is>(x))), 0)...

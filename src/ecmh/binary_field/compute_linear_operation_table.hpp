@@ -28,8 +28,9 @@ void compute_linear_operation_table(BinaryPolynomial<Bits> table[(Bits+BlockBits
       size_t base_bit = block_i * BlockBits;
       size_t max_bit = std::min(BlockBits, Bits - base_bit);
       for (size_t bit_i = 0; bit_i < max_bit; ++bit_i) {
-        if ((val >> bit_i) & 1)
+        if ((val >> bit_i) & 1) {
           x += monomial_results[bit_i + base_bit];
+        }
       }
       table[block_i][val] = x;
     }

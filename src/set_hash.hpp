@@ -44,7 +44,7 @@ public:
 	SetHash();	
 	SetHash(const std::string &hex_str);
 	SetHash(const SetHash& o);
-	SetHash(const SetHash&& o);
+	SetHash(SetHash&& o) noexcept;
 	SetHash(const std::vector<std::string> &in_set);
 	~SetHash();
 

@@ -147,7 +147,7 @@ namespace sse {
              *  @param k    The moved key
              *
              */
-            Key(Key<N>&& k):
+            Key(Key<N>&& k) noexcept:
             content_(k.content_), is_locked_(k.is_locked_)
             {
                 k.content_ = NULL;

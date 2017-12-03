@@ -107,7 +107,7 @@ SetHash::SetHash(const SetHash& o) : set_hash_imp_(new SetHashImpl(o.set_hash_im
 {
 }
 
-SetHash::SetHash(const SetHash&& o) : set_hash_imp_(new SetHashImpl(o.set_hash_imp_->hex()))
+SetHash::SetHash(SetHash&& o) noexcept : set_hash_imp_(o.set_hash_imp_)
 {
 }
 

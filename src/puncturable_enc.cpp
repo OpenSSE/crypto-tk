@@ -133,7 +133,7 @@ namespace sse
                 shares[i] = GmppkePrivateKeyShare(punctured_key[i].data());
             }
             
-            sk_ = GmppkePrivateKey(std::move(shares));
+            sk_ = GmppkePrivateKey(shares);
         }
 
         bool PuncturableDecryption::PDecImpl::decrypt(const punct::ciphertext_type &ct_bytes, uint64_t &m) const

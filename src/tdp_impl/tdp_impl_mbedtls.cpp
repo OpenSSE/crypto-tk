@@ -46,7 +46,7 @@ namespace crypto
 {
 	
 
-#define RSA_MODULUS_SIZE TdpInverse::kMessageSize*8
+#define RSA_MODULUS_SIZE (TdpInverse::kMessageSize*8)
     
 #define RSA_PK 0x10001L // RSA_F4 for OpenSSL
     

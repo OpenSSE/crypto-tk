@@ -39,7 +39,7 @@ namespace hash
 	
 void blake2b::hash(const unsigned char *in, const size_t len, unsigned char *digest)
 {
-    crypto_generichash_blake2b(digest, kDigestSize, in, len, NULL, 0);
+    crypto_generichash_blake2b(digest, kDigestSize, in, len, nullptr, 0);
 }
 
 }

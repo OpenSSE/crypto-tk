@@ -413,7 +413,7 @@ private:
         
     }
     
-    void keygenPartial(const relicxx::ZR & gamma,GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
+    void keygenPartial(const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
     void keygenPartial(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const relicxx::ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const;
     
     GmppkePrivateKeyShare skgen(const GmppkeSecretParameters &sp ) const;

@@ -36,7 +36,7 @@ struct blake2b
 		constexpr static size_t kDigestSize = 64;
 		constexpr static size_t kBlockSize = 128;
 		
-		static void hash(const unsigned char *in, const size_t len, unsigned char *out);
+		static void hash(const unsigned char *in, const size_t len, unsigned char *digest);
 
 	};	
 

@@ -105,23 +105,6 @@ TdpImpl_mbedTLS::TdpImpl_mbedTLS(const TdpImpl_mbedTLS& tdp)
     }
 }
 
-
-//inline mbedtls_rsa_context* TdpImpl_mbedTLS::get_rsa_key() const
-//{
-//    return &rsa_key_;
-//}
-//
-//inline void TdpImpl_mbedTLS::set_rsa_key(RSA* k)
-//{
-//    if(k == NULL)
-//    {
-//        throw std::invalid_argument("Invalid input: k == NULL."); /* LCOV_EXCL_LINE */
-//    }
-//
-//    rsa_key_ = k;
-//    RSA_blinding_off(rsa_key_);
-//}
-
 inline size_t TdpImpl_mbedTLS::rsa_size() const
 {
     return rsa_key_.len;
@@ -245,7 +228,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::sample_
     
     int ret = 0;
     
-    ret = mbedtls_mpi_fill_random( &x, Tdp::kRSAPrgSize, mbedTLS_rng_wrap, NULL );
+    ret = mbedtls_mpi_fill_random( &x, Tdp::kRSAPrgSize, mbedTLS_rng_wrap, nullptr );
     
     if (ret != 0) {
         throw std::runtime_error("Error during random TDP message generation"); /* LCOV_EXCL_LINE */
@@ -336,7 +319,7 @@ TdpInverseImpl_mbedTLS::TdpInverseImpl_mbedTLS()
     mbedtls_mpi_init(&q_1_);
 
     // generate a new random key
-    ret = mbedtls_rsa_gen_key(&rsa_key_, mbedTLS_rng_wrap, NULL, RSA_MODULUS_SIZE, RSA_PK);
+    ret = mbedtls_rsa_gen_key(&rsa_key_, mbedTLS_rng_wrap, nullptr, RSA_MODULUS_SIZE, RSA_PK);
 
     
     if (ret != 0) {
@@ -373,7 +356,7 @@ TdpInverseImpl_mbedTLS::TdpInverseImpl_mbedTLS(const std::string& sk)
     mbedtls_mpi_init(&q_1_);
 
     // do not forget the '\0' character
-    ret = mbedtls_rsa_parse_key( &rsa_key_, reinterpret_cast<const unsigned char*>(sk.c_str()), sk.length()+1, 0, 0);
+    ret = mbedtls_rsa_parse_key( &rsa_key_, reinterpret_cast<const unsigned char*>(sk.c_str()), sk.length()+1, nullptr, 0);
     
     if (ret != 0) {
         throw std::runtime_error("Error when reading the RSA private key. Error code: " + std::to_string(ret)); /* LCOV_EXCL_LINE */
@@ -470,7 +453,7 @@ void TdpInverseImpl_mbedTLS::invert(const std::string &in, std::string &out) con
         throw std::invalid_argument("Invalid TDP input size. Input size should be kMessageSpaceSize bytes long.");
     }
     
-    ret = mbedtls_rsa_private(&rsa_key_, mbedTLS_rng_wrap, NULL, reinterpret_cast<const unsigned char*>(in.data()), rsa_out);
+    ret = mbedtls_rsa_private(&rsa_key_, mbedTLS_rng_wrap, nullptr, reinterpret_cast<const unsigned char*>(in.data()), rsa_out);
     
     if (ret != 0) {
         throw std::invalid_argument("Error during the RSA private key operation. Code: " + std::to_string(ret)); /* LCOV_EXCL_LINE */
@@ -486,7 +469,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mbedTLS::
 {
     std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> out;
     
-    int ret = mbedtls_rsa_private(&rsa_key_, mbedTLS_rng_wrap, NULL, in.data(), out.data());
+    int ret = mbedtls_rsa_private(&rsa_key_, mbedTLS_rng_wrap, nullptr, in.data(), out.data());
     
     if (ret != 0) {
         throw std::invalid_argument("Error during the RSA private key operation. Code: " + std::to_string(ret)); /* LCOV_EXCL_LINE */
@@ -580,8 +563,8 @@ std::array<uint8_t, TdpInverseImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mb
     // mbedTLS mpi library does not allow for a modular exponentiation
     // where the module is even. And we were actually relying on that
     // to compute the adjusted exponent
-    //    mbedtls_mpi_exp_mod(&d_p, &rsa_key_.DP, &mpi_order, &p_1_, NULL);
-    //    mbedtls_mpi_exp_mod(&d_q, &rsa_key_.DQ, &mpi_order, &q_1_, NULL);
+    //    mbedtls_mpi_exp_mod(&d_p, &rsa_key_.DP, &mpi_order, &p_1_, nullptr);
+    //    mbedtls_mpi_exp_mod(&d_q, &rsa_key_.DQ, &mpi_order, &q_1_, nullptr);
 
     // instead, we implemented the insecure_mod_exp function
     // it is definitely less secure than mbedtls_mpi_exp_mod

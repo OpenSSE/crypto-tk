@@ -71,7 +71,7 @@ static_assert(MULTI == OPENMP, "Error. Relicxx compiled to use OPENMP. But Relic
 
 namespace relicxx{
 typedef  std::vector<uint8_t> bytes_vec;
-void ro_error(void);
+void ro_error();
 
 const static std::string HASH_FUNCTION_STRINGS       = "0";
 const static std::string HASH_FUNCTION_BYTES_TO_Zr_CRH = "1";

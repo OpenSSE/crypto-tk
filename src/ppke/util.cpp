@@ -1,6 +1,5 @@
-#include<assert.h>
-#include"util.h"
-#include <cmath>
+#include "util.h"
+
 using namespace std;
 namespace sse
 {

@@ -1,5 +1,5 @@
 
-#include <assert.h>
+#include <cassert>
 #include <unordered_set>
 #include "GMPpke.h"
 #include "util.h"
@@ -129,9 +129,6 @@ void Gmppke::keygenPartial(const ZR & alpha, GmppkePublicKey & pk, GmppkePrivate
     
     
     sk.shares.push_back(skgen(sp));
-    
-    
-    return;
 }
 
 void Gmppke::keygenPartial(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, const ZR & alpha, GmppkePublicKey & pk, GmppkePrivateKey & sk, const GmppkeSecretParameters &sp) const
@@ -168,9 +165,6 @@ void Gmppke::keygenPartial(const sse::crypto::Prf<kPPKEPrfOutputSize> &prf, cons
     //    assert(pk.g2G2 == LagrangeInterpInExponent<G2>(group,0,polynomial_xcordinates,pk.gqofxG2));
     
     sk.shares.push_back(skgen(prf, sp));
-    
-    
-    return;
 }
 
 GmppkePrivateKeyShare Gmppke::skgen(const GmppkeSecretParameters &sp ) const{

@@ -1,10 +1,10 @@
-#include <assert.h>
+#include <cassert>
 #include <stdexcept>
 #include "relic_api.h"
 using namespace std;
 namespace relicxx{
 
-void ro_error(void)
+void ro_error()
 {
 	throw  std::invalid_argument("writing to read only object");
 }
@@ -22,8 +22,10 @@ static void invertZR(ZR & c, const ZR & a, const bn_t order)
 	bn_t s;
 	bn_inits(s);
 	// compute c = (1 / a) mod n
-	bn_gcd_ext(s, c.z, NULL, a1.z, order);
-	if(bn_sign(c.z) == BN_NEG) bn_add(c.z, c.z, order);
+	bn_gcd_ext(s, c.z, nullptr, a1.z, order);
+    if(bn_sign(c.z) == BN_NEG) {
+        bn_add(c.z, c.z, order);
+    }
 	bn_free(s);
 }
 
@@ -91,8 +93,9 @@ ZR operator-(const ZR& x, const ZR& y)
 	ZR zr;
 
 	bn_sub(zr.z, x.z, y.z);
-	if(bn_sign(zr.z) == BN_NEG) bn_add(zr.z, zr.z, zr.order);
-	else {
+    if(bn_sign(zr.z) == BN_NEG) {
+        bn_add(zr.z, zr.z, zr.order);
+    } else {
 		bn_mod(zr.z, zr.z, zr.order);
 	}
 	return zr;
@@ -104,10 +107,9 @@ ZR operator-(const ZR& x)
 	bn_neg(zr.z, x.z);
 	if(bn_sign(zr.z) == BN_NEG) {
 		bn_add(zr.z, zr.z, zr.order);
-		return zr;
-	}else{
-		return zr;
 	}
+    return zr;
+
 }
 
 
@@ -115,8 +117,9 @@ ZR operator*(const ZR& x, const ZR& y)
 {
 	ZR zr;
 	bn_mul(zr.z, x.z, y.z);
-	if(bn_sign(zr.z) == BN_NEG) bn_add(zr.z, zr.z, zr.order);
-	else {
+    if(bn_sign(zr.z) == BN_NEG) {
+        bn_add(zr.z, zr.z, zr.order);
+    } else {
 		bn_mod(zr.z, zr.z, zr.order);
 	}
 
@@ -125,14 +128,18 @@ ZR operator*(const ZR& x, const ZR& y)
 
 static int bn_is_one(bn_t a)
 {
-	if(a->used == 0) return 0; // false
-	else if((a->used == 1) && (a->dp[0] == 1)) return 1; // true
-	else return 0; // false
+    if(a->used == 0) {
+        return 0; // false
+    }
+    if((a->used == 1) && (a->dp[0] == 1)) {
+        return 1; // true
+    }
+    return 0; // false
 }
 
 ZR operator/(const ZR& x, const ZR& y)
 {
-	if(bn_is_zero(y.z)) {
+	if(bn_is_zero(y.z) != 0) {
 		throw RelicDividByZero("divide by zero");
 	}
 	ZR i;
@@ -168,7 +175,9 @@ ZR hashToZR(const bytes_vec & b)
 	memset(digest, 0, digest_len);
 	SHA_FUNC(digest,&data[0],(int)data.size());
 	bn_read_bin(zr.z, digest, digest_len);
-	if(bn_cmp(zr.z, zr.order) == CMP_GT) bn_mod(zr.z, zr.z, zr.order);
+    if(bn_cmp(zr.z, zr.order) == CMP_GT) {
+        bn_mod(zr.z, zr.z, zr.order);
+    }
 	return zr;
 }
 
@@ -177,14 +186,9 @@ ZR hashToZR(const bytes_vec & b)
         return bn_size_bin(z);
     }
 
-bool ZR::ismember(void) const
+bool ZR::ismember() const
 {
-	bool result;
-	if((bn_cmp(z, order) < CMP_EQ) && (bn_sign(z) == BN_POS))
-		result = true;
-	else
-		result = false;
-	return result;
+    return ((bn_cmp(z, order) < CMP_EQ) && (bn_sign(z) == BN_POS));
 }
 
 std::vector<uint8_t> ZR::getBytes() const {
@@ -210,7 +214,9 @@ ZR operator<<(const ZR& a, int b)
 	// left shift
 	ZR zr;
 	bn_lsh(zr.z, a.z, b);
-    if(bn_cmp(zr.z, zr.order) == CMP_GT) bn_mod(zr.z, zr.z, zr.order);
+    if(bn_cmp(zr.z, zr.order) == CMP_GT) {
+        bn_mod(zr.z, zr.z, zr.order);
+    }
 	return zr;
 }
 
@@ -228,9 +234,10 @@ ZR operator&(const ZR& a, const ZR& b)
 	bn_t c;
 	bn_inits(c);
 
-	for(i = 0; i < d; i++)
+    for(i = 0; i < d; i++) {
 		c->dp[i] = (a.z->dp[i] & b.z->dp[i]);
-
+    }
+    
 	c->used = d;
 	ZR zr(c);
 	bn_free(c);
@@ -324,15 +331,14 @@ G1 hashToG1(const bytes_vec & b){
 
 bool G1::ismember(const bn_t order) const
 {
-	bool result;
+	bool result = false;
 	g1_t r;
 	g1_inits(r);
 
 	g1_mul(r, g, order);
-	if(g1_is_infty(r) == 1)
+    if(g1_is_infty(r) == 1) {
 		result = true;
-	else
-		result = false;
+    }
 	g1_free(r);
 	return result;
 }
@@ -358,7 +364,7 @@ ostream& operator<<(ostream& s, const G1& g1)
 	auto data = g1.getBytes();
 	s << "0x";
 	for(auto i : data){
-	s << std::hex << (unsigned int)data[i];
+        s << std::hex << (unsigned int)data[i];
 	}
 	s<< std::endl;
 	return s;
@@ -425,14 +431,13 @@ G2 hashToG2(const bytes_vec & b)
 
 bool G2::ismember(bn_t order)
 {
-	bool result;
+	bool result = false;
 	g2_t r;
 	g2_inits(r);
 	g2_mul(r, g, order);
-	if(g2_is_infty(r) == 1)
+    if(g2_is_infty(r) == 1) {
 		result = true;
-	else
-		result = false;
+    }
 	g2_free(r);
 	return result;
 }
@@ -461,7 +466,7 @@ ostream& operator<<(ostream& s, const G2& g2)
 	auto data= g2.getBytes();
 	s << "0x";
 	for(auto i : data){
-	s<< std::hex << (unsigned int)data[i];
+        s<< std::hex << (unsigned int)data[i];
 	}
 	s << std::endl;
 	return s;
@@ -508,9 +513,8 @@ GT power(const GT& g, const ZR& zr)
 		// compute inverse
 		return -g;
 	}
-	else {
-		gt_exp(gt.g, gg.g, zr1.z);
-	}
+    
+	gt_exp(gt.g, gg.g, zr1.z);
 	return gt;
 }
 
@@ -536,14 +540,13 @@ GT pairing(const G1& g1, const G2& g2)
 
 bool GT::ismember(bn_t order)
 {
-	bool result;
+	bool result = false;
 	gt_t r;
 	gt_inits(r);
 	gt_exp(r,g, order);
-	if(gt_is_unity(r) == 1)
+    if(gt_is_unity(r) == 1) {
 		result = true;
-	else
-		result = false;
+    }
 	gt_free(r);
 	return result;
 }

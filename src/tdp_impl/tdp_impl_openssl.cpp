@@ -53,10 +53,10 @@ static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize, "Constants kMessage
   
 // OpenSSL implementation of the trapdoor permutation
     
-TdpImpl_OpenSSL::TdpImpl_OpenSSL() : rsa_key_(NULL)
+TdpImpl_OpenSSL::TdpImpl_OpenSSL() : rsa_key_(nullptr)
 {
 }
-TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(NULL)
+TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(nullptr)
 {
     // create a BIO from the std::string
     BIO *mem;
@@ -70,9 +70,9 @@ TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(NULL)
 #pragma GCC diagnostic pop
     
     // read the key from the BIO
-    rsa_key_ = PEM_read_bio_RSA_PUBKEY(mem,NULL,NULL,NULL);
+    rsa_key_ = PEM_read_bio_RSA_PUBKEY(mem,nullptr,nullptr,nullptr);
 
-    if(rsa_key_ == NULL)
+    if(rsa_key_ == nullptr)
     {
         throw std::runtime_error("Error when initializing the RSA key from public key.");
     }
@@ -98,9 +98,9 @@ inline RSA* TdpImpl_OpenSSL::get_rsa_key() const
     
 inline void TdpImpl_OpenSSL::set_rsa_key(RSA* k)
 {
-    if(k == NULL)
+    if(k == nullptr)
     {
-        throw std::invalid_argument("Invalid input: k == NULL."); /* LCOV_EXCL_LINE */
+        throw std::invalid_argument("Invalid input: k == nullptr."); /* LCOV_EXCL_LINE */
     }
 
     rsa_key_ = k;
@@ -248,7 +248,7 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::generat
     BIGNUM *rnd_bn, *rnd_mod;
     BN_CTX *ctx = BN_CTX_new();
     
-    rnd_bn = BN_bin2bn(rnd.data(), Tdp::kRSAPrgSize, NULL);
+    rnd_bn = BN_bin2bn(rnd.data(), Tdp::kRSAPrgSize, nullptr);
     
     // now, take rnd_bn mod N
     rnd_mod = BN_new();
@@ -293,7 +293,7 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL()
     // generate a new random key
     
     unsigned long e = RSA_PK;
-    BIGNUM *bne = NULL;
+    BIGNUM *bne = nullptr;
     bne = BN_new();
     ret = BN_set_word(bne, e);
     if(ret != 1)
@@ -301,7 +301,7 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL()
         throw std::runtime_error("Invalid BIGNUM initialization."); /* LCOV_EXCL_LINE */
     }
     
-    ret = RSA_generate_key_ex(get_rsa_key(), RSA_MODULUS_SIZE, bne, NULL);
+    ret = RSA_generate_key_ex(get_rsa_key(), RSA_MODULUS_SIZE, bne, nullptr);
     if(ret != 1)
     {
         throw std::runtime_error("Invalid RSA key generation."); /* LCOV_EXCL_LINE */
@@ -337,9 +337,9 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL(const std::string& sk)
 
 
     EVP_PKEY* evpkey;
-    evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
+    evpkey = PEM_read_bio_PrivateKey(mem, nullptr, nullptr, nullptr);
 
-    if(evpkey == NULL)
+    if(evpkey == nullptr)
     {
         throw std::runtime_error("Error when reading the RSA private key.");
     }
@@ -409,7 +409,7 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
     BIO *bio = BIO_new(BIO_s_mem());
     
     // write the key to the buffer
-    ret = PEM_write_bio_PKCS8PrivateKey(bio, evpkey, NULL, NULL, 0, NULL, NULL);
+    ret = PEM_write_bio_PKCS8PrivateKey(bio, evpkey, nullptr, nullptr, 0, nullptr, nullptr);
     if(ret != 1)
     {
         throw std::runtime_error("Failure when writing private KEY."); /* LCOV_EXCL_LINE */

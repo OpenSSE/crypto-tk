@@ -5,6 +5,7 @@
 #include "ecmh/array_view/array_view.hpp"
 #include "ecmh/utility/division.hpp"
 #include "ecmh/hash/hash_expand.hpp"
+#include "ecmh/utility/assign_endian.hpp"
 
 namespace jbms {
 namespace binary_field {

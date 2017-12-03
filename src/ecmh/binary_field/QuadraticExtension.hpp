@@ -4,6 +4,7 @@
 #include "./detail/field_operation_helpers.hpp"
 #include <boost/range/iterator_range.hpp>
 #include "ecmh/array_view/array_view.hpp"
+#include "ecmh/utility/assign_endian.hpp"
 #include <array>
 
 namespace jbms {
@@ -108,7 +109,7 @@ struct QuadraticExtension {
   static constexpr Zero get(One const &a) { return {}; }
 
   template <size_t i, class BaseElement, JBMS_ENABLE_IF_C(i == 0 && is_field_element<BaseField,BaseElement>::value)>
-  static constexpr Zero get(QuadraticU<BaseElement> const &) { return {}; }
+  static constexpr Zero get(QuadraticU<BaseElement> const & /*unused*/) { return {}; }
 
   // Careful: this returns a reference
   template <size_t i, class BaseElement, JBMS_ENABLE_IF_C(i == 1 && is_field_element<BaseField,BaseElement>::value)>
@@ -134,7 +135,7 @@ struct QuadraticExtension {
   static constexpr typename BaseField::Element &get(typename BaseField::Element &a) { return a; }
 
   template <size_t i, JBMS_ENABLE_IF_C(i == 1)>
-  static constexpr Zero get(typename BaseField::Element const &) { return {}; }
+  static constexpr Zero get(typename BaseField::Element const & /*unused*/) { return {}; }
 
   static void copy_0_to_1(QuadraticExtension const &F, Element &a) { a[1] = a[0]; }
 
@@ -175,8 +176,9 @@ struct QuadraticExtension {
             JBMS_ENABLE_IF(is_single_or_double<ElementT>)>
   friend void assign_from_hex(QuadraticExtension const &F, ElementT &a, Range const &range) {
     auto split_it = std::find(range.begin(), range.end(), ',');
-    if (split_it == range.end())
+    if (split_it == range.end()) {
       throw std::invalid_argument("QuadraticExtension hex representation must contain a comma");
+}
     assign_from_hex(F.base_field(), a[0], boost::make_iterator_range(range.begin(), split_it));
     ++split_it;
     assign_from_hex(F.base_field(), a[1], boost::make_iterator_range(split_it, range.end()));
@@ -184,8 +186,9 @@ struct QuadraticExtension {
 
   template <class Data, boost::endian::order order>
   friend void assign(QuadraticExtension const &F, Element &a, endian_wrapper<Data, order> source) {
-    if (source.data.size() != F.num_bytes())
+    if (source.data.size() != F.num_bytes()) {
       throw std::invalid_argument("invalid source length");
+}
 
     auto source_view = jbms::make_view(source.data);
     size_t split_pos = F.base_field().num_bytes();
@@ -890,8 +893,8 @@ struct QuadraticExtension {
     return get_bit(F.base_field(), a[i / degree], i % degree);
   }
 
-  friend bool get_bit(QuadraticExtension const &F, Zero const &, size_t i) { return false; }
-  friend bool get_bit(QuadraticExtension const &F, One const &, size_t i) { return i == 0; }
+  friend bool get_bit(QuadraticExtension const &F, Zero const & /*unused*/, size_t i) { return false; }
+  friend bool get_bit(QuadraticExtension const &F, One const & /*unused*/, size_t i) { return i == 0; }
 
   template <class BaseElement, JBMS_ENABLE_IF(is_field_element<BaseField,BaseElement>)>
   friend bool get_bit(QuadraticExtension const &F, QuadraticU<BaseElement> const &a, size_t i) {

@@ -4,6 +4,7 @@
 #include "ecmh/utility/enable_if.hpp"
 #include "ecmh/utility/logical.hpp"
 #include <type_traits>
+#include <string>
 
 namespace jbms {
 namespace binary_field {

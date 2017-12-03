@@ -1,12 +1,14 @@
 #ifndef HEADER_GUARD_0cce9e7fd4c0c2c2f09a5f908eb4bdd2
 #define HEADER_GUARD_0cce9e7fd4c0c2c2f09a5f908eb4bdd2
 
+#include "./detail/polynomial_base.hpp"
+#include <cstddef>
+
 namespace jbms {
 namespace binary_field {
 
 template <size_t BlockBits, size_t Bits, class Op>
-void compute_linear_operation_table(BinaryPolynomial<Bits> table[(Bits+BlockBits-1)/BlockBits][1<<BlockBits],
-                                    Op &&op) {
+void compute_linear_operation_table(BinaryPolynomial<Bits> table[(Bits+BlockBits-1)/BlockBits][1<<BlockBits], Op &&op) {
   std::array<BinaryPolynomial<Bits>,Bits> monomial_results;
   for (size_t i = 0; i < Bits; ++i) {
     BinaryPolynomial<Bits> x;

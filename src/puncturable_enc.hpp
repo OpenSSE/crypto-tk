@@ -46,17 +46,17 @@ namespace sse
         namespace punct
         {
             constexpr static size_t kTagSize = 16;
-            typedef std::array<uint8_t, kTagSize> tag_type;
+            using tag_type = std::array<uint8_t, kTagSize>;
             
             constexpr static size_t kKeyShareSize = 211;
-            typedef std::array<uint8_t, kKeyShareSize> key_share_type;
-            typedef std::vector<key_share_type> punctured_key_type;
+            using key_share_type = std::array<uint8_t, kKeyShareSize>;
+            using punctured_key_type = std::vector<key_share_type>;
             
             const static size_t kMasterKeySize = 32;
-            typedef Key<kMasterKeySize> master_key_type;
+            using master_key_type = Key<kMasterKeySize>;
             
             const static size_t kCiphertextSize = 90;
-            typedef std::array<uint8_t, kCiphertextSize> ciphertext_type;
+            using ciphertext_type = std::array<uint8_t, kCiphertextSize>;
 
             
             inline tag_type extract_tag(const key_share_type& keyshare)

@@ -52,7 +52,7 @@ template <uint16_t NBYTES> class Prf
 {
 public:
 	static constexpr uint8_t kKeySize = 32;
-    typedef HMac<Hash,kKeySize> PrfBase;
+    using PrfBase = HMac<Hash,kKeySize>;
 
     static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too large for the hash block size");
     
@@ -66,7 +66,7 @@ public:
     }
 
 	// Destructor.
-	~Prf() {}; 
+	~Prf() = default; 
 	
 	std::array<uint8_t, NBYTES> prf(const unsigned char* in, const size_t &length) const;
 	std::array<uint8_t, NBYTES> prf(const std::string &s) const;

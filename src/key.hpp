@@ -32,8 +32,8 @@
 #include <sodium/utils.h>
 
 namespace tests {
-    template <size_t K_SIZE>    void prg_test_key_derivation_consistency();
-    template <size_t N>         void test_key_derivation_consistency(size_t input_size);
+    template <size_t K_SIZE>    extern void prg_test_key_derivation_consistency();
+    template <size_t L>         extern void test_key_derivation_consistency(size_t input_size);
 }
 
 namespace sse {
@@ -71,11 +71,9 @@ namespace sse {
             friend class Fpe;
             friend class Cipher;
             
-            template <size_t K_SIZE>    friend void tests::prg_test_key_derivation_consistency();
-            template <size_t L>         friend void tests::test_key_derivation_consistency(size_t input_size);
+            template <size_t K_SIZE>    friend void tests::prg_test_key_derivation_consistency(); // NOLINT
+            template <size_t L>         friend void tests::test_key_derivation_consistency(size_t input_size); // NOLINT
 
-//            friend class TdpImpl;
-            
         public:
             /**
              *  @brief Constructor
@@ -89,7 +87,7 @@ namespace sse {
             {
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
                 
-                if( content_ == NULL)
+                if( content_ == nullptr)
                 {
                     throw std::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
@@ -113,17 +111,17 @@ namespace sse {
              *
              *  @exception std::bad_alloc           Memory cannot be allocated.
              *  @exception std::runtime_error       Memory could not be protected.
-             *  @exception std::invalid_argument    The input argument is NULL.
+             *  @exception std::invalid_argument    The input argument is nullptr.
              */
             Key(uint8_t* const key)
             {
-                if(key == NULL)
+                if(key == nullptr)
                 {
-                    throw std::invalid_argument("Invalid key: key == NULL");
+                    throw std::invalid_argument("Invalid key: key == nullptr");
                 }
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
                 
-                if(content_ == NULL)
+                if(content_ == nullptr)
                 {
                     throw std::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
@@ -150,7 +148,7 @@ namespace sse {
             Key(Key<N>&& k) noexcept:
             content_(k.content_), is_locked_(k.is_locked_)
             {
-                k.content_ = NULL;
+                k.content_ = nullptr;
                 k.is_locked_ = true;
             }
             
@@ -162,9 +160,9 @@ namespace sse {
              */
             ~Key()
             {
-                if (content_ != NULL) {
+                if (content_ != nullptr) {
                     sodium_free(content_);
-                    content_ = NULL;
+                    content_ = nullptr;
                     is_locked_ = true;
                 }
             }
@@ -180,18 +178,18 @@ namespace sse {
              *
              */
 
-            Key& operator=(Key<N>&& other)
+            Key& operator=(Key<N>&& other) noexcept
             {
                 if (this != &other)
                 {
-                    if (content_ != NULL) {
+                    if (content_ != nullptr) {
                         sodium_free(content_);
                     }
                     
                     content_ = other.content_;
                     is_locked_ = other.is_locked_;
                     
-                    other.content_ = NULL;
+                    other.content_ = nullptr;
                     other.is_locked_ = true;
                 }
                 return *this;
@@ -200,16 +198,16 @@ namespace sse {
             /**
              *  @brief Erase the key
              *
-             *  Erases the current key content, and set the content to NULL.
+             *  Erases the current key content, and set the content to nullptr.
              *
              *
              */
 
             void erase()
             {
-                if (content_ != NULL) {
+                if (content_ != nullptr) {
                     sodium_free(content_);
-                    content_ = NULL;
+                    content_ = nullptr;
                     is_locked_ = true;
                 }
             }
@@ -230,7 +228,7 @@ namespace sse {
             {
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
                 
-                if(content_ == NULL)
+                if(content_ == nullptr)
                 {
                     throw std::bad_alloc(); /* LCOV_EXCL_LINE */
                 }
@@ -253,7 +251,7 @@ namespace sse {
              */
             void lock() const
             {
-                if (content_ != NULL && !is_locked_) {
+                if (content_ != nullptr && !is_locked_) {
                     int err = sodium_mprotect_noaccess(content_);
                     if (err == -1 && errno != ENOSYS) {
                         throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
@@ -271,7 +269,7 @@ namespace sse {
              */
             void unlock() const
             {
-                if (content_ != NULL && is_locked_) {
+                if (content_ != nullptr && is_locked_) {
                     int err = sodium_mprotect_readonly(content_);
                     if (err == -1 && errno != ENOSYS) {
                         throw std::runtime_error("Error when locking memory: " + std::string(strerror(errno))); /* LCOV_EXCL_LINE */
@@ -283,12 +281,12 @@ namespace sse {
             /**
              *  @brief Checks if the key is empty
              *
-             *  Returns true if the key content is NULL.
+             *  Returns true if the key content is nullptr.
              *
              */
             const bool is_empty() const noexcept
             {
-                return content_ == NULL;
+                return content_ == nullptr;
             }
 
             /**
@@ -328,7 +326,7 @@ namespace sse {
              */
             const uint8_t* unlock_get() const
             {
-                if (content_ == NULL) {
+                if (content_ == nullptr) {
                     throw std::runtime_error("Memory is absent");
                 }
                 

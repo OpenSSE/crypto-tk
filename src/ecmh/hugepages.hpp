@@ -2,12 +2,12 @@
 #define HEADER_GUARD_6cfbf6f8bc7b73b420820eda3c580707
 
 #include <memory>
-#include <stdlib.h>
+#include <cstdlib>
 #include <system_error>
 #include <sys/mman.h>
-#include <errno.h>
+#include <cerrno>
 #include <unistd.h>
-#include <stdio.h>
+#include <cstdio>
 #include <fstream>
 
 
@@ -41,11 +41,13 @@ inline std::pair<size_t,size_t> check_huge_page_allocation(void *ptr, size_t len
   size_t huge_page_size = 2 * 1024 * 1024;
 
   uintptr_t ptr_begin = (uintptr_t)ptr;
-  if (ptr_begin % huge_page_size)
+  if ( (ptr_begin % huge_page_size) != 0) {
     ptr_begin += huge_page_size - (ptr_begin % huge_page_size);
+  }
   uintptr_t ptr_end = (uintptr_t)ptr + len;
-  if (ptr_end % huge_page_size)
+  if ( (ptr_end % huge_page_size) != 0) {
     ptr_end -= (ptr_end % huge_page_size);
+  }
   ptr_end = std::max(ptr_begin, ptr_end);
 
   std::ifstream ifs("/proc/self/smaps");
@@ -62,12 +64,12 @@ inline std::pair<size_t,size_t> check_huge_page_allocation(void *ptr, size_t len
       r_end = r_end_temp;
 
       r_begin_aligned = r_begin;
-      if (r_begin % huge_page_size) {
+      if ( (r_begin % huge_page_size) != 0) {
         r_begin_aligned += huge_page_size - (r_begin % huge_page_size);
       }
 
       r_end_aligned = r_end;
-      if (r_end % huge_page_size) {
+      if ((r_end % huge_page_size) != 0u) {
         r_end_aligned -= (r_end % huge_page_size);
         r_end_aligned = std::max(r_end_aligned, r_begin_aligned);
       }
@@ -82,8 +84,9 @@ inline std::pair<size_t,size_t> check_huge_page_allocation(void *ptr, size_t len
     if (sscanf(line.c_str(), "AnonHugePages: %lu kB", &count_kb) == 1) {
       size_t count_bytes = count_kb * 1024;
       size_t aligned_amount = (r_end_aligned - r_begin_aligned);
-      if (count_bytes > aligned_amount)
+      if (count_bytes > aligned_amount) {
         throw std::runtime_error("AnonHugePages size is > aligned size");
+}
 
       //size_t non_huge_amount = aligned_amount - count_bytes;
       if (ptr_begin <= r_end_aligned && ptr_end >= r_begin_aligned) {
@@ -93,8 +96,9 @@ inline std::pair<size_t,size_t> check_huge_page_allocation(void *ptr, size_t len
 
         size_t max_contrib = std::min(overlap_amount, count_bytes);
         size_t min_contrib = 0;
-        if (non_overlap_amount < count_bytes)
+        if (non_overlap_amount < count_bytes) {
           min_contrib += count_bytes - non_overlap_amount;
+}
         min_amount += min_contrib;
         max_amount += max_contrib;
       }
@@ -112,8 +116,9 @@ unique_hugepage_ptr<T[]> allocate_hugepage_array(size_t n, bool verify = false) 
   constexpr size_t huge_page_size = 2 * 1024 * 1024; // 2 MiB
   size_t page_size = huge_page_size;
   auto rem = bytes_req % page_size;
-  if (rem > 0)
+  if (rem > 0) {
     bytes_req += (page_size - rem);
+}
 
   size_t bytes_allocated = bytes_req;
   // mmap might not give us memory aligned at the huge_page_size boundary, so we need some extra room to adjust it

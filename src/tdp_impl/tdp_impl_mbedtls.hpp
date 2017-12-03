@@ -46,22 +46,22 @@ namespace crypto
         TdpImpl_mbedTLS(const std::string& pk);
         TdpImpl_mbedTLS(const TdpImpl_mbedTLS& tdp);
         
-        ~TdpImpl_mbedTLS();
+        ~TdpImpl_mbedTLS() override;
         
-        size_t rsa_size() const;
+        size_t rsa_size() const override;
         
-        std::string public_key() const;
+        std::string public_key() const override;
         
-        void eval(const std::string &in, std::string &out) const;
-        std::array<uint8_t, kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in) const;
+        void eval(const std::string &in, std::string &out) const override;
+        std::array<uint8_t, kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in) const override;
         
-        std::string sample() const;
-        std::array<uint8_t, kMessageSpaceSize> sample_array() const;
+        std::string sample() const override;
+        std::array<uint8_t, kMessageSpaceSize> sample_array() const override;
         
-        std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
-        std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const;
-        std::string generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
-        std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const;
+        std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const override;
+        std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const override;
+        std::string generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const override;
+        std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const override;
         
     protected:
         TdpImpl_mbedTLS();
@@ -75,14 +75,14 @@ namespace crypto
         TdpInverseImpl_mbedTLS();
         TdpInverseImpl_mbedTLS(const std::string& sk);
         TdpInverseImpl_mbedTLS(const TdpInverseImpl_mbedTLS& tdp);
-        ~TdpInverseImpl_mbedTLS();
+        ~TdpInverseImpl_mbedTLS() override;
         
-        std::string private_key() const;
-        void invert(const std::string &in, std::string &out) const;
-        std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const;
+        std::string private_key() const override;
+        void invert(const std::string &in, std::string &out) const override;
+        std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const override;
         
-        std::array<uint8_t, kMessageSpaceSize> invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const;
-        void invert_mult(const std::string &in, std::string &out, uint32_t order) const;
+        std::array<uint8_t, kMessageSpaceSize> invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const override;
+        void invert_mult(const std::string &in, std::string &out, uint32_t order) const override;
         
     private:
         mbedtls_mpi phi_, p_1_, q_1_;
@@ -94,13 +94,13 @@ namespace crypto
         TdpMultPoolImpl_mbedTLS(const std::string& sk, const uint8_t size);
         TdpMultPoolImpl_mbedTLS(const TdpMultPoolImpl_mbedTLS& pool_impl);
         
-        ~TdpMultPoolImpl_mbedTLS();
+        ~TdpMultPoolImpl_mbedTLS() override;
         
-        std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> eval_pool(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const;
-        void eval_pool(const std::string &in, std::string &out, const uint8_t order) const;
+        std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> eval_pool(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const override;
+        void eval_pool(const std::string &in, std::string &out, const uint8_t order) const override;
         
-        uint8_t maximum_order() const;
-        uint8_t pool_size() const;
+        uint8_t maximum_order() const override;
+        uint8_t pool_size() const override;
     private:
         mbedtls_rsa_context* keys_;
         

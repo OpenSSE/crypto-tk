@@ -46,7 +46,7 @@ namespace crypto
         TdpImpl_OpenSSL(const std::string& pk);
         TdpImpl_OpenSSL(const TdpImpl_OpenSSL& tdp);
         
-        virtual ~TdpImpl_OpenSSL();
+        ~TdpImpl_OpenSSL() override;
         
         RSA* get_rsa_key() const;
         void set_rsa_key(RSA* k);
@@ -78,7 +78,7 @@ namespace crypto
         TdpInverseImpl_OpenSSL();
         TdpInverseImpl_OpenSSL(const std::string& sk);
         TdpInverseImpl_OpenSSL(const TdpInverseImpl_OpenSSL& tdp);
-        ~TdpInverseImpl_OpenSSL();
+        ~TdpInverseImpl_OpenSSL() override;
         
         std::string private_key() const override;
         void invert(const std::string &in, std::string &out) const override;
@@ -97,7 +97,7 @@ namespace crypto
         TdpMultPoolImpl_OpenSSL(const std::string& sk, const uint8_t size);
         TdpMultPoolImpl_OpenSSL(const TdpMultPoolImpl_OpenSSL& pool_impl);
         
-        ~TdpMultPoolImpl_OpenSSL();
+        ~TdpMultPoolImpl_OpenSSL() override;
         
         std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> eval_pool(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const override;
         void eval_pool(const std::string &in, std::string &out, const uint8_t order) const override;

@@ -48,7 +48,7 @@ static pthread_mutex_t *mutex_buf = nullptr;
  */
 static void locking_function(int mode, int n, const char *file, int line)
 {
-    if (mode & CRYPTO_LOCK) {
+    if ((mode & CRYPTO_LOCK) != 0) {
         pthread_mutex_lock(&mutex_buf[n]);
     } else {
         pthread_mutex_unlock(&mutex_buf[n]);
@@ -77,7 +77,7 @@ static struct CRYPTO_dynlock_value *dyn_create_function(const char *file, int li
     
     value = (struct CRYPTO_dynlock_value *)
     malloc(sizeof(struct CRYPTO_dynlock_value));
-    if (!value) {
+    if (value != nullptr) {
         goto err;
     }
     pthread_mutex_init(&value->mutex, nullptr);
@@ -100,7 +100,7 @@ err:
 static void dyn_lock_function(int mode, struct CRYPTO_dynlock_value *l,
                               const char *file, int line)
 {
-    if (mode & CRYPTO_LOCK) {
+    if ((mode & CRYPTO_LOCK) != 0) {
         pthread_mutex_lock(&l->mutex);
     } else {
         pthread_mutex_unlock(&l->mutex);

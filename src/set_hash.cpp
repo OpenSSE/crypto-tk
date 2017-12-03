@@ -67,9 +67,9 @@ public:
  	template <class InputIterator> SetHashImpl(InputIterator first, InputIterator last);
 
 	void add_element(const std::string &in);
-	void add_set(const SetHashImpl *h);
+	void add_set(const SetHashImpl *in);
 	void remove_element(const std::string &in);
-	void remove_set(const SetHashImpl *h);
+	void remove_set(const SetHashImpl *in);
 	MSH::State invert_set();
 	
 	std::string hex() const;

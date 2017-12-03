@@ -82,7 +82,7 @@ namespace crypto
 
 static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize, "Constants kMessageSize of Tdp and TdpInverse do not match");
 
-Tdp::Tdp(const std::string& sk) : tdp_imp_(new TdpImpl_Current(sk))
+Tdp::Tdp(const std::string& pk) : tdp_imp_(new TdpImpl_Current(pk))
 {
 }
 

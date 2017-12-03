@@ -118,7 +118,7 @@ namespace sse
             PDecImpl(const punct::punctured_key_type& punctured_key);
             
             bool is_punctured_on_tag(const punct::tag_type &tag);
-            bool decrypt(const punct::ciphertext_type &ct, uint64_t &m) const;
+            bool decrypt(const punct::ciphertext_type &ct_bytes, uint64_t &m) const;
             
         private:
             const Gmppke ppke_;

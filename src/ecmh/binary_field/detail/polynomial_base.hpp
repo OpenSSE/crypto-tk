@@ -30,12 +30,9 @@ public:
 
 private:
   constexpr static limb_t last_limb_mask_(size_t last_bits) {
-    if (last_bits >= word_bits + 8*sizeof(word_t))
-    {
-      return limb_t{~word_t(0), ~word_t(0) };
-    }
-    return limb_t{last_bits >= word_bits ? ~word_t(0) : (word_t(1) << last_bits) - 1,
-      last_bits == limb_bits ? ~word_t(0) : (word_t(1) << (last_bits >= word_bits ? last_bits - word_bits : 0)) - 1};
+    return (last_bits >= word_bits + 8*sizeof(word_t)) ? limb_t{~word_t(0), ~word_t(0) }
+      : limb_t{last_bits >= word_bits ? ~word_t(0) : (word_t(1) << last_bits) - 1,
+               last_bits == limb_bits ? ~word_t(0) : (word_t(1) << (last_bits >= word_bits ? last_bits - word_bits : 0)) - 1};
   }
 
 public:

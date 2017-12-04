@@ -486,8 +486,8 @@ inline typename Field::Element direct_multi_square(Field const &F, typename Fiel
 }
 
 template <size_t n, class Field, JBMS_ENABLE_IF(is_field<Field>)>
-inline void multi_square(Field const &F, typename Field::Element &x, typename Field::Element const &a) {
-  direct_multi_square<n>(F, x, a);
+inline void multi_square(Field const &F, typename Field::Element &result, typename Field::Element const &x) {
+  direct_multi_square<n>(F, result, x);
 }
 
 // catch-all

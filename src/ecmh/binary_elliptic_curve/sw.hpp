@@ -182,6 +182,9 @@ void batch_map(Curve const &curve, Encoder<Curve> const &encoder, OutputIterator
 
   size_t batch_size = boost::size(w_range);
 
+  if(batch_size == 0) {
+    return;
+  }
 //  // variable length array
 //  FE c_arr[batch_size];
 //  FE w_arr[batch_size];

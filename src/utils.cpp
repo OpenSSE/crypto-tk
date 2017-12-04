@@ -75,9 +75,8 @@ static struct CRYPTO_dynlock_value *dyn_create_function(const char *file, int li
 {
     struct CRYPTO_dynlock_value *value;
     
-    value = (struct CRYPTO_dynlock_value *)
-    malloc(sizeof(struct CRYPTO_dynlock_value));
-    if (value != nullptr) {
+    value = (struct CRYPTO_dynlock_value *) malloc(sizeof(struct CRYPTO_dynlock_value));
+    if (value == nullptr) {
         goto err;
     }
     pthread_mutex_init(&value->mutex, nullptr);

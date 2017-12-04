@@ -26,7 +26,7 @@ struct endian_wrapper {
   // template <class AssignFrom,
             // decltype(assign(std::declval<endian_wrapper>(), std::declval<AssignFrom const &>())) * = nullptr>
   template <class AssignFrom>
-  endian_wrapper const &operator=(AssignFrom const &x) const {
+  endian_wrapper& operator=(AssignFrom const &x) {
     assign(*this, x);
     return *this;
   }

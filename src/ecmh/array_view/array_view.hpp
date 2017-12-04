@@ -106,9 +106,9 @@ public:
   {}
 
   array_view(array_view const &) = default;
-  array_view(array_view &&other) = default;
+  array_view(array_view &&other) noexcept = default;
   array_view &operator=(array_view const &) = default;
-  array_view &operator=(array_view &&) = default;
+  array_view &operator=(array_view &&) noexcept = default;
 
   template <class Other, JBMS_ENABLE_IF(array_view_detail::is_constructible_from_range<T, Other>)>
   array_view(Other &&other) // NOLINT

@@ -53,7 +53,10 @@ void test_key_derivation_consistency(size_t input_size)
     auto out_array = prf.prf(in_s);
     auto out_key = prf.derive_key(in_s);
     out_key.unlock();
-    ASSERT_TRUE(memcmp(out_array.data(), out_key.data(), N) == 0);
+    ASSERT_NE(out_key.data(), nullptr);
+    if (out_key.data() != nullptr) {
+        ASSERT_TRUE(memcmp(out_array.data(), out_key.data(), N) == 0);
+    }
     out_key.lock();
 }
 

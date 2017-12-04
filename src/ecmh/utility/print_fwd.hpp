@@ -39,7 +39,7 @@ struct PrintWrapper {
 
   // For some reason, if we don't make this a template, there are obscure errors when instantiating it with array_view.
   template <class U>
-  PrintWrapper(U &&value_) : value(std::forward<U>(value_)) {}
+  PrintWrapper(U &&value_) : value(std::forward<U>(value_)) {} // NOLINT
 
   template <class CharT, class Traits>
   friend std::basic_ostream<CharT, Traits> &operator<<(std::basic_ostream<CharT, Traits> &os, PrintWrapper<T> const &p) {

@@ -236,11 +236,7 @@ bool is_rational(Curve const &curve, LambdaAffinePoint<Curve> const &P) {
   auto &&F =  curve.field();
 
   if (is_zero(F, P.x())) {
-    if (is_zero(F, P.m())) {
-      // special non-lambda point
-      return true;
-    }
-    return false;
+    return is_zero(F, P.m());       // special non-lambda point if true
   }
 
   auto m2 = square(F, P.m());
@@ -270,11 +266,7 @@ bool is_rational(Curve const &curve, LambdaProjectivePoint<Curve> const &P) {
       return true;
   }
   if (is_zero(F, P.x())) {
-    if (is_zero(F, P.m())) {
-      // special non-lambda point
-      return true;
-    }
-    return false;
+    return is_zero(F, P.m());       // special non-lambda point if true
   }
 
   auto m2 = square(F, P.m());

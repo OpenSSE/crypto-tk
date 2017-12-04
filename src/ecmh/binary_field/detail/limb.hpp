@@ -11,6 +11,8 @@ namespace binary_field {
 typedef uint64_t limb_t __attribute__ ((__vector_size__ (16), __may_alias__));
 using word_t = uint64_t;
 
+#define ZERO_LIMB {0UL, 0UL}
+    
 constexpr size_t limb_bits = 128;
 constexpr size_t word_bits = 64;
 

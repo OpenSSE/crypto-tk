@@ -49,7 +49,7 @@ public:
       limbs[i] ^= x.limbs[i];
     return *this;
   }
-  limb_t limbs[num_limbs]{0};
+  limb_t limbs[num_limbs]{ZERO_LIMB};
 
   BinaryPolynomial() = default; // uninitialized
 

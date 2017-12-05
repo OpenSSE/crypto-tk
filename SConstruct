@@ -131,6 +131,15 @@ if int(sanitize_address):
     env.Append(CCFLAGS = ['-fsanitize=address','-fsanitize-address-use-after-scope','-fno-omit-frame-pointer'])
     env.Append(LINKFLAGS = ['-fsanitize=address','-fsanitize-address-use-after-scope','-fno-omit-frame-pointer'])
 
+
+sanitize_undefined = ARGUMENTS.get('sanitize_undefined', 0) # debug mode
+
+if int(sanitize_undefined):
+    env.Append(CCFLAGS = ['-fsanitize=undefined','-fno-omit-frame-pointer'])
+    env.Append(LINKFLAGS = ['-fsanitize=undefined','-fno-omit-frame-pointer'])
+
+
+
 coverage = ARGUMENTS.get('coverage', 0) # activate coverage
 if int(coverage):
     env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline','-Wno-ignored-optimization-argument'])

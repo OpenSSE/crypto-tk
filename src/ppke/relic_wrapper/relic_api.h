@@ -117,7 +117,7 @@ public:
 #if ALLOC == AUTO
 			z[0] = rhs.z[0];
 			order[0] = rhs.order[0];
-			std::memset((&rhs.z[0]),sizeof(rhs.z[0]),0);
+            std::memset((&rhs.z[0]),0,sizeof(rhs.z[0]));
 #else
 			z=rhs.z;
 			order=rhs.order;
@@ -206,7 +206,7 @@ public:
 			}
 #if ALLOC == AUTO
 			g[0] = rhs.g[0];
-			std::memset((&rhs.g[0]),sizeof(rhs.g[0]),0);
+			std::memset((&rhs.g[0]),0,sizeof(rhs.g[0]));
 #else
 			g=rhs.g;
 			rhs.g=nullptr;
@@ -270,7 +270,7 @@ public:
 			}
 #if ALLOC == AUTO
 			g[0] = rhs.g[0];
-			std::memset((&rhs.g[0]),sizeof(rhs.g[0]),0);
+            std::memset((&rhs.g[0]),0,sizeof(rhs.g[0]));
 #else
 			g=rhs.g;
 			rhs.g=nulltpr;
@@ -336,7 +336,7 @@ public:
 			}
 #if ALLOC == AUTO
 			std::memcpy(*g,*(rhs.g),sizeof(g));
-			std::memset(*(rhs.g),sizeof(rhs.g),0);
+            std::memset((&rhs.g[0]),0,sizeof(rhs.g[0]));
 #else
 			g=rhs.g;
 			rhs.g=nullptr;

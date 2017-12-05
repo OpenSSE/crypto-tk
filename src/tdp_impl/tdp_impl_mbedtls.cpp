@@ -445,8 +445,7 @@ std::string TdpInverseImpl_mbedTLS::private_key() const
 void TdpInverseImpl_mbedTLS::invert(const std::string &in, std::string &out) const
 {
     int ret;
-    //    alloc on the stack
-    unsigned char *rsa_out = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()));
+    unsigned char rsa_out[rsa_size()];
     
     if(in.size() != rsa_size())
     {
@@ -569,25 +568,25 @@ std::array<uint8_t, TdpInverseImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mb
     // instead, we implemented the insecure_mod_exp function
     // it is definitely less secure than mbedtls_mpi_exp_mod
     // but it works with even modulis
-    insecure_mod_exp(&d_p, &rsa_key_.DP, order, &p_1_);
-    insecure_mod_exp(&d_q, &rsa_key_.DQ, order, &q_1_);
+    MBEDTLS_MPI_CHK( insecure_mod_exp(&d_p, &rsa_key_.DP, order, &p_1_));
+    MBEDTLS_MPI_CHK( insecure_mod_exp(&d_q, &rsa_key_.DQ, order, &q_1_));
     
-    mbedtls_mpi_exp_mod(&y_p, &x, &d_p,&rsa_key_.P, &rsa_key_.RP);
-    mbedtls_mpi_exp_mod(&y_q, &x, &d_q,&rsa_key_.Q, &rsa_key_.RQ);
+    MBEDTLS_MPI_CHK( mbedtls_mpi_exp_mod(&y_p, &x, &d_p,&rsa_key_.P, &rsa_key_.RP));
+    MBEDTLS_MPI_CHK( mbedtls_mpi_exp_mod(&y_q, &x, &d_q,&rsa_key_.Q, &rsa_key_.RQ));
     
     /*
      * Y = (YP - YQ) * (Q^-1 mod P) mod P
      */
     
-    mbedtls_mpi_sub_mpi( &y, &y_p, &y_q );
-    mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.QP );
-    mbedtls_mpi_mod_mpi( &y, &y_p, &rsa_key_.P );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_sub_mpi( &y, &y_p, &y_q ));
+    MBEDTLS_MPI_CHK( mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.QP ));
+    MBEDTLS_MPI_CHK( mbedtls_mpi_mod_mpi( &y, &y_p, &rsa_key_.P ));
     
     /*
      * Y = YQ + Y * Q
      */
-    mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.Q);
-    mbedtls_mpi_add_mpi(&y, &y_q, &y_p);
+    MBEDTLS_MPI_CHK( mbedtls_mpi_mul_mpi( &y_p, &y, &rsa_key_.Q));
+    MBEDTLS_MPI_CHK( mbedtls_mpi_add_mpi(&y, &y_q, &y_p));
     
     ////    BN_mod_sub(h, y_p, y_q, get_rsa_key()->p, ctx);
     //    mbedtls_mpi_sub_mpi(&h, &y_p, &y_q);
@@ -608,7 +607,12 @@ std::array<uint8_t, TdpInverseImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mb
     if( mbedtls_mutex_unlock( &rsa_key_->mutex ) != 0 )
         throw std::runtime_error("Unable to unlock the RSA context"); /* LCOV_EXCL_LINE */
 #endif
-    
+   
+    if( mbedtls_mpi_write_binary(&y, out.data(), out.size()) != 0) {
+        throw std::runtime_error("Error while writing RSA result to the out buffer"); /* LCOV_EXCL_LINE */
+    }
+
+cleanup:
     // erase the temporary variables
     mbedtls_mpi_lset(&x, 0);
     mbedtls_mpi_lset(&d_p, 0);
@@ -621,7 +625,6 @@ std::array<uint8_t, TdpInverseImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mb
         throw std::runtime_error("Error during the modular exponentiation"); /* LCOV_EXCL_LINE */
     }
     
-    mbedtls_mpi_write_binary(&y, out.data(), out.size());
     mbedtls_mpi_lset(&y, 0); // erase the temporary variable
 
     return out;

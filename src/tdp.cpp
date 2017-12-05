@@ -99,7 +99,7 @@ Tdp::~Tdp()
 
 Tdp& Tdp::operator=(const Tdp& t)
 {
-    if (tdp_imp_ != t.tdp_imp_) {
+    if ((this != &t) && (tdp_imp_ != t.tdp_imp_)) {
         delete tdp_imp_;
         tdp_imp_ = new TdpImpl_Current(*dynamic_cast<const TdpImpl_Current*>(t.tdp_imp_));
     }
@@ -172,7 +172,7 @@ TdpInverse::TdpInverse(const TdpInverse& tdp) : tdp_inv_imp_(new TdpInverseImpl_
 
 TdpInverse& TdpInverse::operator=(const TdpInverse& t)
 {
-    if (tdp_inv_imp_ != t.tdp_inv_imp_) {
+    if ((this != &t) && (tdp_inv_imp_ != t.tdp_inv_imp_)) {
         delete tdp_inv_imp_;
         tdp_inv_imp_ = new TdpInverseImpl_Current(*dynamic_cast<const TdpInverseImpl_Current*>(t.tdp_inv_imp_));
     }
@@ -289,7 +289,7 @@ TdpMultPool::TdpMultPool(const TdpMultPool& pool) :
 
 TdpMultPool& TdpMultPool::operator=(const TdpMultPool& t)
 {
-    if (tdp_pool_imp_ != t.tdp_pool_imp_) {
+    if ((this != &t) && (tdp_pool_imp_ != t.tdp_pool_imp_)) {
         delete tdp_pool_imp_;
         tdp_pool_imp_ = new TdpMultPoolImpl_Current(*dynamic_cast<const TdpMultPoolImpl_Current*>(t.tdp_pool_imp_));
     }

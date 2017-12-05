@@ -439,8 +439,7 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
 void TdpInverseImpl_OpenSSL::invert(const std::string &in, std::string &out) const
 {
     int ret;
-    //	alloc on the stack
-    unsigned char *rsa_out = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()));
+    unsigned char rsa_out[rsa_size()];
 
     if(in.size() != rsa_size())
     {

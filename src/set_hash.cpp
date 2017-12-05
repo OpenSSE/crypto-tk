@@ -161,7 +161,7 @@ std::ostream& operator<<(std::ostream& os, const SetHash& h)
 
 SetHash& SetHash::operator=(const SetHash& h)
 {
-    if (set_hash_imp_ != h.set_hash_imp_) {
+    if ((this != &h) && (set_hash_imp_ != h.set_hash_imp_)) {
         delete set_hash_imp_;
         set_hash_imp_ = new SetHashImpl(*h.set_hash_imp_);
     }

@@ -23,11 +23,7 @@
 #ifndef MBEDTLS_BIGNUM_H
 #define MBEDTLS_BIGNUM_H
 
-#if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
 
 #include <stddef.h>
 #include <stdint.h>

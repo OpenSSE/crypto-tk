@@ -24,11 +24,7 @@
 #ifndef MBEDTLS_PK_H
 #define MBEDTLS_PK_H
 
-#if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
 
 
 #if defined(MBEDTLS_RSA_C)

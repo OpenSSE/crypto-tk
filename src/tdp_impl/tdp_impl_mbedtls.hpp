@@ -48,6 +48,9 @@ namespace crypto
         
         ~TdpImpl_mbedTLS() override;
         
+        TdpImpl_mbedTLS& operator=(const TdpImpl_mbedTLS& t);
+
+        
         size_t rsa_size() const override;
         
         std::string public_key() const override;
@@ -74,9 +77,12 @@ namespace crypto
     public:
         TdpInverseImpl_mbedTLS();
         TdpInverseImpl_mbedTLS(const std::string& sk);
-        TdpInverseImpl_mbedTLS(const TdpInverseImpl_mbedTLS& tdp);
+        TdpInverseImpl_mbedTLS(const TdpInverseImpl_mbedTLS& tdp) = delete;
+        TdpInverseImpl_mbedTLS(TdpInverseImpl_mbedTLS&& tdp) = delete;
         ~TdpInverseImpl_mbedTLS() override;
         
+        TdpInverseImpl_mbedTLS& operator=(const TdpInverseImpl_mbedTLS& t) = delete;
+
         std::string private_key() const override;
         void invert(const std::string &in, std::string &out) const override;
         std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const override;
@@ -94,6 +100,8 @@ namespace crypto
         TdpMultPoolImpl_mbedTLS(const std::string& sk, const uint8_t size);
         TdpMultPoolImpl_mbedTLS(const TdpMultPoolImpl_mbedTLS& pool_impl);
         
+        TdpMultPoolImpl_mbedTLS& operator=(const TdpMultPoolImpl_mbedTLS& t);
+
         ~TdpMultPoolImpl_mbedTLS() override;
         
         std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> eval_pool(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const override;

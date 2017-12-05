@@ -1100,19 +1100,20 @@
 					"-lsodium",
 				);
 				WARNING_CFLAGS = (
+					"-Wall",
 					"-Wcast-qual",
-					"-Wshadow",
-					"-Wdeprecated",
-					"-Weffc++",
 					"-Wdisabled-optimization",
-					"-Wnon-virtual-dtor",
-					"-Wstrict-overflow=5",
 					"-Wformat=2",
 					"-Wmissing-declarations",
 					"-Wmissing-include-dirs",
-					"-Woverloaded-virtual",
 					"-Wredundant-decls",
 					"-Wshadow",
+					"-Wdeprecated",
+					"-Wstrict-overflow=5",
+					"-Wno-unused-function",
+					"-Weffc++",
+					"-Wnon-virtual-dtor",
+					"-Woverloaded-virtual",
 					"-Wsign-promo",
 				);
 			};
@@ -1172,19 +1173,20 @@
 					"-lsodium",
 				);
 				WARNING_CFLAGS = (
+					"-Wall",
 					"-Wcast-qual",
-					"-Wshadow",
-					"-Wdeprecated",
-					"-Weffc++",
 					"-Wdisabled-optimization",
-					"-Wnon-virtual-dtor",
-					"-Wstrict-overflow=5",
 					"-Wformat=2",
 					"-Wmissing-declarations",
 					"-Wmissing-include-dirs",
-					"-Woverloaded-virtual",
 					"-Wredundant-decls",
 					"-Wshadow",
+					"-Wdeprecated",
+					"-Wstrict-overflow=5",
+					"-Wno-unused-function",
+					"-Weffc++",
+					"-Wnon-virtual-dtor",
+					"-Woverloaded-virtual",
 					"-Wsign-promo",
 				);
 			};

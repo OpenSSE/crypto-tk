@@ -84,9 +84,10 @@ public:
 
     TdpInverse();
     TdpInverse(const std::string& sk);
-    TdpInverse(const TdpInverse& tdp);
-    
-    TdpInverse& operator=(const TdpInverse& t);
+    TdpInverse(const TdpInverse& tdp) = delete;
+    TdpInverse(TdpInverse&& tdp) = delete;
+
+    TdpInverse& operator=(const TdpInverse& t) = delete;
 
     
 	~TdpInverse();

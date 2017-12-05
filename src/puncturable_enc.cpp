@@ -31,7 +31,7 @@ namespace sse
 
 #define PPKE ppke_
         
-        static_assert(punct::kCiphertextSize == GmmppkeCT<uint64_t>::kByteSize, "Invalid Ciphertext Size");
+        static_assert(punct::kCiphertextSize == GmmppkeCT<uint64_t>::kCTByteSize, "Invalid Ciphertext Size");
         static_assert(punct::kKeyShareSize == GmppkePrivateKeyShare::kByteSize, "Invalid Key share Size");
         
         class PuncturableEncryption::PEncImpl

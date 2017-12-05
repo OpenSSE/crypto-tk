@@ -219,7 +219,7 @@ template <typename T>
 class GmmppkeCT: public PartialGmmppkeCT{
 public:
     
-    static constexpr size_t kByteSize = PartialGmmppkeCT::kByteSize + sizeof(T);
+    static constexpr size_t kCTByteSize = PartialGmmppkeCT::kByteSize + sizeof(T);
 
     GmmppkeCT(){};
     GmmppkeCT(const uint8_t *bytes) : PartialGmmppkeCT(bytes+sizeof(T))

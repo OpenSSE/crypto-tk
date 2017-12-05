@@ -417,7 +417,6 @@ static void test_tdp_impl_copy(const size_t test_count)
     
     for (size_t i = 0; i < test_count; i++) {
         TDP_INV tdp_inv_orig;
-        TDP_INV tdp_inv_copy(tdp_inv_orig);
         TDP_INV tdp_inv_sk_copy(tdp_inv_orig.private_key());
         
         TDP tdp_pk_copy(tdp_inv_orig.public_key());
@@ -429,11 +428,9 @@ static void test_tdp_impl_copy(const size_t test_count)
         
         
         tdp_test::tdp_assign(tdp_assign, tdp_pk_copy_copy);
-        tdp_test::tdp_inv_assign(tdp_inv_assign, tdp_inv_copy);
         tdp_test::tdp_pool_assign(tdp_pool_assign, tdp_pool_copy);
         
         // check that tdp inverse have the same private key
-        ASSERT_EQ(tdp_inv_copy.private_key(), tdp_inv_orig.private_key());
         ASSERT_EQ(tdp_inv_sk_copy.private_key(), tdp_inv_orig.private_key());
         
         if (!is_implementation) {
@@ -442,7 +439,6 @@ static void test_tdp_impl_copy(const size_t test_count)
         
         
         // check that they have the same public key
-        ASSERT_EQ(tdp_inv_copy.public_key(), tdp_inv_orig.public_key());
         ASSERT_EQ(tdp_inv_sk_copy.public_key(), tdp_inv_orig.public_key());
         ASSERT_EQ(tdp_pk_copy.public_key(), tdp_inv_orig.public_key());
         ASSERT_EQ(tdp_pk_copy_copy.public_key(), tdp_inv_orig.public_key());

@@ -78,7 +78,7 @@ env.Append(CXXFLAGS=['-std=c++14'])
 
 # C(XX) warnings flags
 env.Append(CCFLAGS=['-Wall', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat=2', '-Wmissing-declarations', '-Wmissing-include-dirs', '-Wredundant-decls', '-Wshadow', '-Wstrict-overflow=5', '-Wdeprecated', '-Wno-unused-function'])
-env.Append(CXXFLAGS=['-Weffc++','-Woverloaded-virtual',  '-Wsign-promo', '-Wstrict-overflow=5'])
+env.Append(CXXFLAGS=['-Weffc++', '-Wnon-virtual-dtor','-Woverloaded-virtual',  '-Wsign-promo', '-Wstrict-overflow=5'])
 
 
 if env['PLATFORM'] == 'darwin':

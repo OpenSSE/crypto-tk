@@ -166,19 +166,6 @@ TdpInverse::TdpInverse(const std::string& sk) : tdp_inv_imp_(new TdpInverseImpl_
 {
 }
 
-TdpInverse::TdpInverse(const TdpInverse& tdp) : tdp_inv_imp_(new TdpInverseImpl_Current(*dynamic_cast<const TdpInverseImpl_Current*>(tdp.tdp_inv_imp_)))
-{
-}
-
-TdpInverse& TdpInverse::operator=(const TdpInverse& t)
-{
-    if ((this != &t) && (tdp_inv_imp_ != t.tdp_inv_imp_)) {
-        delete tdp_inv_imp_;
-        tdp_inv_imp_ = new TdpInverseImpl_Current(*dynamic_cast<const TdpInverseImpl_Current*>(t.tdp_inv_imp_));
-    }
-    return *this;
-}
-
 TdpInverse::~TdpInverse()
 {
     delete tdp_inv_imp_;

@@ -128,8 +128,8 @@ else:
 sanitize_address = ARGUMENTS.get('sanitize_address', 0) # debug mode
 
 if int(sanitize_address):
-    env.Append(CCFLAGS = ['-fsanitize=address','-fno-omit-frame-pointer'])
-    env.Append(LINKFLAGS = ['-fsanitize=address','-fno-omit-frame-pointer'])
+    env.Append(CCFLAGS = ['-fsanitize=address','-fsanitize-address-use-after-scope','-fno-omit-frame-pointer'])
+    env.Append(LINKFLAGS = ['-fsanitize=address','-fsanitize-address-use-after-scope','-fno-omit-frame-pointer'])
 
 coverage = ARGUMENTS.get('coverage', 0) # activate coverage
 if int(coverage):

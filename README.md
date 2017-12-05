@@ -151,6 +151,10 @@ The scons script takes the following options:
 
 *  `run_check`: By default, when the `check` target is built, the tests are automatically run upon successful compilation. The option `run_check=0` disables this behavior.
 
+*  `sanitize_address`: Compiles the library with [AddressSanitizer (ASan)](https://github.com/google/sanitizers/wiki/AddressSanitizer) when set to 1. Great to check for stack/heap buffer overflows, memory leaks, ... Disabled by default.
+
+*  `sanitize_undefined`: When set to 1, compiles the library with [UndefinedBehaviorSanitizer (UBSan)](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html). UBSan detects undefined behavior at runtime in your code. Disabled by default. 
+
 ## Code coverage
 
 Code coverage is available using the `coverage=1` option in the building script. A report can be then generated the `coverage.sh` script (which uses lcov). 

@@ -32,7 +32,5 @@ script:
   - scons check debug=1 coverage=1 static_relic=1
 
 after_success:
-  - cd coverage
   - ./gen_coverage.sh # get the code coverage
   - ./upload_report.sh # upload the report to coveralls
-  - cd ..

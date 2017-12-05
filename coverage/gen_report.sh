@@ -1,4 +1,4 @@
 #! /bin/sh
 set -ex
 
-genhtml -q -o report coverage.info
+genhtml -q -o coverage/report coverage/coverage.info

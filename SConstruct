@@ -125,6 +125,12 @@ if int(debug):
 else:
 	env.Append(CCFLAGS = ['-O2'])
 
+sanitize_address = ARGUMENTS.get('sanitize_address', 0) # debug mode
+
+if int(sanitize_address):
+    env.Append(CCFLAGS = ['-fsanitize=address','-fno-omit-frame-pointer'])
+    env.Append(LINKFLAGS = ['-fsanitize=address','-fno-omit-frame-pointer'])
+
 coverage = ARGUMENTS.get('coverage', 0) # activate coverage
 if int(coverage):
     env.Append(CCFLAGS = ['-fprofile-arcs','-ftest-coverage', '-fno-inline', '-fno-inline-small-functions', '-fno-default-inline','-Wno-ignored-optimization-argument'])

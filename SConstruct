@@ -97,8 +97,25 @@ if FindFile('config.scons', '.'):
 
 
 
+def CheckFSanUseAfterScope(context):
+    context.Message( 'Checking for -fsanitize-address-use-after-scope flag ...' )
+    lastCCFLAGS = context.env['CCFLAGS']
+    lastLINKFLAGS = context.env['LINKFLAGS']
+    context.env.Append(CCFLAGS = '-fsanitize-address-use-after-scope' )
+    context.env.Append(LINKFLAGS = '-fsanitize-address-use-after-scope' )
+    ret = context.TryCompile("""
+int main(int argc, char **argv) {
+  return 0;
+}
+""", '.c')
+    context.env.Replace(CCFLAGS = lastCCFLAGS, LINKFLAGS=lastLINKFLAGS)
+    context.Result( ret )
+    return ret
+
 # Look for the configuration of the machine
-conf = Configure( env )
+conf = Configure( env, custom_tests = { 'CheckFSanUseAfterScope' : CheckFSanUseAfterScope } )
+
+conf.env['HAS_FSanUseAfterScope']=conf.CheckFSanUseAfterScope()
 
 if conf.CheckLib( 'crypto' ):
     conf.env.Append( CPPFLAGS = '-DWITH_OPENSSL' )
@@ -128,9 +145,12 @@ else:
 sanitize_address = ARGUMENTS.get('sanitize_address', 0) # debug mode
 
 if int(sanitize_address):
-    env.Append(CCFLAGS = ['-fsanitize=address','-fsanitize-address-use-after-scope','-fno-omit-frame-pointer'])
-    env.Append(LINKFLAGS = ['-fsanitize=address','-fsanitize-address-use-after-scope','-fno-omit-frame-pointer'])
-
+    env.Append(CCFLAGS = ['-fsanitize=address','-fno-omit-frame-pointer'])
+    env.Append(LINKFLAGS = ['-fsanitize=address','-fno-omit-frame-pointer'])
+    if env['HAS_FSanUseAfterScope']:
+        env.Append(CCFLAGS = '-fsanitize-address-use-after-scope' )
+        env.Append(LINKFLAGS = '-fsanitize-address-use-after-scope' )
+        
 
 sanitize_undefined = ARGUMENTS.get('sanitize_undefined', 0) # debug mode
 

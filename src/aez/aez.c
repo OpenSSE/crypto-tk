@@ -450,7 +450,7 @@ static block pass_two(const aez_ctx_t *ctx, block s, unsigned bytes, block *dst)
 static int cipher_aez_core(const aez_ctx_t *ctx, block t, int d, const char *src, unsigned bytes, unsigned abytes, char *dst) {
     block s, x, y, frag0, frag1, final0, final1;
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0], I4=ctx->I[2];
-    unsigned i, frag_bytes, initial_bytes;
+    unsigned frag_bytes, initial_bytes;
     
     if (!d) bytes += abytes;
     frag_bytes = bytes % 32;
@@ -502,9 +502,10 @@ static int cipher_aez_core(const aez_ctx_t *ctx, block t, int d, const char *src
     }
     
     storeu(dst + (bytes - 32), vxor3(final1, y, t));
-    if (!d || !abytes)
+    if (!d || !abytes) {
         storeu(dst + (bytes - 32) + 16, final0);
-    else {
+    } else {
+        unsigned i;
         for (i=0; i<16-abytes; i++)
             ((char*)dst + (bytes - 16))[i] = ((char*)&final0)[i];
     }

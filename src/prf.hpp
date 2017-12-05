@@ -62,7 +62,6 @@ public:
     
     Prf(Key<kKeySize>&& key) : base_(std::move(key))
     {
-        key.lock();
     }
 
 	// Destructor.

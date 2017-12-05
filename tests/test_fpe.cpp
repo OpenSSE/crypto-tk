@@ -36,7 +36,7 @@ using namespace std;
 TEST(fpe, correctness) {
     
     for (size_t i = 1; i <= 20*16; i++) {
-        
+//        std::cout << i << std::endl;
         string in_enc = sse::crypto::random_string(i);
         string out_enc, out_dec;
         

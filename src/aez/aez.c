@@ -185,21 +185,15 @@ static void store(void *p, uint8x16_t x) { *(uint8x16_t *)p = x; }
 
 #define vxor3(x,y,z)        vxor(vxor(x,y),z)
 #define vxor4(w,x,y,z)      vxor(vxor(w,x),vxor(y,z))
-#define load_partial(p,n)   loadu(p)
 
-/*
-Might need a version like this if, for example, we want to load a 12-byte nonce
-into a 16-byte block.
-
+// This version of load_partial raised errors (stack-buffer-overflow)
+// with clang's address sanitizers for obvious reasons
+//#define load_partial(p,n)   loadu(p)
 static block load_partial(const void *p, unsigned n) {
-    if ((intptr_t)p % 16 == 0) return load(p);
-    else {
-        block tmp; unsigned i;
-        for (i=0; i<n; i++) ((char*)&tmp)[i] = ((char*)p)[i];
-        return tmp;
-    }
+    block tmp = {0UL, 0UL}; unsigned i;
+    for (i=0; i<n; i++) ((char*)&tmp)[i] = ((const char*)p)[i];
+    return tmp;
 }
-*/
 
 static const unsigned char pad[] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
                                     0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,

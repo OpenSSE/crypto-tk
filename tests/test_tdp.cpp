@@ -57,8 +57,16 @@ public:
         return tdp.eval(in);
     }
 
+    inline static std::string tdp_eval(const TDP_INV& tdp_inv, const std::string& in) {
+        return tdp_inv.eval(in);
+    }
+
     inline static std::string tdp_eval(const TDP_POOL& tdp_mult, const std::string& in) {
         return tdp_mult.eval(in);
+    }
+
+    inline static std::string tdp_invert(const TDP_INV& tdp_inv, const std::string& in) {
+        return tdp_inv.invert(in);
     }
 
     inline static void tdp_eval_pool(const TDP_POOL& tdp_mult, const std::string& in, std::string& out, uint8_t order) {
@@ -76,21 +84,6 @@ public:
     inline static std::string tdp_invert_mult(const TDP_INV& tdp_inv, const std::string& in, uint8_t order) {
         return tdp_inv.invert_mult(in, order);
     }
-
-    inline static void tdp_assign(TDP& dst, const TDP& src)
-    {
-        dst = src;
-    }
-    
-    inline static void tdp_inv_assign(TDP_INV& dst, const TDP_INV& src)
-    {
-        dst = src;
-    }
-    
-    inline static void tdp_pool_assign(TDP_POOL& dst, const TDP_POOL& src)
-    {
-        dst = src;
-    }
 };
 
 template <typename TDP,  typename TDP_INV, typename TDP_POOL>
@@ -99,8 +92,16 @@ public:
     inline static std::string tdp_eval(const TDP& tdp, const std::string& in) {
         return std::string();
     }
-    
+
+    inline static std::string tdp_eval(const TDP_INV& tdp_inv, const std::string& in) {
+        return std::string();
+    }
+
     inline static std::string tdp_eval(const TDP_POOL& tdp_mult, const std::string& in) {
+        return std::string();
+    }
+
+    inline static std::string tdp_invert(const TDP_INV& tdp_inv, const std::string& in) {
         return std::string();
     }
 
@@ -119,19 +120,6 @@ public:
     inline static std::string tdp_invert_mult(const TDP_INV& tdp_inv, const std::string& in, uint8_t order) {
         return std::string();
     }
-
-    inline static void tdp_assign(TDP& dst, const TDP& src)
-    {
-    }
-    
-    inline static void tdp_inv_assign(TDP_INV& dst, const TDP_INV& src)
-    {
-    }
-    
-    inline static void tdp_pool_assign(TDP_POOL& dst, const TDP_POOL& src)
-    {
-    }
-
 };
 
 
@@ -212,13 +200,15 @@ static void test_tdp_impl_correctness(const size_t test_count)
 
         enc2 = tdp_test::tdp_eval(tdp,sample_string);
 
-        string enc_inv;
+        string enc_inv, enc_inv2;
         tdp_inv.eval(sample_string, enc_inv);
-        
+        enc_inv2 = tdp_test::tdp_eval(tdp_inv,sample_string);
+
+        ASSERT_EQ(enc, enc_inv);
         if(!is_implementation){
             ASSERT_EQ(enc, enc2);
+            ASSERT_EQ(enc, enc_inv2);
         }
-        ASSERT_EQ(enc, enc_inv);
         
         string enc_mult1, enc_mult2;
         tdp_mult.eval(sample_string, enc_mult1);
@@ -232,10 +222,15 @@ static void test_tdp_impl_correctness(const size_t test_count)
         
         
         
-        string dec;
+        string dec, dec2;
         tdp_inv.invert(enc, dec);
+        dec2 = tdp_test::tdp_invert(tdp_inv,enc);
 
         ASSERT_EQ(sample_string, dec);
+        if(!is_implementation){
+            ASSERT_EQ(sample_string, dec2);
+        }
+
     }
 }
 
@@ -405,14 +400,11 @@ static void test_tdp_impl_multiple_inverse_2(const size_t test_count)
 template <typename TDP, typename TDP_INV, typename TDP_POOL, bool is_implementation>
 static void test_tdp_impl_copy(const size_t test_count)
 {
-    using tdp_test = conditional_tdp_test<TDP, TDP_INV, TDP_POOL, is_implementation>;
-    
     // check that deterministically generated values are consistent after copies
     
     TDP_INV temp_inv_tdp;
-    TDP_INV tdp_inv_assign(temp_inv_tdp.private_key());
-    TDP tdp_assign(temp_inv_tdp.public_key());
-    TDP_POOL tdp_pool_assign(temp_inv_tdp.public_key(),2);
+    TDP tdp_pk_assign(temp_inv_tdp.public_key());
+    TDP_POOL tdp_pool_assign(temp_inv_tdp.public_key(),3);
     
     
     for (size_t i = 0; i < test_count; i++) {
@@ -426,16 +418,15 @@ static void test_tdp_impl_copy(const size_t test_count)
         TDP_POOL tdp_pool(tdp_inv_orig.public_key(),2);
         TDP_POOL tdp_pool_copy(tdp_pool);
         
-        
-        tdp_test::tdp_assign(tdp_assign, tdp_pk_copy_copy);
-        tdp_test::tdp_pool_assign(tdp_pool_assign, tdp_pool_copy);
+        tdp_pk_assign = tdp_pk_copy_copy;
+        tdp_pool_assign = tdp_pool_copy;
         
         // check that tdp inverse have the same private key
         ASSERT_EQ(tdp_inv_sk_copy.private_key(), tdp_inv_orig.private_key());
         
-        if (!is_implementation) {
-            ASSERT_EQ(tdp_inv_assign.private_key(), tdp_inv_orig.private_key());
-        }
+//        if (!is_implementation) {
+//            ASSERT_EQ(tdp_inv_sk_assign.private_key(), tdp_inv_orig.private_key());
+//        }
         
         
         // check that they have the same public key
@@ -443,8 +434,8 @@ static void test_tdp_impl_copy(const size_t test_count)
         ASSERT_EQ(tdp_pk_copy.public_key(), tdp_inv_orig.public_key());
         ASSERT_EQ(tdp_pk_copy_copy.public_key(), tdp_inv_orig.public_key());
         if (!is_implementation) {
-            ASSERT_EQ(tdp_inv_assign.public_key(), tdp_inv_orig.public_key());
-            ASSERT_EQ(tdp_assign.public_key(), tdp_inv_orig.public_key());
+//            ASSERT_EQ(tdp_inv_sk_assign.public_key(), tdp_inv_orig.public_key());
+            ASSERT_EQ(tdp_pk_assign.public_key(), tdp_inv_orig.public_key());
         }
 
         ASSERT_EQ(tdp_pool.public_key(), tdp_inv_orig.public_key());
@@ -465,7 +456,7 @@ static void test_tdp_impl_copy(const size_t test_count)
             std::array<uint8_t, 32> key1 = key;
             std::array<uint8_t, 32> key2 = key;
             std::array<uint8_t, 32> key3 = key;
-            std::array<uint8_t, 32> key4 = key;
+//            std::array<uint8_t, 32> key4 = key;
             std::array<uint8_t, 32> key5 = key;
             std::array<uint8_t, 32> key6 = key;
             std::array<uint8_t, 32> key7 = key;
@@ -473,17 +464,17 @@ static void test_tdp_impl_copy(const size_t test_count)
             string sample_orig = tdp_inv_orig.generate(sse::crypto::Key<32>(key1.data()), std::to_string(j));
             string sample_orig_copy = tdp_inv_orig.generate(sse::crypto::Key<32>(key2.data()), std::to_string(j));
             string sample_sk_copy = tdp_inv_orig.generate(sse::crypto::Key<32>(key3.data()), std::to_string(j));
-            string sample_inv_assign = tdp_inv_assign.generate(sse::crypto::Key<32>(key4.data()), std::to_string(j));
+//            string sample_inv_assign = tdp_inv_sk_assign.generate(sse::crypto::Key<32>(key4.data()), std::to_string(j));
             string sample_pk_copy = tdp_pk_copy.generate(sse::crypto::Key<32>(key5.data()), std::to_string(j));
             string sample_eq = tdp_pk_copy_copy.generate(sse::crypto::Key<32>(key6.data()), std::to_string(j));
-            string sample_assign = tdp_assign.generate(sse::crypto::Key<32>(key7.data()), std::to_string(j));
+            string sample_assign = tdp_pk_assign.generate(sse::crypto::Key<32>(key7.data()), std::to_string(j));
             
             ASSERT_EQ(sample_orig_copy, sample_orig);
             ASSERT_EQ(sample_sk_copy, sample_orig);
             ASSERT_EQ(sample_pk_copy, sample_orig);
             ASSERT_EQ(sample_eq, sample_orig);
             if (!is_implementation) {
-                ASSERT_EQ(sample_inv_assign, sample_orig);
+//                ASSERT_EQ(sample_inv_assign, sample_orig);
                 ASSERT_EQ(sample_assign, sample_orig);
             }
         }

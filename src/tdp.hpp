@@ -52,7 +52,7 @@ public:
     static constexpr unsigned int kStatisticalSecurity = 64;
     static constexpr size_t kRSAPrgSize = kMessageSize + (kStatisticalSecurity+7)/8;
 
-	Tdp(const std::string& pk);
+	explicit Tdp(const std::string& pk);
 
     Tdp(const Tdp &t);
     Tdp& operator=(const Tdp& t);
@@ -83,10 +83,11 @@ public:
     static constexpr size_t kMessageSize = Tdp::kMessageSize;
 
     TdpInverse();
-    TdpInverse(const std::string& sk);
-    TdpInverse(const TdpInverse& tdp);
-    
-    TdpInverse& operator=(const TdpInverse& t);
+    explicit TdpInverse(const std::string& sk);
+    TdpInverse(const TdpInverse& tdp) = delete;
+    TdpInverse(TdpInverse&& tdp) = delete;
+
+    TdpInverse& operator=(const TdpInverse& t) = delete;
 
     
 	~TdpInverse();

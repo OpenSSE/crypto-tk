@@ -56,7 +56,7 @@ TEST(hmac_sha_512, test_vector_1)
 	k.fill(0x0b);
 	
 	
-    HMAC_SHA512<20> hmac(k.data());
+    HMAC_SHA512<20> hmac(sse::crypto::Key<20>(k.data()));
     
 	string in = "Hi There";
 	
@@ -107,7 +107,7 @@ TEST(hmac_sha_512, test_vector_3)
 	k.fill(0xaa);
 	
 	
-	HMAC_SHA512<20> hmac(k.data());
+	HMAC_SHA512<20> hmac(sse::crypto::Key<20>(k.data()));
 		
 	unsigned char in [50];
 	memset(in,0xdd,50);
@@ -131,7 +131,7 @@ TEST(hmac_sha_512, test_vector_4)
 								0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19}};
 	
 	
-	HMAC_SHA512<25> hmac(k.data());
+	HMAC_SHA512<25> hmac(sse::crypto::Key<25>(k.data()));
 	
 	unsigned char in [50];
 	memset(in,0xcd,50);
@@ -149,26 +149,9 @@ TEST(hmac_sha_512, test_vector_4)
     ASSERT_EQ(result_64, reference);
 }
 
-TEST(hmac, consistency)
-{
-    constexpr uint16_t HMAC_max_key_size = HMAC_SHA512<25>::kHMACKeySize;
-    array<uint8_t,HMAC_max_key_size> key_arr, key_copy;
-
-    sse::crypto::random_bytes(key_arr);
-    key_copy = key_arr;
-    
-    HMAC_SHA512<HMAC_max_key_size> hmac1(key_arr.data());
-    HMAC_SHA512<HMAC_max_key_size> hmac2(sse::crypto::Key<HMAC_max_key_size>(key_copy.data()));
-
-    string in = sse::crypto::random_string(1000);
-    auto ref = hmac1.hmac(in);
-    
-    ASSERT_EQ(ref, hmac2.hmac(in));
-}
-
 TEST(hmac, exception)
 { 
-    ASSERT_THROW(HMAC_SHA512<25> hmac(NULL), std::invalid_argument);
+    ASSERT_THROW(HMAC_SHA512<25> hmac(sse::crypto::Key<25>(NULL)), std::invalid_argument);
     
 
     sse::crypto::Key<25> k1;

@@ -81,7 +81,7 @@ const static std::string HASH_FUNCTION_BYTES_TO_G2_ROM = "3";
 class RelicDividByZero : public std::logic_error
 {
 public:
-	RelicDividByZero(std::string const& error)
+	explicit RelicDividByZero(std::string const& error)
         : std::logic_error(error)
     {}
 };
@@ -96,10 +96,10 @@ public:
 	bool isInit;
 	ZR() 	 {error_if_relic_not_init(); bn_inits(z); bn_inits(order); g1_get_ord(order); isInit = true;bn_set_dig(z,1); }
 
-	ZR(int);
-    ZR(const char*);
+	explicit ZR(int);
+    explicit ZR(const char*);
     ZR(const uint8_t*,size_t);
-	ZR(const bn_t y) {error_if_relic_not_init(); bn_inits(z); bn_inits(order); g1_get_ord(order); isInit = true; bn_copy(z, y); }
+	explicit ZR(const bn_t y) {error_if_relic_not_init(); bn_inits(z); bn_inits(order); g1_get_ord(order); isInit = true; bn_copy(z, y); }
 	ZR(const ZR& w) { error_if_relic_not_init();bn_inits(z); bn_inits(order); bn_copy(z, w.z); bn_copy(order, w.order); isInit = true; }
 
 #ifdef RELICXX_MOVEZR
@@ -117,7 +117,7 @@ public:
 #if ALLOC == AUTO
 			z[0] = rhs.z[0];
 			order[0] = rhs.order[0];
-			std::memset((&rhs.z[0]),sizeof(rhs.z[0]),0);
+            std::memset((&rhs.z[0]),0,sizeof(rhs.z[0]));
 #else
 			z=rhs.z;
 			order=rhs.order;
@@ -206,7 +206,7 @@ public:
 			}
 #if ALLOC == AUTO
 			g[0] = rhs.g[0];
-			std::memset((&rhs.g[0]),sizeof(rhs.g[0]),0);
+			std::memset((&rhs.g[0]),0,sizeof(rhs.g[0]));
 #else
 			g=rhs.g;
 			rhs.g=nullptr;
@@ -270,7 +270,7 @@ public:
 			}
 #if ALLOC == AUTO
 			g[0] = rhs.g[0];
-			std::memset((&rhs.g[0]),sizeof(rhs.g[0]),0);
+            std::memset((&rhs.g[0]),0,sizeof(rhs.g[0]));
 #else
 			g=rhs.g;
 			rhs.g=nulltpr;
@@ -336,7 +336,7 @@ public:
 			}
 #if ALLOC == AUTO
 			std::memcpy(*g,*(rhs.g),sizeof(g));
-			std::memset(*(rhs.g),sizeof(rhs.g),0);
+            std::memset((&rhs.g[0]),0,sizeof(rhs.g[0]));
 #else
 			g=rhs.g;
 			rhs.g=nullptr;
@@ -372,7 +372,7 @@ public:
 	 * code.
 	 * @param allowAlreadyInitilazed
 	 */
-	relicResourceHandle(const bool & allowAlreadyInitilazed = true);
+	explicit relicResourceHandle(const bool & allowAlreadyInitilazed = true);
 	~relicResourceHandle();
 
 	// you cannot meaningfully copy this resource

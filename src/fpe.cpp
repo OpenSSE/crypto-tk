@@ -46,7 +46,7 @@ public:
     
     FpeImpl();
     
-    FpeImpl(Key<kKeySize>&& k);
+    explicit FpeImpl(Key<kKeySize>&& k);
     
     void encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out);
     void encrypt(const std::string &in, std::string &out);
@@ -67,7 +67,7 @@ public:
 
     FpeImpl(){};
 	
-    FpeImpl(Key<kKeySize>&& k){};
+    explicit FpeImpl(Key<kKeySize>&& k){};
 	
     void encrypt(const unsigned char* in, const unsigned int &len, unsigned char* out){};
     void encrypt(const std::string &in, std::string &out){};

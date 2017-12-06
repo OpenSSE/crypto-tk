@@ -76,7 +76,7 @@ void ZR::writeBytes(uint8_t *bytes) const
     
 ZR ZR::inverse() const{
 	ZR i;
-	invertZR(i,z,i.order);
+	invertZR(i,ZR(z),i.order);
 	return i;
 }
 
@@ -170,8 +170,7 @@ ZR hashToZR(const bytes_vec & b)
 
 	ZR zr;
 	unsigned int digest_len = SHA_LEN;
-//	alloc on the stack 
-    unsigned char *digest = (unsigned char *)alloca(sizeof(unsigned char)*(digest_len + 1));
+    unsigned char digest[digest_len + 1];
 	memset(digest, 0, digest_len);
 	SHA_FUNC(digest,&data[0],(int)data.size());
 	bn_read_bin(zr.z, digest, digest_len);

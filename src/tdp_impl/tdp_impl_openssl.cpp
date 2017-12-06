@@ -90,6 +90,14 @@ TdpImpl_OpenSSL::TdpImpl_OpenSSL(const TdpImpl_OpenSSL& tdp)
     set_rsa_key(RSAPublicKey_dup(tdp.rsa_key_)); /* LCOV_EXCL_LINE */
 }
     
+TdpImpl_OpenSSL& TdpImpl_OpenSSL::operator=(const TdpImpl_OpenSSL& t)
+{
+    if (this != &t) {
+        set_rsa_key(RSAPublicKey_dup(t.rsa_key_)); /* LCOV_EXCL_LINE */
+    }
+    
+    return *this;
+}
 
 inline RSA* TdpImpl_OpenSSL::get_rsa_key() const
 {
@@ -293,8 +301,7 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL()
     // generate a new random key
     
     unsigned long e = RSA_PK;
-    BIGNUM *bne = nullptr;
-    bne = BN_new();
+    BIGNUM *bne = BN_new();
     ret = BN_set_word(bne, e);
     if(ret != 1)
     {
@@ -368,24 +375,6 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL(const std::string& sk)
     BN_CTX_free(ctx);
 }
 
-TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL(const TdpInverseImpl_OpenSSL& tdp)
-{
-    set_rsa_key(RSAPrivateKey_dup(tdp.rsa_key_));
-
-    // initialize the useful variables
-    phi_ = BN_new();
-    p_1_ = BN_dup(get_rsa_key()->p);
-    q_1_ = BN_dup(get_rsa_key()->q);
-    BN_sub_word(p_1_, 1);
-    BN_sub_word(q_1_, 1);
-
-    BN_CTX* ctx = BN_CTX_new();
-
-    BN_mul(phi_, p_1_, q_1_, ctx);
-    
-    BN_CTX_free(ctx);
-}
-    
 TdpInverseImpl_OpenSSL::~TdpInverseImpl_OpenSSL()
 {
     BN_free(phi_);
@@ -439,8 +428,7 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
 void TdpInverseImpl_OpenSSL::invert(const std::string &in, std::string &out) const
 {
     int ret;
-    //	alloc on the stack
-    unsigned char *rsa_out = (unsigned char *)alloca(sizeof(unsigned char)*(rsa_size()));
+    unsigned char rsa_out[rsa_size()];
 
     if(in.size() != rsa_size())
     {
@@ -565,6 +553,28 @@ TdpMultPoolImpl_OpenSSL::TdpMultPoolImpl_OpenSSL(const TdpMultPoolImpl_OpenSSL& 
     }
 
 }
+
+TdpMultPoolImpl_OpenSSL& TdpMultPoolImpl_OpenSSL::operator=(const TdpMultPoolImpl_OpenSSL& t)
+{
+    if (this != & t) {
+        for (uint8_t i = 0; i < keys_count_; i++) {
+            RSA_free(keys_[i]);
+        }
+        
+        if (keys_count_ != t.keys_count_) {
+            // realloc the key array
+            delete [] keys_;
+            keys_count_ = t.keys_count_;
+            keys_ = new RSA*[keys_count_];
+        }
+        
+        for (uint8_t i = 0; i < keys_count_; i++) {
+            keys_[i] = RSAPublicKey_dup(t.keys_[i]);
+        }
+    }
+    return *this;
+}
+
     
 TdpMultPoolImpl_OpenSSL::~TdpMultPoolImpl_OpenSSL()
 {

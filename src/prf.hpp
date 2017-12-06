@@ -56,13 +56,12 @@ public:
 
     static_assert(kKeySize <= Hash::kBlockSize, "The PRF key is too large for the hash block size");
     
-    Prf() : base_(random_bytes<uint8_t,kKeySize>().data())
+    Prf() : base_()
 	{
 	}
     
-    Prf(Key<kKeySize>&& key) : base_(std::move(key))
+    explicit Prf(Key<kKeySize>&& key) : base_(std::move(key))
     {
-        key.lock();
     }
 
 	// Destructor.

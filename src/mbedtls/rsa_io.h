@@ -9,11 +9,7 @@
 #ifndef rsa_io_h
 #define rsa_io_h
 
-#if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
 
 
 #if defined(MBEDTLS_RSA_C)

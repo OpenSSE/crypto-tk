@@ -235,10 +235,10 @@ TEST(relic, arithmetic_ZR)
         ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
         ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
 
-        ASSERT_EQ(z1<<1, z1*2);
-        ASSERT_EQ(z2<<2, z2*4);
-        ASSERT_EQ(z3<<3, z3*8);
-        ASSERT_EQ(z4<<4, z4*16);
+        ASSERT_EQ(z1<<1, z1*relicxx::ZR(2));
+        ASSERT_EQ(z2<<2, z2*relicxx::ZR(4));
+        ASSERT_EQ(z3<<3, z3*relicxx::ZR(8));
+        ASSERT_EQ(z4<<4, z4*relicxx::ZR(16));
 
         ASSERT_EQ(group.exp(z1, (int) 42), group.exp(z1, relicxx::ZR(42)));
         ASSERT_EQ(group.exp(z2, (int) 10), group.exp(z2, relicxx::ZR(10)));

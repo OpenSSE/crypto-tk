@@ -88,7 +88,7 @@ namespace sse
         public:
             PrgImpl() = delete;
             
-            inline PrgImpl(Key<kKeySize>&& key);
+            inline explicit PrgImpl(Key<kKeySize>&& key);
                         
             inline void derive(const size_t len, std::string &out) const;
             inline void derive(const size_t len, unsigned char* out) const;

@@ -3,5 +3,5 @@ set -ex
 
 shopt -s extglob
 
-rm *.!(sh) # remove everything except the scripts
-rm -r report # remove the report
+rm coverage/*.!(sh) # remove everything except the scripts
+rm -r coverage/report # remove the report

@@ -55,7 +55,7 @@ public:
 	Fpe(Fpe&& c) = delete;
 	
 	
-	Fpe(Key<kKeySize>&& k);
+	explicit Fpe(Key<kKeySize>&& k);
 	
 	~Fpe();
 

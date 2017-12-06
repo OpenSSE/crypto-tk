@@ -42,10 +42,10 @@ class SetHash
 public:
 
 	SetHash();	
-	SetHash(const std::string &hex_str);
+	explicit SetHash(const std::string &hex_str);
 	SetHash(const SetHash& o);
 	SetHash(SetHash&& o) noexcept;
-	SetHash(const std::vector<std::string> &in_set);
+	explicit SetHash(const std::vector<std::string> &in_set);
 	~SetHash();
 
 	void add_element(const std::string &in);

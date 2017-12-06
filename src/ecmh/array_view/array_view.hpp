@@ -93,7 +93,7 @@ public:
   // array_view<const void> can be constructed from any array_view<T>
   // array_view<void> can be constructed from any array_view<T> with non-const T
   template <class U, JBMS_ENABLE_IF(array_view_detail::is_constructible<T,U>)>
-  constexpr array_view(array_view<U> const &other)
+  constexpr explicit array_view(array_view<U> const &other)
     : begin_((value_type *)other.begin()), end_((value_type *)other.end()) {}
 
   template <class U, JBMS_ENABLE_IF(array_view_detail::is_constructible<T,U>)>
@@ -111,6 +111,7 @@ public:
   array_view &operator=(array_view &&) noexcept = default;
 
   template <class Other, JBMS_ENABLE_IF(array_view_detail::is_constructible_from_range<T, Other>)>
+    // cppcheck-suppress noExplicitConstructor
   array_view(Other &&other) // NOLINT
       : begin_((value_type *)&*boost::begin(other)), end_((value_type *)&*boost::end(other)) {}
 

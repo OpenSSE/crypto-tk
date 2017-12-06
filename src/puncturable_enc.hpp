@@ -79,7 +79,7 @@ namespace sse
         {
         public:
             
-            PuncturableEncryption(punct::master_key_type&& key);
+            explicit PuncturableEncryption(punct::master_key_type&& key);
             PuncturableEncryption(const PuncturableEncryption&) = delete;
             ~PuncturableEncryption();
             
@@ -95,7 +95,7 @@ namespace sse
         class PuncturableDecryption
         {
         public:
-            PuncturableDecryption(const punct::punctured_key_type& punctured_key);
+            explicit PuncturableDecryption(const punct::punctured_key_type& punctured_key);
             PuncturableDecryption(const PuncturableDecryption&) = delete;
             ~PuncturableDecryption();
 

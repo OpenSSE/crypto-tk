@@ -70,7 +70,7 @@ namespace sse
             HMac(HMac<H,N>& hmac) = delete;
             HMac(const HMac<H,N>& hmac) = delete;
 
-            HMac(Key<kKeySize>&& key) : key_(std::move(key))
+            explicit HMac(Key<kKeySize>&& key) : key_(std::move(key))
             {
                 if(key_.is_empty())
                 {

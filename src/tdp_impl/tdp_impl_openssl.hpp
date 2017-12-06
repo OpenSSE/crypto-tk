@@ -40,10 +40,8 @@ namespace crypto
 {
     class TdpImpl_OpenSSL : virtual public TdpImpl
     {
-    public:
-//        static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
-        
-        TdpImpl_OpenSSL(const std::string& pk);
+    public:        
+        explicit TdpImpl_OpenSSL(const std::string& pk);
         TdpImpl_OpenSSL(const TdpImpl_OpenSSL& tdp);
         
         TdpImpl_OpenSSL& operator=(const TdpImpl_OpenSSL& t);
@@ -78,7 +76,7 @@ namespace crypto
     {
     public:
         TdpInverseImpl_OpenSSL();
-        TdpInverseImpl_OpenSSL(const std::string& sk);
+        explicit TdpInverseImpl_OpenSSL(const std::string& sk);
         TdpInverseImpl_OpenSSL(const TdpInverseImpl_OpenSSL& tdp) = delete;
         TdpInverseImpl_OpenSSL(TdpInverseImpl_OpenSSL&& tdp) = delete;
         ~TdpInverseImpl_OpenSSL() override;

@@ -59,8 +59,8 @@ TEST(fpe, consistency_32) {
     for (size_t i = 1; i <= 100; i++) {
         array<uint8_t, 48> key;
 
-        sse::crypto::Fpe fpe(key.data());
-        
+        sse::crypto::Fpe fpe(sse::crypto::Key<sse::crypto::Fpe::kKeySize>(key.data()));
+
         array<uint8_t, sizeof(uint32_t)> arr_32;
         
         sse::crypto::random_bytes(arr_32);

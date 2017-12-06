@@ -76,7 +76,7 @@ void ZR::writeBytes(uint8_t *bytes) const
     
 ZR ZR::inverse() const{
 	ZR i;
-	invertZR(i,z,i.order);
+	invertZR(i,ZR(z),i.order);
 	return i;
 }
 

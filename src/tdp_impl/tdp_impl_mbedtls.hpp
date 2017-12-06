@@ -43,7 +43,7 @@ namespace crypto
     public:
 //        static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
         
-        TdpImpl_mbedTLS(const std::string& pk);
+        explicit TdpImpl_mbedTLS(const std::string& pk);
         TdpImpl_mbedTLS(const TdpImpl_mbedTLS& tdp);
         
         ~TdpImpl_mbedTLS() override;
@@ -76,7 +76,7 @@ namespace crypto
     {
     public:
         TdpInverseImpl_mbedTLS();
-        TdpInverseImpl_mbedTLS(const std::string& sk);
+        explicit TdpInverseImpl_mbedTLS(const std::string& sk);
         TdpInverseImpl_mbedTLS(const TdpInverseImpl_mbedTLS& tdp) = delete;
         TdpInverseImpl_mbedTLS(TdpInverseImpl_mbedTLS&& tdp) = delete;
         ~TdpInverseImpl_mbedTLS() override;

@@ -44,7 +44,7 @@ public:
 
     CipherImpl() = delete;
 	
-	CipherImpl(Key<kKeySize>&& k);
+	explicit CipherImpl(Key<kKeySize>&& k);
 	
 	~CipherImpl() = default;
 

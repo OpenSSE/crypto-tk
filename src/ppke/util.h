@@ -13,7 +13,7 @@ namespace crypto
 template <size_t N>
 relicxx::ZR LagrangeBasisCoefficients(const relicxx::PairingGroup & group, const unsigned int & j,const relicxx::ZR &x , const std::array<relicxx::ZR, N> & polynomial_xcordinates){
     unsigned int k = N;
-    relicxx::ZR prod = 1;
+    relicxx::ZR prod = relicxx::ZR(1);
     for(unsigned int  m=0;m<k;m++){
         if(j != m){
             try{

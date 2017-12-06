@@ -37,16 +37,17 @@ using namespace std;
 
 #include "gtest/gtest.h"
 
+constexpr size_t kCipherKeySize = sse::crypto::Cipher::kKeySize;
 
 TEST(encryption, correctness)
 {
 	string in_enc = "This is a test input.";
 	string out_enc, out_dec;
 	
-	array<uint8_t,sse::crypto::Cipher::kKeySize> k;
+	array<uint8_t,kCipherKeySize> k;
 	k.fill(0x00);
 	
-	sse::crypto::Cipher cipher(k.data());
+    sse::crypto::Cipher cipher(sse::crypto::Key<kCipherKeySize>(k.data()));
 	cipher.encrypt(in_enc, out_enc);
 	
 	string in_dec = string(out_enc);
@@ -68,7 +69,7 @@ TEST(encryption, exception)
     array<uint8_t,sse::crypto::Cipher::kKeySize> k;
     k.fill(0x00);
 
-    sse::crypto::Cipher cipher(k.data());
+    sse::crypto::Cipher cipher(sse::crypto::Key<kCipherKeySize>(k.data()));
 
     ASSERT_THROW(cipher.encrypt(in_enc, out_enc), std::invalid_argument);
     

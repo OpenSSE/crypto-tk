@@ -301,8 +301,7 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL()
     // generate a new random key
     
     unsigned long e = RSA_PK;
-    BIGNUM *bne = nullptr;
-    bne = BN_new();
+    BIGNUM *bne = BN_new();
     ret = BN_set_word(bne, e);
     if(ret != 1)
     {

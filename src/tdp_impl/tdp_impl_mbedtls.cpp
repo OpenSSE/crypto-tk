@@ -589,6 +589,8 @@ std::array<uint8_t, TdpInverseImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mb
         throw std::runtime_error("Error while writing RSA result to the out buffer"); /* LCOV_EXCL_LINE */
     }
 
+    // cppcheck does not see the use of goto cleanup in the MBEDTLS_MPI_CHK macros
+// cppcheck-suppress unusedLabel
 cleanup:
     // erase the temporary variables
     mbedtls_mpi_lset(&x, 0);

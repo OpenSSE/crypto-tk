@@ -37,7 +37,7 @@ namespace sse
         class PuncturableEncryption::PEncImpl
         {
         public:
-            PEncImpl(punct::master_key_type&& key);
+            explicit PEncImpl(punct::master_key_type&& key);
             
             punct::ciphertext_type encrypt(const uint64_t m, const punct::tag_type &tag);
             punct::key_share_type initial_keyshare(const size_t d);
@@ -115,7 +115,7 @@ namespace sse
         class PuncturableDecryption::PDecImpl
         {
         public:
-            PDecImpl(const punct::punctured_key_type& punctured_key);
+            explicit PDecImpl(const punct::punctured_key_type& punctured_key);
             
             bool is_punctured_on_tag(const punct::tag_type &tag);
             bool decrypt(const punct::ciphertext_type &ct_bytes, uint64_t &m) const;

@@ -38,7 +38,7 @@ std::string tag2string(const tag_type& tag);
 class BadCiphertext : public std::invalid_argument
 {
 public:
-    BadCiphertext(std::string const& error)
+    explicit BadCiphertext(std::string const& error)
     : std::invalid_argument(error)
     {}
 };
@@ -46,7 +46,7 @@ public:
 class PuncturedCiphertext : public BadCiphertext
 {
 public:
-    PuncturedCiphertext(std::string const& error)
+    explicit PuncturedCiphertext(std::string const& error)
     : BadCiphertext(error)
     {}
 };
@@ -97,7 +97,7 @@ public:
     static constexpr size_t kByteSize = 3*relicxx::G2::kCompactByteSize + kTagSize;
 
     GmppkePrivateKeyShare() {};
-    GmppkePrivateKeyShare(const uint8_t *bytes): sk1(bytes, true), sk2(bytes+relicxx::G2::kCompactByteSize, true), sk3(bytes+2*relicxx::G2::kCompactByteSize, true)
+    explicit GmppkePrivateKeyShare(const uint8_t *bytes): sk1(bytes, true), sk2(bytes+relicxx::G2::kCompactByteSize, true), sk3(bytes+2*relicxx::G2::kCompactByteSize, true)
     {
         ::memcpy(sk4.data(), bytes+3*relicxx::G2::kCompactByteSize, kTagSize);
     };
@@ -136,7 +136,7 @@ protected:
 class GmppkePrivateKey{
 public:
     GmppkePrivateKey() : shares() {};
-    GmppkePrivateKey(const std::vector<GmppkePrivateKeyShare>& s) : shares(s) {};
+    explicit GmppkePrivateKey(const std::vector<GmppkePrivateKeyShare>& s) : shares(s) {};
     
     friend bool operator==(const GmppkePrivateKey & l, const GmppkePrivateKey & r){
         return l.shares == r.shares;
@@ -179,7 +179,7 @@ public:
     static constexpr size_t kByteSize = 2*relicxx::G1::kCompactByteSize + kTagSize;
     
     PartialGmmppkeCT(){};
-    PartialGmmppkeCT(const uint8_t *bytes): ct2(bytes, true), ct3(bytes+relicxx::G1::kCompactByteSize, true)
+    explicit PartialGmmppkeCT(const uint8_t *bytes): ct2(bytes, true), ct3(bytes+relicxx::G1::kCompactByteSize, true)
     {
         ::memcpy(tag.data(), bytes+2*relicxx::G1::kCompactByteSize, kTagSize);
     };
@@ -222,11 +222,11 @@ public:
     static constexpr size_t kCTByteSize = PartialGmmppkeCT::kByteSize + sizeof(T);
 
     GmmppkeCT(){};
-    GmmppkeCT(const uint8_t *bytes) : PartialGmmppkeCT(bytes+sizeof(T))
+    explicit GmmppkeCT(const uint8_t *bytes) : PartialGmmppkeCT(bytes+sizeof(T))
     {
         ::memcpy(&ct1, bytes, sizeof(T));
     };
-    GmmppkeCT(const  PartialGmmppkeCT & c) : PartialGmmppkeCT(c){}
+    explicit GmmppkeCT(const  PartialGmmppkeCT & c) : PartialGmmppkeCT(c){}
 
     void writeBytes(uint8_t *bytes) const
     {
@@ -277,11 +277,11 @@ public:
     GmmppkeCT<T> encrypt(const GmppkePublicKey & pk,const T & M,const tag_type & tag) const
     {
         const relicxx::ZR s = group.randomZR();
-        GmmppkeCT<T> ct = blind(pk,s,tag);
+        GmmppkeCT<T> ct = GmmppkeCT<T>(blind(pk,s,tag));
 
         auto arr = tag;
         
-        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(arr.data());
+        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(sse::crypto::Key<kTagSize>(arr.data()));
 
         std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
         group.exp(group.pair(pk.g2G1, pk.ppkeg1), s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
@@ -316,10 +316,10 @@ public:
     GmmppkeCT<T> encrypt(const GmppkeSecretParameters & sp,const T & M,const tag_type & tag) const
     {
         const relicxx::ZR s = group.randomZR();
-        GmmppkeCT<T> ct = blind(sp,s,tag);
+        GmmppkeCT<T> ct = GmmppkeCT<T>(blind(sp,s,tag));
 
         auto arr = tag;
-        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(arr.data());
+        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(sse::crypto::Key<kTagSize>(arr.data()));
 
         std::array<uint8_t, 12*FP_BYTES> gt_blind_bytes;
         group.exp(group.generatorGT(), sp.alpha*sp.beta*s).getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
@@ -378,7 +378,7 @@ public:
         std::vector<uint8_t> gt_blind_bytes = recoverBlind(sk,ct).getBytes(false);
 
         auto arr = ct.tag;
-        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(arr.data());
+        sse::crypto::HMac<sse::crypto::Hash,kTagSize> hkdf(sse::crypto::Key<kTagSize>(arr.data()));
 
         T mask;
         hkdf.hmac(gt_blind_bytes.data(), gt_blind_bytes.size(), (uint8_t*)&mask, sizeof(mask));

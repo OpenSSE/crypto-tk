@@ -51,7 +51,7 @@ namespace sse
             static constexpr uint8_t kKeySize = 32;
             
             Prg() = delete;
-            Prg(Key<kKeySize>&& k);
+            explicit Prg(Key<kKeySize>&& k);
 
             // we should not be able to duplicate Prg objects
             Prg(const Prg& c) = delete;

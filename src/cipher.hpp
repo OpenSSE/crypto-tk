@@ -55,7 +55,7 @@ public:
 	Cipher(Cipher&& c) = delete;
 	
 	
-	Cipher(Key<kKeySize>&& k);
+	explicit Cipher(Key<kKeySize>&& k);
 	
 	~Cipher();
 

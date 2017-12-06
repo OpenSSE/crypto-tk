@@ -113,7 +113,7 @@ namespace sse {
              *  @exception std::runtime_error       Memory could not be protected.
              *  @exception std::invalid_argument    The input argument is nullptr.
              */
-            Key(uint8_t* const key)
+            explicit Key(uint8_t* const key)
             {
                 if(key == nullptr)
                 {
@@ -224,7 +224,7 @@ namespace sse {
              *  @exception std::bad_alloc           Memory cannot be allocated.
              *  @exception std::runtime_error       Memory could not be protected.
              */
-            Key(const std::function<void(uint8_t*)> &init_callback)
+            explicit Key(const std::function<void(uint8_t*)> &init_callback)
             {
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
                 

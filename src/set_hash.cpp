@@ -61,9 +61,9 @@ class SetHash::SetHashImpl
 public:
 
 	SetHashImpl();	
-	SetHashImpl(const MSH::State &s);	
-	SetHashImpl(const std::string &hex_str);
-	SetHashImpl(const std::vector<std::string> &in_set);
+	explicit SetHashImpl(const MSH::State &s);
+	explicit SetHashImpl(const std::string &hex_str);
+	explicit SetHashImpl(const std::vector<std::string> &in_set);
  	template <class InputIterator> SetHashImpl(InputIterator first, InputIterator last);
 
 	void add_element(const std::string &in);

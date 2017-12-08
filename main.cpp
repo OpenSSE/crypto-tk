@@ -40,7 +40,7 @@
 #include "src/tdp.hpp"
 #include "src/prg.hpp"
 
-#include "src/ppke/GMPpke.h"
+#include "src/ppke/GMPpke.hpp"
 
 #include "src/key.hpp"
 

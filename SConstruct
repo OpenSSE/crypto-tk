@@ -53,7 +53,7 @@ bld = Builder(action = run_test)
 ## Environment initialization and configuration
 
 env = Environment(tools = ['default', 'gcccov'])
-env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
+# env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 env.Append(BUILDERS = {'Test' :  bld})
 env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
 
@@ -208,7 +208,7 @@ library_build_prefix = 'library'
 shared_lib = shared_lib_env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects);
 static_lib = lib_env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 
-headers = Glob('src/*.h') + Glob('src/*.hpp') + ['src/ppke/GMPpke.h']
+headers = Glob('src/*.h') + Glob('src/*.hpp') + ['src/ppke/GMPpke.hpp']
 headers_lib = [lib_env.Install(library_build_prefix+'/include/sse/crypto', headers)]
 
 env.Clean(headers_lib,[library_build_prefix+'/include'])

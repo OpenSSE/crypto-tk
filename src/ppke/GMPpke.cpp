@@ -1,8 +1,8 @@
 
 #include <cassert>
 #include <unordered_set>
-#include "GMPpke.h"
-#include "util.h"
+#include "GMPpke.hpp"
+#include "util.hpp"
 #include "prf.hpp"
 
 namespace sse

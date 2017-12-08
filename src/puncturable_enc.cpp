@@ -21,7 +21,7 @@
 #include "puncturable_enc.hpp"
 
 #include "prf.hpp"
-#include "ppke/GMPpke.h"
+#include "ppke/GMPpke.hpp"
 
 namespace sse
 {

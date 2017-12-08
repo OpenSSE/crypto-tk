@@ -18,7 +18,7 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../src/ppke/GMPpke.h"
+#include "../src/ppke/GMPpke.hpp"
 #include "../src/puncturable_enc.hpp"
 
 #include <iostream>

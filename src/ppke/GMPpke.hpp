@@ -1,5 +1,5 @@
 /*
- * GMPpke.h
+ * GMPpke.hpp
  *
  *  Created on: Dec 21, 2014
  *      Author: imiers
@@ -12,7 +12,7 @@
 
 #include "relic_wrapper/relic_api.h"
 
-#include "util.h"
+#include "util.hpp"
 
 #include "key.hpp"
 #include "prf.hpp"

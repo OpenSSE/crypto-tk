@@ -52,7 +52,7 @@ bld = Builder(action = run_test)
 
 ## Environment initialization and configuration
 
-env = Environment(tools = ['default', 'gcccov'])
+env = Environment(tools = ['default', 'gcccov', 'doxygen'])
 # env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 env.Append(BUILDERS = {'Test' :  bld})
 env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
@@ -194,6 +194,11 @@ Clean(objects, 'build')
 debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = smart_concat(['src'], env.get('CPPPATH')))
 
 Default(debug)
+
+# To build the documentation
+
+doc = env.Doxygen('doc/Doxyfile')
+
 
 # Specific environments for building the libraries
 lib_env = env.Clone()

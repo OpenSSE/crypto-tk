@@ -1,3 +1,7 @@
+branches:
+   except:
+     - doc
+
 language: cpp
 
 os: linux

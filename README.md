@@ -112,6 +112,7 @@ Three targets can be built:
 
 * `lib`: the compiled library. It produces both the static and the shared versions of `libsse_crypto`, copied in the directory `library/lib`, together with the headers in `library/include`. If possible, unit tests are run before constructing the library.
 
+* `doc`: build the documentation (requires [Doxygen](http://www.doxygen.org/)).
 
 To build the library, just enter in your terminal
 ``scons lib``.

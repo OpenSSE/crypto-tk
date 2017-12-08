@@ -41,24 +41,24 @@ namespace sse {
         
         void test_keys();
         
-        /** @class Key
-         *  @brief A class for keys represented as byte strings.
-         *
-         *  Keys are precious elements that must be protected
-         *  The key template provides all the necessary tools to securely manage keys
-         *  in OpenSSE's cryptographic toolkit.
-         *
-         *  The Key<N> template wraps a pointer to memory allocated with sodium_malloc.
-         *  It in particular means that the key memory is protected with no-access pages
-         *  and a canary.
-         *
-         *  Keys can only be accessed through a handler, which can only be used by the
-         *  cryptographic toolkit: the toolkit user is not meant to read or write the keys.
-         *  Also, a key is not copyable, only movable.
-         *
-         *  @tparam N       Byte length of the key
-         *
-         */
+        /// @class Key
+        /// @brief A class for keys represented as byte strings.
+        ///
+        /// Keys are precious elements that must be protected
+        /// The key template provides all the necessary tools to securely manage keys
+        /// in OpenSSE's cryptographic toolkit.
+        ///
+        /// The Key<N> template wraps a pointer to memory allocated with sodium_malloc.
+        /// It in particular means that the key memory is protected with no-access pages
+        /// and a canary.
+        ///
+        /// Keys can only be accessed through a handler, which can only be used by the
+        /// cryptographic toolkit: the toolkit user is not meant to read or write the keys.
+        /// Also, a key is not copyable, only movable.
+        ///
+        /// @tparam N       Byte length of the key
+        ///
+        ///
         
         template <size_t N>
         class Key {
@@ -75,14 +75,14 @@ namespace sse {
             template <size_t L>         friend void tests::test_key_derivation_consistency(size_t input_size); // NOLINT
 
         public:
-            /**
-             *  @brief Constructor
-             *
-             *  Initializes the key with random bytes.
-             *
-             *  @exception std::bad_alloc       Memory cannot be allocated.
-             *  @exception std::runtime_erro    Memory could not be protected.
-             */
+            ///
+            /// @brief Constructor
+            ///
+            /// Initializes the key with random bytes.
+            ///
+            /// @exception std::bad_alloc       Memory cannot be allocated.
+            /// @exception std::runtime_erro    Memory could not be protected.
+            ///
             Key()
             {
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
@@ -100,19 +100,19 @@ namespace sse {
                 is_locked_ = true;
             }
 
-            /**
-             *  @brief Constructor
-             *
-             *  Initializes the key with the byte array given as argument.
-             *  The argument is set to zero.
-             *
-             *  @param key    The input byte array. When the constructor returns,
-             *  key is set to 0.
-             *
-             *  @exception std::bad_alloc           Memory cannot be allocated.
-             *  @exception std::runtime_error       Memory could not be protected.
-             *  @exception std::invalid_argument    The input argument is nullptr.
-             */
+            ///
+            /// @brief Constructor
+            ///
+            /// Initializes the key with the byte array given as argument.
+            /// The argument is set to zero.
+            ///
+            /// @param key    The input byte array. When the constructor returns,
+            /// key is set to 0.
+            ///
+            /// @exception std::bad_alloc           Memory cannot be allocated.
+            /// @exception std::runtime_error       Memory could not be protected.
+            /// @exception std::invalid_argument    The input argument is nullptr.
+            ///
             explicit Key(uint8_t* const key)
             {
                 if(key == nullptr)
@@ -139,12 +139,12 @@ namespace sse {
             
             Key(Key<N>& k) = delete;
             
-            /**
-             *  @brief Move constructor
-             *
-             *  @param k    The moved key
-             *
-             */
+            ///
+            /// @brief Move constructor
+            ///
+            /// @param k    The moved key
+            ///
+            ///
             Key(Key<N>&& k) noexcept:
             content_(k.content_), is_locked_(k.is_locked_)
             {
@@ -152,12 +152,12 @@ namespace sse {
                 k.is_locked_ = true;
             }
             
-            /**
-             *  @brief Destructor
-             *
-             *  Erase the content of the key and frees the memory.
-             *
-             */
+            ///
+            /// @brief Destructor
+            ///
+            /// Erase the content of the key and frees the memory.
+            ///
+            ///
             ~Key()
             {
                 if (content_ != nullptr) {
@@ -167,16 +167,16 @@ namespace sse {
                 }
             }
             
-            /**
-             *  @brief Move assignment operator
-             *
-             *  Erases the current key content,
-             *  sets the key content to the content of the parameter key,
-             *  and empties the content of the parameter key.
-             *
-             *  @param k    The moved key
-             *
-             */
+            ///
+            /// @brief Move assignment operator
+            ///
+            /// Erases the current key content,
+            /// sets the key content to the content of the parameter key,
+            /// and empties the content of the parameter key.
+            ///
+            /// @param k    The moved key
+            ///
+            ///
 
             Key& operator=(Key<N>&& other) noexcept
             {
@@ -195,13 +195,13 @@ namespace sse {
                 return *this;
             }
             
-            /**
-             *  @brief Erase the key
-             *
-             *  Erases the current key content, and set the content to nullptr.
-             *
-             *
-             */
+            ///
+            /// @brief Erase the key
+            ///
+            /// Erases the current key content, and set the content to nullptr.
+            ///
+            ///
+            ///
 
             void erase()
             {
@@ -213,17 +213,17 @@ namespace sse {
             }
 
         private:
-            /**
-             *  @brief Constructor
-             *
-             *  Initializes the key using a callback given as input.
-             *
-             *  @param init_callback    The callback used to fill the key. It takes an uint8_t
-             *  pointer as argument, with will point to the key content
-             *
-             *  @exception std::bad_alloc           Memory cannot be allocated.
-             *  @exception std::runtime_error       Memory could not be protected.
-             */
+            ///
+            /// @brief Constructor
+            ///
+            /// Initializes the key using a callback given as input.
+            ///
+            /// @param init_callback    The callback used to fill the key. It takes an uint8_t
+            /// pointer as argument, with will point to the key content
+            ///
+            /// @exception std::bad_alloc           Memory cannot be allocated.
+            /// @exception std::runtime_error       Memory could not be protected.
+            ///
             explicit Key(const std::function<void(uint8_t*)> &init_callback)
             {
                 content_ = static_cast<uint8_t*>(sodium_malloc(N));
@@ -242,13 +242,13 @@ namespace sse {
                 is_locked_ = true;
             }
 
-            /**
-             *  @brief Locks the key
-             *
-             *  Makes the key content neither readable or writable.
-             *
-             *  @exception std::runtime_error Memory cannot be locked.
-             */
+            ///
+            /// @brief Locks the key
+            ///
+            /// Makes the key content neither readable or writable.
+            ///
+            /// @exception std::runtime_error Memory cannot be locked.
+            ///
             void lock() const
             {
                 if (content_ != nullptr && !is_locked_) {
@@ -260,13 +260,13 @@ namespace sse {
                 }
             }
             
-            /**
-             *  @brief Unlocks the key
-             *
-             *  Makes the key content readable (but not writable).
-             *
-             *  @exception std::runtime_error Memory cannot be locked.
-             */
+            ///
+            /// @brief Unlocks the key
+            ///
+            /// Makes the key content readable (but not writable).
+            ///
+            /// @exception std::runtime_error Memory cannot be locked.
+            ///
             void unlock() const
             {
                 if (content_ != nullptr && is_locked_) {
@@ -278,35 +278,35 @@ namespace sse {
                 }
             }
             
-            /**
-             *  @brief Checks if the key is empty
-             *
-             *  Returns true if the key content is nullptr.
-             *
-             */
+            ///
+            /// @brief Checks if the key is empty
+            ///
+            /// Returns true if the key content is nullptr.
+            ///
+            ///
             const bool is_empty() const noexcept
             {
                 return content_ == nullptr;
             }
 
-            /**
-             *  @brief Checks if the key is locked
-             *
-             *  Returns true if the key is not read accessible.
-             *
-             */
+            ///
+            /// @brief Checks if the key is locked
+            ///
+            /// Returns true if the key is not read accessible.
+            ///
+            ///
             const bool is_locked() const noexcept
             {
                 return is_locked_;
             }
 
-            /**
-             *  @brief Gets the key content
-             *
-             *  Returns a pointer to the key data.
-             *
-             *  @exception std::runtime_error The memory cannot be accessed: it is absent or locked.
-             */
+            ///
+            /// @brief Gets the key content
+            ///
+            /// Returns a pointer to the key data.
+            ///
+            /// @exception std::runtime_error The memory cannot be accessed: it is absent or locked.
+            ///
             const uint8_t* data() const
             {
                 if (is_locked_) {
@@ -315,15 +315,15 @@ namespace sse {
                 return content_;
             }
             
-            /**
-             *  @brief Unlocks the key and gets its content
-             *
-             *  Returns a pointer to the key data.
-             *  The caller has to relock the key after by calling unlock().
-             *
-             *  @exception std::runtime_error The memory cannot be accessed: it is absent (happens when
-             *  the key has been modved) or cannot be unlocked.
-             */
+            ///
+            /// @brief Unlocks the key and gets its content
+            ///
+            /// Returns a pointer to the key data.
+            /// The caller has to relock the key after by calling unlock().
+            ///
+            /// @exception std::runtime_error The memory cannot be accessed: it is absent (happens when
+            /// the key has been modved) or cannot be unlocked.
+            ///
             const uint8_t* unlock_get() const
             {
                 if (content_ == nullptr) {
@@ -335,8 +335,8 @@ namespace sse {
             }
             
             
-            uint8_t *content_; /*!< Pointer to the key content */
-            mutable bool is_locked_; /*!< Flag denoting is the content_ point is read_protected */
+            uint8_t *content_; /// !< Pointer to the key content 
+            mutable bool is_locked_; /// !< Flag denoting is the content_ point is read_protected
             
             
             

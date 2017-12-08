@@ -258,8 +258,10 @@ def DoxyEmitter(target, source, env):
 
     targets = []
     out_dir = data.get("OUTPUT_DIRECTORY", ".")
-    if not os.path.isabs(out_dir):
-        out_dir = os.path.join(conf_dir, out_dir)
+    if out_dir != conf_dir:
+        if not os.path.isabs(out_dir):
+            out_dir = os.path.join(conf_dir, out_dir)
+        
 
     # add our output locations
     for (k, v) in output_formats.items():

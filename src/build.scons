@@ -9,7 +9,7 @@ ecmh_files = ['ecmh/binary_field/GF2_127_63.cpp', 'ecmh/binary_elliptic_curve/GL
 
 # -Weffc++ generates a lot of warnings due to boost
 # disable it for the set hashing code
-objs += env.Object(ecmh_files, CPPPATH = smart_concat(['.'], env.get('CPPPATH'))
-                             , CXXFLAGS = smart_concat(['-Wno-effc++'], env.get('CXXFLAGS'))
+objs += env.Object(ecmh_files, CPPPATH = smart_concat(['.'], env.get('CPPPATH')), 
+                               CXXFLAGS = smart_concat(['-Wno-effc++'], env.get('CXXFLAGS')))
 
 Return('objs')

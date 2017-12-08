@@ -9,6 +9,7 @@
 #define GMPPKE_H_
 
 #include <array>
+#include <utility>
 
 #include "relic_wrapper/relic_api.h"
 
@@ -29,9 +30,9 @@ constexpr static size_t kTagSize = 16;
 constexpr unsigned int kPPKEStatisticalSecurity = 32;
 constexpr static size_t kPPKEPrfOutputSize = relicxx::PairingGroup::kPrfOutputSize;
 
-typedef sse::crypto::HMac<sse::crypto::Hash,12*FP_BYTES> PPKE_HKDF;
+using PPKE_HKDF = sse::crypto::HMac<sse::crypto::Hash,12*FP_BYTES>;
     
-typedef std::array<uint8_t, kTagSize> tag_type;
+using tag_type = std::array<uint8_t, kTagSize>;
 
 std::string tag2string(const tag_type& tag);
 
@@ -96,7 +97,7 @@ class GmppkePrivateKeyShare{
 public:
     static constexpr size_t kByteSize = 3*relicxx::G2::kCompactByteSize + kTagSize;
 
-    GmppkePrivateKeyShare() {};
+    GmppkePrivateKeyShare() = default;;
     explicit GmppkePrivateKeyShare(const uint8_t *bytes): sk1(bytes, true), sk2(bytes+relicxx::G2::kCompactByteSize, true), sk3(bytes+2*relicxx::G2::kCompactByteSize, true)
     {
         ::memcpy(sk4.data(), bytes+3*relicxx::G2::kCompactByteSize, kTagSize);
@@ -135,8 +136,8 @@ protected:
 
 class GmppkePrivateKey{
 public:
-    GmppkePrivateKey() : shares() {};
-    explicit GmppkePrivateKey(const std::vector<GmppkePrivateKeyShare>& s) : shares(s) {};
+    GmppkePrivateKey()  = default;;
+    explicit GmppkePrivateKey(std::vector<GmppkePrivateKeyShare>  s) : shares(std::move(s)) {};
     
     friend bool operator==(const GmppkePrivateKey & l, const GmppkePrivateKey & r){
         return l.shares == r.shares;
@@ -178,7 +179,7 @@ class PartialGmmppkeCT{
 public:
     static constexpr size_t kByteSize = 2*relicxx::G1::kCompactByteSize + kTagSize;
     
-    PartialGmmppkeCT(){};
+    PartialGmmppkeCT()= default;;
     explicit PartialGmmppkeCT(const uint8_t *bytes): ct2(bytes, true), ct3(bytes+relicxx::G1::kCompactByteSize, true)
     {
         ::memcpy(tag.data(), bytes+2*relicxx::G1::kCompactByteSize, kTagSize);
@@ -221,7 +222,7 @@ public:
     
     static constexpr size_t kCTByteSize = PartialGmmppkeCT::kByteSize + sizeof(T);
 
-    GmmppkeCT(){};
+    GmmppkeCT()= default;;
     explicit GmmppkeCT(const uint8_t *bytes) : PartialGmmppkeCT(bytes+sizeof(T))
     {
         ::memcpy(&ct1, bytes, sizeof(T));
@@ -255,10 +256,8 @@ public:
     static constexpr uint8_t kPRFKeySize = 32; // 256 bits
     static const tag_type NULLTAG;
 
-    Gmppke(){
-        //        std::cout << "Pairing group order: " << group.order() << std::endl;
-    };
-    ~Gmppke() {};
+    Gmppke() = default;
+    ~Gmppke() = default;;
     
     void keygen(GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;
     void keygen(Key<kPRFKeySize> &&prf_key, GmppkePublicKey & pk, GmppkePrivateKey & sk, GmppkeSecretParameters &sp) const;

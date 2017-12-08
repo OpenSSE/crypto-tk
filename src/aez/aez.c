@@ -191,7 +191,9 @@ static void store(void *p, uint8x16_t x) { *(uint8x16_t *)p = x; }
 //#define load_partial(p,n)   loadu(p)
 static block load_partial(const void *p, unsigned n) {
     block tmp = {0UL, 0UL}; unsigned i;
-    for (i=0; i<n; i++) ((char*)&tmp)[i] = ((const char*)p)[i];
+    for (i=0; i<n; i++) {
+        ((char*)&tmp)[i] = ((const char*)p)[i];
+    }
     return tmp;
 }
 
@@ -258,7 +260,9 @@ static block aez_hash(const aez_ctx_t *ctx, const char *n, unsigned nbytes, unsi
     tmp = zero_set_byte((char)(8*abytes),15);
     sum = aes4(vxor(offset,tmp),J,I,L,offset);
     offset = L2;
-    if (nbytes==16) offset = vxor(offset, J8);
+    if (nbytes==16) {
+        offset = vxor(offset, J8);
+    }
     tmp = one_zero_pad(load_partial(n,nbytes),16-nbytes);
     sum = vxor(sum, aes4(vxor(offset,tmp),J,I,L,offset));
     
@@ -452,7 +456,9 @@ static int cipher_aez_core(const aez_ctx_t *ctx, block t, int d, const char *src
     block I=ctx->I[0], L=ctx->L, J=ctx->J[0], I4=ctx->I[2];
     unsigned frag_bytes, initial_bytes;
     
-    if (!d) bytes += abytes;
+    if (!d) {
+        bytes += abytes;
+    }
     frag_bytes = bytes % 32;
     initial_bytes = bytes - frag_bytes - 32;
     
@@ -474,14 +480,19 @@ static int cipher_aez_core(const aez_ctx_t *ctx, block t, int d, const char *src
     
     /* Calculate s and final block values (y xor'd to final1 later) */
     final0 = vxor3(loadu(src + (bytes - 32)), x, t);
-    if (d || !abytes) final1 = loadu(src+(bytes-32)+16);
-    else              final1 = zero_pad(loadu(src+(bytes-32)+16), abytes);
+    if (d || !abytes) {
+        final1 = loadu(src+(bytes-32)+16);
+    } else {
+        final1 = zero_pad(loadu(src+(bytes-32)+16), abytes);
+    }
     final0 = aes4(vxor(final1, ctx->I[d]), J, I, L, final0);
     final1 = vxor(final1, aes((const block*)ctx, final0, ctx->J[d]));
     s = vxor(final0, final1);
     final0 = vxor(final0, aes((const block*)ctx, final1, ctx->J[d^1]));
     /* Decryption: final0 should hold abytes zero bytes. If not, failure */
-    if (d && !is_zero(vandnot(loadu(pad+abytes),final0))) return -1;
+    if (d && !is_zero(vandnot(loadu(pad+abytes),final0))) {
+        return -1;
+    }
     final1 = aes4(vxor(final0, ctx->I[d^1]), J, I, L, final1);
     
     /* Compute y and store final results */
@@ -506,8 +517,9 @@ static int cipher_aez_core(const aez_ctx_t *ctx, block t, int d, const char *src
         storeu(dst + (bytes - 32) + 16, final0);
     } else {
         unsigned i;
-        for (i=0; i<16-abytes; i++)
+        for (i=0; i<16-abytes; i++) {
             ((char*)dst + (bytes - 16))[i] = ((char*)&final0)[i];
+        }
     }
     return 0;
 }
@@ -527,7 +539,9 @@ static int cipher_aez_tiny(const aez_ctx_t *ctx, block t, int d, const char *src
         buf[0] = zero_pad(load_partial(src,bytes),16-bytes);
         buf[1] = zero;
     }
-    if (!d) bytes += abytes;
+    if (!d) {
+        bytes += abytes;
+    }
     
     /* load l/r, create 10* padding masks, shift r 4 bits if odd length */
     l = buf[0];
@@ -549,7 +563,13 @@ static int cipher_aez_tiny(const aez_ctx_t *ctx, block t, int d, const char *src
         rnds = 8;
     } else {
         t = vxor4(t, ctx->I[0], ctx->I[1], ctx->I[2]);  /* (0,7) offset */
-        if (bytes>=3) rnds = 10; else if (bytes==2) rnds = 16; else rnds = 24;
+        if (bytes>=3) {
+            rnds = 10;
+        } else if (bytes==2) {
+            rnds = 16;
+        } else {
+            rnds = 24;
+        }
     }
     
     if (!d) {
@@ -585,18 +605,25 @@ static int cipher_aez_tiny(const aez_ctx_t *ctx, block t, int d, const char *src
     storeu((char*)buf+bytes/2, l);
     if (d) {
         bytes -= abytes;
-        if (abytes==16) tmp = loadu((char*)buf+bytes);
-        else {
+        if (abytes==16) {
+            tmp = loadu((char*)buf+bytes);
+        } else {
             tmp = zero;
-            for (i=0; i<abytes; i++) ((char*)&tmp)[i] = ((char*)buf+bytes)[i];
+            for (i=0; i<abytes; i++) {
+                ((char*)&tmp)[i] = ((char*)buf+bytes)[i];
+            }
         }
-        if (!is_zero(tmp)) return -1;
+        if (!is_zero(tmp)) {
+            return -1;
+        }
     } else if (bytes < 16) {
         tmp = vor(zero_pad(buf[0], 16-bytes), loadu(pad+32));
         tmp = aes4(vxor4(tmp,t_orig,ctx->I[0],ctx->I[1]), J, I, L, zero);
         buf[0] = vxor(buf[0], vand(tmp, loadu(pad+32)));
     }
-    for (i=0; i<bytes; i++) dst[i] = ((char*)buf)[i];
+    for (i=0; i<bytes; i++) {
+        dst[i] = ((char*)buf)[i];
+    }
     return 0;
 }
 
@@ -610,11 +637,14 @@ void aez_encrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
     if (bytes==0) {
         unsigned i;
         t = aes((const block*)ctx, t, vxor(ctx->J[0], ctx->J[1]));
-        for (i=0; i<abytes; i++) dst[i] = ((char*)&t)[i];
-    } else if (bytes+abytes < 32)
+        for (i=0; i<abytes; i++) {
+            dst[i] = ((char*)&t)[i];
+        }
+    } else if (bytes+abytes < 32) {
         cipher_aez_tiny(ctx, t, 0, src, bytes, abytes, dst);
-    else
+    } else {
         cipher_aez_core(ctx, t, 0, src, bytes, abytes, dst);
+    }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -624,15 +654,17 @@ int aez_decrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
                 const char *src, unsigned bytes, char *dst) {
     
     block t;
-    if (bytes < abytes) return -1;
+    if (bytes < abytes) {
+        return -1;
+    }
     t = aez_hash(ctx, n, nbytes, abytes);
     if (bytes==abytes) {
         block claimed = zero_pad(load_partial(src,abytes), 16-abytes);
         t = zero_pad(aes((const block*)ctx, t, vxor(ctx->J[0], ctx->J[1])), 16-abytes);
         return is_zero(vandnot(t, claimed)) - 1;  /* is_zero return 0 or 1 */
-    } else if (bytes < 32) {
-        return cipher_aez_tiny(ctx, t, 1, src, bytes, abytes, dst);
-    } else {
-        return cipher_aez_core(ctx, t, 1, src, bytes, abytes, dst);
     }
+    if (bytes < 32) {
+        return cipher_aez_tiny(ctx, t, 1, src, bytes, abytes, dst);
+    }
+    return cipher_aez_core(ctx, t, 1, src, bytes, abytes, dst);
 }

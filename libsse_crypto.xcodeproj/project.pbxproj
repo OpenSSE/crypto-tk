@@ -17,10 +17,10 @@
 		310C2BDF1EC0B59700E80B3A /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
 		310C2BE01EC0B59700E80B3A /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
 		310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
-		310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BE21EC0B63600E80B3A /* GMPpke.h */; };
+		310C2BE31EC0B63600E80B3A /* GMPpke.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BE21EC0B63600E80B3A /* GMPpke.hpp */; };
 		310C2BE61EC0B6D800E80B3A /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BE41EC0B6D800E80B3A /* util.cpp */; };
 		310C2BE81EC0B6D800E80B3A /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BE41EC0B6D800E80B3A /* util.cpp */; };
-		310C2BE91EC0B6D800E80B3A /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BE51EC0B6D800E80B3A /* util.h */; };
+		310C2BE91EC0B6D800E80B3A /* util.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 310C2BE51EC0B6D800E80B3A /* util.hpp */; };
 		310C2BEA1EC0B8F100E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
 		310C2BEB1EC0B98E00E80B3A /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BE41EC0B6D800E80B3A /* util.cpp */; };
 		310C2BEC1EC0B99300E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
@@ -246,9 +246,9 @@
 		310C2BD01EC0B59700E80B3A /* GMPpke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GMPpke.cpp; sourceTree = "<group>"; };
 		310C2BD11EC0B59700E80B3A /* relic_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = relic_api.h; sourceTree = "<group>"; };
 		310C2BD41EC0B59700E80B3A /* relic_api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = relic_api.cpp; sourceTree = "<group>"; };
-		310C2BE21EC0B63600E80B3A /* GMPpke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GMPpke.h; sourceTree = "<group>"; };
+		310C2BE21EC0B63600E80B3A /* GMPpke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GMPpke.hpp; sourceTree = "<group>"; };
 		310C2BE41EC0B6D800E80B3A /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = util.cpp; sourceTree = "<group>"; };
-		310C2BE51EC0B6D800E80B3A /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		310C2BE51EC0B6D800E80B3A /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = util.hpp; sourceTree = "<group>"; };
 		311400971F9E628C0025DE3A /* key.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = key.hpp; sourceTree = "<group>"; };
 		313CD4511EC719DD0058A0C5 /* test_ppke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_ppke.cpp; sourceTree = "<group>"; };
 		313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = puncturable_enc.cpp; sourceTree = "<group>"; };
@@ -396,10 +396,10 @@
 		310C2BCC1EC0B59700E80B3A /* ppke */ = {
 			isa = PBXGroup;
 			children = (
-				310C2BE21EC0B63600E80B3A /* GMPpke.h */,
+				310C2BE21EC0B63600E80B3A /* GMPpke.hpp */,
 				310C2BD01EC0B59700E80B3A /* GMPpke.cpp */,
 				310C2BE41EC0B6D800E80B3A /* util.cpp */,
-				310C2BE51EC0B6D800E80B3A /* util.h */,
+				310C2BE51EC0B6D800E80B3A /* util.hpp */,
 				310C2BD21EC0B59700E80B3A /* relic_wrapper */,
 			);
 			path = ppke;
@@ -685,7 +685,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				319966A01FB8A72D00051179 /* bn_mul.h in Headers */,
-				310C2BE91EC0B6D800E80B3A /* util.h in Headers */,
+				310C2BE91EC0B6D800E80B3A /* util.hpp in Headers */,
 				6CC2D4C91C3193E500334ADD /* fpe.hpp in Headers */,
 				6CC2D4D11C3193E900334ADD /* set_hash.hpp in Headers */,
 				6CC2D4CB1C3193E900334ADD /* hash.hpp in Headers */,
@@ -697,7 +697,7 @@
 				6CC2D4CF1C3193E900334ADD /* random.hpp in Headers */,
 				6CF4160B1CB4FF1D00C448D4 /* utils.hpp in Headers */,
 				316F0D421D25600700F87904 /* prg.hpp in Headers */,
-				310C2BE31EC0B63600E80B3A /* GMPpke.h in Headers */,
+				310C2BE31EC0B63600E80B3A /* GMPpke.hpp in Headers */,
 				319966A11FB8A72D00051179 /* pem.h in Headers */,
 				6CC2D5111C31945000334ADD /* enable_if.hpp in Headers */,
 				6CC2D4FF1C31943300334ADD /* field_operation_helpers.hpp in Headers */,

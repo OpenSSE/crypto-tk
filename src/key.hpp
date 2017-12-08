@@ -335,8 +335,8 @@ namespace sse {
             }
             
             
-            uint8_t *content_; /// !< Pointer to the key content 
-            mutable bool is_locked_; /// !< Flag denoting is the content_ point is read_protected
+            uint8_t *content_; /// Pointer to the key content 
+            mutable bool is_locked_; /// Flag denoting is the content_ point is read_protected
             
             
             

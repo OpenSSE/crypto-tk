@@ -22,16 +22,13 @@
 
 #include <sodium/randombytes.h>
 
-namespace sse
-{
+namespace sse {
 
-namespace crypto
-{
-	
-    void random_bytes(const size_t byte_count, unsigned char* out)
-    {
-        randombytes_buf(out, byte_count);
-    }
-    
+namespace crypto {
+
+void random_bytes(const size_t byte_count, unsigned char *out) noexcept {
+  randombytes_buf(out, byte_count);
 }
-}
+
+} // namespace crypto
+} // namespace sse

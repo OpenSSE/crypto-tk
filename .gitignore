@@ -39,3 +39,6 @@ xcshareddata
 # Code coverage
 *.gcda
 *.gcno
+
+# Python products (from scons)
+*.pyc

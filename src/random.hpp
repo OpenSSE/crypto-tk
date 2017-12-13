@@ -41,7 +41,7 @@ namespace crypto {
 ///
 /// @param out          Buffer to be filled
 ///
-void random_bytes(const size_t byte_count, unsigned char *out) noexcept;
+void random_bytes(const size_t byte_count, unsigned char* out) noexcept;
 
 /// @brief Fill an array with random bytes
 ///
@@ -49,10 +49,11 @@ void random_bytes(const size_t byte_count, unsigned char *out) noexcept;
 ///
 /// @param out          Array to be filled
 ///
-template <typename T, size_t N>
-inline void random_bytes(std::array<T, N> &out) noexcept {
-  random_bytes(out.size() * sizeof(T),
-               reinterpret_cast<unsigned char *>(out.data()));
+template<typename T, size_t N>
+inline void random_bytes(std::array<T, N>& out) noexcept
+{
+    random_bytes(out.size() * sizeof(T),
+                 reinterpret_cast<unsigned char*>(out.data()));
 }
 
 /// @brief Generate a random array
@@ -62,12 +63,13 @@ inline void random_bytes(std::array<T, N> &out) noexcept {
 /// @return A newly initialized array of type T and length N filled with
 /// randomness
 ///
-template <typename T, size_t N>
-inline std::array<T, N> random_bytes() noexcept {
-  std::array<T, N> out;
-  random_bytes(out.size() * sizeof(T),
-               reinterpret_cast<unsigned char *>(out.data()));
-  return out;
+template<typename T, size_t N>
+inline std::array<T, N> random_bytes() noexcept
+{
+    std::array<T, N> out;
+    random_bytes(out.size() * sizeof(T),
+                 reinterpret_cast<unsigned char*>(out.data()));
+    return out;
 }
 
 /// @brief Generate a random string
@@ -78,14 +80,15 @@ inline std::array<T, N> random_bytes() noexcept {
 ///
 /// @return A newly initialized string filled with randomness
 ///
-inline std::string random_string(const size_t length) {
-  uint8_t *tmp = new uint8_t[length];
-  random_bytes(length, tmp);
+inline std::string random_string(const size_t length)
+{
+    uint8_t* tmp = new uint8_t[length];
+    random_bytes(length, tmp);
 
-  std::string out(reinterpret_cast<char *>(tmp), length);
-  delete[] tmp;
+    std::string out(reinterpret_cast<char*>(tmp), length);
+    delete[] tmp;
 
-  return out;
+    return out;
 }
 
 /// @brief RNG wrapper for mbedTLS
@@ -98,10 +101,10 @@ inline std::string random_string(const size_t length) {
 /// @param len      Length of the buffer
 ///
 /// @return     Always return 0
-inline int mbedTLS_rng_wrap(void *arg, unsigned char *out,
-                            size_t len) noexcept {
-  random_bytes(len, out);
-  return 0;
+inline int mbedTLS_rng_wrap(void* arg, unsigned char* out, size_t len) noexcept
+{
+    random_bytes(len, out);
+    return 0;
 }
 
 } // namespace crypto

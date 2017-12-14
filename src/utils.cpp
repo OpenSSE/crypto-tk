@@ -20,6 +20,7 @@
 
 #include "utils.hpp"
 
+#include "fpe.hpp"
 
 #include "ppke/relic_wrapper/relic_api.h"
 
@@ -199,6 +200,8 @@ namespace sse
                 throw std::runtime_error("Unable to init libsodium");
             }
             sodium_set_misuse_handler(sodium_misuse_handler);
+            
+            Fpe::compute_is_available();
         }
         
         void cleanup_crypto_lib()

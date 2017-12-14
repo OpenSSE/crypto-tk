@@ -20,11 +20,7 @@
 
 #include "key.hpp"
 
-#include "hash/sha512.hpp"
-
-// Instantiation of some Key templates
 namespace sse {
-    namespace crypto {
-
-    }
+namespace crypto {
 }
+} // namespace sse

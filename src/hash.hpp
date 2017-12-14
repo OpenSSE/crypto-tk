@@ -56,7 +56,7 @@ public:
     /// @param in   The input buffer. Must be non NULL.
     /// @param len  The size of the input buffer in bytes.
     /// @param out  The output buffer. Must be non NULL, and larger than
-    /// kDigestSize bytes.
+    ///             kDigestSize bytes.
     ///
     /// @exception std::invalid_argument       One of in or out is NULL
     ///
@@ -73,7 +73,7 @@ public:
     /// @param in       The input buffer. Must be non NULL.
     /// @param len      The size of the input buffer in bytes.
     /// @param out_len  The size of the output buffer in bytes. Must be smaller
-    /// than kDigestSize.
+    ///                 than kDigestSize.
     /// @param out      The output buffer. Must be non NULL, and larger than
     /// out_len bytes.
     ///
@@ -105,9 +105,9 @@ public:
     ///
     /// @param in       The input string.
     /// @param out_len  The size of the output buffer in bytes. Must be smaller
-    /// than kDigestSize.
+    ///                 than kDigestSize.
     /// @param out      The output string. Will be an out_len bytes string after
-    /// return of the function
+    ///                 return of the function
     ///
     /// @exception std::invalid_argument       out_len is larger than
     /// kDigestSize
@@ -134,7 +134,7 @@ public:
     ///
     /// @param in       The input string.
     /// @param out_len  The size of the output buffer in bytes. Must be smaller
-    /// than kDigestSize.
+    ///                 than kDigestSize.
     ///
     /// @return The hash of in, truncated to its first out_len bytes.
     ///

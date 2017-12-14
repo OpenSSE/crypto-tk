@@ -90,7 +90,7 @@ public:
     /// Initializes the key with random bytes.
     ///
     /// @exception std::bad_alloc       Memory cannot be allocated.
-    /// @exception std::runtime_erro    Memory could not be protected.
+    /// @exception std::runtime_error    Memory could not be protected.
     ///
     Key()
     {

@@ -20,152 +20,239 @@
 
 #pragma once
 
-#include "random.hpp"
 #include "key.hpp"
+#include "random.hpp"
 
 #include <cstdint>
 #include <cstring>
 
-#include <sodium/utils.h>
-#include <string>
 #include <array>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <string>
+#include <sodium/utils.h>
 
 #include <cassert>
 
-namespace sse
+namespace sse {
+
+namespace crypto {
+
+
+/// @class HMac
+/// @brief Hash-based message authentication code.
+///
+/// The HMac class implements the hash-based message authentication code as
+/// defined by Bellare, Canetti, and Krawczyk (cf. RFC 2104). The class can is
+/// templated with the underlying hash function, and the key size.
+///
+/// @tparam H   Hash function used to compute HMAC
+/// @tparam N   Key size (in bytes)
+///
+
+template<class H, uint16_t N>
+class HMac
 {
-    
-    namespace crypto
+public:
+    /// @brief Maximum key size (in bytes) of the H-HMac instantiation
+    static constexpr uint16_t kHMACKeySize = H::kBlockSize;
+    /// @brief The key size (in bytes) of the template instantiation (N)
+    static constexpr uint16_t kKeySize = N;
+    /// @brief Minimum key size: 16 bytes to offer at least 128 bits of security
+    static constexpr uint16_t kMinKeySize
+        = 16; // minimum key size to ensure security
+
+    static_assert(kHMACKeySize >= kMinKeySize,
+                  "The hash block size is less than 16 bytes. "
+                  "This is insecure. Chose an other hash function");
+
+    static_assert(N >= kMinKeySize,
+                  "The HMAC key is less than 16 bytes. "
+                  "This is insecure. Chose an other hash function");
+
+    /// @brief Digest (out) size (in bytes) of the H-HMac instantiation
+    static constexpr uint8_t kDigestSize = H::kDigestSize;
+
+    ///
+    /// @brief Constructor
+    ///
+    /// Creates a HMac object with a new randomly generated key.
+    ///
+    HMac() : key_()
     {
-        
-        
-        /*****
-         * HMac class
-         *
-         * Implementation of HMAC.
-         * It is templatized according to the hash function.
-         ******/
-        
-        template <class H, uint16_t N> class HMac
-        {
-        public:
-            static constexpr uint16_t kHMACKeySize = H::kBlockSize;
-            static constexpr uint16_t kKeySize = N;
-            static constexpr uint16_t kMinKeySize = 16; // minimum key size to ensure security
-            
-            static_assert(kHMACKeySize >= kMinKeySize, "The hash block size is less than 16 bytes. \
-                                              This is insecure. Chose an other hash function" );
+    }
 
-            static_assert(N >= kMinKeySize, "The HMAC key is less than 16 bytes. \
-                          This is insecure. Chose an other hash function" );
+    HMac(HMac<H, N>& hmac)       = delete;
+    HMac(const HMac<H, N>& hmac) = delete;
 
-            static constexpr uint8_t kDigestSize = H::kDigestSize;
-            
-            HMac() : key_()
-            {
-            };
-
-            HMac(HMac<H,N>& hmac) = delete;
-            HMac(const HMac<H,N>& hmac) = delete;
-
-            explicit HMac(Key<kKeySize>&& key) : key_(std::move(key))
-            {
-                if(key_.is_empty())
-                {
-                    throw std::invalid_argument("Invalid key: key is empty");
-                }
-
-            };
-            
-            
-            void hmac(const unsigned char* in, const size_t &length, unsigned char* out,  const size_t &out_len = kDigestSize) const;
-            std::array<uint8_t, H::kDigestSize> hmac(const unsigned char* in, const size_t &length) const;
-            std::array<uint8_t, H::kDigestSize> hmac(const std::string &s) const;
-            
-        private:
-            
-            Key<kKeySize> key_;
-        };
-        
-        
-        // HMac instantiation
-        template <class H, uint16_t N> void HMac<H,N>::hmac(const unsigned char* in, const size_t &length, unsigned char* out, const size_t &out_len) const
-        {
-            assert(out_len <= kDigestSize);
-            
-            uint8_t* buffer, *tmp;
-            size_t i_len = kHMACKeySize + length;
-            size_t o_len = kHMACKeySize + kDigestSize;
-            size_t buffer_len = (i_len > kDigestSize) ? i_len : (kDigestSize);
-            
-            buffer = static_cast<uint8_t*>(sodium_malloc(buffer_len));
-            tmp = static_cast<uint8_t*>(sodium_malloc(o_len));
-            
-            key_.unlock();
-            
-            // set the buffer to 0x00
-            memset(buffer, 0, kHMACKeySize);
-            
-            // copy the key to the buffer
-            memcpy(buffer, key_.data(), kKeySize);
-            
-            // set the other bytes to 0x00
-            if (kKeySize < kHMACKeySize) {
-                memset(buffer+kKeySize, 0x00, kHMACKeySize-kKeySize);
-            }
-
-            // xor the magic number for input
-            for(uint16_t i = 0; i < kHMACKeySize; ++i){
-                buffer[i] ^= 0x36;
-            }
-            
-            memcpy(buffer + kHMACKeySize, in, length);
-
-            H::hash(buffer, i_len, buffer);
-            
-            // prepend the key
-            memcpy(tmp, key_.data(), kKeySize);
-            // set the other bytes to 0x00
-            if (kKeySize < kHMACKeySize) {
-                memset(tmp+kKeySize, 0x00, kHMACKeySize-kKeySize);
-            }
-
-            // xor the magic number for output
-            for(uint16_t i = 0; i < kHMACKeySize; ++i){
-                tmp[i] ^= 0x5c;
-            }
-
-            memcpy(tmp + kHMACKeySize, buffer, kDigestSize);
-            
-            H::hash(tmp, kHMACKeySize + kDigestSize, buffer);
-            
-
-            memcpy(out, buffer, out_len);
-            
-            sodium_memzero(buffer,buffer_len);
-            sodium_free(buffer);
-            
-            sodium_memzero(tmp,o_len);
-            sodium_free(tmp);
-
-            key_.lock();
+    ///
+    /// @brief Constructor
+    ///
+    /// Creates a HMac object from a kKeySize (= N) bytes key.
+    /// After a call to the constructor, the input key is
+    /// held by the HMac object, and cannot be re-used.
+    ///
+    /// @param k    The key used to initialize the PRP.
+    ///             Upon return, k is empty
+    ///
+    explicit HMac(Key<kKeySize>&& key) : key_(std::move(key))
+    {
+        if (key_.is_empty()) {
+            throw std::invalid_argument("Invalid key: key is empty");
         }
-        
-        template <class H, uint16_t N> std::array<uint8_t, H::kDigestSize> HMac<H,N>::hmac(const unsigned char* in, const size_t &length) const
-        {
-            std::array<uint8_t, kDigestSize> result;
-            
-            hmac(in, length, result.data(), kDigestSize);
-            return result;
-        }
-        
-        // Convienience function to run HMac over a C++ string
-        template <class H, uint16_t N> std::array<uint8_t, H::kDigestSize> HMac<H,N>::hmac(const std::string &s) const
-        {
-            return hmac((const unsigned char*)s.data() , s.length());
-        }
-        
-    } // namespace crypto
+    };
+
+    ///
+    /// @brief Evaluate HMac
+    ///
+    /// Evaluates HMac on the input buffer and places the result in the output
+    /// buffer (and truncates the result it if necessary).
+    ///
+    ///
+    /// @param in       The input buffer. Must be non NULL.
+    /// @param len      The size of the input buffer in bytes.
+    /// @param out      The output buffer. Must be non NULL, and larger than
+    ///                 out_len bytes.
+    /// @param out_len  The size of the output buffer in bytes. Must be smaller
+    ///                 than kDigestSize.
+    ///
+    /// @exception std::invalid_argument       One of in or out is NULL
+    /// @exception std::invalid_argument       out_len is larger than
+    /// kDigestSize
+    ///
+    void hmac(const unsigned char* in,
+              const size_t         length,
+              unsigned char*       out,
+              const size_t         out_len = kDigestSize) const;
+
+    ///
+    /// @brief Evaluate HMac
+    ///
+    /// Evaluates HMac on the input buffer and returns the digest in an array.
+    ///
+    ///
+    /// @param in       The input buffer. Must be non NULL.
+    /// @param length   The size of the input buffer in bytes.
+    ///
+    /// @return         An std::array of kDigestSize bytes containing the digest
+    ///
+    /// @exception std::invalid_argument       in or out is NULL
+    ///
+    std::array<uint8_t, H::kDigestSize> hmac(const unsigned char* in,
+                                             const size_t         length) const;
+
+    ///
+    /// @brief Evaluate HMac
+    ///
+    /// Evaluates HMac on the input string and returns the digest in an array.
+    ///
+    ///
+    /// @param in       The input string.
+    ///
+    /// @return         An std::array of kDigestSize bytes containing the digest
+    ///
+    ///
+    std::array<uint8_t, H::kDigestSize> hmac(const std::string& s) const;
+
+private:
+    Key<kKeySize> key_;
+};
+
+
+// HMac instantiation
+template<class H, uint16_t N>
+void HMac<H, N>::hmac(const unsigned char* in,
+                      const size_t         length,
+                      unsigned char*       out,
+                      const size_t         out_len) const
+{
+    if (out_len > kDigestSize) {
+        throw std::invalid_argument(
+            "Invalid output length: out_len > kDigestSize");
+    }
+
+    if (in == nullptr) {
+        throw std::invalid_argument("in is NULL");
+    }
+
+    if (out == nullptr) {
+        throw std::invalid_argument("out is NULL");
+    }
+
+    uint8_t *buffer, *tmp;
+    size_t   i_len      = kHMACKeySize + length;
+    size_t   o_len      = kHMACKeySize + kDigestSize;
+    size_t   buffer_len = (i_len > kDigestSize) ? i_len : (kDigestSize);
+
+    buffer = static_cast<uint8_t*>(sodium_malloc(buffer_len));
+    tmp    = static_cast<uint8_t*>(sodium_malloc(o_len));
+
+    key_.unlock();
+
+    // set the buffer to 0x00
+    memset(buffer, 0, kHMACKeySize);
+
+    // copy the key to the buffer
+    memcpy(buffer, key_.data(), kKeySize);
+
+    // set the other bytes to 0x00
+    if (kKeySize < kHMACKeySize) {
+        memset(buffer + kKeySize, 0x00, kHMACKeySize - kKeySize);
+    }
+
+    // xor the magic number for input
+    for (uint16_t i = 0; i < kHMACKeySize; ++i) {
+        buffer[i] ^= 0x36;
+    }
+
+    memcpy(buffer + kHMACKeySize, in, length);
+
+    H::hash(buffer, i_len, buffer);
+
+    // prepend the key
+    memcpy(tmp, key_.data(), kKeySize);
+    // set the other bytes to 0x00
+    if (kKeySize < kHMACKeySize) {
+        memset(tmp + kKeySize, 0x00, kHMACKeySize - kKeySize);
+    }
+
+    // xor the magic number for output
+    for (uint16_t i = 0; i < kHMACKeySize; ++i) {
+        tmp[i] ^= 0x5c;
+    }
+
+    memcpy(tmp + kHMACKeySize, buffer, kDigestSize);
+
+    H::hash(tmp, kHMACKeySize + kDigestSize, buffer);
+
+
+    memcpy(out, buffer, out_len);
+
+    sodium_memzero(buffer, buffer_len);
+    sodium_free(buffer);
+
+    sodium_memzero(tmp, o_len);
+    sodium_free(tmp);
+
+    key_.lock();
+}
+
+template<class H, uint16_t N>
+std::array<uint8_t, H::kDigestSize> HMac<H, N>::hmac(const unsigned char* in,
+                                                     const size_t length) const
+{
+    std::array<uint8_t, kDigestSize> result;
+
+    hmac(in, length, result.data(), kDigestSize);
+    return result;
+}
+
+// Convienience function to run HMac over a C++ string
+template<class H, uint16_t N>
+std::array<uint8_t, H::kDigestSize> HMac<H, N>::hmac(const std::string& s) const
+{
+    return hmac((const unsigned char*)s.data(), s.length());
+}
+
+} // namespace crypto
 } // namespace sse

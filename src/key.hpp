@@ -74,7 +74,7 @@ class Key
     template<uint16_t NBYTES>
     friend class Prf;
     friend class Prg;
-    friend class Fpe;
+    friend class Prp;
     friend class Cipher;
 
     template<size_t K_SIZE>

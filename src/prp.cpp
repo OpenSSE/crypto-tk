@@ -18,7 +18,7 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "fpe.hpp"
+#include "prp.hpp"
 
 #include "random.hpp"
 
@@ -38,15 +38,15 @@ namespace sse {
 
 namespace crypto {
 
-bool Fpe::is_available__ = false;
+bool Prp::is_available__ = false;
 
 #if __AES__ || __ARM_FEATURE_CRYPTO
-class Fpe::FpeImpl
+class Prp::PrpImpl
 {
 public:
-    FpeImpl();
+    PrpImpl();
 
-    explicit FpeImpl(Key<kKeySize>&& k);
+    explicit PrpImpl(Key<kKeySize>&& k);
 
     void encrypt(const unsigned char* in,
                  const unsigned int&  len,
@@ -62,7 +62,7 @@ private:
 };
 
 #else
-#warning FPE is not available without CPU support for AES instructions
+#warning PRP is not available without CPU support for AES instructions
 
 class Fpe::FpeImpl
 {
@@ -82,7 +82,7 @@ public:
 };
 #endif /* __AES__ || __ARM_FEATURE_CRYPTO */
 
-void Fpe::compute_is_available() noexcept
+void Prp::compute_is_available() noexcept
 {
 #if __AES__ || __ARM_FEATURE_CRYPTO
     is_available__
@@ -92,90 +92,90 @@ void Fpe::compute_is_available() noexcept
 #endif
 }
 
-Fpe::Fpe() : fpe_imp_(Fpe::is_available() ? new FpeImpl() : NULL)
+Prp::Prp() : prp_imp_(Prp::is_available() ? new PrpImpl() : NULL)
 {
-    if (!Fpe::is_available()) {
-        throw std::runtime_error("FPE is unavailable: AES hardward "
+    if (!Prp::is_available()) {
+        throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
     }
 }
 
 
-Fpe::Fpe(Key<kKeySize>&& k)
-    : fpe_imp_(Fpe::is_available() ? new FpeImpl(std::move(k)) : NULL)
+Prp::Prp(Key<kKeySize>&& k)
+    : prp_imp_(Prp::is_available() ? new PrpImpl(std::move(k)) : NULL)
 {
-    if (!Fpe::is_available()) {
-        throw std::runtime_error("FPE is unavailable: AES hardward "
+    if (!Prp::is_available()) {
+        throw std::runtime_error("PRP are unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
     }
 }
 
 
-Fpe::~Fpe()
+Prp::~Prp()
 {
-    delete fpe_imp_;
+    delete prp_imp_;
 }
 
-void Fpe::encrypt(const std::string& in, std::string& out)
+void Prp::encrypt(const std::string& in, std::string& out)
 {
-    fpe_imp_->encrypt(in, out);
+    prp_imp_->encrypt(in, out);
 }
 
-std::string Fpe::encrypt(const std::string& in)
+std::string Prp::encrypt(const std::string& in)
 {
     std::string out;
-    fpe_imp_->encrypt(in, out);
+    prp_imp_->encrypt(in, out);
     return out;
 }
 
-uint32_t Fpe::encrypt(const uint32_t in)
+uint32_t Prp::encrypt(const uint32_t in)
 {
     uint32_t out;
-    fpe_imp_->encrypt(
+    prp_imp_->encrypt(
         (const unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
     return out;
 }
 
-uint64_t Fpe::encrypt_64(const uint64_t in)
+uint64_t Prp::encrypt_64(const uint64_t in)
 {
     uint64_t out;
-    fpe_imp_->encrypt(
+    prp_imp_->encrypt(
         (const unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
     return out;
 }
 
 
-void Fpe::decrypt(const std::string& in, std::string& out)
+void Prp::decrypt(const std::string& in, std::string& out)
 {
-    fpe_imp_->decrypt(in, out);
+    prp_imp_->decrypt(in, out);
 }
 
-std::string Fpe::decrypt(const std::string& in)
+std::string Prp::decrypt(const std::string& in)
 {
     std::string out;
-    fpe_imp_->decrypt(in, out);
+    prp_imp_->decrypt(in, out);
     return out;
 }
 
-uint32_t Fpe::decrypt(const uint32_t in)
+uint32_t Prp::decrypt(const uint32_t in)
 {
     uint32_t out;
-    fpe_imp_->decrypt(
+    prp_imp_->decrypt(
         (const unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
     return out;
 }
 
-uint64_t Fpe::decrypt_64(const uint64_t in)
+uint64_t Prp::decrypt_64(const uint64_t in)
 {
     uint64_t out;
-    fpe_imp_->decrypt(
+    prp_imp_->decrypt(
         (const unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
     return out;
 }
 
 #if __AES__ || __ARM_FEATURE_CRYPTO
 
-Fpe::FpeImpl::FpeImpl()
+Prp::PrpImpl::PrpImpl()
 {
     auto callback = [](uint8_t* key_content) {
         Key<kKeySize> r_key;
@@ -187,7 +187,7 @@ Fpe::FpeImpl::FpeImpl()
     aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
 }
 
-Fpe::FpeImpl::FpeImpl(Key<kKeySize>&& k)
+Prp::PrpImpl::PrpImpl(Key<kKeySize>&& k)
 {
     auto callback = [&k](uint8_t* key_content) {
         aez_setup((const unsigned char*)k.unlock_get(),
@@ -199,12 +199,12 @@ Fpe::FpeImpl::FpeImpl(Key<kKeySize>&& k)
     k.erase();
 }
 
-void Fpe::FpeImpl::encrypt(const unsigned char* in,
+void Prp::PrpImpl::encrypt(const unsigned char* in,
                            const unsigned int&  len,
                            unsigned char*       out)
 {
-    if (!Fpe::is_available()) {
-        throw std::runtime_error("FPE is unavailable: AES hardward "
+    if (!Prp::is_available()) {
+        throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
     }
     char iv[16] = {0x00,
@@ -232,10 +232,10 @@ void Fpe::FpeImpl::encrypt(const unsigned char* in,
                 (char*)out);
 }
 
-void Fpe::FpeImpl::encrypt(const std::string& in, std::string& out)
+void Prp::PrpImpl::encrypt(const std::string& in, std::string& out)
 {
-    if (!Fpe::is_available()) {
-        throw std::runtime_error("FPE is unavailable: AES hardward "
+    if (!Prp::is_available()) {
+        throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
     }
 
@@ -254,12 +254,12 @@ void Fpe::FpeImpl::encrypt(const std::string& in, std::string& out)
     delete[] data;
 }
 
-void Fpe::FpeImpl::decrypt(const unsigned char* in,
+void Prp::PrpImpl::decrypt(const unsigned char* in,
                            const unsigned int&  len,
                            unsigned char*       out)
 {
-    if (!Fpe::is_available()) {
-        throw std::runtime_error("FPE is unavailable: AES hardward "
+    if (!Prp::is_available()) {
+        throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
     }
 
@@ -290,10 +290,10 @@ void Fpe::FpeImpl::decrypt(const unsigned char* in,
     aez_ctx_.lock();
 }
 
-void Fpe::FpeImpl::decrypt(const std::string& in, std::string& out)
+void Prp::PrpImpl::decrypt(const std::string& in, std::string& out)
 {
-    if (!Fpe::is_available()) {
-        throw std::runtime_error("FPE is unavailable: AES hardward "
+    if (!Prp::is_available()) {
+        throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
     }
 

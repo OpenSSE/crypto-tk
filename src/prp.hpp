@@ -42,7 +42,7 @@ namespace crypto {
 /// for availability.
 ///
 
-class Fpe
+class Prp
 {
 public:
     friend void init_crypto_lib();
@@ -71,7 +71,7 @@ public:
     ///
     /// @exception std::runtime_error The Prp class is not available.
     ///
-    Fpe();
+    Prp();
 
     ///
     /// @brief Constructor
@@ -85,7 +85,7 @@ public:
     ///
     /// @exception std::runtime_error The Prp class is not available.
     ///
-    explicit Fpe(Key<kKeySize>&& k);
+    explicit Prp(Key<kKeySize>&& k);
 
     ///
     /// @brief Destructor
@@ -93,13 +93,13 @@ public:
     /// Destructs the Prp object and erase its key.
     ///
     ///
-    ~Fpe();
+    ~Prp();
 
     // we should not be able to duplicate Fpe objects
-    Fpe(const Fpe& c)  = delete;
-    Fpe(Fpe& c)        = delete;
-    Fpe(const Fpe&& c) = delete;
-    Fpe(Fpe&& c)       = delete;
+    Prp(const Prp& c)  = delete;
+    Prp(Prp& c)        = delete;
+    Prp(const Prp&& c) = delete;
+    Prp(Prp&& c)       = delete;
 
     ///
     /// @brief PRP evaluation
@@ -196,12 +196,12 @@ public:
     uint64_t decrypt_64(const uint64_t in);
 
     // Again, avoid any assignement of Cipher objects
-    Fpe& operator=(const Fpe& h) = delete;
-    Fpe& operator=(Fpe& h) = delete;
+    Prp& operator=(const Prp& h) = delete;
+    Prp& operator=(Prp& h) = delete;
 
 private:
-    class FpeImpl;     // not defined in the header
-    FpeImpl* fpe_imp_; // opaque pointer
+    class PrpImpl;     // not defined in the header
+    PrpImpl* prp_imp_; // opaque pointer
 
 
     ///

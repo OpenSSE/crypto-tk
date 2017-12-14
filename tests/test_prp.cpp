@@ -20,7 +20,7 @@
 
 #if __AES__ || __ARM_FEATURE_CRYPTO   /* Defined by gcc/clang when compiling for AES-NI */
 
-#include "../src/fpe.hpp"
+#include "../src/prp.hpp"
 #include "../src/random.hpp"
 
 
@@ -33,14 +33,14 @@
 using namespace std;
 
 
-TEST(fpe, correctness) {
+TEST(prp, correctness) {
     
     for (size_t i = 1; i <= 20*16; i++) {
 //        std::cout << i << std::endl;
         string in_enc = sse::crypto::random_string(i);
         string out_enc, out_dec;
         
-        sse::crypto::Fpe fpe;
+        sse::crypto::Prp fpe;
         fpe.encrypt(in_enc, out_enc);
         
         ASSERT_EQ(in_enc.length(), out_enc.length());
@@ -54,12 +54,12 @@ TEST(fpe, correctness) {
     }
 }
 
-TEST(fpe, consistency_32) {
+TEST(prp, consistency_32) {
     
     for (size_t i = 1; i <= 100; i++) {
         array<uint8_t, 48> key;
 
-        sse::crypto::Fpe fpe(sse::crypto::Key<sse::crypto::Fpe::kKeySize>(key.data()));
+        sse::crypto::Prp fpe(sse::crypto::Key<sse::crypto::Prp::kKeySize>(key.data()));
 
         array<uint8_t, sizeof(uint32_t)> arr_32;
         
@@ -88,10 +88,10 @@ TEST(fpe, consistency_32) {
     }
 }
 
-TEST(fpe, consistency_64) {
+TEST(prp, consistency_64) {
     
     for (size_t i = 1; i <= 100; i++) {
-        sse::crypto::Fpe fpe;
+        sse::crypto::Prp fpe;
         
         uint64_t in_64_i;
         sse::crypto::random_bytes(sizeof(uint64_t),(uint8_t *) &in_64_i);
@@ -116,5 +116,5 @@ TEST(fpe, consistency_64) {
 }
 
 #else
-#warning FPE is disabled (requires support of AES instructions)
+#warning PRP is disabled (requires support of AES instructions)
 #endif

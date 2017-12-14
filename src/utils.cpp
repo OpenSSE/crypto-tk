@@ -20,7 +20,7 @@
 
 #include "utils.hpp"
 
-#include "fpe.hpp"
+#include "prp.hpp"
 
 #include "ppke/relic_wrapper/relic_api.h"
 
@@ -201,7 +201,7 @@ namespace sse
             }
             sodium_set_misuse_handler(sodium_misuse_handler);
             
-            Fpe::compute_is_available();
+            Prp::compute_is_available();
         }
         
         void cleanup_crypto_lib()

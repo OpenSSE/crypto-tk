@@ -256,3 +256,12 @@ std::array<uint8_t, H::kDigestSize> HMac<H, N>::hmac(const std::string& s) const
 
 } // namespace crypto
 } // namespace sse
+
+#ifdef CHECK_TEMPLATE_INSTANTIATION
+#include "hash/sha512.hpp"
+namespace sse {
+    namespace crypto {
+        extern template class HMac<hash::sha512,25>;
+    }
+}
+#endif

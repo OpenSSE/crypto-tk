@@ -44,10 +44,6 @@ using namespace std;
 
 template <uint16_t N> using HMAC_SHA512 = sse::crypto::HMac<sse::crypto::hash::sha512,N>;
 
-//bool hmac_tests()
-//{
-//	return hmac_test_case_1() && hmac_test_case_2() && hmac_test_case_3() && hmac_test_case_4();
-//}
 
 TEST(hmac_sha_512, test_vector_1)
 {
@@ -136,7 +132,7 @@ TEST(hmac_sha_512, test_vector_4)
 	unsigned char in [50];
 	memset(in,0xcd,50);
 		
-	array<uint8_t,64> result_64 = hmac.hmac(in, 50);
+    array<uint8_t,64> result_64 = hmac.hmac(std::string(reinterpret_cast<char*>(in), 50));
 	
 	array<uint8_t,64> reference = 	{{
 								0xb0, 0xba, 0x46, 0x56, 0x37, 0x45, 0x8c, 0x69, 0x90, 0xe5, 0xa8, 0xc5, 0xf6, 0x1d, 0x4a, 0xf7,
@@ -157,4 +153,12 @@ TEST(hmac, exception)
     sse::crypto::Key<25> k1;
     sse::crypto::Key<25> k2(std::move(k1));
     ASSERT_THROW(HMAC_SHA512<25> hmac(std::move(k1)), std::invalid_argument);
+    
+    
+    HMAC_SHA512<25> hmac;
+    uint8_t c;
+    ASSERT_THROW(hmac.hmac(nullptr, 0, nullptr), std::invalid_argument);
+    ASSERT_THROW(hmac.hmac(&c, 1, nullptr), std::invalid_argument);
+    ASSERT_THROW(hmac.hmac(&c, 1, &c, HMAC_SHA512<25>::kDigestSize+10), std::invalid_argument);
+
 }

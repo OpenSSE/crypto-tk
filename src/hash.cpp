@@ -20,97 +20,98 @@
 
 #include "hash.hpp"
 
-#include "hash/sha512.hpp"
 #include "hash/blake2b.hpp"
+#include "hash/sha512.hpp"
 
 #include <cstring>
 
 #include <stdexcept>
 
-namespace sse
-{
-	
-namespace crypto
-{
-	
+namespace sse {
+
+namespace crypto {
+
 using hash_function = hash::blake2b;
-	
-void Hash::hash(const unsigned char *in, const size_t &len, unsigned char *out)
+
+void Hash::hash(const unsigned char* in, const size_t len, unsigned char* out)
 {
-    if(in == nullptr)
-    {
+    if (in == nullptr) {
         throw std::invalid_argument("in is NULL");
     }
-    
-    if(out == nullptr)
-    {
+
+    if (out == nullptr) {
         throw std::invalid_argument("out is NULL");
     }
 
-	static_assert(kDigestSize == hash_function::kDigestSize, "Declared digest size and hash_function digest size do not match");
-	static_assert(kBlockSize == hash_function::kBlockSize, "Declared block size and hash_function block size do not match");
-	hash_function::hash(in, len, out);
+    static_assert(
+        kDigestSize == hash_function::kDigestSize,
+        "Declared digest size and hash_function digest size do not match");
+    static_assert(
+        kBlockSize == hash_function::kBlockSize,
+        "Declared block size and hash_function block size do not match");
+    hash_function::hash(in, len, out);
 }
 
-void Hash::hash(const unsigned char *in, const size_t &len, const size_t &out_len, unsigned char *out)
+void Hash::hash(const unsigned char* in,
+                const size_t         len,
+                const size_t         out_len,
+                unsigned char*       out)
 {
-    if(out_len > kDigestSize)
-    {
-        throw std::invalid_argument("Invalid output length: out_len > kDigestSize");
+    if (out_len > kDigestSize) {
+        throw std::invalid_argument(
+            "Invalid output length: out_len > kDigestSize");
     }
-    
-    if(in == nullptr)
-    {
+
+    if (in == nullptr) {
         throw std::invalid_argument("in is NULL");
     }
-    
-    if(out == nullptr)
-    {
+
+    if (out == nullptr) {
         throw std::invalid_argument("out is NULL");
     }
-    
-    
-	unsigned char digest[kDigestSize];
 
-	hash(in, len, digest);
-	memcpy(out, digest, out_len);
+
+    unsigned char digest[kDigestSize];
+
+    hash(in, len, digest);
+    memcpy(out, digest, out_len);
 }
 
-void Hash::hash(const std::string &in, std::string &out)
+void Hash::hash(const std::string& in, std::string& out)
 {
-    unsigned char tmp_out [kDigestSize];
-	hash((const unsigned char*)in.data(),in.length(),tmp_out);
-    
-    out = std::string((char *)tmp_out, kDigestSize);
+    unsigned char tmp_out[kDigestSize];
+    hash((const unsigned char*)in.data(), in.length(), tmp_out);
+
+    out = std::string((char*)tmp_out, kDigestSize);
 }
 
-void Hash::hash(const std::string &in, const size_t &out_len, std::string &out)
+void Hash::hash(const std::string& in, const size_t out_len, std::string& out)
 {
-    if(out_len > kDigestSize)
-    {
-        throw std::invalid_argument("Invalid output length: out_len > kDigestSize");
+    if (out_len > kDigestSize) {
+        throw std::invalid_argument(
+            "Invalid output length: out_len > kDigestSize");
     }
 
-    unsigned char tmp_out [kDigestSize];
+    unsigned char tmp_out[kDigestSize];
 
-    hash((const unsigned char*)in.data(),in.length(),tmp_out);
-    
-    out = std::string((char *)tmp_out, out_len);
+    hash((const unsigned char*)in.data(), in.length(), tmp_out);
+
+    out = std::string((char*)tmp_out, out_len);
 }
 
-std::string Hash::hash(const std::string &in)
+std::string Hash::hash(const std::string& in)
 {
-	std::string out;
-	hash(in,out);
-	return out;
+    std::string out;
+    hash(in, out);
+    return out;
 }
 
-std::string Hash::hash(const std::string &in, const size_t &out_len)
+std::string Hash::hash(const std::string& in, const size_t out_len)
 {
-	std::string out;
-	hash(in,out_len,out);
-	return out;
+    std::string out;
+    hash(in, out_len, out);
+    return out;
 }
 
-}
-}
+} // namespace crypto
+} // namespace sse

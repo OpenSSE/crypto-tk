@@ -21,35 +21,128 @@
 #pragma once
 
 #include <cstddef>
+
 #include <string>
 
 
-namespace sse
-{
+namespace sse {
 
-namespace crypto
-{
-	/*****
-	* Hash class
-	*
-	* Implementation of a hash function.
-	* 	
-	* Hash implements Blake2b
-	******/
-	
-	class Hash
-	{
-	public:
-		constexpr static size_t kDigestSize = 64;
-		constexpr static size_t kBlockSize = 128;
-	
-		static void hash(const unsigned char *in, const size_t &len, unsigned char *out);
-		static void hash(const unsigned char *in, const size_t &len, const size_t &out_len, unsigned char *out);
-		static void hash(const std::string &in, std::string &out);
-		static void hash(const std::string &in, const size_t &out_len, std::string &out);
-		static std::string hash(const std::string &in);
-		static std::string hash(const std::string &in, const size_t &out_len);
-	};
+namespace crypto {
 
-}
-}
+/// @class Hash
+/// @brief Cryptographic hashing
+///
+/// Hash is an opaque class for cryptographic hashing.
+/// The hash function used is Blake2b.
+/// Digests are 512 bits (64 bytes) large, which ensures a 2^256 bits security
+/// against collisions (and more against pre-image and second pre-image
+/// attacks).
+///
+
+class Hash
+{
+public:
+    /// @brief Digest size (in bytes)
+    constexpr static size_t kDigestSize = 64;
+    /// @brief Size of the blocks in the hash function (in bytes)
+    constexpr static size_t kBlockSize = 128;
+
+    ///
+    /// @brief Hash a buffer
+    ///
+    /// Computes the hash of the input buffer and places it in the output
+    /// buffer.
+    ///
+    /// @param in   The input buffer. Must be non NULL.
+    /// @param len  The size of the input buffer in bytes.
+    /// @param out  The output buffer. Must be non NULL, and larger than
+    /// kDigestSize bytes.
+    ///
+    /// @exception std::invalid_argument       One of in or out is NULL
+    ///
+    static void hash(const unsigned char* in,
+                     const size_t         len,
+                     unsigned char*       out);
+
+    ///
+    /// @brief Hash a buffer
+    ///
+    /// Computes the hash of the input buffer, truncates it and places it in the
+    /// output buffer.
+    ///
+    /// @param in       The input buffer. Must be non NULL.
+    /// @param len      The size of the input buffer in bytes.
+    /// @param out_len  The size of the output buffer in bytes. Must be smaller
+    /// than kDigestSize.
+    /// @param out      The output buffer. Must be non NULL, and larger than
+    /// out_len bytes.
+    ///
+    /// @exception std::invalid_argument       One of in or out is NULL
+    /// @exception std::invalid_argument       out_len is larger than
+    /// kDigestSize
+    ///
+    static void hash(const unsigned char* in,
+                     const size_t         len,
+                     const size_t         out_len,
+                     unsigned char*       out);
+    ///
+    /// @brief Hash a string
+    ///
+    /// Computes the hash of the input string andplaces it in the
+    /// output string.
+    ///
+    /// @param in       The input string.
+    /// @param out      The output string.
+    ///
+    ///
+    static void hash(const std::string& in, std::string& out);
+
+    ///
+    /// @brief Hash a string
+    ///
+    /// Computes the hash of the input string, truncates it and places it in the
+    /// output string.
+    ///
+    /// @param in       The input string.
+    /// @param out_len  The size of the output buffer in bytes. Must be smaller
+    /// than kDigestSize.
+    /// @param out      The output string. Will be an out_len bytes string after
+    /// return of the function
+    ///
+    /// @exception std::invalid_argument       out_len is larger than
+    /// kDigestSize
+    ///
+    static void hash(const std::string& in,
+                     const size_t       out_len,
+                     std::string&       out);
+
+    ///
+    /// @brief Hash a string and return the digest
+    ///
+    /// Computes the hash of the input string and and returns it.
+    ///
+    /// @param in       The input string.
+    ///
+    /// @return The hash of in, truncated to its first out_len bytes.
+    ///
+    static std::string hash(const std::string& in);
+
+    ///
+    /// @brief Hash a string and return the digest
+    ///
+    /// Computes the hash of the input string, truncates it and returns it.
+    ///
+    /// @param in       The input string.
+    /// @param out_len  The size of the output buffer in bytes. Must be smaller
+    /// than kDigestSize.
+    ///
+    /// @return The hash of in, truncated to its first out_len bytes.
+    ///
+    /// @exception std::invalid_argument       out_len is larger than
+    /// kDigestSize
+    ///
+    static std::string hash(const std::string& in, const size_t out_len);
+};
+
+} // namespace crypto
+} // namespace sse

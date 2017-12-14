@@ -53,7 +53,7 @@ bld = Builder(action = run_test)
 ## Environment initialization and configuration
 
 env = Environment(tools = ['default', 'gcccov', 'doxygen'])
-# env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
+env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 env.Append(BUILDERS = {'Test' :  bld})
 env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
 

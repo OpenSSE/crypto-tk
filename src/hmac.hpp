@@ -92,7 +92,7 @@ public:
     /// After a call to the constructor, the input key is
     /// held by the HMac object, and cannot be re-used.
     ///
-    /// @param k    The key used to initialize HMAC.
+    /// @param key  The key used to initialize HMAC.
     ///             Upon return, k is empty
     ///
     explicit HMac(Key<kKeySize>&& key) : key_(std::move(key))
@@ -110,7 +110,7 @@ public:
     ///
     ///
     /// @param in       The input buffer. Must be non NULL.
-    /// @param len      The size of the input buffer in bytes.
+    /// @param length   The size of the input buffer in bytes.
     /// @param out      The output buffer. Must be non NULL, and larger than
     ///                 out_len bytes.
     /// @param out_len  The size of the output buffer in bytes. Must be smaller
@@ -147,7 +147,7 @@ public:
     /// Evaluates HMac on the input string and returns the digest in an array.
     ///
     ///
-    /// @param in       The input string.
+    /// @param s        The input string.
     ///
     /// @return         An std::array of kDigestSize bytes containing the digest
     ///

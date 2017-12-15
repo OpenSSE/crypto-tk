@@ -59,6 +59,9 @@ class Prf
 public:
     /// @brief PRF key size (in bytes)
     static constexpr uint8_t kKeySize = 32;
+    
+    /// @internal
+    /// @brief Inner implementation of the PRF
     using PrfBase                     = HMac<Hash, kKeySize>;
 
     static_assert(kKeySize <= Hash::kBlockSize,
@@ -80,7 +83,7 @@ public:
     /// After a call to the constructor, the input key is
     /// held by the Prf object, and cannot be re-used.
     ///
-    /// @param k    The key used to initialize the PRF.
+    /// @param key  The key used to initialize the PRF.
     ///             Upon return, k is empty
     ///
     explicit Prf(Key<kKeySize>&& key) : base_(std::move(key))
@@ -161,7 +164,7 @@ public:
     /// on the input string. The input acts as a salt for the key derivation.
     ///
     ///
-    /// @param in       The input string.
+    /// @param s        The input string.
     ///
     /// @return         A new NBYTES bytes key.
     ///

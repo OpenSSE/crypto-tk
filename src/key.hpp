@@ -189,7 +189,7 @@ public:
     /// sets the key content to the content of the parameter key,
     /// and empties the content of the parameter key.
     ///
-    /// @param k    The moved key
+    /// @param other    The moved key
     ///
     ///
 

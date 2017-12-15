@@ -45,6 +45,7 @@ namespace crypto {
 class Prp
 {
 public:
+    /// @internal
     friend void init_crypto_lib();
 
     /// @brief Prp key size (in bytes)

@@ -426,7 +426,7 @@ TEST(ppke, serialization)
         
         auto ct = ppke.encrypt<M_type>(pk, M, tag);
 
-        std::array<uint8_t, sse::crypto::GmmppkeCT<M_type>::kByteSize> ct_data;
+        std::array<uint8_t, sse::crypto::GmmppkeCT<M_type>::kCTByteSize> ct_data;
         ct.writeBytes(ct_data.data());
         sse::crypto::GmmppkeCT<M_type> serialized_ct(ct_data.data());
 

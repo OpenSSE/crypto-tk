@@ -64,12 +64,12 @@ private:
 #else
 #warning PRP is not available without CPU support for AES instructions
 
-class Fpe::FpeImpl
+class Prp::PrpImpl
 {
 public:
-    FpeImpl(){};
+    PrpImpl(){};
 
-    explicit FpeImpl(Key<kKeySize>&& k){};
+    explicit PrpImpl(Key<kKeySize>&& k){};
 
     void encrypt(const unsigned char* in,
                  const unsigned int&  len,

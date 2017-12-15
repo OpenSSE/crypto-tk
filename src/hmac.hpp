@@ -92,7 +92,7 @@ public:
     /// After a call to the constructor, the input key is
     /// held by the HMac object, and cannot be re-used.
     ///
-    /// @param k    The key used to initialize the PRP.
+    /// @param k    The key used to initialize HMAC.
     ///             Upon return, k is empty
     ///
     explicit HMac(Key<kKeySize>&& key) : key_(std::move(key))
@@ -257,11 +257,12 @@ std::array<uint8_t, H::kDigestSize> HMac<H, N>::hmac(const std::string& s) const
 } // namespace crypto
 } // namespace sse
 
+// Explicitely instantiate some templates for the code coverage
 #ifdef CHECK_TEMPLATE_INSTANTIATION
 #include "hash/sha512.hpp"
 namespace sse {
-    namespace crypto {
-        extern template class HMac<hash::sha512,25>;
-    }
+namespace crypto {
+extern template class HMac<hash::sha512, 25>;
 }
+} // namespace sse
 #endif

@@ -24,10 +24,11 @@
 #include "hash/sha512.hpp"
 
 
+// Explicitely instantiate some templates for the code coverage
 #ifdef CHECK_TEMPLATE_INSTANTIATION
 namespace sse {
 namespace crypto {
-    template class HMac<hash::sha512,25>;
+template class HMac<hash::sha512, 25>;
 }
-}
+} // namespace sse
 #endif

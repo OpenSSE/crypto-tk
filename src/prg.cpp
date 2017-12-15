@@ -21,11 +21,10 @@
 
 #include "prg.hpp"
 
-#include <sodium/crypto_stream_chacha20.h>
-
-
-#include <cstring>
 #include <cassert>
+#include <cstring>
+
+#include <sodium/crypto_stream_chacha20.h>
 
 
 // ChaCha is not really a all-in-one stream cipher (like RC4/Trivium/Grain)
@@ -35,251 +34,291 @@
 #define CHACHA20_BLOCK_SIZE 64
 
 // static nonce
-static const uint8_t chacha_nonce [8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+static const uint8_t chacha_nonce[8]
+    = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-namespace sse
+namespace sse {
+
+namespace crypto {
+
+static void prg_derivation(const unsigned char* key,
+                           const uint32_t       offset,
+                           const size_t         len,
+                           unsigned char*       out)
 {
-    
-    namespace crypto
-    {
-        
-        static void prg_derivation(const unsigned char* key, const uint32_t offset, const size_t len, unsigned char* out)
-        {
-            const size_t mod_offset = (offset % CHACHA20_BLOCK_SIZE);
-            const size_t block_offset = offset/CHACHA20_BLOCK_SIZE;
-            const size_t max_block_index = (len+offset-1)/CHACHA20_BLOCK_SIZE + 1;
-            
-            const size_t block_len = max_block_index - block_offset;
-            
-            memset(out, 0, len);
-            
-            if (offset%CHACHA20_BLOCK_SIZE == 0) {
-                // things are aligned, good !
-                crypto_stream_chacha20_xor_ic(out, out, len, chacha_nonce, block_offset, key);
-            }else{
-                unsigned char buffer[CHACHA20_BLOCK_SIZE];
-                memset(buffer, 0, CHACHA20_BLOCK_SIZE);
-
-                size_t prefix_len = CHACHA20_BLOCK_SIZE - mod_offset;
-                // start by generating the inner blocks
-                if(block_len>1) {
-                    const size_t tmp_len = len - prefix_len;
-                    crypto_stream_chacha20_xor_ic(out+prefix_len, out+prefix_len, tmp_len, chacha_nonce, block_offset+1, key);
-                }else{
-                    // The output is just the prefix
-                    // We must cut the output before the end of the block
-                    prefix_len = len;
-                }
-                // Now, we have to generate the first bytes of out
-                // These are the last out_offset bytes of the block index block_offset
-
-                crypto_stream_chacha20_xor_ic(buffer, buffer, CHACHA20_BLOCK_SIZE, chacha_nonce, block_offset, key);
-
-                // copy these last bytes
-                memcpy(out, buffer+mod_offset, prefix_len);
-
-                // zeroize the buffer
-                sodium_memzero(buffer, CHACHA20_BLOCK_SIZE);
-            }
-        }
-        
-        class Prg::PrgImpl
-        {
-        public:
-            PrgImpl() = delete;
-            
-            inline explicit PrgImpl(Key<kKeySize>&& key);
-                        
-            inline void derive(const size_t len, std::string &out) const;
-            inline void derive(const size_t len, unsigned char* out) const;
-            
-            inline void derive(const uint32_t offset, const size_t len, unsigned char* out) const;
-            inline void derive(const uint32_t offset, const size_t len, std::string &out) const;
-            
-
-            
-            inline static void derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out);
-            
-        private:
-     
-            Key<kKeySize> key_;
-        };
-        
-        
-        Prg::Prg(Key<kKeySize>&& k) : prg_imp_(new PrgImpl(std::move(k)))
-        {
-        }
-        
-        Prg::~Prg()
-        {
-            delete prg_imp_;
-        }
-        
-        void Prg::derive(const size_t len, std::string &out) const
-        {
-            prg_imp_->derive(len, out);
-        }
-
-        std::string Prg::derive(const size_t len) const
-        {
-            std::string out;
-            
-            prg_imp_->derive(len, out);
-            
-            return out;
-        }
-
-        void Prg::derive(const uint32_t offset, const size_t len, std::string &out) const
-        {
-            prg_imp_->derive(offset, len, out);
-        }
-        
-        std::string Prg::derive(const uint32_t offset, const size_t len) const
-        {
-            std::string out;
-            
-            prg_imp_->derive(offset,len, out);
-            
-            return out;
-        }
-        
-        void Prg::derive(const uint32_t offset, const size_t len, unsigned char* out) const
-        {
-            prg_imp_->derive(offset,len, out);
-        }
-
-        void Prg::derive(Key<kKeySize>&& k, const size_t len, std::string &out)
-        {
-            unsigned char *data = new unsigned char[len];
-            
-            Prg::PrgImpl::derive(std::move(k), 0, len, data);
-            out = std::string((char *)data, len);
-            
-            // erase the buffer
-            sodium_memzero(data, len);
-
-            delete [] data;
-        }
-        
-        void Prg::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out)
-        {
-            Prg::PrgImpl::derive(std::move(k), offset, len, out);
-        }
-
-        std::string Prg::derive(Key<kKeySize>&& k, const size_t len)
-        {
-            unsigned char *data = new unsigned char[len];
-            
-            Prg::PrgImpl::derive(std::move(k), 0, len, data);
-            std::string out = std::string((char *)data, len);
-            
-            // erase the buffer
-            sodium_memzero(data, len);
-
-            delete [] data;
-            return out;
-        }
-        
-        void Prg::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, std::string &out)
-        {
-            unsigned char *data = new unsigned char[len];
-            
-            Prg::PrgImpl::derive(std::move(k), offset, len, data);
-            out = std::string((char *)data, len);
-            
-            // erase the buffer
-            sodium_memzero(data, len);
-
-            delete [] data;
-        }
-
-        std::string Prg::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len)
-        {
-            unsigned char *data = new unsigned char[len];
-            
-            Prg::PrgImpl::derive(std::move(k), offset, len, data);
-            std::string out = std::string((char *)data, len);
-            
-            // erase the buffer
-            sodium_memzero(data, len);
-
-            delete [] data;
-            return out;
-        }
-
-        
-
-        // Prg implementation
-        
-        Prg::PrgImpl::PrgImpl(Key<kKeySize>&& key)
-        : key_(std::move(key))
-        {
-        }
-        
-        void Prg::PrgImpl::derive(const size_t len, unsigned char* out) const
-        {
-            
-            derive(0, len, out);
-        }
-        
-
-        void Prg::PrgImpl::derive(const uint32_t offset, const size_t len, unsigned char* out) const
-        {
-            if (len == 0) {
-                throw std::invalid_argument("The minimum number of bytes to derive is 1.");
-            }
-            
-            prg_derivation (key_.unlock_get(), offset, len, out);
-            key_.lock();
-        }
-
-        void Prg::PrgImpl::derive(const size_t len, std::string &out) const
-        {
-            unsigned char *data = new unsigned char[len];
-            
-            derive(len, data);
-            out = std::string((char *)data, len);
-            
-            // erase the buffer
-            sodium_memzero(data, len);
-
-            delete [] data;
-        }
-        
-        void Prg::PrgImpl::derive(const uint32_t offset, const size_t len, std::string &out) const
-        {
-            unsigned char *data = new unsigned char[len];
-            
-            derive(offset, len, data);
-            out = std::string((char *)data, len);
-            
-            // erase the buffer
-            sodium_memzero(data, len);
-
-            delete [] data;
-        }
-        
-        
-        void Prg::PrgImpl::derive(Key<kKeySize>&& k, const uint32_t offset, const size_t len, unsigned char* out)
-        {
-            if (k.is_empty()) {
-                throw std::invalid_argument("PRG input key is empty");
-            }
-            if (len == 0) {
-                throw std::invalid_argument("The minimum number of bytes to derive is 1.");
-            }
-            
-            Key<kKeySize> local_key(std::move(k)); // make sure the input key cannot be reused
-            
-            prg_derivation (local_key.unlock_get(), offset, len, out);
-            
-            local_key.lock();
-        }
-
-
+    if (out == nullptr) {
+        throw std::invalid_argument("out is NULL");
     }
 
+    const size_t mod_offset      = (offset % CHACHA20_BLOCK_SIZE);
+    const size_t block_offset    = offset / CHACHA20_BLOCK_SIZE;
+    const size_t max_block_index = (len + offset - 1) / CHACHA20_BLOCK_SIZE + 1;
+
+    const size_t block_len = max_block_index - block_offset;
+
+    memset(out, 0, len);
+
+    if (offset % CHACHA20_BLOCK_SIZE == 0) {
+        // things are aligned, good !
+        crypto_stream_chacha20_xor_ic(
+            out, out, len, chacha_nonce, block_offset, key);
+    } else {
+        unsigned char buffer[CHACHA20_BLOCK_SIZE];
+        memset(buffer, 0, CHACHA20_BLOCK_SIZE);
+
+        size_t prefix_len = CHACHA20_BLOCK_SIZE - mod_offset;
+        // start by generating the inner blocks
+        if (block_len > 1) {
+            const size_t tmp_len = len - prefix_len;
+            crypto_stream_chacha20_xor_ic(out + prefix_len,
+                                          out + prefix_len,
+                                          tmp_len,
+                                          chacha_nonce,
+                                          block_offset + 1,
+                                          key);
+        } else {
+            // The output is just the prefix
+            // We must cut the output before the end of the block
+            prefix_len = len;
+        }
+        // Now, we have to generate the first bytes of out
+        // These are the last out_offset bytes of the block index block_offset
+
+        crypto_stream_chacha20_xor_ic(buffer,
+                                      buffer,
+                                      CHACHA20_BLOCK_SIZE,
+                                      chacha_nonce,
+                                      block_offset,
+                                      key);
+
+        // copy these last bytes
+        memcpy(out, buffer + mod_offset, prefix_len);
+
+        // zeroize the buffer
+        sodium_memzero(buffer, CHACHA20_BLOCK_SIZE);
+    }
 }
+
+class Prg::PrgImpl
+{
+public:
+    PrgImpl() = delete;
+
+    inline explicit PrgImpl(Key<kKeySize>&& key);
+
+    inline void derive(const size_t len, std::string& out) const;
+    inline void derive(const size_t len, unsigned char* out) const;
+
+    inline void derive(const uint32_t offset,
+                       const size_t   len,
+                       unsigned char* out) const;
+    inline void derive(const uint32_t offset,
+                       const size_t   len,
+                       std::string&   out) const;
+
+
+    inline static void derive(Key<kKeySize>&& k,
+                              const uint32_t  offset,
+                              const size_t    len,
+                              unsigned char*  out);
+
+private:
+    Key<kKeySize> key_;
+};
+
+
+Prg::Prg(Key<kKeySize>&& k) : prg_imp_(new PrgImpl(std::move(k)))
+{
+}
+
+Prg::~Prg()
+{
+    delete prg_imp_;
+}
+
+void Prg::derive(const size_t len, std::string& out) const
+{
+    prg_imp_->derive(len, out);
+}
+
+std::string Prg::derive(const size_t len) const
+{
+    std::string out;
+
+    prg_imp_->derive(len, out);
+
+    return out;
+}
+
+void Prg::derive(const uint32_t offset,
+                 const size_t   len,
+                 std::string&   out) const
+{
+    prg_imp_->derive(offset, len, out);
+}
+
+std::string Prg::derive(const uint32_t offset, const size_t len) const
+{
+    std::string out;
+
+    prg_imp_->derive(offset, len, out);
+
+    return out;
+}
+
+void Prg::derive(const uint32_t offset,
+                 const size_t   len,
+                 unsigned char* out) const
+{
+    prg_imp_->derive(offset, len, out);
+}
+
+void Prg::derive(Key<kKeySize>&& k, const size_t len, std::string& out)
+{
+    unsigned char* data = new unsigned char[len];
+
+    Prg::PrgImpl::derive(std::move(k), 0, len, data);
+    out = std::string((char*)data, len);
+
+    // erase the buffer
+    sodium_memzero(data, len);
+
+    delete[] data;
+}
+
+void Prg::derive(Key<kKeySize>&& k,
+                 const uint32_t  offset,
+                 const size_t    len,
+                 unsigned char*  out)
+{
+    Prg::PrgImpl::derive(std::move(k), offset, len, out);
+}
+
+std::string Prg::derive(Key<kKeySize>&& k, const size_t len)
+{
+    unsigned char* data = new unsigned char[len];
+
+    Prg::PrgImpl::derive(std::move(k), 0, len, data);
+    std::string out = std::string((char*)data, len);
+
+    // erase the buffer
+    sodium_memzero(data, len);
+
+    delete[] data;
+    return out;
+}
+
+void Prg::derive(Key<kKeySize>&& k,
+                 const uint32_t  offset,
+                 const size_t    len,
+                 std::string&    out)
+{
+    unsigned char* data = new unsigned char[len];
+
+    Prg::PrgImpl::derive(std::move(k), offset, len, data);
+    out = std::string((char*)data, len);
+
+    // erase the buffer
+    sodium_memzero(data, len);
+
+    delete[] data;
+}
+
+std::string Prg::derive(Key<kKeySize>&& k,
+                        const uint32_t  offset,
+                        const size_t    len)
+{
+    unsigned char* data = new unsigned char[len];
+
+    Prg::PrgImpl::derive(std::move(k), offset, len, data);
+    std::string out = std::string((char*)data, len);
+
+    // erase the buffer
+    sodium_memzero(data, len);
+
+    delete[] data;
+    return out;
+}
+
+
+// Prg implementation
+
+Prg::PrgImpl::PrgImpl(Key<kKeySize>&& key) : key_(std::move(key))
+{
+}
+
+void Prg::PrgImpl::derive(const size_t len, unsigned char* out) const
+{
+    derive(0, len, out);
+}
+
+
+void Prg::PrgImpl::derive(const uint32_t offset,
+                          const size_t   len,
+                          unsigned char* out) const
+{
+    if (len == 0) {
+        return;
+    }
+
+    prg_derivation(key_.unlock_get(), offset, len, out);
+    key_.lock();
+}
+
+void Prg::PrgImpl::derive(const size_t len, std::string& out) const
+{
+    unsigned char* data = new unsigned char[len];
+
+    derive(len, data);
+    out = std::string((char*)data, len);
+
+    // erase the buffer
+    sodium_memzero(data, len);
+
+    delete[] data;
+}
+
+void Prg::PrgImpl::derive(const uint32_t offset,
+                          const size_t   len,
+                          std::string&   out) const
+{
+    unsigned char* data = new unsigned char[len];
+
+    derive(offset, len, data);
+    out = std::string((char*)data, len);
+
+    // erase the buffer
+    sodium_memzero(data, len);
+
+    delete[] data;
+}
+
+
+void Prg::PrgImpl::derive(Key<kKeySize>&& k,
+                          const uint32_t  offset,
+                          const size_t    len,
+                          unsigned char*  out)
+{
+    if (k.is_empty()) {
+        throw std::invalid_argument("PRG input key is empty");
+    }
+    if (len == 0) {
+        throw std::invalid_argument(
+            "The minimum number of bytes to derive is 1.");
+    }
+
+    Key<kKeySize> local_key(
+        std::move(k)); // make sure the input key cannot be reused
+
+    prg_derivation(local_key.unlock_get(), offset, len, out);
+
+    local_key.lock();
+}
+
+
+} // namespace crypto
+
+} // namespace sse
 
 /* Instantiate some of the useful template sizes */
 

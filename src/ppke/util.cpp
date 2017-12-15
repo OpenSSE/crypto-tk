@@ -1,13 +1,10 @@
 #include "util.hpp"
 
 using namespace std;
-namespace sse
-{
+namespace sse {
 
-namespace crypto
-{
+namespace crypto {
 
 using namespace relicxx;
-
 }
-}
+} // namespace sse

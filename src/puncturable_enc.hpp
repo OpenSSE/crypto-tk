@@ -163,10 +163,17 @@ public:
     /// Generates (pseudo-randomly) the d-th keyshare of a punctured key.
     ///
     /// @param d    The number of punctures of the final punctured key
-    /// @param tag  The tag associated to the new keyshare
+    /// @param tag  The tag associated to the new keyshare. The tag MUST be
+    ///             different from the NULL tag {{0x00, 0x01, 0x02, 0x03, 0x04,
+    ///             0x05, 0x06, 0x07, 0x08, 0x10, 0x11, 0x12, 0x13, 0x14,
+    ///             0x15}}.
     ///
     /// @return     The d-th keyshare of a punctured decryption key for the
     ///             current PuncturableEncryption object with d punctures
+    ///
+    /// @exception  std::invalid_argument   The input tag is the NULL tag.
+    ///
+    ///
     ///
     punct::key_share_type inc_puncture(const size_t           d,
                                        const punct::tag_type& tag);

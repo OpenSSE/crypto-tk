@@ -243,8 +243,7 @@ GmppkePrivateKeyShare Gmppke::skShareGen(const sse::crypto::Prf<kPPKEPrfOutputSi
     assert(tag != NULLTAG);
     std::string d_string = std::to_string(d);
     
-    const ZR r1 = group.pseudoRandomZR(prf, ("param_r1_%d" + d_string));
-    //        const ZR rho_d_1 = group.pseudoRandomZR(prf, std::string("param_rho_%d",d-1));
+    const ZR r1 = group.pseudoRandomZR(prf, ("param_r1_" + d_string));
     
     const ZR l_d = group.pseudoRandomZR(prf, ("param_l_" + d_string));
     const ZR l_d_1 = (d > 1) ? (group.pseudoRandomZR(prf, std::string("param_l_" + to_string(d-1)))) : (-sp.alpha);

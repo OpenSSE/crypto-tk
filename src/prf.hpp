@@ -60,10 +60,6 @@ public:
     /// @brief PRF key size (in bytes)
     static constexpr uint8_t kKeySize = 32;
     
-    /// @internal
-    /// @brief Inner implementation of the PRF
-    using PrfBase                     = HMac<Hash, kKeySize>;
-
     static_assert(kKeySize <= Hash::kBlockSize,
                   "The PRF key is too large for the hash block size");
 
@@ -187,6 +183,10 @@ public:
     Key<NBYTES> derive_key(const std::array<uint8_t, L>& in) const;
 
 private:
+    /// @internal
+    /// @brief Inner implementation of the PRF
+    using PrfBase                     = HMac<Hash, kKeySize>;
+    
     PrfBase base_;
 };
 

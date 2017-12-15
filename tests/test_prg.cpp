@@ -284,7 +284,7 @@ TEST(prg, exceptions)
 
     std::string out;
     
-    ASSERT_THROW(prg.derive(0, out), std::invalid_argument);
+    ASSERT_THROW(prg.derive(0, 10, NULL), std::invalid_argument);
     ASSERT_THROW(sse::crypto::Prg::derive(std::move(key),0, out), std::invalid_argument);
     
     sse::crypto::Prg::derive(std::move(key),1, out);

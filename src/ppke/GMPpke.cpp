@@ -6,14 +6,15 @@
 
 #include <cassert>
 
-#include <unordered_set>
-
 namespace sse {
 
 namespace crypto {
 
 using namespace std;
 using namespace relicxx;
+// static const string  NULLTAG = "whoever wishes to keep a secret, must hide
+// from us that he possesses one.-- Johann Wolfgang von Goethe"; // the reserved
+// tag
 
 const tag_type Gmppke::NULLTAG = {{0x00,
                                    0x01,
@@ -29,7 +30,7 @@ const tag_type Gmppke::NULLTAG = {{0x00,
                                    0x12,
                                    0x13,
                                    0x14,
-                                   0x15}}; // the reserved tag
+                                   0x15}};
 
 std::string tag2string(const tag_type& tag)
 {

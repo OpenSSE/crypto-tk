@@ -31,7 +31,7 @@
 namespace sse {
 namespace crypto {
 
-/// @class Fpe
+/// @class Prp
 /// @brief Random permutation.
 ///
 /// Prp is an opaque class implementing a length-preserving pseudorandom

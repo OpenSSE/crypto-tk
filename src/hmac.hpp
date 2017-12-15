@@ -179,13 +179,13 @@ void HMac<H, N>::hmac(const unsigned char* in,
         throw std::invalid_argument("out is NULL");
     }
 
-    uint8_t *buffer, *tmp;
+    uint8_t *buffer;
     size_t   i_len      = kHMACKeySize + length;
-    size_t   o_len      = kHMACKeySize + kDigestSize;
+    constexpr size_t   tmp_len      = kHMACKeySize + kDigestSize;
     size_t   buffer_len = (i_len > kDigestSize) ? i_len : (kDigestSize);
 
     buffer = static_cast<uint8_t*>(sodium_malloc(buffer_len));
-    tmp    = static_cast<uint8_t*>(sodium_malloc(o_len));
+    uint8_t tmp [tmp_len];
 
     key_.unlock();
 
@@ -231,8 +231,7 @@ void HMac<H, N>::hmac(const unsigned char* in,
     sodium_memzero(buffer, buffer_len);
     sodium_free(buffer);
 
-    sodium_memzero(tmp, o_len);
-    sodium_free(tmp);
+    sodium_memzero(tmp, tmp_len);
 
     key_.lock();
 }

@@ -207,7 +207,7 @@ std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in,
     std::array<uint8_t, NBYTES> result;
 
     if (NBYTES > PrfBase::kDigestSize) {
-        unsigned char* tmp = new unsigned char[length + 1]();
+        unsigned char* tmp = new unsigned char[length + 1];
         memcpy(tmp, in, length);
 
         uint16_t pos = 0;
@@ -221,16 +221,15 @@ std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in,
                 base_.hmac(
                     tmp, length + 1, result.data() + pos, PrfBase::kDigestSize);
             } else {
-                std::copy_n(base_.hmac(tmp, length + 1).begin(),
-                            NBYTES - pos,
-                            result.begin() + pos);
+                base_.hmac(tmp, length + 1, result.data() + pos, (size_t)(NBYTES - pos));
             }
         }
+        
+        sodium_memzero(tmp, length + 1);
+        delete [] tmp;
     } else if (NBYTES <= Hash::kDigestSize) {
         // only need one output bloc of PrfBase.
-        std::array<uint8_t, Hash::kDigestSize> hmac_out
-            = base_.hmac(in, length);
-        std::copy_n(hmac_out.begin(), NBYTES, result.begin());
+        base_.hmac(in, length, result.data(), result.size());
     }
 
 

@@ -21,12 +21,22 @@
 #pragma once
 
 
-namespace sse
-{
-    
-    namespace crypto
-    {
-        void init_crypto_lib();
-        void cleanup_crypto_lib();
-    }
-}
+namespace sse {
+
+namespace crypto {
+///
+/// @brief Initialize the library
+///
+/// init_crypto_lib needs to be called before using any component of
+/// libsse_crypto.
+///
+void init_crypto_lib();
+
+///
+/// @brief Cleanup the library
+///
+/// Properly cleans up the library.
+///
+void cleanup_crypto_lib();
+} // namespace crypto
+} // namespace sse

@@ -20,9 +20,8 @@
 
 #include "utils.hpp"
 
-#include "prp.hpp"
-
 #include "ppke/relic_wrapper/relic_api.h"
+#include "prp.hpp"
 
 #include <pthread.h>
 
@@ -36,7 +35,7 @@ struct CRYPTO_dynlock_value
     pthread_mutex_t mutex;
 };
 
-static pthread_mutex_t *mutex_buf = nullptr;
+static pthread_mutex_t* mutex_buf = nullptr;
 
 /**
  * OpenSSL locking function.
@@ -47,7 +46,7 @@ static pthread_mutex_t *mutex_buf = nullptr;
  * @param    line    source file line number
  * @return    none
  */
-static void locking_function(int mode, int n, const char *file, int line)
+static void locking_function(int mode, int n, const char* file, int line)
 {
     if ((mode & CRYPTO_LOCK) != 0) {
         pthread_mutex_lock(&mutex_buf[n]);
@@ -63,7 +62,7 @@ static void locking_function(int mode, int n, const char *file, int line)
  */
 static unsigned long id_function()
 {
-    return ((unsigned long) pthread_self());
+    return ((unsigned long)pthread_self());
 }
 
 /**
@@ -72,18 +71,20 @@ static unsigned long id_function()
  * @param    file    source file name
  * @param    line    source file line number
  */
-static struct CRYPTO_dynlock_value *dyn_create_function(const char *file, int line)
+static struct CRYPTO_dynlock_value* dyn_create_function(const char* file,
+                                                        int         line)
 {
-    struct CRYPTO_dynlock_value *value;
-    
-    value = (struct CRYPTO_dynlock_value *) malloc(sizeof(struct CRYPTO_dynlock_value));
+    struct CRYPTO_dynlock_value* value;
+
+    value = (struct CRYPTO_dynlock_value*)malloc(
+        sizeof(struct CRYPTO_dynlock_value));
     if (value == nullptr) {
         goto err;
     }
     pthread_mutex_init(&value->mutex, nullptr);
-    
+
     return value;
-    
+
 err:
     return (nullptr);
 }
@@ -97,8 +98,10 @@ err:
  * @param    line    source file line number
  * @return    none
  */
-static void dyn_lock_function(int mode, struct CRYPTO_dynlock_value *l,
-                              const char *file, int line)
+static void dyn_lock_function(int                          mode,
+                              struct CRYPTO_dynlock_value* l,
+                              const char*                  file,
+                              int                          line)
 {
     if ((mode & CRYPTO_LOCK) != 0) {
         pthread_mutex_lock(&l->mutex);
@@ -116,8 +119,9 @@ static void dyn_lock_function(int mode, struct CRYPTO_dynlock_value *l,
  * @return    none
  */
 
-static void dyn_destroy_function(struct CRYPTO_dynlock_value *l,
-                                 const char *file, int line)
+static void dyn_destroy_function(struct CRYPTO_dynlock_value* l,
+                                 const char*                  file,
+                                 int                          line)
 {
     pthread_mutex_destroy(&l->mutex);
     free(l);
@@ -126,90 +130,88 @@ static void dyn_destroy_function(struct CRYPTO_dynlock_value *l,
 #endif
 
 
-namespace sse
+namespace sse {
+
+namespace crypto {
+
+static relicxx::relicResourceHandle* __relic_handle;
+
+static int init_locks()
 {
-    
-    namespace crypto
-    {
-        
-        static relicxx::relicResourceHandle *__relic_handle;
-
-        static int init_locks()
-        {
 #ifdef WITH_OPENSSL
-            int i;
-            
-            /* static locks area */
-            mutex_buf = (pthread_mutex_t*)malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t));
-            if (mutex_buf == nullptr) {
-                return (-1);
-            }
-            for (i = 0; i < CRYPTO_num_locks(); i++) {
-                pthread_mutex_init(&mutex_buf[i], nullptr);
-            }
-            /* static locks callbacks */
-            CRYPTO_set_locking_callback(locking_function);
-            CRYPTO_set_id_callback(id_function);
-            /* dynamic locks callbacks */
-            CRYPTO_set_dynlock_create_callback(&dyn_create_function);
-            CRYPTO_set_dynlock_lock_callback(&dyn_lock_function);
-            CRYPTO_set_dynlock_destroy_callback(&dyn_destroy_function);
-#endif
-            return 0;
-        }
-        
-        static int kill_locks()
-        {
-#ifdef WITH_OPENSSL
+    int i;
 
-            int i;
-            
-            if (mutex_buf == nullptr) {
-                return (0);
-            }
-            
-            CRYPTO_set_dynlock_create_callback(nullptr);
-            CRYPTO_set_dynlock_lock_callback(nullptr);
-            CRYPTO_set_dynlock_destroy_callback(nullptr);
-            
-            CRYPTO_set_locking_callback(nullptr);
-            CRYPTO_set_id_callback(nullptr);
-            
-            for (i = 0; i < CRYPTO_num_locks(); i++) {
-                pthread_mutex_destroy(&mutex_buf[i]); 
-            } 
-            free(mutex_buf); 
-            mutex_buf = nullptr;
-#endif
-            return 0;
-        }
-
-        static void sodium_misuse_handler()
-        {
-            throw std::runtime_error("Sodium Misuse");
-        }
-        
-        void init_crypto_lib()
-        {
-            init_locks();
-            
-            __relic_handle = new relicxx::relicResourceHandle(true);
-
-            if(sodium_init() < 0 )
-            {
-                throw std::runtime_error("Unable to init libsodium");
-            }
-            sodium_set_misuse_handler(sodium_misuse_handler);
-            
-            Prp::compute_is_available();
-        }
-        
-        void cleanup_crypto_lib()
-        {
-            delete  __relic_handle;
-            __relic_handle = nullptr;
-            
-            kill_locks();
-        }
+    /* static locks area */
+    mutex_buf = (pthread_mutex_t*)malloc(CRYPTO_num_locks()
+                                         * sizeof(pthread_mutex_t));
+    if (mutex_buf == nullptr) {
+        return (-1);
     }
+    for (i = 0; i < CRYPTO_num_locks(); i++) {
+        pthread_mutex_init(&mutex_buf[i], nullptr);
+    }
+    /* static locks callbacks */
+    CRYPTO_set_locking_callback(locking_function);
+    CRYPTO_set_id_callback(id_function);
+    /* dynamic locks callbacks */
+    CRYPTO_set_dynlock_create_callback(&dyn_create_function);
+    CRYPTO_set_dynlock_lock_callback(&dyn_lock_function);
+    CRYPTO_set_dynlock_destroy_callback(&dyn_destroy_function);
+#endif
+    return 0;
 }
+
+static int kill_locks()
+{
+#ifdef WITH_OPENSSL
+
+    int i;
+
+    if (mutex_buf == nullptr) {
+        return (0);
+    }
+
+    CRYPTO_set_dynlock_create_callback(nullptr);
+    CRYPTO_set_dynlock_lock_callback(nullptr);
+    CRYPTO_set_dynlock_destroy_callback(nullptr);
+
+    CRYPTO_set_locking_callback(nullptr);
+    CRYPTO_set_id_callback(nullptr);
+
+    for (i = 0; i < CRYPTO_num_locks(); i++) {
+        pthread_mutex_destroy(&mutex_buf[i]);
+    }
+    free(mutex_buf);
+    mutex_buf = nullptr;
+#endif
+    return 0;
+}
+
+static void sodium_misuse_handler()
+{
+    throw std::runtime_error("Sodium Misuse");
+}
+
+void init_crypto_lib()
+{
+    init_locks();
+
+    __relic_handle = new relicxx::relicResourceHandle(true);
+
+    if (sodium_init() < 0) {
+        throw std::runtime_error("Unable to init libsodium");
+    }
+    sodium_set_misuse_handler(sodium_misuse_handler);
+
+    Prp::compute_is_available();
+}
+
+void cleanup_crypto_lib()
+{
+    delete __relic_handle;
+    __relic_handle = nullptr;
+
+    kill_locks();
+}
+} // namespace crypto
+} // namespace sse

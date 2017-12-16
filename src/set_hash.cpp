@@ -55,6 +55,8 @@ using MSH = jbms::multiset_hash::
 
 class SetHash::SetHashImpl
 {
+    friend SetHash;
+    
 public:
     SetHashImpl();
     explicit SetHashImpl(const MSH::State& s);
@@ -101,7 +103,7 @@ SetHash::SetHash(const std::string& hex_str)
 }
 
 SetHash::SetHash(const SetHash& o)
-    : set_hash_imp_(new SetHashImpl(o.set_hash_imp_->hex()))
+    : set_hash_imp_(new SetHashImpl(o.set_hash_imp_->state_))
 {
 }
 

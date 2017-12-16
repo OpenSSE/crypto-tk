@@ -274,7 +274,19 @@ void test_generic_multiset_hash_with_size() {
       REQUIRE_HEX_EQUAL_MH(a, b);
       ASSERT_TRUE(a == b);
     }
-	
+
+    // Move operator
+    {
+      SetHash a = SetHash(std::vector<std::string>(examples.begin(),examples.end()));
+      
+      SetHash b = a;
+      SetHash c(std::move(a));
+
+      
+      REQUIRE_HEX_EQUAL_MH(c, b);
+      ASSERT_TRUE(c == b);
+    }
+
   }
 }
 

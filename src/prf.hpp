@@ -114,7 +114,7 @@ public:
     /// Evaluates the PRF on the input string and places the result in an array.
     ///
     ///
-    /// @param in       The input string.
+    /// @param s        The input string.
     ///
     /// @return         An std::array of NBYTES bytes containing the result of
     ///                 the evaluation

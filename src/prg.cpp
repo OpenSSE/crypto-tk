@@ -51,7 +51,7 @@ static void prg_derivation(const unsigned char* key,
     }
     
     if (len == 0) {
-        return;
+        return; /* LCOV_EXCL_LINE */
     }
 
     const size_t mod_offset      = (offset % CHACHA20_BLOCK_SIZE);
@@ -110,16 +110,13 @@ public:
 
     inline explicit PrgImpl(Key<kKeySize>&& key);
 
-    inline void derive(const size_t len, std::string& out) const;
-    inline void derive(const size_t len, unsigned char* out) const;
-
     inline void derive(const uint32_t offset,
                        const size_t   len,
                        unsigned char* out) const;
+    
     inline void derive(const uint32_t offset,
                        const size_t   len,
                        std::string&   out) const;
-
 
     inline static void derive(Key<kKeySize>&& k,
                               const uint32_t  offset,
@@ -138,20 +135,6 @@ Prg::Prg(Key<kKeySize>&& k) : prg_imp_(new PrgImpl(std::move(k)))
 Prg::~Prg()
 {
     delete prg_imp_;
-}
-
-void Prg::derive(const size_t len, std::string& out) const
-{
-    prg_imp_->derive(len, out);
-}
-
-std::string Prg::derive(const size_t len) const
-{
-    std::string out;
-
-    prg_imp_->derive(len, out);
-
-    return out;
 }
 
 void Prg::derive(const uint32_t offset,
@@ -198,20 +181,6 @@ void Prg::derive(Key<kKeySize>&& k,
     Prg::PrgImpl::derive(std::move(k), offset, len, out);
 }
 
-std::string Prg::derive(Key<kKeySize>&& k, const size_t len)
-{
-    unsigned char* data = new unsigned char[len];
-
-    Prg::PrgImpl::derive(std::move(k), 0, len, data);
-    std::string out = std::string((char*)data, len);
-
-    // erase the buffer
-    sodium_memzero(data, len);
-
-    delete[] data;
-    return out;
-}
-
 void Prg::derive(Key<kKeySize>&& k,
                  const uint32_t  offset,
                  const size_t    len,
@@ -251,11 +220,6 @@ Prg::PrgImpl::PrgImpl(Key<kKeySize>&& key) : key_(std::move(key))
 {
 }
 
-void Prg::PrgImpl::derive(const size_t len, unsigned char* out) const
-{
-    derive(0, len, out);
-}
-
 
 void Prg::PrgImpl::derive(const uint32_t offset,
                           const size_t   len,
@@ -267,19 +231,6 @@ void Prg::PrgImpl::derive(const uint32_t offset,
 
     prg_derivation(key_.unlock_get(), offset, len, out);
     key_.lock();
-}
-
-void Prg::PrgImpl::derive(const size_t len, std::string& out) const
-{
-    unsigned char* data = new unsigned char[len];
-
-    derive(len, data);
-    out = std::string((char*)data, len);
-
-    // erase the buffer
-    sodium_memzero(data, len);
-
-    delete[] data;
 }
 
 void Prg::PrgImpl::derive(const uint32_t offset,

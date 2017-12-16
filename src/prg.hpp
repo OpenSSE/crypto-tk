@@ -82,7 +82,10 @@ public:
     /// @param len      The number of pseudo-random bytes to generate.
     /// @param out      The output string.
     ///
-    void derive(const size_t len, std::string& out) const;
+    inline void derive(const size_t len, std::string& out) const
+    {
+        derive(0, len, out);
+    };
 
     ///
     /// @brief Generate and return a pseudorandom string
@@ -93,7 +96,10 @@ public:
     /// @param len      The number of pseudo-random bytes to generate.
     /// @return         A len-bytes string filled with random bytes.
     ///
-    std::string derive(const size_t len) const;
+    inline std::string derive(const size_t len) const
+    {
+        return derive(0, len);
+    };
 
     ///
     /// @brief Generate a pseudorandom string
@@ -206,7 +212,10 @@ public:
     /// @param len      The number of pseudo-random bytes to generate.
     /// @return         A len-bytes string filled with random bytes.
     ///
-    static std::string derive(Key<kKeySize>&& k, const size_t len);
+    static inline std::string derive(Key<kKeySize>&& k, const size_t len)
+    {
+        return Prg::derive(std::move(k), 0, len);
+    };
 
     ///
     /// @brief Generate and return a pseudorandom string from the input seed

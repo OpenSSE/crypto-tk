@@ -238,12 +238,6 @@ void test_generic_multiset_hash_with_size() {
 		ASSERT_TRUE(a.hex() != I.hex());
 		ASSERT_TRUE(a != I);
 		
-		SetHash b = a.invert_set();
-		
-		b.add_set(a);
-		REQUIRE_HEX_EQUAL_MH(b, I);
-		ASSERT_TRUE(b == I);
-
 		SetHash c = a;
 		c.remove_element(examples[0]);
 		c.remove_element(examples[1]);

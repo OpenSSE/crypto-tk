@@ -49,6 +49,10 @@ static void prg_derivation(const unsigned char* key,
     if (out == nullptr) {
         throw std::invalid_argument("out is NULL");
     }
+    
+    if (len == 0) {
+        return;
+    }
 
     const size_t mod_offset      = (offset % CHACHA20_BLOCK_SIZE);
     const size_t block_offset    = offset / CHACHA20_BLOCK_SIZE;
@@ -302,11 +306,7 @@ void Prg::PrgImpl::derive(Key<kKeySize>&& k,
     if (k.is_empty()) {
         throw std::invalid_argument("PRG input key is empty");
     }
-    if (len == 0) {
-        throw std::invalid_argument(
-            "The minimum number of bytes to derive is 1.");
-    }
-
+    
     Key<kKeySize> local_key(
         std::move(k)); // make sure the input key cannot be reused
 

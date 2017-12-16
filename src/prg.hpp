@@ -113,8 +113,8 @@ public:
     ///
     /// @brief Generate and return a pseudorandom string
     ///
-    /// Fills the out string with len pseudorandom bytes, skipping the offset of
-    /// the pseudo-random generation.
+    /// Returns a string with len pseudorandom bytes, skipping the first
+    /// offset bytes of the pseudo-random generation.
     ///
     ///
     /// @param offset   The number of bytes to skip in the pseudo-random
@@ -127,8 +127,8 @@ public:
     ///
     /// @brief Fills buffer with pseudorandom bytes
     ///
-    /// Fills the out buffer with len pseudorandom bytes, skipping the offset of
-    /// the pseudo-random generation.
+    /// Fills the out buffer with len pseudorandom bytes, skipping the first
+    /// offset bytes of the pseudo-random generation.
     ///
     ///
     /// @param offset   The number of bytes to skip in the pseudo-random
@@ -142,30 +142,180 @@ public:
                 const size_t   len,
                 unsigned char* out) const;
 
+    ///
+    /// @brief Generate a pseudorandom string from the input seed
+    ///
+    /// Fills the out string with len pseudorandom bytes using k as a seed.
+    ///
+    ///
+    /// @param k        The seed of the pseudo-random generation. After the call
+    ///                 completes, k is empty
+    /// @param len      The number of pseudo-random bytes to generate.
+    /// @param out      The output string.
+    ///
     static void derive(Key<kKeySize>&& k, const size_t len, std::string& out);
+ 
+    ///
+    /// @brief Generate a pseudorandom string from the input seed
+    ///
+    /// Fills the out string with len pseudorandom bytes, skipping the first
+    /// offset bytes of the pseudo-random generation, using k as a seed.
+    ///
+    ///
+    /// @param k        The seed of the pseudo-random generation. After the call
+    ///                 completes, k is empty
+    /// @param offset   The number of bytes to skip in the pseudo-random
+    ///                 sequence.
+    /// @param len      The number of pseudo-random bytes to generate.
+    /// @param out      The output string.
+    ///
     static void derive(Key<kKeySize>&& k,
                        const uint32_t  offset,
                        const size_t    len,
                        std::string&    out);
-    static std::string derive(Key<kKeySize>&& k, const size_t len);
-    static std::string derive(Key<kKeySize>&& k,
-                              const uint32_t  offset,
-                              const size_t    len);
 
-    template<size_t K>
-    Key<K> derive_key(const uint16_t key_offset);
-
-    template<size_t K>
-    std::vector<Key<K>> derive_keys(const uint16_t n_keys,
-                                    const uint16_t key_offset = 0);
-
-    /* Static functions */
-
+    ///
+    /// @brief Fills a buffer with pseudorandom bytes from the input seed
+    ///
+    /// Fills the out buffer with len pseudorandom bytes, skipping the first
+    /// offset bytes of the pseudo-random generation, using k as a seed.
+    ///
+    ///
+    /// @param k        The seed of the pseudo-random generation. After the call
+    ///                 completes, k is empty
+    /// @param offset   The number of bytes to skip in the pseudo-random
+    ///                 sequence.
+    /// @param len      The number of pseudo-random bytes to generate.
+    /// @param out      The output buffer. Must not be NULL.
+    ///
+    /// @exception std::invalid_argument       out is NULL
+    ///
     static void derive(Key<kKeySize>&& k,
                        const uint32_t  offset,
                        const size_t    len,
                        unsigned char*  out);
 
+    ///
+    /// @brief Generate and return a pseudorandom string from the input seed
+    ///
+    /// Returns a string with len pseudorandom bytes, using k as a seed.
+    ///
+    ///
+    /// @param k        The seed of the pseudo-random generation. After the call
+    ///                 completes, k is empty
+    /// @param len      The number of pseudo-random bytes to generate.
+    /// @return         A len-bytes string filled with random bytes.
+    ///
+    static std::string derive(Key<kKeySize>&& k, const size_t len);
+
+    ///
+    /// @brief Generate and return a pseudorandom string from the input seed
+    ///
+    /// Returns a string with len pseudorandom bytes, skipping the first
+    /// offset bytes of the pseudo-random generation, using k as a seed.
+    ///
+    ///
+    /// @param k        The seed of the pseudo-random generation. After the call
+    ///                 completes, k is empty
+    /// @param offset   The number of bytes to skip in the pseudo-random
+    ///                 sequence.
+    /// @param len      The number of pseudo-random bytes to generate.
+    /// @return         A len-bytes string filled with random bytes.
+    ///
+    static std::string derive(Key<kKeySize>&& k,
+                              const uint32_t  offset,
+                              const size_t    len);
+
+    ///
+    /// @brief Derive a key
+    ///
+    /// Returns a pseudo-randomly generated key. The pseudo-random stream is cut
+    /// in blocks of K bytes and the key_offset-th block is used to initialize
+    /// the key (starting from block 0).
+    ///
+    /// @tparam K           The size of the generated key.
+    ///
+    /// @param key_offset   The number of the block used to initialize the key.
+    ///
+    /// @return             A new pseudo-randomly generated key.
+    ///
+    template<size_t K>
+    Key<K> derive_key(const uint16_t key_offset);
+
+    ///
+    /// @brief Derive multiple keys
+    ///
+    /// Returns a vector of pseudo-randomly generated keys.
+    /// The pseudo-random stream is cut in blocks of K bytes and the blocks
+    /// number key_offset to key_offset+n_keys are used to initialize the keys.
+    ///
+    /// @tparam K           The size of the generated keys.
+    ///
+    /// @param n_keys       The number of keys to generate.
+    /// @param key_offset   The number of the block used to initialize the key.
+    ///
+    /// @return             A vectore of pseudo-randomly generated keys.
+    ///
+    template<size_t K>
+    std::vector<Key<K>> derive_keys(const uint16_t n_keys,
+                                    const uint16_t key_offset = 0);
+
+    
+
+    ///
+    /// @brief Derive a key from a seed
+    ///
+    /// Returns a key pseudo-randomly generated using a seed. The pseudo-random
+    /// stream is cut in blocks of K bytes and the key_offset-th block is used
+    /// to initialize the key (starting from block 0).
+    ///
+    /// @tparam K           The size of the generated key.
+    ///
+    /// @param k            The seed of the pseudo-random generation. After the
+    ///                     call completes, k is empty.
+    /// @param key_offset   The number of the block used to initialize the key.
+    ///
+    /// @return             A new pseudo-randomly generated key.
+    ///
+    template<size_t K>
+    static Key<K> derive_key(Key<kKeySize>&& k, const uint16_t key_offset);
+
+    ///
+    /// @brief Derive multiple keys from a seed
+    ///
+    /// Returns a vector of pseudo-randomly generated keys, given an input seed.
+    /// The pseudo-random stream is cut in blocks of K bytes and the blocks
+    /// number key_offset to key_offset+n_keys are used to initialize the keys.
+    ///
+    /// @tparam K           The size of the generated keys.
+    ///
+    /// @param k            The seed of the pseudo-random generation. After the
+    ///                     call completes, k is empty.
+    /// @param n_keys       The number of keys to generate.
+    /// @param key_offset   The number of the block used to initialize the key.
+    ///
+    /// @return             A vectore of pseudo-randomly generated keys.
+    ///
+    template<size_t K>
+    static std::vector<Key<K>> derive_keys(Key<kKeySize>&& k,
+                                           const uint16_t  n_keys,
+                                           const uint16_t  key_offset = 0);
+
+    ///
+    /// @brief Fills an array with pseudorandom bytes from the input seed
+    ///
+    /// Fills the out array with N pseudorandom bytes, skipping the first
+    /// offset bytes of the pseudo-random generation, using k as a seed.
+    ///
+    /// @tparam N       The number of pseudo-random bytes to generate.
+    ///
+    /// @param k        The seed of the pseudo-random generation. After the call
+    ///                 completes, k is empty
+    /// @param offset   The number of bytes to skip in the pseudo-random
+    ///                 sequence.
+    /// @param out      The output array.
+    ///
+    ///
     template<size_t N>
     static inline void derive(Key<kKeySize>&&         k,
                               const uint32_t          offset,
@@ -173,15 +323,7 @@ public:
     {
         derive(std::move(k), offset, N, out.data());
     }
-
-    template<size_t K>
-    static Key<K> derive_key(Key<kKeySize>&& k, const uint16_t key_offset);
-
-    template<size_t K>
-    static std::vector<Key<K>> derive_keys(Key<kKeySize>&& k,
-                                           const uint16_t  n_keys,
-                                           const uint16_t  key_offset = 0);
-
+    
 
 private:
     class PrgImpl;     // not defined in the header
@@ -206,7 +348,7 @@ Key<K> Prg::derive_key(const uint16_t key_offset)
 }
 
 template<size_t K>
-Key<K> Prg::derive_key(Key<Prg::kKeySize>&& k, const uint16_t key_offset)
+Key<K> Prg::derive_key(Key<kKeySize>&& k, const uint16_t key_offset)
 {
     static_assert(K < SIZE_MAX, "K is too large: K < SIZE_MAX");
 

@@ -66,3 +66,30 @@ BENCHMARK(SetHash_insert)->RangeMultiplier(2)
 ->Unit(benchmark::kMicrosecond)->Complexity(benchmark::oN);
 
 
+static void SetHash_batch_construct(benchmark::State& state) {
+    for (auto _ : state){
+        state.PauseTiming();
+        std::vector<std::string> samples(state.range(0));
+        for (auto &e : samples){
+            e = sse::crypto::random_string(state.range(1));
+        }
+        state.ResumeTiming();
+        
+        SetHash a(samples);
+        benchmark::DoNotOptimize(a);
+    }
+    
+    state.SetItemsProcessed(int64_t(state.iterations()) *
+                            int64_t(state.range(0)));
+    
+    state.SetComplexityN((int)state.items_processed());
+}
+
+BENCHMARK(SetHash_batch_construct)->Apply(SetHash_insert_args)
+->Unit(benchmark::kMicrosecond);
+
+BENCHMARK(SetHash_batch_construct)->RangeMultiplier(2)
+->Ranges({{1<<4, 1<<14},{32,32}})
+->Unit(benchmark::kMicrosecond)->Complexity(benchmark::oN);
+
+

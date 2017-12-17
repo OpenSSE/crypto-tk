@@ -23,99 +23,115 @@
 
 #ifdef WITH_OPENSSL
 
-#include "tdp_impl.hpp"
-#include "prf.hpp"
 #include "key.hpp"
-
-#include <openssl/rsa.h>
+#include "prf.hpp"
+#include "tdp_impl.hpp"
 
 #include <cstdint>
 
 #include <array>
 #include <string>
 
-namespace sse
+#include <openssl/rsa.h>
+
+namespace sse {
+namespace crypto {
+class TdpImpl_OpenSSL : virtual public TdpImpl
 {
-namespace crypto
+public:
+    explicit TdpImpl_OpenSSL(const std::string& pk);
+    TdpImpl_OpenSSL(const TdpImpl_OpenSSL& tdp);
+
+    TdpImpl_OpenSSL& operator=(const TdpImpl_OpenSSL& t);
+
+    ~TdpImpl_OpenSSL() override;
+
+    RSA* get_rsa_key() const;
+    void set_rsa_key(RSA* k);
+
+    size_t rsa_size() const override;
+
+    std::string public_key() const override;
+
+    void eval(const std::string& in, std::string& out) const override;
+    std::array<uint8_t, kMessageSpaceSize> eval(
+        const std::array<uint8_t, kMessageSpaceSize>& in) const override;
+
+    std::string                            sample() const override;
+    std::array<uint8_t, kMessageSpaceSize> sample_array() const override;
+
+    std::string generate(const Prf<Tdp::kRSAPrfSize>& prg,
+                         const std::string&           seed) const override;
+    std::array<uint8_t, kMessageSpaceSize> generate_array(
+        const Prf<Tdp::kRSAPrfSize>& prg,
+        const std::string&           seed) const override;
+    std::string generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+                         const std::string& seed) const override;
+    std::array<uint8_t, kMessageSpaceSize> generate_array(
+        Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+        const std::string&                     seed) const override;
+
+protected:
+    TdpImpl_OpenSSL();
+
+    RSA* rsa_key_;
+};
+
+class TdpInverseImpl_OpenSSL : public TdpImpl_OpenSSL,
+                               virtual public TdpInverseImpl
 {
-    class TdpImpl_OpenSSL : virtual public TdpImpl
-    {
-    public:        
-        explicit TdpImpl_OpenSSL(const std::string& pk);
-        TdpImpl_OpenSSL(const TdpImpl_OpenSSL& tdp);
-        
-        TdpImpl_OpenSSL& operator=(const TdpImpl_OpenSSL& t);
+public:
+    TdpInverseImpl_OpenSSL();
+    explicit TdpInverseImpl_OpenSSL(const std::string& sk);
+    TdpInverseImpl_OpenSSL(const TdpInverseImpl_OpenSSL& tdp) = delete;
+    TdpInverseImpl_OpenSSL(TdpInverseImpl_OpenSSL&& tdp)      = delete;
+    ~TdpInverseImpl_OpenSSL() override;
 
-        ~TdpImpl_OpenSSL() override;
-        
-        RSA* get_rsa_key() const;
-        void set_rsa_key(RSA* k);
+    TdpInverseImpl_OpenSSL& operator=(const TdpInverseImpl_OpenSSL& t) = delete;
 
-        size_t rsa_size() const override;
-        
-        std::string public_key() const override;
-        
-        void eval(const std::string &in, std::string &out) const override;
-        std::array<uint8_t, kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in) const override;
-        
-        std::string sample() const override;
-        std::array<uint8_t, kMessageSpaceSize> sample_array() const override;
-        
-        std::string generate(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const override;
-        std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const override;
-        std::string generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const override;
-        std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const override;
-        
-    protected:
-        TdpImpl_OpenSSL();
-        
-        RSA* rsa_key_;
-    };
-    
-    class TdpInverseImpl_OpenSSL : public TdpImpl_OpenSSL, virtual public TdpInverseImpl
-    {
-    public:
-        TdpInverseImpl_OpenSSL();
-        explicit TdpInverseImpl_OpenSSL(const std::string& sk);
-        TdpInverseImpl_OpenSSL(const TdpInverseImpl_OpenSSL& tdp) = delete;
-        TdpInverseImpl_OpenSSL(TdpInverseImpl_OpenSSL&& tdp) = delete;
-        ~TdpInverseImpl_OpenSSL() override;
-        
-        TdpInverseImpl_OpenSSL& operator=(const TdpInverseImpl_OpenSSL& t) = delete;
+    std::string private_key() const override;
+    void        invert(const std::string& in, std::string& out) const override;
+    std::array<uint8_t, kMessageSpaceSize> invert(
+        const std::array<uint8_t, kMessageSpaceSize>& in) const override;
 
-        std::string private_key() const override;
-        void invert(const std::string &in, std::string &out) const override;
-        std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const override;
-        
-        std::array<uint8_t, kMessageSpaceSize> invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const override;
-        void invert_mult(const std::string &in, std::string &out, uint32_t order) const override;
-        
-    private:
-        BIGNUM *phi_, *p_1_, *q_1_;
-    };
-    
-    class TdpMultPoolImpl_OpenSSL : public TdpImpl_OpenSSL, virtual public TdpMultPoolImpl
-    {
-    public:
-        TdpMultPoolImpl_OpenSSL(const std::string& sk, const uint8_t size);
-        TdpMultPoolImpl_OpenSSL(const TdpMultPoolImpl_OpenSSL& pool_impl);
-        
-        TdpMultPoolImpl_OpenSSL& operator=(const TdpMultPoolImpl_OpenSSL& t);
+    std::array<uint8_t, kMessageSpaceSize> invert_mult(
+        const std::array<uint8_t, kMessageSpaceSize>& in,
+        uint32_t                                      order) const override;
+    void invert_mult(const std::string& in,
+                     std::string&       out,
+                     uint32_t           order) const override;
 
-        ~TdpMultPoolImpl_OpenSSL() override;
-        
-        std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> eval_pool(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const override;
-        void eval_pool(const std::string &in, std::string &out, const uint8_t order) const override;
-        
-        uint8_t maximum_order() const override;
-    private:
-        RSA **keys_;
+private:
+    BIGNUM *phi_, *p_1_, *q_1_;
+};
 
-        uint8_t keys_count_;
-    };
-    
-    
+class TdpMultPoolImpl_OpenSSL : public TdpImpl_OpenSSL,
+                                virtual public TdpMultPoolImpl
+{
+public:
+    TdpMultPoolImpl_OpenSSL(const std::string& sk, const uint8_t size);
+    TdpMultPoolImpl_OpenSSL(const TdpMultPoolImpl_OpenSSL& pool_impl);
 
-}
-}
+    TdpMultPoolImpl_OpenSSL& operator=(const TdpMultPoolImpl_OpenSSL& t);
+
+    ~TdpMultPoolImpl_OpenSSL() override;
+
+    std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> eval_pool(
+        const std::array<uint8_t, kMessageSpaceSize>& in,
+        const uint8_t                                 order) const override;
+    void eval_pool(const std::string& in,
+                   std::string&       out,
+                   const uint8_t      order) const override;
+
+    uint8_t maximum_order() const override;
+
+private:
+    RSA** keys_;
+
+    uint8_t keys_count_;
+};
+
+
+} // namespace crypto
+} // namespace sse
 #endif

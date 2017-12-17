@@ -21,69 +21,83 @@
 
 #pragma once
 
-#include "tdp.hpp"
-#include "prf.hpp"
 #include "key.hpp"
+#include "prf.hpp"
+#include "tdp.hpp"
 
 #include <cstdint>
 
 #include <array>
 #include <string>
 
-namespace sse
+namespace sse {
+namespace crypto {
+class TdpImpl
 {
-    namespace crypto
-    {
-        class TdpImpl
-        {
-        public:
-            static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
-            
-            virtual ~TdpImpl()= default;;
-            
-            virtual size_t rsa_size() const = 0;
-            
-            virtual std::string public_key() const = 0;
-            
-            virtual void eval(const std::string &in, std::string &out) const = 0;
-            virtual std::array<uint8_t, kMessageSpaceSize> eval(const std::array<uint8_t, kMessageSpaceSize> &in) const = 0;
-            
-            virtual std::string sample() const = 0;
-            virtual std::array<uint8_t, kMessageSpaceSize> sample_array() const = 0;
-            
-            virtual std::string generate(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const = 0;
-            virtual std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const = 0;
-            virtual std::string generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const = 0;
-            virtual std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const = 0;
-            
-        };
-        
-        class TdpInverseImpl : virtual public TdpImpl
-        {
-        public:
-            ~TdpInverseImpl() override= default;;
-            
-            virtual std::string private_key() const = 0;
-            virtual void invert(const std::string &in, std::string &out) const = 0;
-            virtual std::array<uint8_t, kMessageSpaceSize> invert(const std::array<uint8_t, kMessageSpaceSize> &in) const = 0;
-            
-            virtual std::array<uint8_t, kMessageSpaceSize> invert_mult(const std::array<uint8_t, kMessageSpaceSize> &in, uint32_t order) const = 0;
-            virtual void invert_mult(const std::string &in, std::string &out, uint32_t order) const = 0;
-        };
-        
-        class TdpMultPoolImpl : virtual public TdpImpl
-        {
-        public:          
-            ~TdpMultPoolImpl() override= default;;
-            
-            virtual std::array<uint8_t, TdpImpl::kMessageSpaceSize> eval_pool(const std::array<uint8_t, kMessageSpaceSize> &in, const uint8_t order) const = 0;
-            virtual void eval_pool(const std::string &in, std::string &out, const uint8_t order) const = 0;
-            
-            virtual uint8_t maximum_order() const = 0;
-        };
-        
-        
-        
-    }
-}
+public:
+    static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
 
+    virtual ~TdpImpl() = default;
+    ;
+
+    virtual size_t rsa_size() const = 0;
+
+    virtual std::string public_key() const = 0;
+
+    virtual void eval(const std::string& in, std::string& out) const = 0;
+    virtual std::array<uint8_t, kMessageSpaceSize> eval(
+        const std::array<uint8_t, kMessageSpaceSize>& in) const = 0;
+
+    virtual std::string                            sample() const       = 0;
+    virtual std::array<uint8_t, kMessageSpaceSize> sample_array() const = 0;
+
+    virtual std::string generate(const Prf<Tdp::kRSAPrfSize>& prg,
+                                 const std::string&           seed) const = 0;
+    virtual std::array<uint8_t, kMessageSpaceSize> generate_array(
+        const Prf<Tdp::kRSAPrfSize>& prg,
+        const std::string&           seed) const                          = 0;
+    virtual std::string generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+                                 const std::string& seed) const = 0;
+    virtual std::array<uint8_t, kMessageSpaceSize> generate_array(
+        Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+        const std::string&                     seed) const = 0;
+};
+
+class TdpInverseImpl : virtual public TdpImpl
+{
+public:
+    ~TdpInverseImpl() override = default;
+    ;
+
+    virtual std::string private_key() const                            = 0;
+    virtual void invert(const std::string& in, std::string& out) const = 0;
+    virtual std::array<uint8_t, kMessageSpaceSize> invert(
+        const std::array<uint8_t, kMessageSpaceSize>& in) const = 0;
+
+    virtual std::array<uint8_t, kMessageSpaceSize> invert_mult(
+        const std::array<uint8_t, kMessageSpaceSize>& in,
+        uint32_t                                      order) const                      = 0;
+    virtual void invert_mult(const std::string& in,
+                             std::string&       out,
+                             uint32_t           order) const = 0;
+};
+
+class TdpMultPoolImpl : virtual public TdpImpl
+{
+public:
+    ~TdpMultPoolImpl() override = default;
+    ;
+
+    virtual std::array<uint8_t, TdpImpl::kMessageSpaceSize> eval_pool(
+        const std::array<uint8_t, kMessageSpaceSize>& in,
+        const uint8_t                                 order) const                    = 0;
+    virtual void eval_pool(const std::string& in,
+                           std::string&       out,
+                           const uint8_t      order) const = 0;
+
+    virtual uint8_t maximum_order() const = 0;
+};
+
+
+} // namespace crypto
+} // namespace sse

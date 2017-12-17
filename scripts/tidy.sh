@@ -20,7 +20,7 @@ CXXFLAGS="-std=c++14 -Weffc++ -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-pro
 
 LINE_FILTER="''"
 
-eval "$CLANG_TIDY src/**/*.{h,c} -line-filter=$LINE_FILTER -fix -- $CFLAGS $CCFLAGS $INCLUDES"
+eval "$CLANG_TIDY src/**/*.{h,c} -line-filter=$LINE_FILTER -- $CFLAGS $CCFLAGS $INCLUDES"
 
-eval "$CLANG_TIDY src/**/*.{hpp,cpp} -line-filter=$LINE_FILTER -fix -- $CFLAGS $CXXFLAGS $INCLUDES"
+eval "$CLANG_TIDY src/**/*.{hpp,cpp} -line-filter=$LINE_FILTER -- $CFLAGS $CXXFLAGS $INCLUDES"
 

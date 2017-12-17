@@ -61,10 +61,10 @@ namespace crypto
         std::string sample() const override;
         std::array<uint8_t, kMessageSpaceSize> sample_array() const override;
         
-        std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const override;
-        std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const override;
-        std::string generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const override;
-        std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const override;
+        std::string generate(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const override;
+        std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const override;
+        std::string generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const override;
+        std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const override;
         
     protected:
         TdpImpl_OpenSSL();

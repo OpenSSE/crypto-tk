@@ -22,18 +22,18 @@
 
 #include "prf.hpp"
 #include "random.hpp"
-
 #include "tdp_impl/tdp_impl.hpp"
 
 #include <cstring>
+
 #include <exception>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 #define SSE_CRYPTO_TDP_IMPL_MBEDTLS 1
 
 #ifdef WITH_OPENSSL
-    #define SSE_CRYPTO_TDP_IMPL_OPENSSL 2
+#define SSE_CRYPTO_TDP_IMPL_OPENSSL 2
 #endif
 
 /*
@@ -45,10 +45,11 @@
  */
 //#define SSE_CRYPTO_TDP_IMPL SSE_CRYPTO_TDP_IMPL_MBEDTLS
 
-#if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
+#if defined(SSE_CRYPTO_TDP_IMPL)                                               \
+    && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
 
 #ifndef WITH_OPENSSL
-    #error "OpenSSL is not in use."
+#error "OpenSSL is not in use."
 #endif
 
 #include "tdp_impl/tdp_impl_openssl.hpp"
@@ -60,35 +61,36 @@
 #endif
 
 
-namespace sse
-{
+namespace sse {
 
-namespace crypto
-{
-	
-#if defined(SSE_CRYPTO_TDP_IMPL) && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
-    
-    using  TdpImpl_Current = TdpImpl_OpenSSL;
-    using  TdpInverseImpl_Current = TdpInverseImpl_OpenSSL;
-    using  TdpMultPoolImpl_Current = TdpMultPoolImpl_OpenSSL;
+namespace crypto {
+
+#if defined(SSE_CRYPTO_TDP_IMPL)                                               \
+    && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
+
+using TdpImpl_Current         = TdpImpl_OpenSSL;
+using TdpInverseImpl_Current  = TdpInverseImpl_OpenSSL;
+using TdpMultPoolImpl_Current = TdpMultPoolImpl_OpenSSL;
 
 #else
-    
-    using  TdpImpl_Current = TdpImpl_mbedTLS;
-    using  TdpInverseImpl_Current = TdpInverseImpl_mbedTLS;
-    using  TdpMultPoolImpl_Current = TdpMultPoolImpl_mbedTLS;
-    
+
+using TdpImpl_Current         = TdpImpl_mbedTLS;
+using TdpInverseImpl_Current  = TdpInverseImpl_mbedTLS;
+using TdpMultPoolImpl_Current = TdpMultPoolImpl_mbedTLS;
+
 #endif
 
-static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize, "Constants kMessageSize of Tdp and TdpInverse do not match");
+static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize,
+              "Constants kMessageSize of Tdp and TdpInverse do not match");
 
 Tdp::Tdp(const std::string& pk) : tdp_imp_(new TdpImpl_Current(pk))
 {
 }
 
-Tdp::Tdp(const Tdp& t) : tdp_imp_(new TdpImpl_Current(*dynamic_cast<const TdpImpl_Current*>(t.tdp_imp_)))
+Tdp::Tdp(const Tdp& t)
+    : tdp_imp_(new TdpImpl_Current(
+          *dynamic_cast<const TdpImpl_Current*>(t.tdp_imp_)))
 {
-        
 }
 
 Tdp::~Tdp()
@@ -101,17 +103,18 @@ Tdp& Tdp::operator=(const Tdp& t)
 {
     if ((this != &t) && (tdp_imp_ != t.tdp_imp_)) {
         delete tdp_imp_;
-        tdp_imp_ = new TdpImpl_Current(*dynamic_cast<const TdpImpl_Current*>(t.tdp_imp_));
+        tdp_imp_ = new TdpImpl_Current(
+            *dynamic_cast<const TdpImpl_Current*>(t.tdp_imp_));
     }
-    
+
     return *this;
 }
-    
+
 std::string Tdp::public_key() const
 {
     return tdp_imp_->public_key();
 }
-    
+
 std::string Tdp::sample() const
 {
     return tdp_imp_->sample();
@@ -122,38 +125,45 @@ std::array<uint8_t, Tdp::kMessageSize> Tdp::sample_array() const
     return tdp_imp_->sample_array();
 }
 
-std::string Tdp::generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::string Tdp::generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+                          const std::string&                     seed) const
 {
     return tdp_imp_->generate(std::move(key), seed);
 }
-std::array<uint8_t, Tdp::kMessageSize> Tdp::generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::array<uint8_t, Tdp::kMessageSize> Tdp::generate_array(
+    Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+    const std::string&                     seed) const
 {
     return tdp_imp_->generate_array(std::move(key), seed);
 }
 
-std::string Tdp::generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::string Tdp::generate(const Prf<Tdp::kRSAPrfSize>& prf,
+                          const std::string&           seed) const
 {
-    return tdp_imp_->generate(prg, seed);
+    return tdp_imp_->generate(prf, seed);
 }
-std::array<uint8_t, Tdp::kMessageSize> Tdp::generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::array<uint8_t, Tdp::kMessageSize> Tdp::generate_array(
+    const Prf<Tdp::kRSAPrfSize>& prf,
+    const std::string&           seed) const
 {
-    return tdp_imp_->generate_array(prg, seed);
+    return tdp_imp_->generate_array(prf, seed);
 }
 
-void Tdp::eval(const std::string &in, std::string &out) const
+void Tdp::eval(const std::string& in, std::string& out) const
 {
     tdp_imp_->eval(in, out);
 }
 
-std::string Tdp::eval(const std::string &in) const
+std::string Tdp::eval(const std::string& in) const
 {
     std::string out;
     tdp_imp_->eval(in, out);
-    
+
     return out;
 }
 
-std::array<uint8_t, Tdp::kMessageSize> Tdp::eval(const std::array<uint8_t, kMessageSize> &in) const
+std::array<uint8_t, Tdp::kMessageSize> Tdp::eval(
+    const std::array<uint8_t, kMessageSize>& in) const
 {
     return tdp_imp_->eval(in);
 }
@@ -162,7 +172,8 @@ TdpInverse::TdpInverse() : tdp_inv_imp_(new TdpInverseImpl_Current())
 {
 }
 
-TdpInverse::TdpInverse(const std::string& sk) : tdp_inv_imp_(new TdpInverseImpl_Current(sk))
+TdpInverse::TdpInverse(const std::string& sk)
+    : tdp_inv_imp_(new TdpInverseImpl_Current(sk))
 {
 }
 
@@ -192,93 +203,107 @@ std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::sample_array() const
     return tdp_inv_imp_->sample_array();
 }
 
-std::string TdpInverse::generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::string TdpInverse::generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+                                 const std::string& seed) const
 {
     return tdp_inv_imp_->generate(std::move(key), seed);
 }
-std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(
+    Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+    const std::string&                     seed) const
 {
     return tdp_inv_imp_->generate_array(std::move(key), seed);
 }
 
-std::string TdpInverse::generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::string TdpInverse::generate(const Prf<Tdp::kRSAPrfSize>& prg,
+                                 const std::string&           seed) const
 {
     return tdp_inv_imp_->generate(prg, seed);
 }
-std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(
+    const Prf<Tdp::kRSAPrfSize>& prg,
+    const std::string&           seed) const
 {
     return tdp_inv_imp_->generate_array(prg, seed);
 }
 
-void TdpInverse::eval(const std::string &in, std::string &out) const
+void TdpInverse::eval(const std::string& in, std::string& out) const
 {
     tdp_inv_imp_->eval(in, out);
 }
 
-std::string TdpInverse::eval(const std::string &in) const
+std::string TdpInverse::eval(const std::string& in) const
 {
     std::string out;
     tdp_inv_imp_->eval(in, out);
-    
+
     return out;
 }
 
-std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::eval(const std::array<uint8_t, kMessageSize> &in) const
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::eval(
+    const std::array<uint8_t, kMessageSize>& in) const
 {
     return tdp_inv_imp_->eval(in);
 }
 
-void TdpInverse::invert(const std::string &in, std::string &out) const
+void TdpInverse::invert(const std::string& in, std::string& out) const
 {
     tdp_inv_imp_->invert(in, out);
 }
 
-std::string TdpInverse::invert(const std::string &in) const
+std::string TdpInverse::invert(const std::string& in) const
 {
     std::string out;
     tdp_inv_imp_->invert(in, out);
-    
+
     return out;
 }
 
-std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert(const std::array<uint8_t, kMessageSize> &in) const
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert(
+    const std::array<uint8_t, kMessageSize>& in) const
 {
     return tdp_inv_imp_->invert(in);
 }
-  
-void TdpInverse::invert_mult(const std::string &in, std::string &out, uint32_t order) const
+
+void TdpInverse::invert_mult(const std::string& in,
+                             std::string&       out,
+                             uint32_t           order) const
 {
     tdp_inv_imp_->invert_mult(in, out, order);
 }
 
-std::string TdpInverse::invert_mult(const std::string &in, uint32_t order) const
+std::string TdpInverse::invert_mult(const std::string& in, uint32_t order) const
 {
     std::string out;
     tdp_inv_imp_->invert_mult(in, out, order);
-    
+
     return out;
 }
 
-std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert_mult(const std::array<uint8_t, kMessageSize> &in, uint32_t order) const
+std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert_mult(
+    const std::array<uint8_t, kMessageSize>& in,
+    uint32_t                                 order) const
 {
     return tdp_inv_imp_->invert_mult(in, order);
 }
 
-TdpMultPool::TdpMultPool(const std::string& pk, const uint8_t size) : tdp_pool_imp_(new TdpMultPoolImpl_Current(pk, size))
+TdpMultPool::TdpMultPool(const std::string& pk, const uint8_t size)
+    : tdp_pool_imp_(new TdpMultPoolImpl_Current(pk, size))
 {
 }
-    
-TdpMultPool::TdpMultPool(const TdpMultPool& pool) :
-    tdp_pool_imp_(new TdpMultPoolImpl_Current(*dynamic_cast<const TdpMultPoolImpl_Current*>(pool.tdp_pool_imp_)))
+
+TdpMultPool::TdpMultPool(const TdpMultPool& pool)
+    : tdp_pool_imp_(new TdpMultPoolImpl_Current(
+          *dynamic_cast<const TdpMultPoolImpl_Current*>(pool.tdp_pool_imp_)))
 {
-        
 }
 
 TdpMultPool& TdpMultPool::operator=(const TdpMultPool& t)
 {
     if ((this != &t) && (tdp_pool_imp_ != t.tdp_pool_imp_)) {
         delete tdp_pool_imp_;
-        tdp_pool_imp_ = new TdpMultPoolImpl_Current(*dynamic_cast<const TdpMultPoolImpl_Current*>(t.tdp_pool_imp_));
+        tdp_pool_imp_ = new TdpMultPoolImpl_Current(
+            *dynamic_cast<const TdpMultPoolImpl_Current*>(t.tdp_pool_imp_));
     }
     return *this;
 }
@@ -305,56 +330,67 @@ std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::sample_array() const
     return tdp_pool_imp_->sample_array();
 }
 
-std::string TdpMultPool::generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::string TdpMultPool::generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+                                  const std::string& seed) const
 {
     return tdp_pool_imp_->generate(std::move(key), seed);
 }
-std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(
+    Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
+    const std::string&                     seed) const
 {
     return tdp_pool_imp_->generate_array(std::move(key), seed);
 }
 
-std::string TdpMultPool::generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::string TdpMultPool::generate(const Prf<Tdp::kRSAPrfSize>& prg,
+                                  const std::string&           seed) const
 {
     return tdp_pool_imp_->generate(prg, seed);
 }
-std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(
+    const Prf<Tdp::kRSAPrfSize>& prg,
+    const std::string&           seed) const
 {
     return tdp_pool_imp_->generate_array(prg, seed);
 }
 
-void TdpMultPool::eval(const std::string &in, std::string &out, uint8_t order) const
+void TdpMultPool::eval(const std::string& in,
+                       std::string&       out,
+                       uint8_t            order) const
 {
     tdp_pool_imp_->eval_pool(in, out, order);
 }
 
-std::string TdpMultPool::eval(const std::string &in, uint8_t order) const
+std::string TdpMultPool::eval(const std::string& in, uint8_t order) const
 {
     std::string out;
     tdp_pool_imp_->eval_pool(in, out, order);
-    
+
     return out;
 }
 
-std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(const std::array<uint8_t, kMessageSize> &in, uint8_t order) const
+std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(
+    const std::array<uint8_t, kMessageSize>& in,
+    uint8_t                                  order) const
 {
     return tdp_pool_imp_->eval_pool(in, order);
 }
-    
-void TdpMultPool::eval(const std::string &in, std::string &out) const
+
+void TdpMultPool::eval(const std::string& in, std::string& out) const
 {
     static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in, out);
 }
 
-std::string TdpMultPool::eval(const std::string &in) const
+std::string TdpMultPool::eval(const std::string& in) const
 {
     std::string out;
     static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in, out);
-    
+
     return out;
 }
 
-std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(const std::array<uint8_t, kMessageSize> &in) const
+std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(
+    const std::array<uint8_t, kMessageSize>& in) const
 {
     return static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in);
 }
@@ -363,11 +399,11 @@ uint8_t TdpMultPool::maximum_order() const
 {
     return tdp_pool_imp_->maximum_order();
 }
-    
+
 uint8_t TdpMultPool::pool_size() const
 {
     return tdp_pool_imp_->pool_size();
 }
 
-}
-}
+} // namespace crypto
+} // namespace sse

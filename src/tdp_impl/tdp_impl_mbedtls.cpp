@@ -237,7 +237,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::sample_
     
     int ret = 0;
     
-    ret = mbedtls_mpi_fill_random( &x, Tdp::kRSAPrgSize, mbedTLS_rng_wrap, nullptr );
+    ret = mbedtls_mpi_fill_random( &x, Tdp::kRSAPrfSize, mbedTLS_rng_wrap, nullptr );
     
     if (ret != 0) {
         throw std::runtime_error("Error during random TDP message generation"); /* LCOV_EXCL_LINE */
@@ -257,7 +257,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::sample_
     return out;
 }
 
-std::string TdpImpl_mbedTLS::generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::string TdpImpl_mbedTLS::generate(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const
 {
     std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> tmp = generate_array(prg, seed);
     
@@ -268,9 +268,9 @@ std::string TdpImpl_mbedTLS::generate(const Prf<Tdp::kRSAPrgSize>& prg, const st
     return out;
 }
 
-std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generate_array(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const
 {
-    std::array<uint8_t, Tdp::kRSAPrgSize> rnd = prg.prf(seed);
+    std::array<uint8_t, Tdp::kRSAPrfSize> rnd = prg.prf(seed);
     
     mbedtls_mpi x;
     mbedtls_mpi_init(&x);
@@ -299,7 +299,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generat
     return out;
 }
 
-std::string TdpImpl_mbedTLS::generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::string TdpImpl_mbedTLS::generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const
 {
     std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> tmp = generate_array(std::move(key), seed);
     
@@ -310,9 +310,9 @@ std::string TdpImpl_mbedTLS::generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key
     return out;
 }
 
-std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::generate_array(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const
 {
-    Prf<Tdp::kRSAPrgSize> prg(std::move(key));
+    Prf<Tdp::kRSAPrfSize> prg(std::move(key));
     
     return generate_array(prg, seed);
 }

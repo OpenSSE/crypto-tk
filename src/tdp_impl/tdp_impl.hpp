@@ -51,10 +51,10 @@ namespace sse
             virtual std::string sample() const = 0;
             virtual std::array<uint8_t, kMessageSpaceSize> sample_array() const = 0;
             
-            virtual std::string generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const = 0;
-            virtual std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const = 0;
-            virtual std::string generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const = 0;
-            virtual std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const = 0;
+            virtual std::string generate(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const = 0;
+            virtual std::array<uint8_t, kMessageSpaceSize> generate_array(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const = 0;
+            virtual std::string generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const = 0;
+            virtual std::array<uint8_t, kMessageSpaceSize> generate_array(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const = 0;
             
         };
         

@@ -242,21 +242,21 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::sample_
     return out;
 }
 
-std::string TdpImpl_OpenSSL::generate(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::string TdpImpl_OpenSSL::generate(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const
 {
     std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> tmp = generate_array(prg, seed);
     
     return std::string(tmp.begin(), tmp.end());
 }
     
-std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::generate_array(const Prf<Tdp::kRSAPrgSize>& prg, const std::string& seed) const
+std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::generate_array(const Prf<Tdp::kRSAPrfSize>& prg, const std::string& seed) const
 {
-    std::array<uint8_t, Tdp::kRSAPrgSize> rnd = prg.prf(seed);
+    std::array<uint8_t, Tdp::kRSAPrfSize> rnd = prg.prf(seed);
     
     BIGNUM *rnd_bn, *rnd_mod;
     BN_CTX *ctx = BN_CTX_new();
     
-    rnd_bn = BN_bin2bn(rnd.data(), Tdp::kRSAPrgSize, nullptr);
+    rnd_bn = BN_bin2bn(rnd.data(), Tdp::kRSAPrfSize, nullptr);
     
     // now, take rnd_bn mod N
     rnd_mod = BN_new();
@@ -277,16 +277,16 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::generat
     return out;
 }
 
-std::string TdpImpl_OpenSSL::generate(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::string TdpImpl_OpenSSL::generate(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const
 {
     std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> tmp = generate_array(std::move(key), seed);
     
     return std::string(tmp.begin(), tmp.end());
 }
 
-std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::generate_array(Key<Prf<Tdp::kRSAPrgSize>::kKeySize>&& key, const std::string& seed) const
+std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::generate_array(Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key, const std::string& seed) const
 {
-    Prf<Tdp::kRSAPrgSize> prg(std::move(key));
+    Prf<Tdp::kRSAPrfSize> prg(std::move(key));
     
     return generate_array(prg, seed);
 }

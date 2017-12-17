@@ -490,7 +490,7 @@ static void test_tdp_impl_deterministic_generation(const size_t test_count)
     
     std::array<uint8_t, 32> key = sse::crypto::random_bytes<uint8_t, 32>();
     std::array<uint8_t, 32> key_prf = key;
-    const sse::crypto::Prf<sse::crypto::Tdp::kRSAPrgSize> prf(sse::crypto::Key<32>(key_prf.data()));
+    const sse::crypto::Prf<sse::crypto::Tdp::kRSAPrfSize> prf(sse::crypto::Key<32>(key_prf.data()));
     
     for (size_t i = 0; i < test_count; i++) {
         std::string seed = sse::crypto::random_string(128);

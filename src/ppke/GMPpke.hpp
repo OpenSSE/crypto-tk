@@ -154,8 +154,8 @@ class GmppkePrivateKey
 public:
     GmppkePrivateKey() = default;
     ;
-    explicit GmppkePrivateKey(std::vector<GmppkePrivateKeyShare> s)
-        : shares(std::move(s)){};
+    explicit GmppkePrivateKey(const std::vector<GmppkePrivateKeyShare>& s)
+        : shares(s){};
 
     friend bool operator==(const GmppkePrivateKey& l, const GmppkePrivateKey& r)
     {

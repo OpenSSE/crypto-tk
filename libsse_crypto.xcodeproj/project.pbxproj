@@ -142,6 +142,7 @@
 		31DEB77C1FE6B94200CD0F92 /* test_mbedtls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966B31FB8BCF400051179 /* test_mbedtls.cpp */; };
 		31DEB77D1FE6B95400CD0F92 /* bench_set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7301FE6B89A00CD0F92 /* bench_set_hash.cpp */; };
 		31DEB77F1FE6E00100CD0F92 /* benchmarks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */; };
+		31DEB7811FE6FA2100CD0F92 /* bench_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
 		6CC2D4861C31889B00334ADD /* prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* prp.cpp */; };
@@ -357,6 +358,7 @@
 		31DEB7311FE6B89A00CD0F92 /* build.scons */ = {isa = PBXFileReference; lastKnownFileType = text; path = build.scons; sourceTree = "<group>"; };
 		31DEB7721FE6B91F00CD0F92 /* bench */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bench; sourceTree = BUILT_PRODUCTS_DIR; };
 		31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = benchmarks.cpp; sourceTree = "<group>"; };
+		31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bench_tdp.cpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6CC2D3FD1C3185D700334ADD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -542,6 +544,7 @@
 			children = (
 				31DEB7311FE6B89A00CD0F92 /* build.scons */,
 				31DEB7301FE6B89A00CD0F92 /* bench_set_hash.cpp */,
+				31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */,
 			);
 			path = bench;
 			sourceTree = "<group>";
@@ -1003,6 +1006,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				31DEB7401FE6B91F00CD0F92 /* pk.c in Sources */,
+				31DEB7811FE6FA2100CD0F92 /* bench_tdp.cpp in Sources */,
 				31DEB7411FE6B91F00CD0F92 /* blake2b.cpp in Sources */,
 				31DEB7441FE6B91F00CD0F92 /* asn1write.c in Sources */,
 				31DEB7461FE6B91F00CD0F92 /* base64.c in Sources */,

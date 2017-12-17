@@ -84,8 +84,8 @@ class Key
     template<size_t K_SIZE>
     friend void tests::prg_test_key_derivation_consistency(); // NOLINT
     template<size_t L>
-    friend void
-    tests::test_key_derivation_consistency(size_t input_size); // NOLINT
+    friend void tests::test_key_derivation_consistency(
+        size_t input_size); // NOLINT
     template<size_t L, size_t M>
     friend void tests::test_key_derivation_consistency_array(); // NOLINT
 
@@ -109,9 +109,9 @@ public:
         random_bytes(N, content_);
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
-            throw std::runtime_error( /* LCOV_EXCL_LINE */
-                "Error when locking memory: "
-                + std::string(strerror(errno))); 
+            throw std::runtime_error(/* LCOV_EXCL_LINE */
+                                     "Error when locking memory: "
+                                     + std::string(strerror(errno)));
         }
         is_locked_ = true;
     }
@@ -145,9 +145,9 @@ public:
 
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
-            throw std::runtime_error( /* LCOV_EXCL_LINE */
-                "Error when locking memory: "
-                + std::string(strerror(errno))); 
+            throw std::runtime_error(/* LCOV_EXCL_LINE */
+                                     "Error when locking memory: "
+                                     + std::string(strerror(errno)));
         }
         is_locked_ = true;
     }
@@ -250,9 +250,9 @@ private:
 
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
-            throw std::runtime_error( /* LCOV_EXCL_LINE */
-                "Error when locking memory: "
-                + std::string(strerror(errno))); 
+            throw std::runtime_error(/* LCOV_EXCL_LINE */
+                                     "Error when locking memory: "
+                                     + std::string(strerror(errno)));
         }
         is_locked_ = true;
     }
@@ -269,9 +269,9 @@ private:
         if (content_ != nullptr && !is_locked_) {
             int err = sodium_mprotect_noaccess(content_);
             if (err == -1 && errno != ENOSYS) {
-                throw std::runtime_error( /* LCOV_EXCL_LINE */
-                    "Error when locking memory: "
-                    + std::string(strerror(errno))); 
+                throw std::runtime_error(/* LCOV_EXCL_LINE */
+                                         "Error when locking memory: "
+                                         + std::string(strerror(errno)));
             }
             is_locked_ = true;
         }
@@ -289,9 +289,9 @@ private:
         if (content_ != nullptr && is_locked_) {
             int err = sodium_mprotect_readonly(content_);
             if (err == -1 && errno != ENOSYS) {
-                throw std::runtime_error( /* LCOV_EXCL_LINE */
-                    "Error when locking memory: "
-                    + std::string(strerror(errno))); 
+                throw std::runtime_error(/* LCOV_EXCL_LINE */
+                                         "Error when locking memory: "
+                                         + std::string(strerror(errno)));
             }
             is_locked_ = false;
         }

@@ -137,7 +137,7 @@ public:
     static size_t plaintext_length(const size_t c_len) noexcept;
 
 private:
-	/// @class CipherImpl
+    /// @class CipherImpl
     /// @brief Hidden Cipher implementation
     class CipherImpl;
     CipherImpl* cipher_imp_; // opaque pointer

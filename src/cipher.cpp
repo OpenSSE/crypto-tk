@@ -62,11 +62,13 @@ public:
         return 0;
     };
 
-    void
-         encrypt(const unsigned char* in, const size_t& len, unsigned char* out);
+    void encrypt(const unsigned char* in,
+                 const size_t&        len,
+                 unsigned char*       out);
     void encrypt(const std::string& in, std::string& out);
-    void
-         decrypt(const unsigned char* in, const size_t& len, unsigned char* out);
+    void decrypt(const unsigned char* in,
+                 const size_t&        len,
+                 unsigned char*       out);
     void decrypt(const std::string& in, std::string& out);
 
 private:

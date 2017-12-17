@@ -49,7 +49,7 @@ static void prg_derivation(const unsigned char* key,
     if (out == nullptr) {
         throw std::invalid_argument("out is NULL");
     }
-    
+
     if (len == 0) {
         return; /* LCOV_EXCL_LINE */
     }
@@ -113,7 +113,7 @@ public:
     inline void derive(const uint32_t offset,
                        const size_t   len,
                        unsigned char* out) const;
-    
+
     inline void derive(const uint32_t offset,
                        const size_t   len,
                        std::string&   out) const;
@@ -257,7 +257,7 @@ void Prg::PrgImpl::derive(Key<kKeySize>&& k,
     if (k.is_empty()) {
         throw std::invalid_argument("PRG input key is empty");
     }
-    
+
     Key<kKeySize> local_key(
         std::move(k)); // make sure the input key cannot be reused
 

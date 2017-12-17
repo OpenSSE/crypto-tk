@@ -160,7 +160,7 @@ public:
     /// @param out      The output string.
     ///
     static void derive(Key<kKeySize>&& k, const size_t len, std::string& out);
- 
+
     ///
     /// @brief Generate a pseudorandom string from the input seed
     ///
@@ -269,7 +269,6 @@ public:
     std::vector<Key<K>> derive_keys(const uint16_t n_keys,
                                     const uint16_t key_offset = 0);
 
-    
 
     ///
     /// @brief Derive a key from a seed
@@ -332,7 +331,7 @@ public:
     {
         derive(std::move(k), offset, N, out.data());
     }
-    
+
 
 private:
     class PrgImpl;     // not defined in the header

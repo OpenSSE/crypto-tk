@@ -59,7 +59,7 @@ class Prf
 public:
     /// @brief PRF key size (in bytes)
     static constexpr uint8_t kKeySize = 32;
-    
+
     static_assert(kKeySize <= Hash::kBlockSize,
                   "The PRF key is too large for the hash block size");
 
@@ -185,8 +185,8 @@ public:
 private:
     /// @internal
     /// @brief Inner implementation of the PRF
-    using PrfBase                     = HMac<Hash, kKeySize>;
-    
+    using PrfBase = HMac<Hash, kKeySize>;
+
     PrfBase base_;
 };
 
@@ -224,12 +224,15 @@ std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in,
                 base_.hmac(
                     tmp, length + 1, result.data() + pos, PrfBase::kDigestSize);
             } else {
-                base_.hmac(tmp, length + 1, result.data() + pos, (size_t)(NBYTES - pos));
+                base_.hmac(tmp,
+                           length + 1,
+                           result.data() + pos,
+                           (size_t)(NBYTES - pos));
             }
         }
-        
+
         sodium_memzero(tmp, length + 1);
-        delete [] tmp;
+        delete[] tmp;
     } else if (NBYTES <= Hash::kDigestSize) {
         // only need one output bloc of PrfBase.
         base_.hmac(in, length, result.data(), result.size());

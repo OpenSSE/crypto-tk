@@ -48,14 +48,13 @@ namespace crypto {
 class SetHash
 {
 public:
-    
     ///
     /// @brief Constructor
     ///
     /// Creates and initializes a SetHash for an empty set.
     ///
     SetHash();
-    
+
     ///
     /// @brief Constructor
     ///
@@ -86,7 +85,7 @@ public:
     /// @param in_set   The elements to be hashed.
     ///
     explicit SetHash(const std::vector<std::string>& in_set);
-    
+
     ///
     /// @brief Destructor
     ///
@@ -100,7 +99,7 @@ public:
     ///
     /// @param in   The element to insert
     ///
-    void    add_element(const std::string& in);
+    void add_element(const std::string& in);
 
     ///
     /// @brief Compute the hash of a union
@@ -110,9 +109,9 @@ public:
     ///
     /// @param h    The set hash of the set to insert in the target object
     ///
-    void    add_set(const SetHash& h);
-    
-    
+    void add_set(const SetHash& h);
+
+
     ///
     /// @brief Remove an element of the set hash
     ///
@@ -121,7 +120,7 @@ public:
     ///
     /// @param in   The element to insert
     ///
-    void    remove_element(const std::string& in);
+    void remove_element(const std::string& in);
 
     ///
     /// @brief Compute the hash of a set difference
@@ -131,7 +130,7 @@ public:
     ///
     /// @param h    The set hash of the set to remove from the target object
     ///
-    void    remove_set(const SetHash& h);
+    void remove_set(const SetHash& h);
 
     ///
     /// @brief Hexadecimal representation of the SetHash
@@ -143,7 +142,7 @@ public:
     ///
     std::string hex() const;
 
-    
+
     ///
     /// @brief Stream serialization operator
     ///
@@ -155,22 +154,22 @@ public:
     /// @return     The stream os
     ///
     friend std::ostream& operator<<(std::ostream& os, const SetHash& h);
-    
+
     ///
     /// @brief Assignment operator
     ///
     /// @param h    The element to assign
     /// @return     The assigned object
     ///
-    SetHash&             operator=(const SetHash& h);
-    
+    SetHash& operator=(const SetHash& h);
+
     ///
     /// @brief Comparison operator
     ///
     /// @param h    The element to compare
     /// @return     true if h and the object have the same hash, false otherwise
     ///
-    bool                 operator==(const SetHash& h) const;
+    bool operator==(const SetHash& h) const;
 
     ///
     /// @brief Comparison operator
@@ -178,7 +177,7 @@ public:
     /// @return     false if h and the object have the same hash,
     ///             true otherwise
     ///
-    bool                 operator!=(const SetHash& h) const;
+    bool operator!=(const SetHash& h) const;
 
 private:
     class SetHashImpl;          // not defined in the header

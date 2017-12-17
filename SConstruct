@@ -256,7 +256,7 @@ bench_objects = SConscript('bench/build.scons', exports=['bench_env','smart_conc
 
 Clean(bench_objects, 'build_bench')
 
-bench_prog = bench_env.Program('benchmarks', objects + bench_objects)
+bench_prog = bench_env.Program('benchmarks', ['benchmarks.cpp'] + objects + bench_objects)
 
 bench_env.Alias('bench', [bench_prog])
 

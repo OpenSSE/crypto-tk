@@ -94,5 +94,20 @@ public:
 
 #define EVAL_BENCH(LIB) EVAL_BENCH_AUX(LIB, LIB##_Impl)
 
+#define INVERT_BENCH_AUX(NAME, IMPL)                                           \
+    BENCHMARK_TEMPLATE_DEFINE_F(Tdp_Benchmark, NAME##_invert, IMPL)            \
+    (benchmark::State & st)                                                    \
+    {                                                                          \
+        for (auto _ : st) {                                                    \
+            tdp_inv_.invert(message, message);                                 \
+        }                                                                      \
+    }                                                                          \
+    BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_invert);
+
+#define INVERT_BENCH(LIB) INVERT_BENCH_AUX(LIB, LIB##_Impl)
+
 EVAL_BENCH(mbedTLS);
 EVAL_BENCH(OpenSSL);
+
+INVERT_BENCH(mbedTLS);
+INVERT_BENCH(OpenSSL);

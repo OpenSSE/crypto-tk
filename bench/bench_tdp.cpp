@@ -20,53 +20,79 @@
 
 #include <benchmark/benchmark.h>
 
-#include "tdp_impl/tdp_impl_openssl.hpp"
 #include "tdp_impl/tdp_impl_mbedtls.hpp"
+#include "tdp_impl/tdp_impl_openssl.hpp"
 
 using sse::crypto::TdpImpl_mbedTLS;
-using sse::crypto::TdpInverseImpl_mbedTLS;
 using sse::crypto::TdpImpl_OpenSSL;
+using sse::crypto::TdpInverseImpl_mbedTLS;
 using sse::crypto::TdpInverseImpl_OpenSSL;
+using sse::crypto::TdpMultPoolImpl_mbedTLS;
+using sse::crypto::TdpMultPoolImpl_OpenSSL;
 
-template <class TDP_INV>
+
+template<class TDP_INV>
 void tdp_key_generation(benchmark::State& state)
 {
-    for (auto _ : state){
+    for (auto _ : state) {
         TDP_INV sk_tdp;
         benchmark::DoNotOptimize(sk_tdp);
     }
 }
 
-BENCHMARK_TEMPLATE(tdp_key_generation, TdpInverseImpl_mbedTLS)->Unit(benchmark::kMicrosecond)->Iterations(20);
-BENCHMARK_TEMPLATE(tdp_key_generation, TdpInverseImpl_OpenSSL)->Unit(benchmark::kMicrosecond)->Iterations(20);
+BENCHMARK_TEMPLATE(tdp_key_generation, TdpInverseImpl_mbedTLS)
+    ->Unit(benchmark::kMicrosecond)
+    ->Iterations(20);
+BENCHMARK_TEMPLATE(tdp_key_generation, TdpInverseImpl_OpenSSL)
+    ->Unit(benchmark::kMicrosecond)
+    ->Iterations(20);
 
-template<typename TDP_INV>
-class Tdp_Benchmark : public benchmark::Fixture {
+
+struct OpenSSL_Impl
+{
+    typedef TdpImpl_OpenSSL         TdpImpl;
+    typedef TdpInverseImpl_OpenSSL  TdpInverseImpl;
+    typedef TdpMultPoolImpl_OpenSSL TdpMultPoolImpl;
+};
+
+struct mbedTLS_Impl
+{
+    typedef TdpImpl_mbedTLS         TdpImpl;
+    typedef TdpInverseImpl_mbedTLS  TdpInverseImpl;
+    typedef TdpMultPoolImpl_mbedTLS TdpMultPoolImpl;
+};
+
+template<typename IMPL>
+class Tdp_Benchmark : public benchmark::Fixture
+{
 public:
+    Tdp_Benchmark()
+        : tdp_inv_(), tdp_(tdp_inv_.public_key()),
+          tdp_mult_(tdp_inv_.public_key(), 4)
+    {
+    }
     void SetUp(const ::benchmark::State& state)
     {
         message = tdp_.sample();
     }
-    void eval()
-    {
-        tdp_.eval(message,message);
-    }
-    
-    
-    std::string message;
-    TDP_INV tdp_;
+
+    std::string                    message;
+    typename IMPL::TdpInverseImpl  tdp_inv_;
+    typename IMPL::TdpImpl         tdp_;
+    typename IMPL::TdpMultPoolImpl tdp_mult_;
 };
 
-#define EVAL_BENCH(NAME,TDP_INV_IMPL) \
-BENCHMARK_TEMPLATE_DEFINE_F(Tdp_Benchmark, NAME##_eval, TDP_INV_IMPL)(benchmark::State& st) { \
-    for (auto _ : st) { \
-        eval(); \
-    } \
-} \
-BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_eval);
+#define EVAL_BENCH_AUX(NAME, IMPL)                                             \
+    BENCHMARK_TEMPLATE_DEFINE_F(Tdp_Benchmark, NAME##_eval, IMPL)              \
+    (benchmark::State & st)                                                    \
+    {                                                                          \
+        for (auto _ : st) {                                                    \
+            tdp_.eval(message, message);                                       \
+        }                                                                      \
+    }                                                                          \
+    BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_eval);
 
+#define EVAL_BENCH(LIB) EVAL_BENCH_AUX(LIB, LIB##_Impl)
 
-EVAL_BENCH(mbedTLS,TdpInverseImpl_mbedTLS);
-EVAL_BENCH(OpenSSL,TdpInverseImpl_OpenSSL);
-
-
+EVAL_BENCH(mbedTLS);
+EVAL_BENCH(OpenSSL);

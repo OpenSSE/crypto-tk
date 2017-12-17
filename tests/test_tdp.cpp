@@ -445,9 +445,9 @@ static void test_tdp_impl_copy(const size_t test_count)
         }
         
         // for the pools, also check that they have the same size
-        ASSERT_EQ(tdp_pool_copy.pool_size(), tdp_pool.pool_size());
+        ASSERT_EQ(tdp_pool_copy.maximum_order(), tdp_pool.maximum_order());
         if (!is_implementation) {
-            ASSERT_EQ(tdp_pool_assign.pool_size(), tdp_pool.pool_size());
+            ASSERT_EQ(tdp_pool_assign.maximum_order(), tdp_pool.maximum_order());
         }
         
         std::array<uint8_t, 32> key = sse::crypto::random_bytes<uint8_t, 32>();

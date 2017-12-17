@@ -108,7 +108,6 @@ namespace crypto
         void eval_pool(const std::string &in, std::string &out, const uint8_t order) const override;
         
         uint8_t maximum_order() const override;
-        uint8_t pool_size() const override;
     private:
         RSA **keys_;
 

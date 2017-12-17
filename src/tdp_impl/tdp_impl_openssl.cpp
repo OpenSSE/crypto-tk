@@ -623,10 +623,6 @@ uint8_t TdpMultPoolImpl_OpenSSL::maximum_order() const
 {
     return keys_count_+1;
 }
-uint8_t TdpMultPoolImpl_OpenSSL::pool_size() const
-{
-    return keys_count_+1;
-}
 
 }
 }

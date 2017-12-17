@@ -215,16 +215,16 @@ std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(
     return tdp_inv_imp_->generate_array(std::move(key), seed);
 }
 
-std::string TdpInverse::generate(const Prf<Tdp::kRSAPrfSize>& prg,
+std::string TdpInverse::generate(const Prf<Tdp::kRSAPrfSize>& prf,
                                  const std::string&           seed) const
 {
-    return tdp_inv_imp_->generate(prg, seed);
+    return tdp_inv_imp_->generate(prf, seed);
 }
 std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::generate_array(
-    const Prf<Tdp::kRSAPrfSize>& prg,
+    const Prf<Tdp::kRSAPrfSize>& prf,
     const std::string&           seed) const
 {
-    return tdp_inv_imp_->generate_array(prg, seed);
+    return tdp_inv_imp_->generate_array(prf, seed);
 }
 
 void TdpInverse::eval(const std::string& in, std::string& out) const
@@ -342,16 +342,16 @@ std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(
     return tdp_pool_imp_->generate_array(std::move(key), seed);
 }
 
-std::string TdpMultPool::generate(const Prf<Tdp::kRSAPrfSize>& prg,
+std::string TdpMultPool::generate(const Prf<Tdp::kRSAPrfSize>& prf,
                                   const std::string&           seed) const
 {
-    return tdp_pool_imp_->generate(prg, seed);
+    return tdp_pool_imp_->generate(prf, seed);
 }
 std::array<uint8_t, TdpMultPool::kMessageSize> TdpMultPool::generate_array(
-    const Prf<Tdp::kRSAPrfSize>& prg,
+    const Prf<Tdp::kRSAPrfSize>& prf,
     const std::string&           seed) const
 {
-    return tdp_pool_imp_->generate_array(prg, seed);
+    return tdp_pool_imp_->generate_array(prf, seed);
 }
 
 void TdpMultPool::eval(const std::string& in,
@@ -398,11 +398,6 @@ std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(
 uint8_t TdpMultPool::maximum_order() const
 {
     return tdp_pool_imp_->maximum_order();
-}
-
-uint8_t TdpMultPool::pool_size() const
-{
-    return tdp_pool_imp_->pool_size();
 }
 
 } // namespace crypto

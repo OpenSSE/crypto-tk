@@ -799,10 +799,6 @@ uint8_t TdpMultPoolImpl_mbedTLS::maximum_order() const
 {
     return keys_count_+1;
 }
-uint8_t TdpMultPoolImpl_mbedTLS::pool_size() const
-{
-    return keys_count_+1;
-}
     
 }
 }

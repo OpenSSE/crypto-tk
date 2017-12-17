@@ -80,7 +80,6 @@ namespace sse
             virtual void eval_pool(const std::string &in, std::string &out, const uint8_t order) const = 0;
             
             virtual uint8_t maximum_order() const = 0;
-            virtual uint8_t pool_size() const = 0;
         };
         
         

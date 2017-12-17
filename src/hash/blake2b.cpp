@@ -20,28 +20,26 @@
 
 #include "blake2b.hpp"
 
-#include <sodium/crypto_generichash_blake2b.h>
-
 #include <cstdint>
+
+#include <sodium/crypto_generichash_blake2b.h>
 
 using namespace std;
 
 
+namespace sse {
 
-namespace sse
-{
-	
-namespace crypto
-{
+namespace crypto {
 
-namespace hash
-{
-	
-void blake2b::hash(const unsigned char *in, const size_t len, unsigned char *digest)
+namespace hash {
+
+void blake2b::hash(const unsigned char* in,
+                   const size_t         len,
+                   unsigned char*       digest)
 {
     crypto_generichash_blake2b(digest, kDigestSize, in, len, nullptr, 0);
 }
 
-}
-}
-}
+} // namespace hash
+} // namespace crypto
+} // namespace sse

@@ -20,28 +20,26 @@
 
 #include "sha512.hpp"
 
-#include <sodium/crypto_hash_sha512.h>
-
 #include <cstdint>
+
+#include <sodium/crypto_hash_sha512.h>
 
 using namespace std;
 
 
+namespace sse {
 
-namespace sse
-{
-	
-namespace crypto
-{
+namespace crypto {
 
-namespace hash
-{
-	
-void sha512::hash(const unsigned char *in, const size_t len, unsigned char *digest)
+namespace hash {
+
+void sha512::hash(const unsigned char* in,
+                  const size_t         len,
+                  unsigned char*       digest)
 {
     crypto_hash_sha512(digest, in, len);
 }
 
-}
-}
-}
+} // namespace hash
+} // namespace crypto
+} // namespace sse

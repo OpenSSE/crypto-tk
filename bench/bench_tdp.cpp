@@ -89,6 +89,7 @@ public:
         for (auto _ : st) {                                                    \
             tdp_.eval(message, message);                                       \
         }                                                                      \
+        st.SetItemsProcessed(int64_t(st.iterations()));                        \
     }                                                                          \
     BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_eval);
 
@@ -101,6 +102,7 @@ public:
         for (auto _ : st) {                                                    \
             tdp_inv_.invert(message, message);                                 \
         }                                                                      \
+        st.SetItemsProcessed(int64_t(st.iterations()));                        \
     }                                                                          \
     BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_invert);
 

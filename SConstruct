@@ -124,6 +124,12 @@ if conf.CheckLib( 'crypto' ):
 else:
     conf.env['HAS_OPENSSL'] = False
 
+if conf.CheckLibWithHeader( 'benchmark', 'benchmark/benchmark.h', 'CXX' ):
+    conf.env['HAS_GBench'] = True
+else:
+    conf.env['HAS_GBench'] = False
+
+
 env = conf.Finish()
 
 ## Read the arguments passed to the building script
@@ -247,19 +253,23 @@ else:
 test_env.Clean('check', ['check'] + objects)
 
 
-# Setup for the testing environment
+# Setup for the benchmarking environment
 
-bench_env = env.Clone()
-bench_env.Append(LIBS = ['benchmark'])
+if env["HAS_GBench"]:
+    bench_env = env.Clone()
+    bench_env.Append(LIBS = ['benchmark'])
 
-bench_objects = SConscript('bench/build.scons', exports=['bench_env','smart_concat'], variant_dir='build_bench', duplicate=0)
+    bench_objects = SConscript('bench/build.scons', exports=['bench_env','smart_concat'], variant_dir='build_bench', duplicate=0)
 
-Clean(bench_objects, 'build_bench')
+    Clean(bench_objects, 'build_bench')
 
-bench_prog = bench_env.Program('benchmarks', ['benchmarks.cpp'] + objects + bench_objects)
+    bench_prog = bench_env.Program('benchmarks', ['benchmarks.cpp'] + objects + bench_objects)
 
-bench_env.Alias('bench', [bench_prog])
+    bench_env.Alias('bench', [bench_prog])
 
-bench_env.Clean('bench', ['benchmarks'] + objects)
-
+    bench_env.Clean('bench', ['benchmarks'] + objects)
+else:
+    if 'bench' in COMMAND_LINE_TARGETS:
+        print("The benchmark target is unavailable: the Google Benchmark library is not installed")
+        exit(-1)
 

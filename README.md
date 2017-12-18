@@ -114,6 +114,9 @@ Three targets can be built:
 
 * `doc`: build the documentation (requires [Doxygen](http://www.doxygen.org/)).
 
+* `bench`: runs some benchmarks (requires [Google Benchmark](https://github.com/google/benchmark), which can be easily installed on Mac OS using Homebrew: ``brew install google-benchmark``).
+
+
 To build the library, just enter in your terminal
 ``scons lib``.
 

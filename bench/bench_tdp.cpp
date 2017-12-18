@@ -32,7 +32,7 @@ using sse::crypto::TdpMultPoolImpl_OpenSSL;
 
 
 template<class TDP_INV>
-void tdp_key_generation(benchmark::State& state)
+void Tdp_key_generation(benchmark::State& state)
 {
     for (auto _ : state) {
         TDP_INV sk_tdp;
@@ -40,10 +40,12 @@ void tdp_key_generation(benchmark::State& state)
     }
 }
 
-BENCHMARK_TEMPLATE(tdp_key_generation, TdpInverseImpl_mbedTLS)
+#define MAX_POOL_SIZE 0x7E
+
+BENCHMARK_TEMPLATE(Tdp_key_generation, TdpInverseImpl_mbedTLS)
     ->Unit(benchmark::kMicrosecond)
     ->Iterations(20);
-BENCHMARK_TEMPLATE(tdp_key_generation, TdpInverseImpl_OpenSSL)
+BENCHMARK_TEMPLATE(Tdp_key_generation, TdpInverseImpl_OpenSSL)
     ->Unit(benchmark::kMicrosecond)
     ->Iterations(20);
 
@@ -68,7 +70,7 @@ class Tdp_Benchmark : public benchmark::Fixture
 public:
     Tdp_Benchmark()
         : tdp_inv_(), tdp_(tdp_inv_.public_key()),
-          tdp_mult_(tdp_inv_.public_key(), 4)
+          tdp_mult_(tdp_inv_.public_key(), MAX_POOL_SIZE)
     {
     }
     void SetUp(const ::benchmark::State& state)
@@ -95,6 +97,22 @@ public:
 
 #define EVAL_BENCH(LIB) EVAL_BENCH_AUX(LIB, LIB##_Impl)
 
+#define EVAL_MULT_BENCH_AUX(NAME, IMPL)                                        \
+    BENCHMARK_TEMPLATE_DEFINE_F(Tdp_Benchmark, NAME##_eval_mult, IMPL)         \
+    (benchmark::State & st)                                                    \
+    {                                                                          \
+        for (auto _ : st) {                                                    \
+            tdp_mult_.eval_pool(message, message, st.range(0));                \
+        }                                                                      \
+        st.SetItemsProcessed(int64_t(st.iterations()));                        \
+    }                                                                          \
+    BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_eval_mult)                      \
+        ->RangeMultiplier(2)                                                   \
+        ->Range(1, MAX_POOL_SIZE);
+
+#define EVAL_MULT_BENCH(LIB) EVAL_MULT_BENCH_AUX(LIB, LIB##_Impl)
+
+
 #define INVERT_BENCH_AUX(NAME, IMPL)                                           \
     BENCHMARK_TEMPLATE_DEFINE_F(Tdp_Benchmark, NAME##_invert, IMPL)            \
     (benchmark::State & st)                                                    \
@@ -104,12 +122,33 @@ public:
         }                                                                      \
         st.SetItemsProcessed(int64_t(st.iterations()));                        \
     }                                                                          \
-    BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_invert);
+    BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_invert)
 
 #define INVERT_BENCH(LIB) INVERT_BENCH_AUX(LIB, LIB##_Impl)
+
+#define INVERT_MULT_BENCH_AUX(NAME, IMPL)                                      \
+    BENCHMARK_TEMPLATE_DEFINE_F(Tdp_Benchmark, NAME##_invert_mult, IMPL)       \
+    (benchmark::State & st)                                                    \
+    {                                                                          \
+        for (auto _ : st) {                                                    \
+            tdp_inv_.invert_mult(message, message, st.range(0));               \
+        }                                                                      \
+        st.SetItemsProcessed(int64_t(st.iterations()));                        \
+    }                                                                          \
+    BENCHMARK_REGISTER_F(Tdp_Benchmark, NAME##_invert_mult)                    \
+        ->RangeMultiplier(2)                                                   \
+        ->Range(1, 32);
+
+#define INVERT_MULT_BENCH(LIB) INVERT_MULT_BENCH_AUX(LIB, LIB##_Impl)
 
 EVAL_BENCH(mbedTLS);
 EVAL_BENCH(OpenSSL);
 
+EVAL_MULT_BENCH(mbedTLS);
+EVAL_MULT_BENCH(OpenSSL);
+
 INVERT_BENCH(mbedTLS);
 INVERT_BENCH(OpenSSL);
+
+INVERT_MULT_BENCH(mbedTLS);
+INVERT_MULT_BENCH(OpenSSL);

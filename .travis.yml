@@ -1,6 +1,7 @@
 branches:
    except:
      - doc
+     - benchmarks
 
 language: cpp
 

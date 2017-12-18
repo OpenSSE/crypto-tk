@@ -25,13 +25,11 @@
 		310C2BEB1EC0B98E00E80B3A /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BE41EC0B6D800E80B3A /* util.cpp */; };
 		310C2BEC1EC0B99300E80B3A /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
 		3114009B1F9E628C0025DE3A /* key.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 311400971F9E628C0025DE3A /* key.hpp */; };
-		311934B51D27172A0031804B /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
 		311E94871FE2F5D600E01869 /* hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E94861FE2F5D600E01869 /* hmac.cpp */; };
 		311E94881FE2F5D600E01869 /* hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E94861FE2F5D600E01869 /* hmac.cpp */; };
 		311E948A1FE3BF4800E01869 /* prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E94891FE3BF4800E01869 /* prf.cpp */; };
 		311E948B1FE3BF4800E01869 /* prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E94891FE3BF4800E01869 /* prf.cpp */; };
 		311E948C1FE3BF4800E01869 /* prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E94891FE3BF4800E01869 /* prf.cpp */; };
-		313CD4531EC719DD0058A0C5 /* test_ppke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD4511EC719DD0058A0C5 /* test_ppke.cpp */; };
 		313CD48D1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
 		313CD48E1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
 		313CD48F1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
@@ -39,7 +37,6 @@
 		314863CF1FB71E9E009FE78B /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
 		314863D01FB71E9E009FE78B /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
 		314863D11FB71E9E009FE78B /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
-		315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
 		3163D3941ED33C8E00A7FCD9 /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */; };
 		316F0D3F1D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
 		316F0D401D25600700F87904 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
@@ -87,7 +84,6 @@
 		319966B01FB8AE7200051179 /* pk_wrap.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966AF1FB8AE7200051179 /* pk_wrap.c */; };
 		319966B11FB8AE7200051179 /* pk_wrap.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966AF1FB8AE7200051179 /* pk_wrap.c */; };
 		319966B21FB8AE7200051179 /* pk_wrap.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966AF1FB8AE7200051179 /* pk_wrap.c */; };
-		319966B41FB8BCF400051179 /* test_mbedtls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966B31FB8BCF400051179 /* test_mbedtls.cpp */; };
 		319966B71FBC2E9800051179 /* rsa_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966B51FBC2E9800051179 /* rsa_io.c */; };
 		319966B81FBC2E9800051179 /* rsa_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966B51FBC2E9800051179 /* rsa_io.c */; };
 		319966B91FBC2E9800051179 /* rsa_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966B51FBC2E9800051179 /* rsa_io.c */; };
@@ -101,7 +97,52 @@
 		319966CC1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */; };
 		319966CD1FBEE9D500051179 /* tdp_impl_openssl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 319966C51FBEE9D400051179 /* tdp_impl_openssl.hpp */; };
 		319966CF1FBEF1CA00051179 /* tdp_impl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 319966CE1FBEF1CA00051179 /* tdp_impl.hpp */; };
-		31B5489A1FB336AE00E17DD3 /* test_prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31B548991FB336AE00E17DD3 /* test_prf.cpp */; };
+		31DEB7401FE6B91F00CD0F92 /* pk.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966841FB8A72D00051179 /* pk.c */; };
+		31DEB7411FE6B91F00CD0F92 /* blake2b.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310B644C1FCCC3410015FBEE /* blake2b.cpp */; };
+		31DEB7441FE6B91F00CD0F92 /* asn1write.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966761FB8A72B00051179 /* asn1write.c */; };
+		31DEB7461FE6B91F00CD0F92 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966AA1FB8AA1C00051179 /* base64.c */; };
+		31DEB7471FE6B91F00CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4601C3185D700334ADD /* set_hash.cpp */; };
+		31DEB7481FE6B91F00CD0F92 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
+		31DEB7491FE6B91F00CD0F92 /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
+		31DEB74A1FE6B91F00CD0F92 /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
+		31DEB74B1FE6B91F00CD0F92 /* pk_wrap.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966AF1FB8AE7200051179 /* pk_wrap.c */; };
+		31DEB74C1FE6B91F00CD0F92 /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
+		31DEB74D1FE6B91F00CD0F92 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
+		31DEB74E1FE6B91F00CD0F92 /* GLS254.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D40D1C3185D700334ADD /* GLS254.cpp */; };
+		31DEB74F1FE6B91F00CD0F92 /* random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45E1C3185D700334ADD /* random.cpp */; };
+		31DEB7501FE6B91F00CD0F92 /* pkparse.c in Sources */ = {isa = PBXBuildFile; fileRef = 3199667C1FB8A72C00051179 /* pkparse.c */; };
+		31DEB7511FE6B91F00CD0F92 /* pem.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966801FB8A72C00051179 /* pem.c */; };
+		31DEB7531FE6B91F00CD0F92 /* hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E94861FE2F5D600E01869 /* hmac.cpp */; };
+		31DEB7541FE6B91F00CD0F92 /* prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311E94891FE3BF4800E01869 /* prf.cpp */; };
+		31DEB7551FE6B91F00CD0F92 /* bignum.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966751FB8A72B00051179 /* bignum.c */; };
+		31DEB7561FE6B91F00CD0F92 /* gtest-all.cc in Sources */ = {isa = PBXBuildFile; fileRef = 3163D3921ED33C8E00A7FCD9 /* gtest-all.cc */; };
+		31DEB7581FE6B91F00CD0F92 /* rsa_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966B51FBC2E9800051179 /* rsa_io.c */; };
+		31DEB75A1FE6B91F00CD0F92 /* tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 318C72991C9730140040AEE7 /* tdp.cpp */; };
+		31DEB75E1FE6B91F00CD0F92 /* hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45A1C3185D700334ADD /* hash.cpp */; };
+		31DEB75F1FE6B91F00CD0F92 /* aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4011C3185D700334ADD /* aez.c */; };
+		31DEB7611FE6B91F00CD0F92 /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BE41EC0B6D800E80B3A /* util.cpp */; };
+		31DEB7621FE6B91F00CD0F92 /* prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* prp.cpp */; };
+		31DEB7631FE6B91F00CD0F92 /* tdp_impl_mbedtls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C21FBEE9D400051179 /* tdp_impl_mbedtls.cpp */; };
+		31DEB7641FE6B91F00CD0F92 /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
+		31DEB7651FE6B91F00CD0F92 /* asn1parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966781FB8A72C00051179 /* asn1parse.c */; };
+		31DEB7661FE6B91F00CD0F92 /* tdp_impl_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */; };
+		31DEB7671FE6B91F00CD0F92 /* GF2_127_63.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */; };
+		31DEB7681FE6B91F00CD0F92 /* rsa.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966771FB8A72C00051179 /* rsa.c */; };
+		31DEB76A1FE6B91F00CD0F92 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
+		31DEB76B1FE6B91F00CD0F92 /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
+		31DEB7731FE6B94200CD0F92 /* encryption.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4641C3185D700334ADD /* encryption.cpp */; };
+		31DEB7741FE6B94200CD0F92 /* hashing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4661C3185D700334ADD /* hashing.cpp */; };
+		31DEB7751FE6B94200CD0F92 /* test_ecmh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4681C3185D700334ADD /* test_ecmh.cpp */; };
+		31DEB7761FE6B94200CD0F92 /* test_prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46A1C3185D700334ADD /* test_prp.cpp */; };
+		31DEB7771FE6B94200CD0F92 /* test_hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46C1C3185D700334ADD /* test_hmac.cpp */; };
+		31DEB7781FE6B94200CD0F92 /* test_prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31B548991FB336AE00E17DD3 /* test_prf.cpp */; };
+		31DEB7791FE6B94200CD0F92 /* test_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 315D453A1C98909A00590A01 /* test_tdp.cpp */; };
+		31DEB77A1FE6B94200CD0F92 /* test_prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D431D2565CB00F87904 /* test_prg.cpp */; };
+		31DEB77B1FE6B94200CD0F92 /* test_ppke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD4511EC719DD0058A0C5 /* test_ppke.cpp */; };
+		31DEB77C1FE6B94200CD0F92 /* test_mbedtls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966B31FB8BCF400051179 /* test_mbedtls.cpp */; };
+		31DEB77D1FE6B95400CD0F92 /* bench_set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7301FE6B89A00CD0F92 /* bench_set_hash.cpp */; };
+		31DEB77F1FE6E00100CD0F92 /* benchmarks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */; };
+		31DEB7811FE6FA2100CD0F92 /* bench_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
 		6CC2D4861C31889B00334ADD /* prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* prp.cpp */; };
@@ -111,11 +152,6 @@
 		6CC2D48A1C3188A000334ADD /* aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4011C3185D700334ADD /* aez.c */; };
 		6CC2D48B1C3188A800334ADD /* GLS254.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D40D1C3185D700334ADD /* GLS254.cpp */; };
 		6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */; };
-		6CC2D48D1C318B1B00334ADD /* encryption.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4641C3185D700334ADD /* encryption.cpp */; };
-		6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4661C3185D700334ADD /* hashing.cpp */; };
-		6CC2D48F1C318B1B00334ADD /* test_ecmh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4681C3185D700334ADD /* test_ecmh.cpp */; };
-		6CC2D4901C318B1B00334ADD /* test_prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46A1C3185D700334ADD /* test_prp.cpp */; };
-		6CC2D4911C318B1B00334ADD /* test_hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46C1C3185D700334ADD /* test_hmac.cpp */; };
 		6CC2D4921C318B3500334ADD /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
 		6CC2D49E1C318F2500334ADD /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4601C3185D700334ADD /* set_hash.cpp */; };
 		6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
@@ -191,6 +227,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
+		31DEB76E1FE6B91F00CD0F92 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = sourcecode.asm;
+			isEditable = 1;
+			outputFiles = (
+				"${DERIVED_SOURCES_DIR}/${INPUT_FILE_BASE}.o",
+			);
+			script = "#!/bin/bash\n/usr/local/bin/yasm -f macho64 -o ${DERIVED_SOURCES_DIR}/${INPUT_FILE_BASE}.o ${INPUT_FILE_DIR}/${INPUT_FILE_NAME}";
+		};
 		6CC2D4971C318B6200334ADD /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
@@ -224,6 +270,15 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		31DEB76D1FE6B91F00CD0F92 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		6CC2D4791C31888000334ADD /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -299,6 +354,11 @@
 		319966C51FBEE9D400051179 /* tdp_impl_openssl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tdp_impl_openssl.hpp; sourceTree = "<group>"; };
 		319966CE1FBEF1CA00051179 /* tdp_impl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tdp_impl.hpp; sourceTree = "<group>"; };
 		31B548991FB336AE00E17DD3 /* test_prf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_prf.cpp; sourceTree = "<group>"; };
+		31DEB7301FE6B89A00CD0F92 /* bench_set_hash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bench_set_hash.cpp; sourceTree = "<group>"; };
+		31DEB7311FE6B89A00CD0F92 /* build.scons */ = {isa = PBXFileReference; lastKnownFileType = text; path = build.scons; sourceTree = "<group>"; };
+		31DEB7721FE6B91F00CD0F92 /* bench */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bench; sourceTree = BUILT_PRODUCTS_DIR; };
+		31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = benchmarks.cpp; sourceTree = "<group>"; };
+		31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bench_tdp.cpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6CC2D3FD1C3185D700334ADD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -376,6 +436,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		31DEB76C1FE6B91F00CD0F92 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6CC2D4781C31888000334ADD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -472,17 +539,29 @@
 			path = tdp_impl;
 			sourceTree = "<group>";
 		};
+		31DEB72F1FE6B89A00CD0F92 /* bench */ = {
+			isa = PBXGroup;
+			children = (
+				31DEB7311FE6B89A00CD0F92 /* build.scons */,
+				31DEB7301FE6B89A00CD0F92 /* bench_set_hash.cpp */,
+				31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */,
+			);
+			path = bench;
+			sourceTree = "<group>";
+		};
 		6CC2D3F01C31843D00334ADD = {
 			isa = PBXGroup;
 			children = (
 				6CC2D3FB1C3185D700334ADD /* LICENSE */,
 				6CC2D3FC1C3185D700334ADD /* main.cpp */,
 				6CC2D46E1C3185E500334ADD /* checks.cpp */,
+				31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */,
 				6CC2D3FD1C3185D700334ADD /* README.md */,
 				6CC2D3FE1C3185D700334ADD /* SConstruct */,
 				6CC2D3FF1C3185D700334ADD /* src */,
 				3163D3911ED33C8E00A7FCD9 /* gtest */,
 				6CC2D4621C3185D700334ADD /* tests */,
+				31DEB72F1FE6B89A00CD0F92 /* bench */,
 				6CC2D47C1C31888000334ADD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -682,6 +761,7 @@
 				6CC2D47B1C31888000334ADD /* native checks */,
 				6CC2D4B71C318F2500334ADD /* native_main */,
 				6CC2D4BD1C3193AE00334ADD /* libsse_crypto.dylib */,
+				31DEB7721FE6B91F00CD0F92 /* bench */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -803,6 +883,24 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
+		31DEB73E1FE6B91F00CD0F92 /* bench */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 31DEB76F1FE6B91F00CD0F92 /* Build configuration list for PBXNativeTarget "bench" */;
+			buildPhases = (
+				31DEB73F1FE6B91F00CD0F92 /* Sources */,
+				31DEB76C1FE6B91F00CD0F92 /* Frameworks */,
+				31DEB76D1FE6B91F00CD0F92 /* CopyFiles */,
+			);
+			buildRules = (
+				31DEB76E1FE6B91F00CD0F92 /* PBXBuildRule */,
+			);
+			dependencies = (
+			);
+			name = bench;
+			productName = "native checks";
+			productReference = 31DEB7721FE6B91F00CD0F92 /* bench */;
+			productType = "com.apple.product-type.tool";
+		};
 		6CC2D47A1C31888000334ADD /* native_checks */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6CC2D4821C31888000334ADD /* Build configuration list for PBXNativeTarget "native_checks" */;
@@ -897,58 +995,102 @@
 				6CC2D47A1C31888000334ADD /* native_checks */,
 				6CC2D49A1C318F2500334ADD /* native_main */,
 				6CC2D4BC1C3193AE00334ADD /* libsse_crypto */,
+				31DEB73E1FE6B91F00CD0F92 /* bench */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		31DEB73F1FE6B91F00CD0F92 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31DEB7401FE6B91F00CD0F92 /* pk.c in Sources */,
+				31DEB7811FE6FA2100CD0F92 /* bench_tdp.cpp in Sources */,
+				31DEB7411FE6B91F00CD0F92 /* blake2b.cpp in Sources */,
+				31DEB7441FE6B91F00CD0F92 /* asn1write.c in Sources */,
+				31DEB7461FE6B91F00CD0F92 /* base64.c in Sources */,
+				31DEB7471FE6B91F00CD0F92 /* set_hash.cpp in Sources */,
+				31DEB7481FE6B91F00CD0F92 /* utils.cpp in Sources */,
+				31DEB7491FE6B91F00CD0F92 /* key.cpp in Sources */,
+				31DEB74A1FE6B91F00CD0F92 /* relic_api.cpp in Sources */,
+				31DEB74B1FE6B91F00CD0F92 /* pk_wrap.c in Sources */,
+				31DEB74C1FE6B91F00CD0F92 /* cipher.cpp in Sources */,
+				31DEB74D1FE6B91F00CD0F92 /* prg.cpp in Sources */,
+				31DEB74E1FE6B91F00CD0F92 /* GLS254.cpp in Sources */,
+				31DEB77F1FE6E00100CD0F92 /* benchmarks.cpp in Sources */,
+				31DEB74F1FE6B91F00CD0F92 /* random.cpp in Sources */,
+				31DEB7501FE6B91F00CD0F92 /* pkparse.c in Sources */,
+				31DEB7511FE6B91F00CD0F92 /* pem.c in Sources */,
+				31DEB7531FE6B91F00CD0F92 /* hmac.cpp in Sources */,
+				31DEB7541FE6B91F00CD0F92 /* prf.cpp in Sources */,
+				31DEB7551FE6B91F00CD0F92 /* bignum.c in Sources */,
+				31DEB7561FE6B91F00CD0F92 /* gtest-all.cc in Sources */,
+				31DEB77D1FE6B95400CD0F92 /* bench_set_hash.cpp in Sources */,
+				31DEB7581FE6B91F00CD0F92 /* rsa_io.c in Sources */,
+				31DEB75A1FE6B91F00CD0F92 /* tdp.cpp in Sources */,
+				31DEB75E1FE6B91F00CD0F92 /* hash.cpp in Sources */,
+				31DEB75F1FE6B91F00CD0F92 /* aez.c in Sources */,
+				31DEB7611FE6B91F00CD0F92 /* util.cpp in Sources */,
+				31DEB7621FE6B91F00CD0F92 /* prp.cpp in Sources */,
+				31DEB7631FE6B91F00CD0F92 /* tdp_impl_mbedtls.cpp in Sources */,
+				31DEB7641FE6B91F00CD0F92 /* GMPpke.cpp in Sources */,
+				31DEB7651FE6B91F00CD0F92 /* asn1parse.c in Sources */,
+				31DEB7661FE6B91F00CD0F92 /* tdp_impl_openssl.cpp in Sources */,
+				31DEB7671FE6B91F00CD0F92 /* GF2_127_63.cpp in Sources */,
+				31DEB7681FE6B91F00CD0F92 /* rsa.c in Sources */,
+				31DEB76A1FE6B91F00CD0F92 /* puncturable_enc.cpp in Sources */,
+				31DEB76B1FE6B91F00CD0F92 /* sha512.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6CC2D4771C31888000334ADD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				319966A21FB8A72D00051179 /* pk.c in Sources */,
 				310B644E1FCCC3420015FBEE /* blake2b.cpp in Sources */,
-				6CC2D48D1C318B1B00334ADD /* encryption.cpp in Sources */,
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
 				319966881FB8A72D00051179 /* asn1write.c in Sources */,
-				31B5489A1FB336AE00E17DD3 /* test_prf.cpp in Sources */,
+				31DEB7781FE6B94200CD0F92 /* test_prf.cpp in Sources */,
 				319966AC1FB8AA1C00051179 /* base64.c in Sources */,
 				6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */,
 				6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				314863CF1FB71E9E009FE78B /* key.cpp in Sources */,
 				310C2BDF1EC0B59700E80B3A /* relic_api.cpp in Sources */,
 				319966B01FB8AE7200051179 /* pk_wrap.c in Sources */,
+				31DEB77B1FE6B94200CD0F92 /* test_ppke.cpp in Sources */,
+				31DEB7731FE6B94200CD0F92 /* encryption.cpp in Sources */,
 				6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */,
+				31DEB7751FE6B94200CD0F92 /* test_ecmh.cpp in Sources */,
 				316F0D3F1D25600700F87904 /* prg.cpp in Sources */,
+				31DEB77A1FE6B94200CD0F92 /* test_prg.cpp in Sources */,
 				6CC2D48B1C3188A800334ADD /* GLS254.cpp in Sources */,
 				6CC2D4881C31889B00334ADD /* random.cpp in Sources */,
 				319966961FB8A72D00051179 /* pkparse.c in Sources */,
 				3199669C1FB8A72D00051179 /* pem.c in Sources */,
-				6CC2D48F1C318B1B00334ADD /* test_ecmh.cpp in Sources */,
 				311E94871FE2F5D600E01869 /* hmac.cpp in Sources */,
 				311E948A1FE3BF4800E01869 /* prf.cpp in Sources */,
 				319966851FB8A72D00051179 /* bignum.c in Sources */,
 				3163D3941ED33C8E00A7FCD9 /* gtest-all.cc in Sources */,
-				315D453C1C98909A00590A01 /* test_tdp.cpp in Sources */,
 				319966B71FBC2E9800051179 /* rsa_io.c in Sources */,
-				313CD4531EC719DD0058A0C5 /* test_ppke.cpp in Sources */,
+				31DEB7791FE6B94200CD0F92 /* test_tdp.cpp in Sources */,
 				318C729B1C9730140040AEE7 /* tdp.cpp in Sources */,
-				6CC2D48E1C318B1B00334ADD /* hashing.cpp in Sources */,
-				311934B51D27172A0031804B /* test_prg.cpp in Sources */,
-				319966B41FB8BCF400051179 /* test_mbedtls.cpp in Sources */,
 				6CC2D4871C31889B00334ADD /* hash.cpp in Sources */,
 				6CC2D48A1C3188A000334ADD /* aez.c in Sources */,
-				6CC2D4911C318B1B00334ADD /* test_hmac.cpp in Sources */,
 				310C2BE61EC0B6D800E80B3A /* util.cpp in Sources */,
 				6CC2D4861C31889B00334ADD /* prp.cpp in Sources */,
 				319966C61FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */,
 				310C2BEA1EC0B8F100E80B3A /* GMPpke.cpp in Sources */,
 				3199668E1FB8A72D00051179 /* asn1parse.c in Sources */,
+				31DEB77C1FE6B94200CD0F92 /* test_mbedtls.cpp in Sources */,
+				31DEB7741FE6B94200CD0F92 /* hashing.cpp in Sources */,
+				31DEB7771FE6B94200CD0F92 /* test_hmac.cpp in Sources */,
 				319966CA1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */,
 				3199668B1FB8A72D00051179 /* rsa.c in Sources */,
-				6CC2D4901C318B1B00334ADD /* test_prp.cpp in Sources */,
 				313CD48D1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
+				31DEB7761FE6B94200CD0F92 /* test_prp.cpp in Sources */,
 				6CC2D4921C318B3500334ADD /* sha512.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1053,6 +1195,25 @@
 			};
 			name = Release;
 		};
+		31DEB7701FE6B91F00CD0F92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		31DEB7711FE6B91F00CD0F92 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		6CC2D3F61C31843E00334ADD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1112,6 +1273,7 @@
 					"-lcrypto",
 					"-lrelic",
 					"-lsodium",
+					"-lbenchmark",
 				);
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -1185,6 +1347,7 @@
 					"-lcrypto",
 					"-lrelic",
 					"-lsodium",
+					"-lbenchmark",
 				);
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -1303,6 +1466,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		31DEB76F1FE6B91F00CD0F92 /* Build configuration list for PBXNativeTarget "bench" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				31DEB7701FE6B91F00CD0F92 /* Debug */,
+				31DEB7711FE6B91F00CD0F92 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		6CC2D3F41C31843D00334ADD /* Build configuration list for PBXProject "libsse_crypto" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -67,6 +67,8 @@ public:
     explicit SetHashImpl(const std::array<uint8_t, kSetHashSize>& data);
     explicit SetHashImpl(const std::vector<std::string>& in_set);
 
+    SetHashImpl& operator=(const SetHashImpl& h);
+
     void add_element(const std::string& in);
     void add_set(const SetHashImpl* in);
     void remove_element(const std::string& in);
@@ -166,9 +168,8 @@ std::ostream& operator<<(std::ostream& os, const SetHash_Elligator& h)
 
 SetHash_Elligator& SetHash_Elligator::operator=(const SetHash_Elligator& h)
 {
-    if ((this != &h) && (set_hash_imp_ != h.set_hash_imp_)) {
-        delete set_hash_imp_;
-        set_hash_imp_ = new SetHashImpl(*h.set_hash_imp_);
+    if (this != &h) {
+        *set_hash_imp_ = *h.set_hash_imp_;
     }
     return *this;
 }
@@ -183,10 +184,11 @@ bool SetHash_Elligator::operator!=(const SetHash_Elligator& h) const
     return !(*this == h);
 }
 
-/*
- * SetHashImpl
- *
- */
+//
+//
+// SetHashImpl
+//
+//
 
 void SetHash_Elligator::SetHashImpl::gen_curve_point(
     std::array<uint8_t, crypto_core_ed25519_BYTES>& p,
@@ -242,6 +244,14 @@ SetHash_Elligator::SetHashImpl::SetHashImpl(
 
         crypto_core_ed25519_add(ellig_state_, ellig_state_, p.data());
     }
+}
+
+SetHash_Elligator::SetHashImpl& SetHash_Elligator::SetHashImpl::operator=(
+    const SetHashImpl& h)
+{
+    memcpy(ellig_state_, h.ellig_state_, sizeof(ellig_state_));
+
+    return *this;
 }
 
 void SetHash_Elligator::SetHashImpl::add_element(const std::string& in)

@@ -89,6 +89,8 @@ private:
                                                  // dynamic memory allocation
     static constexpr std::array<uint8_t, crypto_scalarmult_ed25519_SCALARBYTES>
         seed__{{0x00}};
+    
+    static_assert(crypto_core_ed25519_BYTES == kSetHashSize, "crypto_core_ed25519_BYTES != kSetHashSize");
 };
 
 constexpr std::array<uint8_t, crypto_scalarmult_ed25519_SCALARBYTES>

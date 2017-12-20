@@ -29,7 +29,7 @@
 
 
 template <size_t N>
-void test_generic_multiset_hash_with_size() {
+void test_elligator_multiset_hash_with_size() {
 
   for (int i = 0; i < 100; ++i) {
     size_t num_examples = 3;
@@ -154,15 +154,15 @@ void test_generic_multiset_hash_with_size() {
 
 TEST(set_hash, 10_bytes)
 {
-    test_generic_multiset_hash_with_size<10>();
+    test_elligator_multiset_hash_with_size<10>();
 }
 
 TEST(set_hash, 100_bytes)
 {
-    test_generic_multiset_hash_with_size<100>();
+    test_elligator_multiset_hash_with_size<100>();
 }
 
 TEST(set_hash, 150_bytes)
 {
-    test_generic_multiset_hash_with_size<150>();
+    test_elligator_multiset_hash_with_size<150>();
 }

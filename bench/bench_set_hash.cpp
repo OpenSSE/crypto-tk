@@ -21,10 +21,10 @@
 #include <benchmark/benchmark.h>
 
 
-#include "set_hash.hpp"
-#include "set_hash_elligator.hpp"
 #include "hash.hpp"
 #include "random.hpp"
+#include "set_hash.hpp"
+#include "set_hash_elligator.hpp"
 
 #include <iostream>
 #include <vector>
@@ -33,81 +33,94 @@
 using sse::crypto::SetHash;
 using sse::crypto::SetHash_Elligator;
 
-template <typename SH>
-static void SetHash_insert(benchmark::State& state) {
-    for (auto _ : state){
+template<typename SH>
+static void SetHash_insert(benchmark::State& state)
+{
+    for (auto _ : state) {
         state.PauseTiming();
         std::vector<std::string> samples(state.range(0));
-        for (auto &e : samples){
+        for (auto& e : samples) {
             e = sse::crypto::random_string(state.range(1));
         }
         state.ResumeTiming();
 
         SetHash a;
-        for (auto &e : samples){
+        for (auto& e : samples) {
             a.add_element(e);
         }
     }
-    
-    state.SetItemsProcessed(int64_t(state.iterations()) *
-                            int64_t(state.range(0)));
-    
+
+    state.SetItemsProcessed(int64_t(state.iterations())
+                            * int64_t(state.range(0)));
+
     state.SetComplexityN((int)state.items_processed());
 }
 
-static void SetHash_insert_args(benchmark::internal::Benchmark* b) {
-    auto elts_size = { 4, 16, 128, 256};
+static void SetHash_insert_args(benchmark::internal::Benchmark* b)
+{
+    auto elts_size = {4, 16, 128, 256};
     for (auto es : elts_size)
-        for (int j = 1<<2; j <= 1<<14; j *= 8)
+        for (int j = 1 << 2; j <= 1 << 14; j *= 8)
             b->Args({j, es});
 }
-BENCHMARK_TEMPLATE(SetHash_insert,SetHash)->Apply(SetHash_insert_args)
-->Unit(benchmark::kMicrosecond);
+BENCHMARK_TEMPLATE(SetHash_insert, SetHash)
+    ->Apply(SetHash_insert_args)
+    ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_TEMPLATE(SetHash_insert,SetHash)->RangeMultiplier(2)
-->Ranges({{1<<4, 1<<14},{32,32}})
-->Unit(benchmark::kMicrosecond)->Complexity(benchmark::oN);
+BENCHMARK_TEMPLATE(SetHash_insert, SetHash)
+    ->RangeMultiplier(2)
+    ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
+    ->Unit(benchmark::kMicrosecond)
+    ->Complexity(benchmark::oN);
 
-BENCHMARK_TEMPLATE(SetHash_insert,SetHash_Elligator)->Apply(SetHash_insert_args)
-->Unit(benchmark::kMicrosecond);
+BENCHMARK_TEMPLATE(SetHash_insert, SetHash_Elligator)
+    ->Apply(SetHash_insert_args)
+    ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_TEMPLATE(SetHash_insert,SetHash_Elligator)->RangeMultiplier(2)
-->Ranges({{1<<4, 1<<14},{32,32}})
-->Unit(benchmark::kMicrosecond)->Complexity(benchmark::oN);
+BENCHMARK_TEMPLATE(SetHash_insert, SetHash_Elligator)
+    ->RangeMultiplier(2)
+    ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
+    ->Unit(benchmark::kMicrosecond)
+    ->Complexity(benchmark::oN);
 
 
-template <typename SH>
-static void SetHash_batch_construct(benchmark::State& state) {
-    for (auto _ : state){
+template<typename SH>
+static void SetHash_batch_construct(benchmark::State& state)
+{
+    for (auto _ : state) {
         state.PauseTiming();
         std::vector<std::string> samples(state.range(0));
-        for (auto &e : samples){
+        for (auto& e : samples) {
             e = sse::crypto::random_string(state.range(1));
         }
         state.ResumeTiming();
-        
+
         SH a(samples);
         benchmark::DoNotOptimize(a);
     }
-    
-    state.SetItemsProcessed(int64_t(state.iterations()) *
-                            int64_t(state.range(0)));
-    
+
+    state.SetItemsProcessed(int64_t(state.iterations())
+                            * int64_t(state.range(0)));
+
     state.SetComplexityN((int)state.items_processed());
 }
 
-BENCHMARK_TEMPLATE(SetHash_batch_construct,SetHash)->Apply(SetHash_insert_args)
-->Unit(benchmark::kMicrosecond);
+BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash)
+    ->Apply(SetHash_insert_args)
+    ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_TEMPLATE(SetHash_batch_construct,SetHash)->RangeMultiplier(2)
-->Ranges({{1<<4, 1<<14},{32,32}})
-->Unit(benchmark::kMicrosecond)->Complexity(benchmark::oN);
+BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash)
+    ->RangeMultiplier(2)
+    ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
+    ->Unit(benchmark::kMicrosecond)
+    ->Complexity(benchmark::oN);
 
-BENCHMARK_TEMPLATE(SetHash_batch_construct,SetHash_Elligator)->Apply(SetHash_insert_args)
-->Unit(benchmark::kMicrosecond);
+BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash_Elligator)
+    ->Apply(SetHash_insert_args)
+    ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_TEMPLATE(SetHash_batch_construct,SetHash_Elligator)->RangeMultiplier(2)
-->Ranges({{1<<4, 1<<14},{32,32}})
-->Unit(benchmark::kMicrosecond)->Complexity(benchmark::oN);
-
-
+BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash_Elligator)
+    ->RangeMultiplier(2)
+    ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
+    ->Unit(benchmark::kMicrosecond)
+    ->Complexity(benchmark::oN);

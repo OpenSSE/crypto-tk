@@ -225,7 +225,7 @@ SetHash_Elligator::SetHashImpl::SetHashImpl(
     memcpy(ellig_state_, data.data(), crypto_core_ed25519_BYTES);
 
     if ((crypto_core_ed25519_is_valid_point(ellig_state_) != 1)
-        || (sodium_memcmp(
+        && (sodium_memcmp(
                 data.data(), ec_inf_point__, crypto_core_ed25519_BYTES)
             != 0)) {
         throw std::invalid_argument("SetHash: Invalid curve point");

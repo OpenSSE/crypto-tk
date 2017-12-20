@@ -28,6 +28,8 @@
 #include <sodium/crypto_scalarmult_ed25519.h>
 #include <sodium/utils.h>
 
+#include <cstring>
+
 #include "hash.hpp"
 
 namespace sse {
@@ -84,8 +86,7 @@ SetHash::SetHash() : set_hash_imp_(new SetHashImpl())
 {
 }
 
-SetHash::SetHash(
-    const std::array<uint8_t, kSetHashSize>& bytes)
+SetHash::SetHash(const std::array<uint8_t, kSetHashSize>& bytes)
     : set_hash_imp_(new SetHashImpl(bytes))
 {
 }
@@ -95,8 +96,7 @@ SetHash::SetHash(const SetHash& o)
 {
 }
 
-SetHash::SetHash(SetHash&& o) noexcept
-    : set_hash_imp_(o.set_hash_imp_)
+SetHash::SetHash(SetHash&& o) noexcept : set_hash_imp_(o.set_hash_imp_)
 {
     o.set_hash_imp_ = NULL;
 }
@@ -133,8 +133,7 @@ void SetHash::remove_set(const SetHash& h)
     set_hash_imp_->remove_set(h.set_hash_imp_);
 }
 
-std::array<uint8_t, SetHash::kSetHashSize> SetHash::data()
-    const
+std::array<uint8_t, SetHash::kSetHashSize> SetHash::data() const
 {
     return set_hash_imp_->data();
 }
@@ -199,8 +198,7 @@ SetHash::SetHashImpl::SetHashImpl()
     memcpy(ellig_state_, ec_inf_point__, crypto_core_ed25519_BYTES);
 }
 
-SetHash::SetHashImpl::SetHashImpl(
-    const SetHash::SetHashImpl& s)
+SetHash::SetHashImpl::SetHashImpl(const SetHash::SetHashImpl& s)
 {
     memcpy(ellig_state_, s.ellig_state_, sizeof(ellig_state_));
 }
@@ -218,8 +216,7 @@ SetHash::SetHashImpl::SetHashImpl(
     }
 }
 
-SetHash::SetHashImpl::SetHashImpl(
-    const std::vector<std::string>& in_set)
+SetHash::SetHashImpl::SetHashImpl(const std::vector<std::string>& in_set)
 {
     memcpy(ellig_state_, ec_inf_point__, crypto_core_ed25519_BYTES);
     std::array<uint8_t, crypto_core_ed25519_BYTES> p;
@@ -232,8 +229,7 @@ SetHash::SetHashImpl::SetHashImpl(
     }
 }
 
-SetHash::SetHashImpl& SetHash::SetHashImpl::operator=(
-    const SetHashImpl& h)
+SetHash::SetHashImpl& SetHash::SetHashImpl::operator=(const SetHashImpl& h)
 {
     memcpy(ellig_state_, h.ellig_state_, sizeof(ellig_state_));
 
@@ -249,8 +245,7 @@ void SetHash::SetHashImpl::add_element(const std::string& in)
     crypto_core_ed25519_add(ellig_state_, ellig_state_, p.data());
 }
 
-void SetHash::SetHashImpl::add_set(
-    const SetHash::SetHashImpl* in)
+void SetHash::SetHashImpl::add_set(const SetHash::SetHashImpl* in)
 {
     crypto_core_ed25519_add(ellig_state_, ellig_state_, in->ellig_state_);
 }
@@ -264,14 +259,12 @@ void SetHash::SetHashImpl::remove_element(const std::string& in)
     crypto_core_ed25519_sub(ellig_state_, ellig_state_, p.data());
 }
 
-void SetHash::SetHashImpl::remove_set(
-    const SetHash::SetHashImpl* in)
+void SetHash::SetHashImpl::remove_set(const SetHash::SetHashImpl* in)
 {
     crypto_core_ed25519_sub(ellig_state_, ellig_state_, in->ellig_state_);
 }
 
-std::array<uint8_t, SetHash::kSetHashSize> SetHash::
-    SetHashImpl::data() const
+std::array<uint8_t, SetHash::kSetHashSize> SetHash::SetHashImpl::data() const
 {
     std::array<uint8_t, kSetHashSize> bytes;
     memcpy(bytes.data(), ellig_state_, kSetHashSize);
@@ -279,8 +272,7 @@ std::array<uint8_t, SetHash::kSetHashSize> SetHash::
     return bytes;
 }
 
-bool SetHash::SetHashImpl::operator==(
-    const SetHash::SetHashImpl& h) const
+bool SetHash::SetHashImpl::operator==(const SetHash::SetHashImpl& h) const
 {
     return sodium_memcmp(
                ellig_state_, h.ellig_state_, crypto_core_ed25519_BYTES)

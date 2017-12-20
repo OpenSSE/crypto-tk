@@ -156,8 +156,7 @@ public:
     ///
     /// @return     The stream os
     ///
-    friend std::ostream& operator<<(std::ostream&            os,
-                                    const SetHash& h);
+    friend std::ostream& operator<<(std::ostream& os, const SetHash& h);
 
     ///
     /// @brief Assignment operator

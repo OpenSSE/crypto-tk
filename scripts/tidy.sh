@@ -3,8 +3,7 @@ if [[ -z $CLANG_TIDY ]]; then
 	CLANG_TIDY="clang-tidy"
 fi
 
-GLOBIGNORE='**/boost/**:boost/**:**/boost' # do not look into boost headers
-GLOBIGNORE=$GLOBIGNORE:'**/mbedtls/**' # do not look into boost headers
+GLOBIGNORE='**/mbedtls/**' # do not look into mbedTLS code
 
 echo "Ignoring files in "$GLOBIGNORE
 

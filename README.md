@@ -30,8 +30,6 @@ Building is done through [SConstruct](http://www.scons.org).
 
 * [libsodium](https://download.libsodium.org/doc/). libsodium version >=1.0.16 is necessary.
 
-* [Boost](http://www.boost.org/) Only headers from Boost are needed to build the library. As the incremental set hashing code relies on the [Endian](http://www.boost.org/doc/libs/release/libs/endian/) library, release older than 1.58 are necessary.
-
 * [RELIC](https://github.com/relic-toolkit/relic) Some features (puncturable encryption) are based on cryptographic pairings. These are implemented using the RELIC toolkit. RELIC has many compilation options. To install RELIC, you can do the following:
 
 ```sh
@@ -72,8 +70,8 @@ env['CC'] = 'gcc-4.9'
 env['CXX'] = 'g++-4.9'
 ```
 
-Then, to install the three dependencies, you can either follow the instructions of their website (in particular for libsodium and Boost), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
-To do so, move to directory `install_dependencies`, and run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.16 and `./install_relic_ubuntu_14_easy.sh` to install RELIC with the `easy` arithmetic.
+Then, to install the three dependencies, you can either follow the instructions of their website (in particular for libsodium), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
+To do so, move to directory `install_dependencies`, and run `./install_sodium.sh` to download and install libsodium 1.0.16 and `./install_relic_ubuntu_14_easy.sh` to install RELIC with the `easy` arithmetic.
 If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respectively `./install_relic_ubuntu_14_gmp.sh` and `./install_relic_ubuntu_14_x64_asm.sh`.
 
 
@@ -84,7 +82,7 @@ If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respec
  $ [sudo] apt-get install build-essential scons libtool libssl-dev libgmp-dev 
 ```
 
-You can then install the Boost and libsodium as for Ubuntu 14.
+You can then install libsodium as for Ubuntu 14.
 For RELIC, use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh`, or `install_relic_x64_asm.sh` depending on the arithmetic you prefer.
 
 #### Mac OS

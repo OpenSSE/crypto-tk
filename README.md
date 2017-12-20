@@ -28,7 +28,7 @@ Building is done through [SConstruct](http://www.scons.org).
 
 `libsse_crypto` uses the following dependencies
 
-* [libsodium](https://download.libsodium.org/doc/)
+* [libsodium](https://download.libsodium.org/doc/). libsodium version >=1.0.16 is necessary.
 
 * [Boost](http://www.boost.org/) Only headers from Boost are needed to build the library. As the incremental set hashing code relies on the [Endian](http://www.boost.org/doc/libs/release/libs/endian/) library, release older than 1.58 are necessary.
 
@@ -73,7 +73,7 @@ env['CXX'] = 'g++-4.9'
 ```
 
 Then, to install the three dependencies, you can either follow the instructions of their website (in particular for libsodium and Boost), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
-To do so, move to directory `install_dependencies`, and run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.15 and `./install_relic_ubuntu_14_easy.sh` to install RELIC with the `easy` arithmetic.
+To do so, move to directory `install_dependencies`, and run `./install_boost.sh` to download and move the boost headers in the `src` directory, `./install_sodium.sh` to download and install libsodium 1.0.16 and `./install_relic_ubuntu_14_easy.sh` to install RELIC with the `easy` arithmetic.
 If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respectively `./install_relic_ubuntu_14_gmp.sh` and `./install_relic_ubuntu_14_x64_asm.sh`.
 
 

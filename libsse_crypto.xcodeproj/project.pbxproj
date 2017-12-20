@@ -148,6 +148,7 @@
 		31DEB7861FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */; };
 		31DEB7871FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */; };
 		31DEB7881FE846F200CD0F92 /* set_hash_elligator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 31DEB7831FE846F100CD0F92 /* set_hash_elligator.hpp */; };
+		31DEB78C1FEA637D00CD0F92 /* test_set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
 		6CC2D4861C31889B00334ADD /* prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* prp.cpp */; };
@@ -366,6 +367,7 @@
 		31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bench_tdp.cpp; sourceTree = "<group>"; };
 		31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = set_hash_elligator.cpp; sourceTree = "<group>"; };
 		31DEB7831FE846F100CD0F92 /* set_hash_elligator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = set_hash_elligator.hpp; sourceTree = "<group>"; };
+		31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_set_hash.cpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6CC2D3FD1C3185D700334ADD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -752,6 +754,7 @@
 				6CC2D4641C3185D700334ADD /* encryption.cpp */,
 				6CC2D4661C3185D700334ADD /* hashing.cpp */,
 				6CC2D4681C3185D700334ADD /* test_ecmh.cpp */,
+				31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */,
 				6CC2D46A1C3185D700334ADD /* test_prp.cpp */,
 				6CC2D46C1C3185D700334ADD /* test_hmac.cpp */,
 				31B548991FB336AE00E17DD3 /* test_prf.cpp */,
@@ -1083,6 +1086,7 @@
 				3199669C1FB8A72D00051179 /* pem.c in Sources */,
 				311E94871FE2F5D600E01869 /* hmac.cpp in Sources */,
 				311E948A1FE3BF4800E01869 /* prf.cpp in Sources */,
+				31DEB78C1FEA637D00CD0F92 /* test_set_hash.cpp in Sources */,
 				319966851FB8A72D00051179 /* bignum.c in Sources */,
 				3163D3941ED33C8E00A7FCD9 /* gtest-all.cc in Sources */,
 				319966B71FBC2E9800051179 /* rsa_io.c in Sources */,

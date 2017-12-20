@@ -27,7 +27,6 @@ before_install:
   # - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   - cd install_dependencies
   - ./install_libsodium.sh
-  - ./install_boost.sh
   - ./install_relic_ubuntu_14_easy.sh
   - cd ..
   - gem install coveralls-lcov

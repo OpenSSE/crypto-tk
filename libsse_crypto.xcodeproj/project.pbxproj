@@ -101,14 +101,12 @@
 		31DEB7411FE6B91F00CD0F92 /* blake2b.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310B644C1FCCC3410015FBEE /* blake2b.cpp */; };
 		31DEB7441FE6B91F00CD0F92 /* asn1write.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966761FB8A72B00051179 /* asn1write.c */; };
 		31DEB7461FE6B91F00CD0F92 /* base64.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966AA1FB8AA1C00051179 /* base64.c */; };
-		31DEB7471FE6B91F00CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4601C3185D700334ADD /* set_hash.cpp */; };
 		31DEB7481FE6B91F00CD0F92 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
 		31DEB7491FE6B91F00CD0F92 /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 314863CE1FB71E9E009FE78B /* key.cpp */; };
 		31DEB74A1FE6B91F00CD0F92 /* relic_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD41EC0B59700E80B3A /* relic_api.cpp */; };
 		31DEB74B1FE6B91F00CD0F92 /* pk_wrap.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966AF1FB8AE7200051179 /* pk_wrap.c */; };
 		31DEB74C1FE6B91F00CD0F92 /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
 		31DEB74D1FE6B91F00CD0F92 /* prg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 316F0D3D1D25600700F87904 /* prg.cpp */; };
-		31DEB74E1FE6B91F00CD0F92 /* GLS254.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D40D1C3185D700334ADD /* GLS254.cpp */; };
 		31DEB74F1FE6B91F00CD0F92 /* random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45E1C3185D700334ADD /* random.cpp */; };
 		31DEB7501FE6B91F00CD0F92 /* pkparse.c in Sources */ = {isa = PBXBuildFile; fileRef = 3199667C1FB8A72C00051179 /* pkparse.c */; };
 		31DEB7511FE6B91F00CD0F92 /* pem.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966801FB8A72C00051179 /* pem.c */; };
@@ -126,13 +124,11 @@
 		31DEB7641FE6B91F00CD0F92 /* GMPpke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 310C2BD01EC0B59700E80B3A /* GMPpke.cpp */; };
 		31DEB7651FE6B91F00CD0F92 /* asn1parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966781FB8A72C00051179 /* asn1parse.c */; };
 		31DEB7661FE6B91F00CD0F92 /* tdp_impl_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 319966C41FBEE9D400051179 /* tdp_impl_openssl.cpp */; };
-		31DEB7671FE6B91F00CD0F92 /* GF2_127_63.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */; };
 		31DEB7681FE6B91F00CD0F92 /* rsa.c in Sources */ = {isa = PBXBuildFile; fileRef = 319966771FB8A72C00051179 /* rsa.c */; };
 		31DEB76A1FE6B91F00CD0F92 /* puncturable_enc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */; };
 		31DEB76B1FE6B91F00CD0F92 /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
 		31DEB7731FE6B94200CD0F92 /* encryption.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4641C3185D700334ADD /* encryption.cpp */; };
 		31DEB7741FE6B94200CD0F92 /* hashing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4661C3185D700334ADD /* hashing.cpp */; };
-		31DEB7751FE6B94200CD0F92 /* test_ecmh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4681C3185D700334ADD /* test_ecmh.cpp */; };
 		31DEB7761FE6B94200CD0F92 /* test_prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46A1C3185D700334ADD /* test_prp.cpp */; };
 		31DEB7771FE6B94200CD0F92 /* test_hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46C1C3185D700334ADD /* test_hmac.cpp */; };
 		31DEB7781FE6B94200CD0F92 /* test_prf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31B548991FB336AE00E17DD3 /* test_prf.cpp */; };
@@ -143,24 +139,24 @@
 		31DEB77D1FE6B95400CD0F92 /* bench_set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7301FE6B89A00CD0F92 /* bench_set_hash.cpp */; };
 		31DEB77F1FE6E00100CD0F92 /* benchmarks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */; };
 		31DEB7811FE6FA2100CD0F92 /* bench_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */; };
+		31DEB7841FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7851FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7861FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7871FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7881FE846F200CD0F92 /* set_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 31DEB7831FE846F100CD0F92 /* set_hash.hpp */; };
+		31DEB78C1FEA637D00CD0F92 /* test_set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
 		6CC2D4861C31889B00334ADD /* prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* prp.cpp */; };
 		6CC2D4871C31889B00334ADD /* hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45A1C3185D700334ADD /* hash.cpp */; };
 		6CC2D4881C31889B00334ADD /* random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45E1C3185D700334ADD /* random.cpp */; };
-		6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4601C3185D700334ADD /* set_hash.cpp */; };
 		6CC2D48A1C3188A000334ADD /* aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4011C3185D700334ADD /* aez.c */; };
-		6CC2D48B1C3188A800334ADD /* GLS254.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D40D1C3185D700334ADD /* GLS254.cpp */; };
-		6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */; };
 		6CC2D4921C318B3500334ADD /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
-		6CC2D49E1C318F2500334ADD /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4601C3185D700334ADD /* set_hash.cpp */; };
 		6CC2D49F1C318F2500334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
-		6CC2D4A21C318F2500334ADD /* GLS254.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D40D1C3185D700334ADD /* GLS254.cpp */; };
 		6CC2D4A41C318F2500334ADD /* random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45E1C3185D700334ADD /* random.cpp */; };
 		6CC2D4A91C318F2500334ADD /* hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45A1C3185D700334ADD /* hash.cpp */; };
 		6CC2D4AA1C318F2500334ADD /* aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4011C3185D700334ADD /* aez.c */; };
 		6CC2D4AC1C318F2500334ADD /* prp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4411C3185D700334ADD /* prp.cpp */; };
-		6CC2D4AE1C318F2500334ADD /* GF2_127_63.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */; };
 		6CC2D4B01C318F2500334ADD /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
 		6CC2D4B81C318F2E00334ADD /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D3FC1C3185D700334ADD /* main.cpp */; };
 		6CC2D4C61C3193E200334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
@@ -173,53 +169,10 @@
 		6CC2D4CD1C3193E900334ADD /* prf.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D45D1C3185D700334ADD /* prf.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		6CC2D4CE1C3193E900334ADD /* random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D45E1C3185D700334ADD /* random.cpp */; };
 		6CC2D4CF1C3193E900334ADD /* random.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D45F1C3185D700334ADD /* random.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
-		6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4601C3185D700334ADD /* set_hash.cpp */; };
-		6CC2D4D11C3193E900334ADD /* set_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4611C3185D700334ADD /* set_hash.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		6CC2D4D21C3193FA00334ADD /* aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4011C3185D700334ADD /* aez.c */; };
 		6CC2D4D31C3193FA00334ADD /* aez.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4021C3185D700334ADD /* aez.h */; };
 		6CC2D4D41C31940400334ADD /* sha512.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4581C3185D700334ADD /* sha512.cpp */; };
 		6CC2D4D51C31940400334ADD /* sha512.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4591C3185D700334ADD /* sha512.hpp */; };
-		6CC2D4E81C31941D00334ADD /* hugepages.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42B1C3185D700334ADD /* hugepages.hpp */; };
-		6CC2D4E91C31942100334ADD /* array_view.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4081C3185D700334ADD /* array_view.hpp */; };
-		6CC2D4EA1C31942100334ADD /* is_contiguous.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4091C3185D700334ADD /* is_contiguous.hpp */; };
-		6CC2D4EB1C31942700334ADD /* add.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D40B1C3185D700334ADD /* add.hpp */; };
-		6CC2D4EC1C31942700334ADD /* compress_point.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D40C1C3185D700334ADD /* compress_point.hpp */; };
-		6CC2D4ED1C31942700334ADD /* GLS254.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D40D1C3185D700334ADD /* GLS254.cpp */; };
-		6CC2D4EE1C31942700334ADD /* GLS254.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D40E1C3185D700334ADD /* GLS254.hpp */; };
-		6CC2D4EF1C31942700334ADD /* Point.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D40F1C3185D700334ADD /* Point.hpp */; };
-		6CC2D4F01C31942700334ADD /* sw.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4101C3185D700334ADD /* sw.hpp */; };
-		6CC2D4F11C31942700334ADD /* sw_blinded.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4111C3185D700334ADD /* sw_blinded.hpp */; };
-		6CC2D4F21C31942F00334ADD /* assign_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4131C3185D700334ADD /* assign_hash.hpp */; };
-		6CC2D4F31C31942F00334ADD /* batch_invert.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4141C3185D700334ADD /* batch_invert.hpp */; };
-		6CC2D4F41C31942F00334ADD /* compute_linear_operation_table.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4151C3185D700334ADD /* compute_linear_operation_table.hpp */; };
-		6CC2D4F51C31942F00334ADD /* generic_half_trace.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41F1C3185D700334ADD /* generic_half_trace.hpp */; };
-		6CC2D4F61C31942F00334ADD /* generic_trace.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4201C3185D700334ADD /* generic_trace.hpp */; };
-		6CC2D4F71C31942F00334ADD /* GF2_127_63.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */; };
-		6CC2D4F81C31942F00334ADD /* GF2_127_63.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4221C3185D700334ADD /* GF2_127_63.hpp */; };
-		6CC2D4F91C31942F00334ADD /* GF2_254.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4231C3185D700334ADD /* GF2_254.hpp */; };
-		6CC2D4FB1C31942F00334ADD /* invert_blinded.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4251C3185D700334ADD /* invert_blinded.hpp */; };
-		6CC2D4FC1C31942F00334ADD /* QuadraticExtension.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4261C3185D700334ADD /* QuadraticExtension.hpp */; };
-		6CC2D4FD1C31942F00334ADD /* solve_quadratic_blinded.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4271C3185D700334ADD /* solve_quadratic_blinded.hpp */; };
-		6CC2D4FE1C31943300334ADD /* apply_linear_table_transform.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4171C3185D700334ADD /* apply_linear_table_transform.hpp */; };
-		6CC2D4FF1C31943300334ADD /* field_operation_helpers.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4181C3185D700334ADD /* field_operation_helpers.hpp */; };
-		6CC2D5001C31943300334ADD /* GF2.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4191C3185D700334ADD /* GF2.hpp */; };
-		6CC2D5011C31943300334ADD /* limb.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41A1C3185D700334ADD /* limb.hpp */; };
-		6CC2D5021C31943300334ADD /* limb_ops.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41B1C3185D700334ADD /* limb_ops.hpp */; };
-		6CC2D5031C31943300334ADD /* polynomial_base.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41C1C3185D700334ADD /* polynomial_base.hpp */; };
-		6CC2D5041C31943300334ADD /* polynomial_multiply.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41D1C3185D700334ADD /* polynomial_multiply.hpp */; };
-		6CC2D5051C31943300334ADD /* polynomial_reduce_127_63.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D41E1C3185D700334ADD /* polynomial_reduce_127_63.hpp */; };
-		6CC2D5061C31943B00334ADD /* hash_expand.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42A1C3185D700334ADD /* hash_expand.hpp */; };
-		6CC2D5081C31944100334ADD /* ECMH.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4301C3185D700334ADD /* ECMH.hpp */; };
-		6CC2D50A1C31944500334ADD /* operation_helpers.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D42F1C3185D700334ADD /* operation_helpers.hpp */; };
-		6CC2D50F1C31945000334ADD /* assign_endian.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4381C3185D700334ADD /* assign_endian.hpp */; };
-		6CC2D5101C31945000334ADD /* division.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4391C3185D700334ADD /* division.hpp */; };
-		6CC2D5111C31945000334ADD /* enable_if.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43A1C3185D700334ADD /* enable_if.hpp */; };
-		6CC2D5121C31945000334ADD /* is_byte.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43B1C3185D700334ADD /* is_byte.hpp */; };
-		6CC2D5131C31945000334ADD /* is_resizable_container.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43C1C3185D700334ADD /* is_resizable_container.hpp */; };
-		6CC2D5141C31945000334ADD /* logical.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43D1C3185D700334ADD /* logical.hpp */; };
-		6CC2D5151C31945000334ADD /* print.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43E1C3185D700334ADD /* print.hpp */; };
-		6CC2D5161C31945000334ADD /* print_fwd.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D43F1C3185D700334ADD /* print_fwd.hpp */; };
-		6CC2D5171C31945000334ADD /* static_repeat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6CC2D4401C3185D700334ADD /* static_repeat.hpp */; };
 		6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
 		6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
 		6CF4160A1CB4FF1D00C448D4 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF416061CB4FF1C00C448D4 /* utils.cpp */; };
@@ -359,6 +312,9 @@
 		31DEB7721FE6B91F00CD0F92 /* bench */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bench; sourceTree = BUILT_PRODUCTS_DIR; };
 		31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = benchmarks.cpp; sourceTree = "<group>"; };
 		31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bench_tdp.cpp; sourceTree = "<group>"; };
+		31DEB7821FE846F100CD0F92 /* set_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = set_hash.cpp; sourceTree = "<group>"; };
+		31DEB7831FE846F100CD0F92 /* set_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = set_hash.hpp; sourceTree = "<group>"; };
+		31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_set_hash.cpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6CC2D3FD1C3185D700334ADD /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -368,47 +324,6 @@
 		6CC2D4031C3185D700334ADD /* build.scons */ = {isa = PBXFileReference; lastKnownFileType = text; path = build.scons; sourceTree = "<group>"; };
 		6CC2D4041C3185D700334ADD /* cipher.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cipher.cpp; sourceTree = "<group>"; };
 		6CC2D4051C3185D700334ADD /* cipher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cipher.hpp; sourceTree = "<group>"; };
-		6CC2D4081C3185D700334ADD /* array_view.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = array_view.hpp; sourceTree = "<group>"; };
-		6CC2D4091C3185D700334ADD /* is_contiguous.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = is_contiguous.hpp; sourceTree = "<group>"; };
-		6CC2D40B1C3185D700334ADD /* add.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = add.hpp; sourceTree = "<group>"; };
-		6CC2D40C1C3185D700334ADD /* compress_point.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = compress_point.hpp; sourceTree = "<group>"; };
-		6CC2D40D1C3185D700334ADD /* GLS254.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GLS254.cpp; sourceTree = "<group>"; };
-		6CC2D40E1C3185D700334ADD /* GLS254.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GLS254.hpp; sourceTree = "<group>"; };
-		6CC2D40F1C3185D700334ADD /* Point.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Point.hpp; sourceTree = "<group>"; };
-		6CC2D4101C3185D700334ADD /* sw.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sw.hpp; sourceTree = "<group>"; };
-		6CC2D4111C3185D700334ADD /* sw_blinded.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sw_blinded.hpp; sourceTree = "<group>"; };
-		6CC2D4131C3185D700334ADD /* assign_hash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assign_hash.hpp; sourceTree = "<group>"; };
-		6CC2D4141C3185D700334ADD /* batch_invert.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = batch_invert.hpp; sourceTree = "<group>"; };
-		6CC2D4151C3185D700334ADD /* compute_linear_operation_table.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = compute_linear_operation_table.hpp; sourceTree = "<group>"; };
-		6CC2D4171C3185D700334ADD /* apply_linear_table_transform.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = apply_linear_table_transform.hpp; sourceTree = "<group>"; };
-		6CC2D4181C3185D700334ADD /* field_operation_helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = field_operation_helpers.hpp; sourceTree = "<group>"; };
-		6CC2D4191C3185D700334ADD /* GF2.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GF2.hpp; sourceTree = "<group>"; };
-		6CC2D41A1C3185D700334ADD /* limb.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = limb.hpp; sourceTree = "<group>"; };
-		6CC2D41B1C3185D700334ADD /* limb_ops.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = limb_ops.hpp; sourceTree = "<group>"; };
-		6CC2D41C1C3185D700334ADD /* polynomial_base.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = polynomial_base.hpp; sourceTree = "<group>"; };
-		6CC2D41D1C3185D700334ADD /* polynomial_multiply.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = polynomial_multiply.hpp; sourceTree = "<group>"; };
-		6CC2D41E1C3185D700334ADD /* polynomial_reduce_127_63.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = polynomial_reduce_127_63.hpp; sourceTree = "<group>"; };
-		6CC2D41F1C3185D700334ADD /* generic_half_trace.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = generic_half_trace.hpp; sourceTree = "<group>"; };
-		6CC2D4201C3185D700334ADD /* generic_trace.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = generic_trace.hpp; sourceTree = "<group>"; };
-		6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GF2_127_63.cpp; sourceTree = "<group>"; };
-		6CC2D4221C3185D700334ADD /* GF2_127_63.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GF2_127_63.hpp; sourceTree = "<group>"; };
-		6CC2D4231C3185D700334ADD /* GF2_254.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GF2_254.hpp; sourceTree = "<group>"; };
-		6CC2D4251C3185D700334ADD /* invert_blinded.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = invert_blinded.hpp; sourceTree = "<group>"; };
-		6CC2D4261C3185D700334ADD /* QuadraticExtension.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = QuadraticExtension.hpp; sourceTree = "<group>"; };
-		6CC2D4271C3185D700334ADD /* solve_quadratic_blinded.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = solve_quadratic_blinded.hpp; sourceTree = "<group>"; };
-		6CC2D42A1C3185D700334ADD /* hash_expand.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hash_expand.hpp; sourceTree = "<group>"; };
-		6CC2D42B1C3185D700334ADD /* hugepages.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hugepages.hpp; sourceTree = "<group>"; };
-		6CC2D42F1C3185D700334ADD /* operation_helpers.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = operation_helpers.hpp; sourceTree = "<group>"; };
-		6CC2D4301C3185D700334ADD /* ECMH.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ECMH.hpp; sourceTree = "<group>"; };
-		6CC2D4381C3185D700334ADD /* assign_endian.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assign_endian.hpp; sourceTree = "<group>"; };
-		6CC2D4391C3185D700334ADD /* division.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = division.hpp; sourceTree = "<group>"; };
-		6CC2D43A1C3185D700334ADD /* enable_if.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = enable_if.hpp; sourceTree = "<group>"; };
-		6CC2D43B1C3185D700334ADD /* is_byte.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = is_byte.hpp; sourceTree = "<group>"; };
-		6CC2D43C1C3185D700334ADD /* is_resizable_container.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = is_resizable_container.hpp; sourceTree = "<group>"; };
-		6CC2D43D1C3185D700334ADD /* logical.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = logical.hpp; sourceTree = "<group>"; };
-		6CC2D43E1C3185D700334ADD /* print.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = print.hpp; sourceTree = "<group>"; };
-		6CC2D43F1C3185D700334ADD /* print_fwd.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = print_fwd.hpp; sourceTree = "<group>"; };
-		6CC2D4401C3185D700334ADD /* static_repeat.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = static_repeat.hpp; sourceTree = "<group>"; };
 		6CC2D4411C3185D700334ADD /* prp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = prp.cpp; sourceTree = "<group>"; };
 		6CC2D4421C3185D700334ADD /* prp.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = prp.hpp; sourceTree = "<group>"; };
 		6CC2D4581C3185D700334ADD /* sha512.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sha512.cpp; sourceTree = "<group>"; };
@@ -419,12 +334,9 @@
 		6CC2D45D1C3185D700334ADD /* prf.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = prf.hpp; sourceTree = "<group>"; };
 		6CC2D45E1C3185D700334ADD /* random.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = random.cpp; sourceTree = "<group>"; };
 		6CC2D45F1C3185D700334ADD /* random.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = random.hpp; sourceTree = "<group>"; };
-		6CC2D4601C3185D700334ADD /* set_hash.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = set_hash.cpp; sourceTree = "<group>"; };
-		6CC2D4611C3185D700334ADD /* set_hash.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = set_hash.hpp; sourceTree = "<group>"; };
 		6CC2D4631C3185D700334ADD /* build.scons */ = {isa = PBXFileReference; lastKnownFileType = text; path = build.scons; sourceTree = "<group>"; };
 		6CC2D4641C3185D700334ADD /* encryption.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = encryption.cpp; sourceTree = "<group>"; };
 		6CC2D4661C3185D700334ADD /* hashing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = hashing.cpp; sourceTree = "<group>"; };
-		6CC2D4681C3185D700334ADD /* test_ecmh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_ecmh.cpp; sourceTree = "<group>"; };
 		6CC2D46A1C3185D700334ADD /* test_prp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_prp.cpp; sourceTree = "<group>"; };
 		6CC2D46C1C3185D700334ADD /* test_hmac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_hmac.cpp; sourceTree = "<group>"; };
 		6CC2D46E1C3185E500334ADD /* checks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = checks.cpp; sourceTree = "<group>"; };
@@ -576,7 +488,6 @@
 				6CF416071CB4FF1D00C448D4 /* utils.hpp */,
 				6CC2D4041C3185D700334ADD /* cipher.cpp */,
 				6CC2D4051C3185D700334ADD /* cipher.hpp */,
-				6CC2D4061C3185D700334ADD /* ecmh */,
 				313CD48B1EC9034B0058A0C5 /* puncturable_enc.cpp */,
 				313CD48C1EC9034B0058A0C5 /* puncturable_enc.hpp */,
 				310C2BCC1EC0B59700E80B3A /* ppke */,
@@ -591,8 +502,8 @@
 				6CC2D45D1C3185D700334ADD /* prf.hpp */,
 				6CC2D45E1C3185D700334ADD /* random.cpp */,
 				6CC2D45F1C3185D700334ADD /* random.hpp */,
-				6CC2D4601C3185D700334ADD /* set_hash.cpp */,
-				6CC2D4611C3185D700334ADD /* set_hash.hpp */,
+				31DEB7821FE846F100CD0F92 /* set_hash.cpp */,
+				31DEB7831FE846F100CD0F92 /* set_hash.hpp */,
 				318C72991C9730140040AEE7 /* tdp.cpp */,
 				318C729A1C9730140040AEE7 /* tdp.hpp */,
 				319966C11FBEE9D400051179 /* tdp_impl */,
@@ -613,118 +524,6 @@
 			path = aez;
 			sourceTree = "<group>";
 		};
-		6CC2D4061C3185D700334ADD /* ecmh */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D4071C3185D700334ADD /* array_view */,
-				6CC2D40A1C3185D700334ADD /* binary_elliptic_curve */,
-				6CC2D4121C3185D700334ADD /* binary_field */,
-				6CC2D4291C3185D700334ADD /* hash */,
-				6CC2D42B1C3185D700334ADD /* hugepages.hpp */,
-				6CC2D42C1C3185D700334ADD /* multiset_hash */,
-				6CC2D4371C3185D700334ADD /* utility */,
-			);
-			path = ecmh;
-			sourceTree = "<group>";
-		};
-		6CC2D4071C3185D700334ADD /* array_view */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D4081C3185D700334ADD /* array_view.hpp */,
-				6CC2D4091C3185D700334ADD /* is_contiguous.hpp */,
-			);
-			path = array_view;
-			sourceTree = "<group>";
-		};
-		6CC2D40A1C3185D700334ADD /* binary_elliptic_curve */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D40B1C3185D700334ADD /* add.hpp */,
-				6CC2D40C1C3185D700334ADD /* compress_point.hpp */,
-				6CC2D40D1C3185D700334ADD /* GLS254.cpp */,
-				6CC2D40E1C3185D700334ADD /* GLS254.hpp */,
-				6CC2D40F1C3185D700334ADD /* Point.hpp */,
-				6CC2D4101C3185D700334ADD /* sw.hpp */,
-				6CC2D4111C3185D700334ADD /* sw_blinded.hpp */,
-			);
-			path = binary_elliptic_curve;
-			sourceTree = "<group>";
-		};
-		6CC2D4121C3185D700334ADD /* binary_field */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D4131C3185D700334ADD /* assign_hash.hpp */,
-				6CC2D4141C3185D700334ADD /* batch_invert.hpp */,
-				6CC2D4151C3185D700334ADD /* compute_linear_operation_table.hpp */,
-				6CC2D4161C3185D700334ADD /* detail */,
-				6CC2D41F1C3185D700334ADD /* generic_half_trace.hpp */,
-				6CC2D4201C3185D700334ADD /* generic_trace.hpp */,
-				6CC2D4211C3185D700334ADD /* GF2_127_63.cpp */,
-				6CC2D4221C3185D700334ADD /* GF2_127_63.hpp */,
-				6CC2D4231C3185D700334ADD /* GF2_254.hpp */,
-				6CC2D4251C3185D700334ADD /* invert_blinded.hpp */,
-				6CC2D4261C3185D700334ADD /* QuadraticExtension.hpp */,
-				6CC2D4271C3185D700334ADD /* solve_quadratic_blinded.hpp */,
-			);
-			path = binary_field;
-			sourceTree = "<group>";
-		};
-		6CC2D4161C3185D700334ADD /* detail */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D4171C3185D700334ADD /* apply_linear_table_transform.hpp */,
-				6CC2D4181C3185D700334ADD /* field_operation_helpers.hpp */,
-				6CC2D4191C3185D700334ADD /* GF2.hpp */,
-				6CC2D41A1C3185D700334ADD /* limb.hpp */,
-				6CC2D41B1C3185D700334ADD /* limb_ops.hpp */,
-				6CC2D41C1C3185D700334ADD /* polynomial_base.hpp */,
-				6CC2D41D1C3185D700334ADD /* polynomial_multiply.hpp */,
-				6CC2D41E1C3185D700334ADD /* polynomial_reduce_127_63.hpp */,
-			);
-			path = detail;
-			sourceTree = "<group>";
-		};
-		6CC2D4291C3185D700334ADD /* hash */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D42A1C3185D700334ADD /* hash_expand.hpp */,
-			);
-			path = hash;
-			sourceTree = "<group>";
-		};
-		6CC2D42C1C3185D700334ADD /* multiset_hash */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D42E1C3185D700334ADD /* detail */,
-				6CC2D4301C3185D700334ADD /* ECMH.hpp */,
-			);
-			path = multiset_hash;
-			sourceTree = "<group>";
-		};
-		6CC2D42E1C3185D700334ADD /* detail */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D42F1C3185D700334ADD /* operation_helpers.hpp */,
-			);
-			path = detail;
-			sourceTree = "<group>";
-		};
-		6CC2D4371C3185D700334ADD /* utility */ = {
-			isa = PBXGroup;
-			children = (
-				6CC2D4381C3185D700334ADD /* assign_endian.hpp */,
-				6CC2D4391C3185D700334ADD /* division.hpp */,
-				6CC2D43A1C3185D700334ADD /* enable_if.hpp */,
-				6CC2D43B1C3185D700334ADD /* is_byte.hpp */,
-				6CC2D43C1C3185D700334ADD /* is_resizable_container.hpp */,
-				6CC2D43D1C3185D700334ADD /* logical.hpp */,
-				6CC2D43E1C3185D700334ADD /* print.hpp */,
-				6CC2D43F1C3185D700334ADD /* print_fwd.hpp */,
-				6CC2D4401C3185D700334ADD /* static_repeat.hpp */,
-			);
-			path = utility;
-			sourceTree = "<group>";
-		};
 		6CC2D4431C3185D700334ADD /* hash */ = {
 			isa = PBXGroup;
 			children = (
@@ -742,7 +541,7 @@
 				6CC2D4631C3185D700334ADD /* build.scons */,
 				6CC2D4641C3185D700334ADD /* encryption.cpp */,
 				6CC2D4661C3185D700334ADD /* hashing.cpp */,
-				6CC2D4681C3185D700334ADD /* test_ecmh.cpp */,
+				31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */,
 				6CC2D46A1C3185D700334ADD /* test_prp.cpp */,
 				6CC2D46C1C3185D700334ADD /* test_hmac.cpp */,
 				31B548991FB336AE00E17DD3 /* test_prf.cpp */,
@@ -776,7 +575,6 @@
 				319966A01FB8A72D00051179 /* bn_mul.h in Headers */,
 				310C2BE91EC0B6D800E80B3A /* util.hpp in Headers */,
 				6CC2D4C91C3193E500334ADD /* prp.hpp in Headers */,
-				6CC2D4D11C3193E900334ADD /* set_hash.hpp in Headers */,
 				6CC2D4CB1C3193E900334ADD /* hash.hpp in Headers */,
 				318C729E1C9730140040AEE7 /* tdp.hpp in Headers */,
 				6CC2D4CD1C3193E900334ADD /* prf.hpp in Headers */,
@@ -788,63 +586,25 @@
 				316F0D421D25600700F87904 /* prg.hpp in Headers */,
 				310C2BE31EC0B63600E80B3A /* GMPpke.hpp in Headers */,
 				319966A11FB8A72D00051179 /* pem.h in Headers */,
-				6CC2D5111C31945000334ADD /* enable_if.hpp in Headers */,
-				6CC2D4FF1C31943300334ADD /* field_operation_helpers.hpp in Headers */,
-				6CC2D5101C31945000334ADD /* division.hpp in Headers */,
 				313CD4901EC9034B0058A0C5 /* puncturable_enc.hpp in Headers */,
-				6CC2D4FD1C31942F00334ADD /* solve_quadratic_blinded.hpp in Headers */,
-				6CC2D4EC1C31942700334ADD /* compress_point.hpp in Headers */,
-				6CC2D4EA1C31942100334ADD /* is_contiguous.hpp in Headers */,
-				6CC2D5031C31943300334ADD /* polynomial_base.hpp in Headers */,
-				6CC2D4E91C31942100334ADD /* array_view.hpp in Headers */,
-				6CC2D5081C31944100334ADD /* ECMH.hpp in Headers */,
-				6CC2D50A1C31944500334ADD /* operation_helpers.hpp in Headers */,
 				310B64511FCCC3420015FBEE /* blake2b.hpp in Headers */,
 				3114009B1F9E628C0025DE3A /* key.hpp in Headers */,
 				6CC2D4D51C31940400334ADD /* sha512.hpp in Headers */,
-				6CC2D4F91C31942F00334ADD /* GF2_254.hpp in Headers */,
-				6CC2D5051C31943300334ADD /* polynomial_reduce_127_63.hpp in Headers */,
 				6CC2D4D31C3193FA00334ADD /* aez.h in Headers */,
-				6CC2D5041C31943300334ADD /* polynomial_multiply.hpp in Headers */,
-				6CC2D4EE1C31942700334ADD /* GLS254.hpp in Headers */,
 				319966C91FBEE9D500051179 /* tdp_impl_mbedtls.hpp in Headers */,
-				6CC2D4F41C31942F00334ADD /* compute_linear_operation_table.hpp in Headers */,
 				319966A61FB8A88900051179 /* pk_internal.h in Headers */,
-				6CC2D5141C31945000334ADD /* logical.hpp in Headers */,
-				6CC2D4EB1C31942700334ADD /* add.hpp in Headers */,
-				6CC2D50F1C31945000334ADD /* assign_endian.hpp in Headers */,
-				6CC2D5131C31945000334ADD /* is_resizable_container.hpp in Headers */,
-				6CC2D4EF1C31942700334ADD /* Point.hpp in Headers */,
-				6CC2D4FB1C31942F00334ADD /* invert_blinded.hpp in Headers */,
 				310C2BDB1EC0B59700E80B3A /* relic_api.h in Headers */,
 				319966951FB8A72D00051179 /* pk.h in Headers */,
 				319966A81FB8A8B300051179 /* asn1write.h in Headers */,
 				310C2BD51EC0B59700E80B3A /* common.h in Headers */,
-				6CC2D4FC1C31942F00334ADD /* QuadraticExtension.hpp in Headers */,
-				6CC2D4F11C31942700334ADD /* sw_blinded.hpp in Headers */,
-				6CC2D4F61C31942F00334ADD /* generic_trace.hpp in Headers */,
-				6CC2D5061C31943B00334ADD /* hash_expand.hpp in Headers */,
 				319966911FB8A72D00051179 /* bignum.h in Headers */,
-				6CC2D4F21C31942F00334ADD /* assign_hash.hpp in Headers */,
+				31DEB7881FE846F200CD0F92 /* set_hash.hpp in Headers */,
 				319966991FB8A72D00051179 /* rsa.h in Headers */,
-				6CC2D4E81C31941D00334ADD /* hugepages.hpp in Headers */,
 				319966AB1FB8AA1C00051179 /* base64.h in Headers */,
-				6CC2D5011C31943300334ADD /* limb.hpp in Headers */,
 				319966BA1FBC2E9800051179 /* rsa_io.h in Headers */,
-				6CC2D4F01C31942700334ADD /* sw.hpp in Headers */,
-				6CC2D5021C31943300334ADD /* limb_ops.hpp in Headers */,
 				3199669F1FB8A72D00051179 /* config.h in Headers */,
-				6CC2D5001C31943300334ADD /* GF2.hpp in Headers */,
 				319966CD1FBEE9D500051179 /* tdp_impl_openssl.hpp in Headers */,
-				6CC2D4F81C31942F00334ADD /* GF2_127_63.hpp in Headers */,
-				6CC2D4FE1C31943300334ADD /* apply_linear_table_transform.hpp in Headers */,
-				6CC2D5151C31945000334ADD /* print.hpp in Headers */,
-				6CC2D5121C31945000334ADD /* is_byte.hpp in Headers */,
 				3199669B1FB8A72D00051179 /* asn1.h in Headers */,
-				6CC2D4F31C31942F00334ADD /* batch_invert.hpp in Headers */,
-				6CC2D5161C31945000334ADD /* print_fwd.hpp in Headers */,
-				6CC2D5171C31945000334ADD /* static_repeat.hpp in Headers */,
-				6CC2D4F51C31942F00334ADD /* generic_half_trace.hpp in Headers */,
 				3199669A1FB8A72D00051179 /* check_config.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1010,14 +770,12 @@
 				31DEB7411FE6B91F00CD0F92 /* blake2b.cpp in Sources */,
 				31DEB7441FE6B91F00CD0F92 /* asn1write.c in Sources */,
 				31DEB7461FE6B91F00CD0F92 /* base64.c in Sources */,
-				31DEB7471FE6B91F00CD0F92 /* set_hash.cpp in Sources */,
 				31DEB7481FE6B91F00CD0F92 /* utils.cpp in Sources */,
 				31DEB7491FE6B91F00CD0F92 /* key.cpp in Sources */,
 				31DEB74A1FE6B91F00CD0F92 /* relic_api.cpp in Sources */,
 				31DEB74B1FE6B91F00CD0F92 /* pk_wrap.c in Sources */,
 				31DEB74C1FE6B91F00CD0F92 /* cipher.cpp in Sources */,
 				31DEB74D1FE6B91F00CD0F92 /* prg.cpp in Sources */,
-				31DEB74E1FE6B91F00CD0F92 /* GLS254.cpp in Sources */,
 				31DEB77F1FE6E00100CD0F92 /* benchmarks.cpp in Sources */,
 				31DEB74F1FE6B91F00CD0F92 /* random.cpp in Sources */,
 				31DEB7501FE6B91F00CD0F92 /* pkparse.c in Sources */,
@@ -1025,6 +783,7 @@
 				31DEB7531FE6B91F00CD0F92 /* hmac.cpp in Sources */,
 				31DEB7541FE6B91F00CD0F92 /* prf.cpp in Sources */,
 				31DEB7551FE6B91F00CD0F92 /* bignum.c in Sources */,
+				31DEB7871FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				31DEB7561FE6B91F00CD0F92 /* gtest-all.cc in Sources */,
 				31DEB77D1FE6B95400CD0F92 /* bench_set_hash.cpp in Sources */,
 				31DEB7581FE6B91F00CD0F92 /* rsa_io.c in Sources */,
@@ -1037,7 +796,6 @@
 				31DEB7641FE6B91F00CD0F92 /* GMPpke.cpp in Sources */,
 				31DEB7651FE6B91F00CD0F92 /* asn1parse.c in Sources */,
 				31DEB7661FE6B91F00CD0F92 /* tdp_impl_openssl.cpp in Sources */,
-				31DEB7671FE6B91F00CD0F92 /* GF2_127_63.cpp in Sources */,
 				31DEB7681FE6B91F00CD0F92 /* rsa.c in Sources */,
 				31DEB76A1FE6B91F00CD0F92 /* puncturable_enc.cpp in Sources */,
 				31DEB76B1FE6B91F00CD0F92 /* sha512.cpp in Sources */,
@@ -1049,12 +807,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				319966A21FB8A72D00051179 /* pk.c in Sources */,
+				31DEB7841FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				310B644E1FCCC3420015FBEE /* blake2b.cpp in Sources */,
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
 				319966881FB8A72D00051179 /* asn1write.c in Sources */,
 				31DEB7781FE6B94200CD0F92 /* test_prf.cpp in Sources */,
 				319966AC1FB8AA1C00051179 /* base64.c in Sources */,
-				6CC2D4891C31889B00334ADD /* set_hash.cpp in Sources */,
 				6CF416081CB4FF1D00C448D4 /* utils.cpp in Sources */,
 				314863CF1FB71E9E009FE78B /* key.cpp in Sources */,
 				310C2BDF1EC0B59700E80B3A /* relic_api.cpp in Sources */,
@@ -1062,15 +820,14 @@
 				31DEB77B1FE6B94200CD0F92 /* test_ppke.cpp in Sources */,
 				31DEB7731FE6B94200CD0F92 /* encryption.cpp in Sources */,
 				6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */,
-				31DEB7751FE6B94200CD0F92 /* test_ecmh.cpp in Sources */,
 				316F0D3F1D25600700F87904 /* prg.cpp in Sources */,
 				31DEB77A1FE6B94200CD0F92 /* test_prg.cpp in Sources */,
-				6CC2D48B1C3188A800334ADD /* GLS254.cpp in Sources */,
 				6CC2D4881C31889B00334ADD /* random.cpp in Sources */,
 				319966961FB8A72D00051179 /* pkparse.c in Sources */,
 				3199669C1FB8A72D00051179 /* pem.c in Sources */,
 				311E94871FE2F5D600E01869 /* hmac.cpp in Sources */,
 				311E948A1FE3BF4800E01869 /* prf.cpp in Sources */,
+				31DEB78C1FEA637D00CD0F92 /* test_set_hash.cpp in Sources */,
 				319966851FB8A72D00051179 /* bignum.c in Sources */,
 				3163D3941ED33C8E00A7FCD9 /* gtest-all.cc in Sources */,
 				319966B71FBC2E9800051179 /* rsa_io.c in Sources */,
@@ -1087,7 +844,6 @@
 				31DEB7741FE6B94200CD0F92 /* hashing.cpp in Sources */,
 				31DEB7771FE6B94200CD0F92 /* test_hmac.cpp in Sources */,
 				319966CA1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
-				6CC2D48C1C3188AE00334ADD /* GF2_127_63.cpp in Sources */,
 				3199668B1FB8A72D00051179 /* rsa.c in Sources */,
 				313CD48D1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				31DEB7761FE6B94200CD0F92 /* test_prp.cpp in Sources */,
@@ -1100,8 +856,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				311E948B1FE3BF4800E01869 /* prf.cpp in Sources */,
+				31DEB7851FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				319966861FB8A72D00051179 /* bignum.c in Sources */,
-				6CC2D49E1C318F2500334ADD /* set_hash.cpp in Sources */,
 				319966891FB8A72D00051179 /* asn1write.c in Sources */,
 				316F0D401D25600700F87904 /* prg.cpp in Sources */,
 				310B644F1FCCC3420015FBEE /* blake2b.cpp in Sources */,
@@ -1116,7 +872,6 @@
 				319966C71FBEE9D500051179 /* tdp_impl_mbedtls.cpp in Sources */,
 				319966B11FB8AE7200051179 /* pk_wrap.c in Sources */,
 				319966B81FBC2E9800051179 /* rsa_io.c in Sources */,
-				6CC2D4A21C318F2500334ADD /* GLS254.cpp in Sources */,
 				6CC2D4A41C318F2500334ADD /* random.cpp in Sources */,
 				6CC2D4A91C318F2500334ADD /* hash.cpp in Sources */,
 				310C2BE01EC0B59700E80B3A /* relic_api.cpp in Sources */,
@@ -1126,7 +881,6 @@
 				318C729C1C9730140040AEE7 /* tdp.cpp in Sources */,
 				6CC2D4AC1C318F2500334ADD /* prp.cpp in Sources */,
 				6CF416091CB4FF1D00C448D4 /* utils.cpp in Sources */,
-				6CC2D4AE1C318F2500334ADD /* GF2_127_63.cpp in Sources */,
 				319966AD1FB8AA1C00051179 /* base64.c in Sources */,
 				313CD48E1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				6CC2D4B01C318F2500334ADD /* sha512.cpp in Sources */,
@@ -1139,6 +893,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				311E948C1FE3BF4800E01869 /* prf.cpp in Sources */,
+				31DEB7861FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				319966A41FB8A72D00051179 /* pk.c in Sources */,
 				318C729D1C9730140040AEE7 /* tdp.cpp in Sources */,
 				310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */,
@@ -1152,7 +907,6 @@
 				6CC2D4C81C3193E500334ADD /* prp.cpp in Sources */,
 				313CD48F1EC9034B0058A0C5 /* puncturable_enc.cpp in Sources */,
 				319966B91FBC2E9800051179 /* rsa_io.c in Sources */,
-				6CC2D4F71C31942F00334ADD /* GF2_127_63.cpp in Sources */,
 				6CC2D4CA1C3193E900334ADD /* hash.cpp in Sources */,
 				6CC2D4C61C3193E200334ADD /* cipher.cpp in Sources */,
 				319966901FB8A72D00051179 /* asn1parse.c in Sources */,
@@ -1160,8 +914,6 @@
 				319966CC1FBEE9D500051179 /* tdp_impl_openssl.cpp in Sources */,
 				314863D11FB71E9E009FE78B /* key.cpp in Sources */,
 				310C2BE11EC0B59700E80B3A /* relic_api.cpp in Sources */,
-				6CC2D4D01C3193E900334ADD /* set_hash.cpp in Sources */,
-				6CC2D4ED1C31942700334ADD /* GLS254.cpp in Sources */,
 				316F0D411D25600700F87904 /* prg.cpp in Sources */,
 				6CC2D4D41C31940400334ADD /* sha512.cpp in Sources */,
 				6CC2D4CE1C3193E900334ADD /* random.cpp in Sources */,

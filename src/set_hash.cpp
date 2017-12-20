@@ -20,38 +20,26 @@
 
 #include "set_hash.hpp"
 
-#include "ecmh/array_view/array_view.hpp"
-#include "ecmh/binary_elliptic_curve/GLS254.hpp"
-#include "ecmh/multiset_hash/ECMH.hpp"
-#include "hash.hpp"
+#include <exception>
+#include <iomanip>
+#include <iostream>
 
-using namespace jbms::multiset_hash;
+#include <sodium/crypto_core_ed25519.h>
+#include <sodium/crypto_scalarmult_ed25519.h>
+#include <sodium/utils.h>
+
+#include <cstring>
+
+#include "hash.hpp"
 
 namespace sse {
 
 namespace crypto {
 
-/*
- * HashWrapper
- *
- * A wrapper around the Hash class to make it compatible with the ECMH code.
- *
- */
-
-class HashWrapper
-{
-public:
-    constexpr static size_t digest_bytes = sse::crypto::Hash::kDigestSize;
-    constexpr static size_t block_bytes  = sse::crypto::Hash::kBlockSize;
-
-    static void hash(unsigned char* out, const unsigned char* in, size_t inlen)
-    {
-        sse::crypto::Hash::hash(in, inlen, out);
-    }
-};
-
-using MSH = jbms::multiset_hash::
-    ECMH<jbms::binary_elliptic_curve::GLS254, sse::crypto::HashWrapper, false>;
+constexpr uint8_t ec_inf_point__[crypto_core_ed25519_BYTES]
+    = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 class SetHash::SetHashImpl
 {
@@ -59,51 +47,52 @@ class SetHash::SetHashImpl
 
 public:
     SetHashImpl();
-    explicit SetHashImpl(const MSH::State& s);
-    explicit SetHashImpl(const std::string& hex_str);
+    explicit SetHashImpl(const SetHashImpl& s);
+    explicit SetHashImpl(const std::array<uint8_t, kSetHashSize>& bytes);
     explicit SetHashImpl(const std::vector<std::string>& in_set);
-    template<class InputIterator>
-    SetHashImpl(InputIterator first, InputIterator last);
 
-    void       add_element(const std::string& in);
-    void       add_set(const SetHashImpl* in);
-    void       remove_element(const std::string& in);
-    void       remove_set(const SetHashImpl* in);
-    MSH::State invert_set();
+    SetHashImpl& operator=(const SetHashImpl& h);
 
-    std::string hex() const;
-    bool        operator==(const SetHashImpl& h) const;
+    void add_element(const std::string& in);
+    void add_set(const SetHashImpl* in);
+    void remove_element(const std::string& in);
+    void remove_set(const SetHashImpl* in);
 
+    std::array<uint8_t, kSetHashSize> data() const;
 
-    // static MSH *ecmh__;
+    bool operator==(const SetHashImpl& h) const;
+
 private:
-    // typedef jbms::multiset_hash::ECMH<jbms::binary_elliptic_curve::GLS254,
-    // sse::crypto::HashWrapper, false> MSH; static const MSH ecmh_;
-    MSH::State state_;
+    static void gen_curve_point(
+        std::array<uint8_t, crypto_core_ed25519_BYTES>& p,
+        const uint8_t*                                  buf,
+        const size_t                                    len);
 
-    static const MSH& ecmh()
-    {
-        // if(ecmh__ == NULL)
-        // 	ecmh__ = new MSH();
-        static MSH ecmh__;
-        return ecmh__;
-    }
+    uint8_t
+        ellig_state_[crypto_core_ed25519_BYTES]; // keep it that way for now,
+                                                 // might be replaced with
+                                                 // dynamic memory allocation
+    static constexpr std::array<uint8_t, crypto_scalarmult_ed25519_SCALARBYTES>
+        seed__{{0x00}};
+
+    static_assert(crypto_core_ed25519_BYTES == kSetHashSize,
+                  "crypto_core_ed25519_BYTES != kSetHashSize");
 };
 
-// SetHash::SetHashImpl::MSH const SetHash::SetHashImpl::ecmh_{};
-// MSH *SetHash::SetHashImpl::ecmh__ = NULL;
+constexpr std::array<uint8_t, crypto_scalarmult_ed25519_SCALARBYTES>
+    SetHash::SetHashImpl::seed__;
 
 SetHash::SetHash() : set_hash_imp_(new SetHashImpl())
 {
 }
 
-SetHash::SetHash(const std::string& hex_str)
-    : set_hash_imp_(new SetHashImpl(hex_str))
+SetHash::SetHash(const std::array<uint8_t, kSetHashSize>& bytes)
+    : set_hash_imp_(new SetHashImpl(bytes))
 {
 }
 
 SetHash::SetHash(const SetHash& o)
-    : set_hash_imp_(new SetHashImpl(o.set_hash_imp_->state_))
+    : set_hash_imp_(new SetHashImpl(*o.set_hash_imp_))
 {
 }
 
@@ -144,25 +133,28 @@ void SetHash::remove_set(const SetHash& h)
     set_hash_imp_->remove_set(h.set_hash_imp_);
 }
 
-std::string SetHash::hex() const
+std::array<uint8_t, SetHash::kSetHashSize> SetHash::data() const
 {
-    return set_hash_imp_->hex();
+    return set_hash_imp_->data();
 }
 
 
 /* LCOV_EXCL_START */
 std::ostream& operator<<(std::ostream& os, const SetHash& h)
 {
-    os << h.set_hash_imp_->hex();
+    auto d = h.set_hash_imp_->data();
+    for (uint8_t b : d) {
+        os << std::hex << std::setw(2) << std::setfill('0') << (uint)b;
+    }
+    os << std::dec;
     return os;
 }
 /* LCOV_EXCL_STOP */
 
 SetHash& SetHash::operator=(const SetHash& h)
 {
-    if ((this != &h) && (set_hash_imp_ != h.set_hash_imp_)) {
-        delete set_hash_imp_;
-        set_hash_imp_ = new SetHashImpl(*h.set_hash_imp_);
+    if (this != &h) {
+        *set_hash_imp_ = *h.set_hash_imp_;
     }
     return *this;
 }
@@ -177,67 +169,114 @@ bool SetHash::operator!=(const SetHash& h) const
     return !(*this == h);
 }
 
-/*
- * SetHashImpl
- *
- */
+//
+//
+// SetHashImpl
+//
+//
 
+void SetHash::SetHashImpl::gen_curve_point(
+    std::array<uint8_t, crypto_core_ed25519_BYTES>& p,
+    const uint8_t*                                  buf,
+    const size_t                                    len)
+{
+    std::array<uint8_t, crypto_core_ed25519_UNIFORMBYTES> h;
+    sse::crypto::Hash::hash(
+        buf, len, crypto_core_ed25519_UNIFORMBYTES, h.data());
+
+    crypto_core_ed25519_from_uniform(p.data(), h.data());
+}
 
 SetHash::SetHashImpl::SetHashImpl()
 {
-    state_ = initial_state(ecmh());
+    // the initial state is the infinite point
+    // we directly copy ec_inf_point__: calling
+    // crypto_scalarmult_ed25519_base(ellig_state_, scalar_zero__)
+    // will generate a differenter byte string as the one obtained by computing
+    // crypto_core_ed25519_sub(_,b,b) (computing b-b). Indeed,
+    // crypto_core_ed25519_sub(x,b,b) sets x to ec_inf_point__.
+    memcpy(ellig_state_, ec_inf_point__, crypto_core_ed25519_BYTES);
 }
 
-SetHash::SetHashImpl::SetHashImpl(const MSH::State& s) : state_(s)
+SetHash::SetHashImpl::SetHashImpl(const SetHash::SetHashImpl& s)
 {
+    memcpy(ellig_state_, s.ellig_state_, sizeof(ellig_state_));
 }
 
-SetHash::SetHashImpl::SetHashImpl(const std::string& hex_str)
+SetHash::SetHashImpl::SetHashImpl(
+    const std::array<uint8_t, kSetHashSize>& bytes)
 {
-    state_ = from_hex(ecmh(), hex_str);
+    memcpy(ellig_state_, bytes.data(), crypto_core_ed25519_BYTES);
+
+    if ((crypto_core_ed25519_is_valid_point(ellig_state_) != 1)
+        && (sodium_memcmp(
+                bytes.data(), ec_inf_point__, crypto_core_ed25519_BYTES)
+            != 0)) {
+        throw std::invalid_argument("SetHash: Invalid curve point");
+    }
 }
 
 SetHash::SetHashImpl::SetHashImpl(const std::vector<std::string>& in_set)
 {
-    state_ = initial_state(ecmh());
-    batch_add(ecmh(), state_, in_set);
+    memcpy(ellig_state_, ec_inf_point__, crypto_core_ed25519_BYTES);
+    std::array<uint8_t, crypto_core_ed25519_BYTES> p;
+
+    for (auto& s : in_set) {
+        SetHash::SetHashImpl::gen_curve_point(
+            p, reinterpret_cast<const uint8_t*>(s.data()), s.size());
+
+        crypto_core_ed25519_add(ellig_state_, ellig_state_, p.data());
+    }
 }
 
-template<class InputIterator>
-SetHash::SetHashImpl::SetHashImpl(InputIterator first, InputIterator last)
+SetHash::SetHashImpl& SetHash::SetHashImpl::operator=(const SetHashImpl& h)
 {
-    state_ = initial_state(ecmh());
-    batch_add(ecmh(), state_, jbms::array_view<std::string>(first, last));
+    memcpy(ellig_state_, h.ellig_state_, sizeof(ellig_state_));
+
+    return *this;
 }
 
 void SetHash::SetHashImpl::add_element(const std::string& in)
 {
-    add(ecmh(), state_, in);
+    std::array<uint8_t, crypto_core_ed25519_BYTES> p;
+    SetHash::SetHashImpl::gen_curve_point(
+        p, reinterpret_cast<const uint8_t*>(in.data()), in.size());
+
+    crypto_core_ed25519_add(ellig_state_, ellig_state_, p.data());
 }
 
 void SetHash::SetHashImpl::add_set(const SetHash::SetHashImpl* in)
 {
-    add_hash(ecmh(), state_, in->state_);
+    crypto_core_ed25519_add(ellig_state_, ellig_state_, in->ellig_state_);
 }
 
 void SetHash::SetHashImpl::remove_element(const std::string& in)
 {
-    remove(ecmh(), state_, in);
+    std::array<uint8_t, crypto_core_ed25519_BYTES> p;
+    SetHash::SetHashImpl::gen_curve_point(
+        p, reinterpret_cast<const uint8_t*>(in.data()), in.size());
+
+    crypto_core_ed25519_sub(ellig_state_, ellig_state_, p.data());
 }
 
 void SetHash::SetHashImpl::remove_set(const SetHash::SetHashImpl* in)
 {
-    remove_hash(ecmh(), state_, in->state_);
+    crypto_core_ed25519_sub(ellig_state_, ellig_state_, in->ellig_state_);
 }
 
-std::string SetHash::SetHashImpl::hex() const
+std::array<uint8_t, SetHash::kSetHashSize> SetHash::SetHashImpl::data() const
 {
-    return to_hex(ecmh(), state_);
+    std::array<uint8_t, kSetHashSize> bytes;
+    memcpy(bytes.data(), ellig_state_, kSetHashSize);
+
+    return bytes;
 }
 
 bool SetHash::SetHashImpl::operator==(const SetHash::SetHashImpl& h) const
 {
-    return equal(ecmh().curve(), state_, h.state_);
+    return sodium_memcmp(
+               ellig_state_, h.ellig_state_, crypto_core_ed25519_BYTES)
+           == 0;
 }
 
 } // namespace crypto

@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -42,12 +43,16 @@ namespace crypto {
 ///
 /// This implementation uses the elliptic curve multiset hash (ECMH) by by
 /// Maitin-Shepard, Tibouchi and Aranha (see https://arxiv.org/abs/1601.06502 )
+/// implemented on Ed25519 using libsodium's Elligator primitives introduced in
+/// libsodium 1.0.16
 ///
 /// The sets that can be hashed are sets of std::string.
 ///
 class SetHash
 {
 public:
+    /// @brief Size of the bytes representation of a SetHash
+    static constexpr size_t kSetHashSize = 32;
     ///
     /// @brief Constructor
     ///
@@ -61,11 +66,9 @@ public:
     /// Creates a new SetHash from an already computed hash, in its hexadecimal
     /// representation
     ///
-    /// @param hex_str  A string representing a set hash. Must contain
-    ///                 hexadecimal character. Otherwise, the behavior is
-    ///                 undefined.
+    /// @param data A bytes array representing a set hash.
     ///
-    explicit SetHash(const std::string& hex_str);
+    explicit SetHash(const std::array<uint8_t, kSetHashSize>& data);
 
     ///
     /// @brief Copy constructor
@@ -133,14 +136,14 @@ public:
     void remove_set(const SetHash& h);
 
     ///
-    /// @brief Hexadecimal representation of the SetHash
+    /// @brief Binary representation of the SetHash
     ///
-    /// Returns a string containing the representation of the
-    /// SetHash object, as a string of hexadecimal characters
+    /// Returns a bytes array containing the representation of the
+    /// SetHash object.
     ///
-    /// @return The string representing the set hash
+    /// @return The array representing the set hash
     ///
-    std::string hex() const;
+    std::array<uint8_t, kSetHashSize> data() const;
 
 
     ///

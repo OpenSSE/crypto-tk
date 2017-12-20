@@ -29,6 +29,11 @@
 #include <netinet/in.h>
 #include <openssl/sha.h>
 
+#include <sodium/utils.h>
+#include <sodium/randombytes.h>
+#include <sodium/crypto_core_ed25519.h>
+#include <sodium/crypto_scalarmult_ed25519.h>
+
 #include "src/utils.hpp"
 #include "src/random.hpp"
 #include "src/key.hpp"
@@ -46,6 +51,8 @@
 
 #include "src/mbedtls/bignum.h"
 #include "src/mbedtls/rsa.h"
+
+#include "src/set_hash.hpp"
 
 using namespace std;
 
@@ -374,26 +381,6 @@ static void bench_rsa()
 
 }
 
-static void bench_prg()
-{
-    size_t N_sample = 1e7;
-    
-    std::array<uint8_t,16> key = {{0x00}};
-    std::array<uint8_t,16*8> out;
-    
-    std::chrono::duration<double, std::nano> prg_time;
-    auto begin_t = std::chrono::high_resolution_clock::now();
-    for (size_t i = 0; i < N_sample; i++) {
-        sse::crypto::Prg::derive(key.data(), 0, out);
-        std::copy(out.begin(), out.begin()+16, key.begin());
-    }
-    auto end_t = std::chrono::high_resolution_clock::now();
-    prg_time = end_t - begin_t;
-    
-    std::cout << "Prg time: " << prg_time.count() << std::endl;
-//    std::cout << "Cycles: " << (double)sse::crypto::tick_counter/N_sample << std::endl;
-}
-
 
 static void ppke()
 {
@@ -688,12 +675,73 @@ void relic()
 //    cout << rho_2 << endl;
 }
 
+
+void elligator()
+{
+    sse::crypto::SetHash a,b,c;
+
+    string elt_1 = "toto";
+    string elt_2 = "titi";
+
+    a.add_element(elt_1);
+    a.add_element(elt_2);
+
+    b.add_element(elt_2);
+    b.add_element(elt_1);
+
+    assert(a == b);
+    
+    a.add_set(b);
+
+    b.add_element(elt_2);
+    b.add_element(elt_1);
+
+    assert(a == b);
+
+//    a.remove_set(b);
+//    assert(a == c);
+
+    
+    
+//    uint8_t p[crypto_core_ed25519_BYTES];
+//    uint8_t q[crypto_core_ed25519_BYTES];
+//    uint8_t r[crypto_core_ed25519_BYTES];
+//
+//    uint8_t zero [crypto_scalarmult_ed25519_SCALARBYTES];
+//    memset(zero, 0x00, crypto_scalarmult_ed25519_SCALARBYTES);
+//
+//    uint8_t rnd [crypto_scalarmult_ed25519_SCALARBYTES];
+//    randombytes_buf(rnd, crypto_scalarmult_ed25519_SCALARBYTES);
+//
+//    int ret;
+//
+//    ret = crypto_scalarmult_ed25519_base(p, rnd);
+//    assert(ret == 0);
+//
+//    ret = crypto_scalarmult_ed25519_base(q, rnd);
+//    assert(ret == 0);
+//
+//    ret = crypto_core_ed25519_sub(r, p, q);
+//    assert(ret == 0);
+//
+//    assert(crypto_core_ed25519_is_valid_point(p));
+//    assert(crypto_core_ed25519_is_valid_point(q));
+////    assert(crypto_core_ed25519_is_valid_point(r));
+//
+//    crypto_core_ed25519_add(q, p, r);
+//
+//    assert(sodium_memcmp(p,q,crypto_core_ed25519_BYTES) == 0);
+
+
+}
+
 int main( int argc, char* argv[] ) {
     
     sse::crypto::init_crypto_lib();
     
 //    sse::crypto::test_keys();
-    bench_rsa();
+//    bench_rsa();
+    elligator();
 //    tdp();
 
     sse::crypto::cleanup_crypto_lib();

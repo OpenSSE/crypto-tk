@@ -32,23 +32,23 @@ constexpr size_t kNumTests     = 20;
 constexpr size_t kTestEltsSize = 100;
 constexpr size_t kNumEltsBatch = 20;
 
-using sse::crypto::SetHash_Elligator;
+using sse::crypto::SetHash;
 
 
 TEST(set_hash, constructors)
 {
     for (size_t i = 0; i < kNumTests; i++) {
-        SetHash_Elligator a;
+        SetHash a;
 
         // generate random elements
         std::string e_1 = sse::crypto::random_string(kTestEltsSize);
         std::string e_2 = sse::crypto::random_string(kTestEltsSize);
 
-        SetHash_Elligator b(a), c, d, e(a.data());
+        SetHash b(a), c, d, e(a.data());
         c = a;
         d = a;
 
-        SetHash_Elligator f(std::move(d));
+        SetHash f(std::move(d));
         ASSERT_EQ(a, b);
         ASSERT_EQ(a, c);
         ASSERT_EQ(a, e);
@@ -59,7 +59,7 @@ TEST(set_hash, constructors)
 TEST(set_hash, commutativity)
 {
     for (size_t i = 0; i < kNumTests; i++) {
-        SetHash_Elligator a, b, c, d;
+        SetHash a, b, c, d;
 
         ASSERT_EQ(a, b);
         ASSERT_EQ(a, c);
@@ -93,7 +93,7 @@ TEST(set_hash, commutativity)
 TEST(set_hash, associativity_insert)
 {
     for (size_t i = 0; i < kNumTests; i++) {
-        SetHash_Elligator a, b, c, d;
+        SetHash a, b, c, d;
 
         ASSERT_EQ(a, b);
         ASSERT_EQ(a, c);
@@ -123,7 +123,7 @@ TEST(set_hash, associativity_insert)
 TEST(set_hash, associativity_remove)
 {
     for (size_t i = 0; i < kNumTests; i++) {
-        SetHash_Elligator a, b, c, d, I;
+        SetHash a, b, c, d, I;
 
         ASSERT_EQ(a, b);
         ASSERT_EQ(a, c);
@@ -155,7 +155,7 @@ TEST(set_hash, associativity_remove)
 TEST(set_hash, identity)
 {
     for (size_t i = 0; i < kNumTests; i++) {
-        SetHash_Elligator a, b, c, I;
+        SetHash a, b, c, I;
         ASSERT_EQ(a, b);
         ASSERT_EQ(a, c);
         ASSERT_EQ(a, I);
@@ -184,13 +184,13 @@ TEST(set_hash, batch_constructor)
 {
     for (size_t i = 0; i < kNumTests; i++) {
         std::vector<std::string> samples(kNumEltsBatch);
-        SetHash_Elligator        a;
+        SetHash        a;
         for (auto& e : samples) {
             e = sse::crypto::random_string(kTestEltsSize);
             a.add_element(e);
         }
 
-        SetHash_Elligator b(samples);
+        SetHash b(samples);
 
         ASSERT_EQ(a, b);
     }
@@ -198,10 +198,10 @@ TEST(set_hash, batch_constructor)
 
 TEST(set_hash, exception)
 {
-    std::array<uint8_t, SetHash_Elligator::kSetHashSize> in{
+    std::array<uint8_t, SetHash::kSetHashSize> in{
         {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
          0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
          0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
-    ASSERT_THROW(SetHash_Elligator a(in), std::invalid_argument);
+    ASSERT_THROW(SetHash a(in), std::invalid_argument);
 }

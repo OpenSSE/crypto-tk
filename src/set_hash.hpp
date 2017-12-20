@@ -48,7 +48,7 @@ namespace crypto {
 ///
 /// The sets that can be hashed are sets of std::string.
 ///
-class SetHash_Elligator
+class SetHash
 {
 public:
     /// @brief Size of the bytes representation of a SetHash
@@ -58,7 +58,7 @@ public:
     ///
     /// Creates and initializes a SetHash for an empty set.
     ///
-    SetHash_Elligator();
+    SetHash();
 
     ///
     /// @brief Constructor
@@ -68,17 +68,17 @@ public:
     ///
     /// @param data A bytes array representing a set hash.
     ///
-    explicit SetHash_Elligator(const std::array<uint8_t, kSetHashSize>& data);
+    explicit SetHash(const std::array<uint8_t, kSetHashSize>& data);
 
     ///
     /// @brief Copy constructor
     ///
-    SetHash_Elligator(const SetHash_Elligator& o);
+    SetHash(const SetHash& o);
 
     ///
     /// @brief Move constructor
     ///
-    SetHash_Elligator(SetHash_Elligator&& o) noexcept;
+    SetHash(SetHash&& o) noexcept;
 
     ///
     /// @brief Constructor
@@ -87,12 +87,12 @@ public:
     ///
     /// @param in_set   The elements to be hashed.
     ///
-    explicit SetHash_Elligator(const std::vector<std::string>& in_set);
+    explicit SetHash(const std::vector<std::string>& in_set);
 
     ///
     /// @brief Destructor
     ///
-    ~SetHash_Elligator();
+    ~SetHash();
 
     ///
     /// @brief Hash a new element in the set hash
@@ -112,7 +112,7 @@ public:
     ///
     /// @param h    The set hash of the set to insert in the target object
     ///
-    void add_set(const SetHash_Elligator& h);
+    void add_set(const SetHash& h);
 
 
     ///
@@ -133,7 +133,7 @@ public:
     ///
     /// @param h    The set hash of the set to remove from the target object
     ///
-    void remove_set(const SetHash_Elligator& h);
+    void remove_set(const SetHash& h);
 
     ///
     /// @brief Binary representation of the SetHash
@@ -157,7 +157,7 @@ public:
     /// @return     The stream os
     ///
     friend std::ostream& operator<<(std::ostream&            os,
-                                    const SetHash_Elligator& h);
+                                    const SetHash& h);
 
     ///
     /// @brief Assignment operator
@@ -165,7 +165,7 @@ public:
     /// @param h    The element to assign
     /// @return     The assigned object
     ///
-    SetHash_Elligator& operator=(const SetHash_Elligator& h);
+    SetHash& operator=(const SetHash& h);
 
     ///
     /// @brief Comparison operator
@@ -173,7 +173,7 @@ public:
     /// @param h    The element to compare
     /// @return     true if h and the object have the same hash, false otherwise
     ///
-    bool operator==(const SetHash_Elligator& h) const;
+    bool operator==(const SetHash& h) const;
 
     ///
     /// @brief Comparison operator
@@ -181,7 +181,7 @@ public:
     /// @return     false if h and the object have the same hash,
     ///             true otherwise
     ///
-    bool operator!=(const SetHash_Elligator& h) const;
+    bool operator!=(const SetHash& h) const;
 
 private:
     class SetHashImpl;          // not defined in the header

@@ -52,7 +52,7 @@
 #include "src/mbedtls/bignum.h"
 #include "src/mbedtls/rsa.h"
 
-#include "src/set_hash_elligator.hpp"
+#include "src/set_hash.hpp"
 
 using namespace std;
 
@@ -678,7 +678,7 @@ void relic()
 
 void elligator()
 {
-    sse::crypto::SetHash_Elligator a,b,c;
+    sse::crypto::SetHash a,b,c;
 
     string elt_1 = "toto";
     string elt_2 = "titi";

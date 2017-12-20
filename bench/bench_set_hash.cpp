@@ -29,7 +29,7 @@
 #include <vector>
 
 
-using sse::crypto::SetHash_Elligator;
+using sse::crypto::SetHash;
 
 template<typename SH>
 static void SetHash_insert(benchmark::State& state)
@@ -63,11 +63,11 @@ static void SetHash_insert_args(benchmark::internal::Benchmark* b)
 }
 
 
-BENCHMARK_TEMPLATE(SetHash_insert, SetHash_Elligator)
+BENCHMARK_TEMPLATE(SetHash_insert, SetHash)
     ->Apply(SetHash_insert_args)
     ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_TEMPLATE(SetHash_insert, SetHash_Elligator)
+BENCHMARK_TEMPLATE(SetHash_insert, SetHash)
     ->RangeMultiplier(2)
     ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
     ->Unit(benchmark::kMicrosecond)
@@ -96,11 +96,11 @@ static void SetHash_batch_construct(benchmark::State& state)
 }
 
 
-BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash_Elligator)
+BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash)
     ->Apply(SetHash_insert_args)
     ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash_Elligator)
+BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash)
     ->RangeMultiplier(2)
     ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
     ->Unit(benchmark::kMicrosecond)

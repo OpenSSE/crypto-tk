@@ -23,7 +23,7 @@
 
 #include "hash.hpp"
 #include "random.hpp"
-#include "set_hash_elligator.hpp"
+#include "set_hash.hpp"
 
 #include <iostream>
 #include <vector>

@@ -18,7 +18,7 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "set_hash_elligator.hpp"
+#include "set_hash.hpp"
 
 #include <exception>
 #include <iomanip>

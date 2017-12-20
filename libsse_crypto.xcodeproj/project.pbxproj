@@ -139,11 +139,11 @@
 		31DEB77D1FE6B95400CD0F92 /* bench_set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7301FE6B89A00CD0F92 /* bench_set_hash.cpp */; };
 		31DEB77F1FE6E00100CD0F92 /* benchmarks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */; };
 		31DEB7811FE6FA2100CD0F92 /* bench_tdp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */; };
-		31DEB7841FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */; };
-		31DEB7851FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */; };
-		31DEB7861FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */; };
-		31DEB7871FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */; };
-		31DEB7881FE846F200CD0F92 /* set_hash_elligator.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 31DEB7831FE846F100CD0F92 /* set_hash_elligator.hpp */; };
+		31DEB7841FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7851FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7861FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7871FE846F200CD0F92 /* set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB7821FE846F100CD0F92 /* set_hash.cpp */; };
+		31DEB7881FE846F200CD0F92 /* set_hash.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 31DEB7831FE846F100CD0F92 /* set_hash.hpp */; };
 		31DEB78C1FEA637D00CD0F92 /* test_set_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */; };
 		6CC2D4841C31888D00334ADD /* checks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D46E1C3185E500334ADD /* checks.cpp */; };
 		6CC2D4851C31889B00334ADD /* cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CC2D4041C3185D700334ADD /* cipher.cpp */; };
@@ -312,8 +312,8 @@
 		31DEB7721FE6B91F00CD0F92 /* bench */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = bench; sourceTree = BUILT_PRODUCTS_DIR; };
 		31DEB77E1FE6E00100CD0F92 /* benchmarks.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = benchmarks.cpp; sourceTree = "<group>"; };
 		31DEB7801FE6FA2100CD0F92 /* bench_tdp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bench_tdp.cpp; sourceTree = "<group>"; };
-		31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = set_hash_elligator.cpp; sourceTree = "<group>"; };
-		31DEB7831FE846F100CD0F92 /* set_hash_elligator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = set_hash_elligator.hpp; sourceTree = "<group>"; };
+		31DEB7821FE846F100CD0F92 /* set_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = set_hash.cpp; sourceTree = "<group>"; };
+		31DEB7831FE846F100CD0F92 /* set_hash.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = set_hash.hpp; sourceTree = "<group>"; };
 		31DEB78B1FEA637D00CD0F92 /* test_set_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_set_hash.cpp; sourceTree = "<group>"; };
 		6CC2D3FB1C3185D700334ADD /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		6CC2D3FC1C3185D700334ADD /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -502,8 +502,8 @@
 				6CC2D45D1C3185D700334ADD /* prf.hpp */,
 				6CC2D45E1C3185D700334ADD /* random.cpp */,
 				6CC2D45F1C3185D700334ADD /* random.hpp */,
-				31DEB7821FE846F100CD0F92 /* set_hash_elligator.cpp */,
-				31DEB7831FE846F100CD0F92 /* set_hash_elligator.hpp */,
+				31DEB7821FE846F100CD0F92 /* set_hash.cpp */,
+				31DEB7831FE846F100CD0F92 /* set_hash.hpp */,
 				318C72991C9730140040AEE7 /* tdp.cpp */,
 				318C729A1C9730140040AEE7 /* tdp.hpp */,
 				319966C11FBEE9D400051179 /* tdp_impl */,
@@ -598,7 +598,7 @@
 				319966A81FB8A8B300051179 /* asn1write.h in Headers */,
 				310C2BD51EC0B59700E80B3A /* common.h in Headers */,
 				319966911FB8A72D00051179 /* bignum.h in Headers */,
-				31DEB7881FE846F200CD0F92 /* set_hash_elligator.hpp in Headers */,
+				31DEB7881FE846F200CD0F92 /* set_hash.hpp in Headers */,
 				319966991FB8A72D00051179 /* rsa.h in Headers */,
 				319966AB1FB8AA1C00051179 /* base64.h in Headers */,
 				319966BA1FBC2E9800051179 /* rsa_io.h in Headers */,
@@ -783,7 +783,7 @@
 				31DEB7531FE6B91F00CD0F92 /* hmac.cpp in Sources */,
 				31DEB7541FE6B91F00CD0F92 /* prf.cpp in Sources */,
 				31DEB7551FE6B91F00CD0F92 /* bignum.c in Sources */,
-				31DEB7871FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */,
+				31DEB7871FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				31DEB7561FE6B91F00CD0F92 /* gtest-all.cc in Sources */,
 				31DEB77D1FE6B95400CD0F92 /* bench_set_hash.cpp in Sources */,
 				31DEB7581FE6B91F00CD0F92 /* rsa_io.c in Sources */,
@@ -807,7 +807,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				319966A21FB8A72D00051179 /* pk.c in Sources */,
-				31DEB7841FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */,
+				31DEB7841FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				310B644E1FCCC3420015FBEE /* blake2b.cpp in Sources */,
 				6CC2D4841C31888D00334ADD /* checks.cpp in Sources */,
 				319966881FB8A72D00051179 /* asn1write.c in Sources */,
@@ -856,7 +856,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				311E948B1FE3BF4800E01869 /* prf.cpp in Sources */,
-				31DEB7851FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */,
+				31DEB7851FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				319966861FB8A72D00051179 /* bignum.c in Sources */,
 				319966891FB8A72D00051179 /* asn1write.c in Sources */,
 				316F0D401D25600700F87904 /* prg.cpp in Sources */,
@@ -893,7 +893,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				311E948C1FE3BF4800E01869 /* prf.cpp in Sources */,
-				31DEB7861FE846F200CD0F92 /* set_hash_elligator.cpp in Sources */,
+				31DEB7861FE846F200CD0F92 /* set_hash.cpp in Sources */,
 				319966A41FB8A72D00051179 /* pk.c in Sources */,
 				318C729D1C9730140040AEE7 /* tdp.cpp in Sources */,
 				310C2BDA1EC0B59700E80B3A /* GMPpke.cpp in Sources */,

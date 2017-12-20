@@ -2,10 +2,10 @@
 set -ex
 
 
-wget -q https://download.libsodium.org/libsodium/releases/libsodium-1.0.15.tar.gz
-tar xf libsodium-1.0.15.tar.gz
+wget -q https://download.libsodium.org/libsodium/releases/libsodium-1.0.16.tar.gz
+tar xf libsodium-1.0.16.tar.gz
 
-cd libsodium-1.0.15
+cd libsodium-1.0.16
 
 ./configure
 make -j4

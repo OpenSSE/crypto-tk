@@ -44,7 +44,7 @@ static void SetHash_insert(benchmark::State& state)
         }
         state.ResumeTiming();
 
-        SetHash a;
+        SH a;
         for (auto& e : samples) {
             a.add_element(e);
         }

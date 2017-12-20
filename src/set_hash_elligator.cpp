@@ -39,19 +39,6 @@ namespace sse {
 
 namespace crypto {
 
-/*
- * HashWrapper
- *
- * A wrapper around the Hash class to make it compatible with the ECMH code.
- *
- */
-
-
-constexpr uint8_t scalar_zero__[crypto_scalarmult_ed25519_SCALARBYTES]
-    = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
 constexpr uint8_t ec_inf_point__[crypto_core_ed25519_BYTES]
     = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -64,7 +51,7 @@ class SetHash_Elligator::SetHashImpl
 public:
     SetHashImpl();
     explicit SetHashImpl(const SetHashImpl& s);
-    explicit SetHashImpl(const std::array<uint8_t, kSetHashSize>& data);
+    explicit SetHashImpl(const std::array<uint8_t, kSetHashSize>& bytes);
     explicit SetHashImpl(const std::vector<std::string>& in_set);
 
     SetHashImpl& operator=(const SetHashImpl& h);
@@ -75,7 +62,8 @@ public:
     void remove_set(const SetHashImpl* in);
 
     std::array<uint8_t, kSetHashSize> data() const;
-    bool                              operator==(const SetHashImpl& h) const;
+
+    bool operator==(const SetHashImpl& h) const;
 
 private:
     static void gen_curve_point(
@@ -89,8 +77,9 @@ private:
                                                  // dynamic memory allocation
     static constexpr std::array<uint8_t, crypto_scalarmult_ed25519_SCALARBYTES>
         seed__{{0x00}};
-    
-    static_assert(crypto_core_ed25519_BYTES == kSetHashSize, "crypto_core_ed25519_BYTES != kSetHashSize");
+
+    static_assert(crypto_core_ed25519_BYTES == kSetHashSize,
+                  "crypto_core_ed25519_BYTES != kSetHashSize");
 };
 
 constexpr std::array<uint8_t, crypto_scalarmult_ed25519_SCALARBYTES>
@@ -101,8 +90,8 @@ SetHash_Elligator::SetHash_Elligator() : set_hash_imp_(new SetHashImpl())
 }
 
 SetHash_Elligator::SetHash_Elligator(
-    const std::array<uint8_t, kSetHashSize>& data)
-    : set_hash_imp_(new SetHashImpl(data))
+    const std::array<uint8_t, kSetHashSize>& bytes)
+    : set_hash_imp_(new SetHashImpl(bytes))
 {
 }
 
@@ -222,13 +211,13 @@ SetHash_Elligator::SetHashImpl::SetHashImpl(
 }
 
 SetHash_Elligator::SetHashImpl::SetHashImpl(
-    const std::array<uint8_t, kSetHashSize>& data)
+    const std::array<uint8_t, kSetHashSize>& bytes)
 {
-    memcpy(ellig_state_, data.data(), crypto_core_ed25519_BYTES);
+    memcpy(ellig_state_, bytes.data(), crypto_core_ed25519_BYTES);
 
     if ((crypto_core_ed25519_is_valid_point(ellig_state_) != 1)
         && (sodium_memcmp(
-                data.data(), ec_inf_point__, crypto_core_ed25519_BYTES)
+                bytes.data(), ec_inf_point__, crypto_core_ed25519_BYTES)
             != 0)) {
         throw std::invalid_argument("SetHash: Invalid curve point");
     }
@@ -289,10 +278,10 @@ void SetHash_Elligator::SetHashImpl::remove_set(
 std::array<uint8_t, SetHash_Elligator::kSetHashSize> SetHash_Elligator::
     SetHashImpl::data() const
 {
-    std::array<uint8_t, kSetHashSize> data;
-    memcpy(data.data(), ellig_state_, kSetHashSize);
+    std::array<uint8_t, kSetHashSize> bytes;
+    memcpy(bytes.data(), ellig_state_, kSetHashSize);
 
-    return data;
+    return bytes;
 }
 
 bool SetHash_Elligator::SetHashImpl::operator==(

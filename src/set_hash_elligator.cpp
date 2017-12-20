@@ -28,12 +28,7 @@
 #include <sodium/crypto_scalarmult_ed25519.h>
 #include <sodium/utils.h>
 
-#include "ecmh/array_view/array_view.hpp"
-#include "ecmh/binary_elliptic_curve/GLS254.hpp"
-#include "ecmh/multiset_hash/ECMH.hpp"
 #include "hash.hpp"
-
-using namespace jbms::multiset_hash;
 
 namespace sse {
 

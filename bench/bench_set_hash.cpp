@@ -23,14 +23,12 @@
 
 #include "hash.hpp"
 #include "random.hpp"
-#include "set_hash.hpp"
 #include "set_hash_elligator.hpp"
 
 #include <iostream>
 #include <vector>
 
 
-using sse::crypto::SetHash;
 using sse::crypto::SetHash_Elligator;
 
 template<typename SH>
@@ -63,15 +61,7 @@ static void SetHash_insert_args(benchmark::internal::Benchmark* b)
         for (int j = 1 << 2; j <= 1 << 14; j *= 8)
             b->Args({j, es});
 }
-BENCHMARK_TEMPLATE(SetHash_insert, SetHash)
-    ->Apply(SetHash_insert_args)
-    ->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_TEMPLATE(SetHash_insert, SetHash)
-    ->RangeMultiplier(2)
-    ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
-    ->Unit(benchmark::kMicrosecond)
-    ->Complexity(benchmark::oN);
 
 BENCHMARK_TEMPLATE(SetHash_insert, SetHash_Elligator)
     ->Apply(SetHash_insert_args)
@@ -105,15 +95,6 @@ static void SetHash_batch_construct(benchmark::State& state)
     state.SetComplexityN((int)state.items_processed());
 }
 
-BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash)
-    ->Apply(SetHash_insert_args)
-    ->Unit(benchmark::kMicrosecond);
-
-BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash)
-    ->RangeMultiplier(2)
-    ->Ranges({{1 << 4, 1 << 14}, {32, 32}})
-    ->Unit(benchmark::kMicrosecond)
-    ->Complexity(benchmark::oN);
 
 BENCHMARK_TEMPLATE(SetHash_batch_construct, SetHash_Elligator)
     ->Apply(SetHash_insert_args)

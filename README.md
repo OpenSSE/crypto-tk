@@ -95,7 +95,7 @@ If you still haven't, you should get [Homebrew](http://brew.sh/).
 You will actually need it to install dependencies: 
 
 ```sh
- $ brew install scons cmake openssl gmp boost libsodium
+ $ brew install scons cmake openssl gmp libsodium
 ```
 
 You will only need to install RELIC, which can be done following the instructions found above, or use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh`, or `install_relic_x64_asm.sh` depending on the arithmetic you prefer.

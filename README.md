@@ -175,9 +175,6 @@ To cleanup the `coverage` directory, run `./cleanup.sh`.
 
 ## Contributors
 
-The code for the incremental (multi)set hash function has been written by Jeremy Maitin-Shepard.
-It is directly available from its [GitHub repo](https://github.com/jbms/ecmh). The source files of the `src/ecmh` directory are directly taken from this codebase and its dependencies, with some minor fixes or modifications to make the code compile using gcc.
-
 An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbed TLS](https://tls.mbed.org))
 
 The puncturable encryption code has been originally written by [Ian Miers](http://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
@@ -185,8 +182,6 @@ The puncturable encryption code has been originally written by [Ian Miers](http:
 Unless otherwise stated, the rest of the code has been written by [Raphael Bost](https://raphael.bost.fyi/).
 
 ## Licensing
-
-Even if it is not explicitly stated, the ECMH code by Jeremy Maitin-Shepard (*i.e.* the the `src/ecmh` directory) must be considered as licensed under GPL (personal communications with Jeremy).
 
 mbed TLS is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 

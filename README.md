@@ -2,6 +2,7 @@
 
 [![build status](https://travis-ci.org/OpenSSE/crypto-tk.svg?branch=master)](https://travis-ci.org/OpenSSE/crypto-tk) 
 [![Coverage Status](https://coveralls.io/repos/github/OpenSSE/crypto-tk/badge.svg)](https://coveralls.io/github/OpenSSE/crypto-tk)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1412/badge)](https://bestpractices.coreinfrastructure.org/projects/1412)
 
 The SSE protocols rely on high level cryptographic features such as pseudo-random functions, hash functions, encryption schemes, or incremental set hashing. The cryptographic layer provides interfaces and implementations of these features. 
 

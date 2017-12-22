@@ -480,7 +480,7 @@ void TdpInverseImpl_mbedTLS::invert(const std::string& in,
             + std::to_string(ret)); /* LCOV_EXCL_LINE */
     }
 
-    out = std::string((char*)rsa_out, rsa_size());
+    out = std::string(reinterpret_cast<char*>(rsa_out), rsa_size());
 
     sodium_memzero(rsa_out, rsa_size());
 }

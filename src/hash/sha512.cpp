@@ -24,8 +24,6 @@
 
 #include <sodium/crypto_hash_sha512.h>
 
-using namespace std;
-
 
 namespace sse {
 

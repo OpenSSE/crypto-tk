@@ -518,7 +518,7 @@ static int cipher_aez_core(const aez_ctx_t *ctx, block t, int d, const char *src
     } else {
         unsigned i;
         for (i=0; i<16-abytes; i++) {
-            ((char*)dst + (bytes - 16))[i] = ((char*)&final0)[i];
+            (dst + (bytes - 16))[i] = ((char*)&final0)[i];
         }
     }
     return 0;

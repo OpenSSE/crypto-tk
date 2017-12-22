@@ -10,8 +10,11 @@ namespace sse {
 
 namespace crypto {
 
-using namespace std;
-using namespace relicxx;
+using relicxx::G1;
+using relicxx::G2;
+using relicxx::GT;
+using relicxx::ZR;
+
 // static const string  NULLTAG = "whoever wishes to keep a secret, must hide
 // from us that he possesses one.-- Johann Wolfgang von Goethe"; // the reserved
 // tag
@@ -34,10 +37,9 @@ const tag_type Gmppke::NULLTAG = {{0x00,
 
 std::string tag2string(const tag_type& tag)
 {
-    return string((const char*)tag.data(), tag.size());
+    return std::string(reinterpret_cast<const char*>(tag.data()), tag.size());
 }
 
-using namespace std;
 
 bool GmppkePrivateKey::isPuncturedOnTag(const tag_type& tag) const
 {
@@ -129,7 +131,7 @@ void Gmppke::keygenPartial(const ZR&                     alpha,
     // by selecting d+1 points. Because we don't actually  care about the
     // polynomial, only g^q(x), we merely select points as (x,g^q(x)).
 
-    array<ZR, 2> polynomial_xcordinates;
+    std::array<ZR, 2> polynomial_xcordinates;
 
     // the first point is (x=0,y=beta) so  x=0, g^beta.
     polynomial_xcordinates[0] = ZR(0);
@@ -170,7 +172,7 @@ void Gmppke::keygenPartial(const sse::crypto::Prf<kPPKEPrfOutputSize>& prf,
     // by selecting d+1 points. Because we don't actually  care about the
     // polynomial, only g^q(x), we merely select points as (x,g^q(x)).
 
-    array<ZR, 2> polynomial_xcordinates;
+    std::array<ZR, 2> polynomial_xcordinates;
 
     // the first point is (x=0,y=beta) so  x=0, g^beta.
     polynomial_xcordinates[0] = ZR(0);
@@ -291,11 +293,11 @@ GmppkePrivateKeyShare Gmppke::skShareGen(
 
     const ZR r1 = group.pseudoRandomZR(prf, ("param_r1_" + d_string));
 
-    const ZR l_d   = group.pseudoRandomZR(prf, ("param_l_" + d_string));
-    const ZR l_d_1 = (d > 1)
-                         ? (group.pseudoRandomZR(
-                               prf, std::string("param_l_" + to_string(d - 1))))
-                         : (-sp.alpha);
+    const ZR l_d = group.pseudoRandomZR(prf, ("param_l_" + d_string));
+    const ZR l_d_1
+        = (d > 1) ? (group.pseudoRandomZR(
+                        prf, std::string("param_l_" + std::to_string(d - 1))))
+                  : (-sp.alpha);
 
     share.sk1 = group.exp(group.generatorG2(), sp.beta * (l_d - l_d_1 + r1));
     share.sk3 = group.exp(group.generatorG2(), r1);          // g^r
@@ -312,7 +314,7 @@ void Gmppke::puncture(const GmppkePublicKey& pk,
                       const tag_type&        tag) const
 {
     if (tag == NULLTAG) {
-        throw invalid_argument(
+        throw std::invalid_argument(
             "Invalid tag: the NULLTAG is reserved and cannot be used.");
     }
     GmppkePrivateKeyShare  skentryn;
@@ -348,7 +350,7 @@ PartialGmmppkeCT Gmppke::blind(const GmppkePublicKey& pk,
                                const tag_type&        tag) const
 {
     if (tag == NULLTAG) {
-        throw invalid_argument(
+        throw std::invalid_argument(
             "Invalid tag: the NULLTAG is reserved and cannot be used.");
     }
 
@@ -366,7 +368,7 @@ PartialGmmppkeCT Gmppke::blind(const GmppkeSecretParameters& sp,
                                const tag_type&               tag) const
 {
     if (tag == NULLTAG) {
-        throw invalid_argument(
+        throw std::invalid_argument(
             "Invalid tag: the NULLTAG is reserved and cannot be used.");
     }
 
@@ -389,14 +391,14 @@ GT Gmppke::recoverBlind(const GmppkePrivateKey& sk,
     static ZR zr_zero = ZR(0);
     ZR        ctTag   = group.hashListToZR(ct.tag);
 
-    const unsigned int numshares = (unsigned int)sk.shares.size();
+    const unsigned int numshares = static_cast<unsigned int>(sk.shares.size());
 
 
     // Compute w_i coefficients for recovery
-    vector<GT> z(numshares);
+    std::vector<GT> z(numshares);
 
 
-    relicResourceHandle h(true);
+    relicxx::relicResourceHandle h(true);
 #pragma omp parallel for private(h) firstprivate(shareTags)
     for (unsigned int i = 0; i < numshares; i++) {
         const GmppkePrivateKeyShare& s0         = sk.shares.at(i);

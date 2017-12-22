@@ -79,8 +79,10 @@ class GmppkePublicKey : public virtual baseKey
 public:
     friend bool operator==(const GmppkePublicKey& x, const GmppkePublicKey& y)
     {
-        return ((baseKey)x == (baseKey)y && x.ppkeg1 == y.ppkeg1
-                && x.gqofxG1 == y.gqofxG1 && x.gqofxG2 == y.gqofxG2);
+        return (dynamic_cast<const baseKey&>(x)
+                    == dynamic_cast<const baseKey&>(y)
+                && x.ppkeg1 == y.ppkeg1 && x.gqofxG1 == y.gqofxG1
+                && x.gqofxG2 == y.gqofxG2);
     }
     friend bool operator!=(const GmppkePublicKey& x, const GmppkePublicKey& y)
     {
@@ -279,7 +281,9 @@ protected:
 
     friend bool operator==(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y)
     {
-        return x.ct1 == y.ct1 && (PartialGmmppkeCT)x == (PartialGmmppkeCT)y;
+        return x.ct1 == y.ct1
+               && dynamic_cast<const PartialGmmppkeCT&>(x)
+                      == dynamic_cast<const PartialGmmppkeCT&>(y);
     }
     friend bool operator!=(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y)
     {
@@ -349,7 +353,7 @@ public:
         T mask;
         hkdf.hmac(gt_blind_bytes.data(),
                   gt_blind_bytes.size(),
-                  (uint8_t*)&mask,
+                  reinterpret_cast<uint8_t*>(&mask),
                   sizeof(mask));
 
         ct.ct1 = mask ^ M;
@@ -375,7 +379,7 @@ public:
         T mask;
         hkdf.hmac(gt_blind_bytes.data(),
                   gt_blind_bytes.size(),
-                  (uint8_t*)&mask,
+                  reinterpret_cast<uint8_t*>(&mask),
                   sizeof(mask));
 
         ct.ct1 = mask ^ M;
@@ -418,7 +422,7 @@ public:
         T mask;
         hkdf.hmac(gt_blind_bytes.data(),
                   gt_blind_bytes.size(),
-                  (uint8_t*)&mask,
+                  reinterpret_cast<uint8_t*>(&mask),
                   sizeof(mask));
 
         return mask ^ ct.ct1;

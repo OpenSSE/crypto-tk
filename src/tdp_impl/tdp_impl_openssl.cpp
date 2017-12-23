@@ -117,7 +117,7 @@ inline void TdpImpl_OpenSSL::set_rsa_key(RSA* k)
 
 inline size_t TdpImpl_OpenSSL::rsa_size() const
 {
-    return ((size_t)RSA_size(get_rsa_key()));
+    return (static_cast<size_t>(RSA_size(get_rsa_key())));
 }
 
 TdpImpl_OpenSSL::~TdpImpl_OpenSSL()

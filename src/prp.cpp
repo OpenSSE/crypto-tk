@@ -92,7 +92,7 @@ void Prp::compute_is_available() noexcept
 #endif
 }
 
-Prp::Prp() : prp_imp_(Prp::is_available() ? new PrpImpl() : NULL)
+Prp::Prp() : prp_imp_(Prp::is_available() ? new PrpImpl() : nullptr)
 {
     if (!Prp::is_available()) {
         throw std::runtime_error("PRP is unavailable: AES hardware "
@@ -102,7 +102,7 @@ Prp::Prp() : prp_imp_(Prp::is_available() ? new PrpImpl() : NULL)
 
 
 Prp::Prp(Key<kKeySize>&& k)
-    : prp_imp_(Prp::is_available() ? new PrpImpl(std::move(k)) : NULL)
+    : prp_imp_(Prp::is_available() ? new PrpImpl(std::move(k)) : nullptr)
 {
     if (!Prp::is_available()) {
         throw std::runtime_error("PRP are unavailable: AES hardware "
@@ -131,16 +131,18 @@ std::string Prp::encrypt(const std::string& in)
 uint32_t Prp::encrypt(const uint32_t in)
 {
     uint32_t out;
-    prp_imp_->encrypt(
-        (const unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
+    prp_imp_->encrypt(reinterpret_cast<const unsigned char*>(&in),
+                      sizeof(uint32_t),
+                      reinterpret_cast<unsigned char*>(&out));
     return out;
 }
 
 uint64_t Prp::encrypt_64(const uint64_t in)
 {
     uint64_t out;
-    prp_imp_->encrypt(
-        (const unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
+    prp_imp_->encrypt(reinterpret_cast<const unsigned char*>(&in),
+                      sizeof(uint64_t),
+                      reinterpret_cast<unsigned char*>(&out));
     return out;
 }
 
@@ -160,16 +162,18 @@ std::string Prp::decrypt(const std::string& in)
 uint32_t Prp::decrypt(const uint32_t in)
 {
     uint32_t out;
-    prp_imp_->decrypt(
-        (const unsigned char*)&in, sizeof(uint32_t), (unsigned char*)&out);
+    prp_imp_->decrypt(reinterpret_cast<const unsigned char*>(&in),
+                      sizeof(uint32_t),
+                      reinterpret_cast<unsigned char*>(&out));
     return out;
 }
 
 uint64_t Prp::decrypt_64(const uint64_t in)
 {
     uint64_t out;
-    prp_imp_->decrypt(
-        (const unsigned char*)&in, sizeof(uint64_t), (unsigned char*)&out);
+    prp_imp_->decrypt(reinterpret_cast<const unsigned char*>(&in),
+                      sizeof(uint64_t),
+                      reinterpret_cast<unsigned char*>(&out));
     return out;
 }
 
@@ -179,7 +183,7 @@ Prp::PrpImpl::PrpImpl()
 {
     auto callback = [](uint8_t* key_content) {
         Key<kKeySize> r_key;
-        aez_setup((const unsigned char*)r_key.unlock_get(),
+        aez_setup(static_cast<const unsigned char*>(r_key.unlock_get()),
                   48,
                   reinterpret_cast<aez_ctx_t*>(key_content));
     };
@@ -190,7 +194,7 @@ Prp::PrpImpl::PrpImpl()
 Prp::PrpImpl::PrpImpl(Key<kKeySize>&& k)
 {
     auto callback = [&k](uint8_t* key_content) {
-        aez_setup((const unsigned char*)k.unlock_get(),
+        aez_setup(static_cast<const unsigned char*>(k.unlock_get()),
                   48,
                   reinterpret_cast<aez_ctx_t*>(key_content));
     };
@@ -227,9 +231,9 @@ void Prp::PrpImpl::encrypt(const unsigned char* in,
                 iv,
                 16,
                 0,
-                (const char*)in,
+                reinterpret_cast<const char*>(in),
                 len,
-                (char*)out);
+                reinterpret_cast<char*>(out));
 }
 
 void Prp::PrpImpl::encrypt(const std::string& in, std::string& out)
@@ -249,8 +253,10 @@ void Prp::PrpImpl::encrypt(const std::string& in, std::string& out)
 
     unsigned char* data = new unsigned char[len];
 
-    encrypt((const unsigned char*)in.data(), (unsigned int)len, data);
-    out = std::string((char*)data, len);
+    encrypt(reinterpret_cast<const unsigned char*>(in.data()),
+            static_cast<unsigned int>(len),
+            data);
+    out = std::string(reinterpret_cast<char*>(data), len);
     delete[] data;
 }
 
@@ -283,9 +289,9 @@ void Prp::PrpImpl::decrypt(const unsigned char* in,
                 iv,
                 16,
                 0,
-                (const char*)in,
+                reinterpret_cast<const char*>(in),
                 len,
-                (char*)out);
+                reinterpret_cast<char*>(out));
 
     aez_ctx_.lock();
 }
@@ -307,9 +313,11 @@ void Prp::PrpImpl::decrypt(const std::string& in, std::string& out)
 
     unsigned char* data = new unsigned char[len];
 
-    decrypt((const unsigned char*)in.data(), (unsigned int)len, data);
+    decrypt(reinterpret_cast<const unsigned char*>(in.data()),
+            static_cast<unsigned int>(len),
+            data);
 
-    out = std::string((const char*)data, len);
+    out = std::string(reinterpret_cast<const char*>(data), len);
     delete[] data;
 }
 

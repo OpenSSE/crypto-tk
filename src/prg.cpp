@@ -165,7 +165,7 @@ void Prg::derive(Key<kKeySize>&& k, const size_t len, std::string& out)
     unsigned char* data = new unsigned char[len];
 
     Prg::PrgImpl::derive(std::move(k), 0, len, data);
-    out = std::string((char*)data, len);
+    out = std::string(reinterpret_cast<char*>(data), len);
 
     // erase the buffer
     sodium_memzero(data, len);
@@ -189,7 +189,7 @@ void Prg::derive(Key<kKeySize>&& k,
     unsigned char* data = new unsigned char[len];
 
     Prg::PrgImpl::derive(std::move(k), offset, len, data);
-    out = std::string((char*)data, len);
+    out = std::string(reinterpret_cast<char*>(data), len);
 
     // erase the buffer
     sodium_memzero(data, len);
@@ -204,7 +204,7 @@ std::string Prg::derive(Key<kKeySize>&& k,
     unsigned char* data = new unsigned char[len];
 
     Prg::PrgImpl::derive(std::move(k), offset, len, data);
-    std::string out = std::string((char*)data, len);
+    std::string out = std::string(reinterpret_cast<char*>(data), len);
 
     // erase the buffer
     sodium_memzero(data, len);
@@ -240,7 +240,7 @@ void Prg::PrgImpl::derive(const uint32_t offset,
     unsigned char* data = new unsigned char[len];
 
     derive(offset, len, data);
-    out = std::string((char*)data, len);
+    out = std::string(reinterpret_cast<char*>(data), len);
 
     // erase the buffer
     sodium_memzero(data, len);

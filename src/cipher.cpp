@@ -127,8 +127,8 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in,
             "The minimum number of bytes to encrypt is 1.");
     }
 
-    uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
-    unsigned long long c_len = 0;
+    uint8_t  chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
+    uint64_t c_len = 0;
 
     // generate a random nonce, and place it at the beginning of the output
     random_bytes(NONCE_SIZE, out);
@@ -170,8 +170,8 @@ void Cipher::CipherImpl::encrypt(const std::string& in, std::string& out)
     size_t         c_len = ciphertext_length(len);
     unsigned char* data  = new unsigned char[c_len];
 
-    encrypt((const unsigned char*)in.data(), len, data);
-    out = std::string((char*)data, c_len);
+    encrypt(reinterpret_cast<const unsigned char*>(in.data()), len, data);
+    out = std::string(reinterpret_cast<char*>(data), c_len);
 
     // erase the buffer
     sodium_memzero(data, c_len);
@@ -189,8 +189,8 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in,
             + std::to_string(ciphertext_length(0))); /* LCOV_EXCL_LINE */
     }
 
-    uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
-    unsigned long long m_len = 0;
+    uint8_t  chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
+    uint64_t m_len = 0;
 
     // unlock the master key
     key_.unlock();
@@ -243,9 +243,9 @@ void Cipher::CipherImpl::decrypt(const std::string& in, std::string& out)
     size_t p_len = plaintext_length(len);
 
     unsigned char* data = new unsigned char[p_len];
-    decrypt((const unsigned char*)in.data(), len, data);
+    decrypt(reinterpret_cast<const unsigned char*>(in.data()), len, data);
 
-    out = std::string((char*)data, p_len);
+    out = std::string(reinterpret_cast<char*>(data), p_len);
     delete[] data;
 }
 

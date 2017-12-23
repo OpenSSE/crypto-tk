@@ -80,9 +80,11 @@ void Hash::hash(const unsigned char* in,
 void Hash::hash(const std::string& in, std::string& out)
 {
     unsigned char tmp_out[kDigestSize];
-    hash((const unsigned char*)in.data(), in.length(), tmp_out);
+    hash(reinterpret_cast<const unsigned char*>(in.data()),
+         in.length(),
+         tmp_out);
 
-    out = std::string((char*)tmp_out, kDigestSize);
+    out = std::string(reinterpret_cast<char*>(tmp_out), kDigestSize);
 }
 
 void Hash::hash(const std::string& in, const size_t out_len, std::string& out)
@@ -94,9 +96,11 @@ void Hash::hash(const std::string& in, const size_t out_len, std::string& out)
 
     unsigned char tmp_out[kDigestSize];
 
-    hash((const unsigned char*)in.data(), in.length(), tmp_out);
+    hash(reinterpret_cast<const unsigned char*>(in.data()),
+         in.length(),
+         tmp_out);
 
-    out = std::string((char*)tmp_out, out_len);
+    out = std::string(reinterpret_cast<char*>(tmp_out), out_len);
 }
 
 std::string Hash::hash(const std::string& in)

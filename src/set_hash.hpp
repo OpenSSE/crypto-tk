@@ -68,7 +68,7 @@ public:
     ///
     /// @param data A bytes array representing a set hash.
     ///
-    explicit SetHash(const std::array<uint8_t, kSetHashSize>& data);
+    explicit SetHash(const std::array<uint8_t, kSetHashSize>& bytes);
 
     ///
     /// @brief Copy constructor

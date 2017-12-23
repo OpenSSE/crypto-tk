@@ -47,7 +47,7 @@ class SetHash::SetHashImpl
 
 public:
     SetHashImpl();
-    explicit SetHashImpl(const SetHashImpl& s);
+    SetHashImpl(const SetHashImpl& s);
     explicit SetHashImpl(const std::array<uint8_t, kSetHashSize>& bytes);
     explicit SetHashImpl(const std::vector<std::string>& in_set);
 
@@ -98,7 +98,7 @@ SetHash::SetHash(const SetHash& o)
 
 SetHash::SetHash(SetHash&& o) noexcept : set_hash_imp_(o.set_hash_imp_)
 {
-    o.set_hash_imp_ = NULL;
+    o.set_hash_imp_ = nullptr;
 }
 
 SetHash::SetHash(const std::vector<std::string>& in_set)
@@ -108,9 +108,7 @@ SetHash::SetHash(const std::vector<std::string>& in_set)
 
 SetHash::~SetHash()
 {
-    if (set_hash_imp_ != nullptr) {
-        delete set_hash_imp_;
-    }
+    delete set_hash_imp_;
 }
 
 void SetHash::add_element(const std::string& in)
@@ -144,7 +142,8 @@ std::ostream& operator<<(std::ostream& os, const SetHash& h)
 {
     auto d = h.set_hash_imp_->data();
     for (uint8_t b : d) {
-        os << std::hex << std::setw(2) << std::setfill('0') << (uint)b;
+        os << std::hex << std::setw(2) << std::setfill('0')
+           << static_cast<uint>(b);
     }
     os << std::dec;
     return os;

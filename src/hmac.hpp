@@ -250,7 +250,7 @@ std::array<uint8_t, H::kDigestSize> HMac<H, N>::hmac(const unsigned char* in,
 template<class H, uint16_t N>
 std::array<uint8_t, H::kDigestSize> HMac<H, N>::hmac(const std::string& s) const
 {
-    return hmac((const unsigned char*)s.data(), s.length());
+    return hmac(reinterpret_cast<const unsigned char*>(s.data()), s.length());
 }
 
 } // namespace crypto

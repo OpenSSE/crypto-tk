@@ -87,9 +87,7 @@ public:
     }
 
     /// @ brief Destructor.
-    ~Prf()
-    {
-    }
+    ~Prf() = default;
 
     ///
     /// @brief Evaluate the PRF
@@ -220,14 +218,14 @@ std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in,
             tmp[length] = i;
 
             // fill res
-            if ((size_t)(NBYTES - pos) >= PrfBase::kDigestSize) {
+            if (static_cast<size_t>(NBYTES - pos) >= PrfBase::kDigestSize) {
                 base_.hmac(
                     tmp, length + 1, result.data() + pos, PrfBase::kDigestSize);
             } else {
                 base_.hmac(tmp,
                            length + 1,
                            result.data() + pos,
-                           (size_t)(NBYTES - pos));
+                           static_cast<size_t>(NBYTES - pos));
             }
         }
 
@@ -246,7 +244,7 @@ std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const unsigned char* in,
 template<uint16_t NBYTES>
 std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(const std::string& s) const
 {
-    return prf((const unsigned char*)s.data(), s.length());
+    return prf(reinterpret_cast<const unsigned char*>(s.data()), s.length());
 }
 
 template<uint16_t NBYTES>
@@ -254,7 +252,7 @@ template<size_t L>
 std::array<uint8_t, NBYTES> Prf<NBYTES>::prf(
     const std::array<uint8_t, L>& in) const
 {
-    return prf((const unsigned char*)in.data(), L);
+    return prf(reinterpret_cast<const unsigned char*>(in.data()), L);
 }
 
 // derive a key using the PRF

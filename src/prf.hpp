@@ -86,8 +86,10 @@ public:
     {
     }
 
-    /// @ brief Destructor.
-    ~Prf() = default;
+    /// @brief Destructor.
+    ~Prf() // NOLINT // using = default causes a linker error on Travis
+    {
+    }
 
     ///
     /// @brief Evaluate the PRF

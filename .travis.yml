@@ -21,7 +21,7 @@ addons:
 
 
 env:
-- MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+- MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" STATIC_ANALYSIS=true
 
 before_install:
   - eval "${MATRIX_EVAL}"
@@ -34,9 +34,14 @@ before_install:
   # - sudo ldconfig
  
 script:
-  # - scons check debug=1 coverage=1 static_relic=1 sanitize_address=1 sanitize_undefined=1
-  - ./scripts/cppcheck.sh
+  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then
+      scons check debug=1 coverage=1 static_relic=1 sanitize_address=1 sanitize_undefined=1;
+    fi
+  - if [ "${STATIC_ANALYSIS}" == "true" ]; then
+      ./scripts/cppcheck.sh;
+    fi
+  
 
 after_success:
-  # - ./coverage/gen_coverage.sh # get the code coverage
+  - ./coverage/gen_coverage.sh # get the code coverage
   # - ./coverage/upload_report.sh # upload the report to coveralls

@@ -18,7 +18,6 @@ addons:
        - libgmp-dev
        - lcov
        - cppcheck
-       - clang-tidy
 
 
 env:

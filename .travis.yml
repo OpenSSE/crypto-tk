@@ -12,35 +12,31 @@ addons:
    apt:
      sources:
        - ubuntu-toolchain-r-test
+       - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
+         key_url: 'http://llvm.org/apt/llvm-snapshot.gpg.key'
      packages:
-       # - g++-4.9
+       - g++-4.9
        - libssl-dev
        - libgmp-dev
        - lcov
        - cppcheck
+       - clang-tidy-5.0
 
 
 env:
 - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" STATIC_ANALYSIS=true
 
 before_install:
-  - eval "${MATRIX_EVAL}"
-  - sudo wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-  - echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" | sudo tee -a /etc/apt/sources.list
-  - sudo apt-get update -qq
-  
-  # - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - eval "${MATRIX_EVAL}"  
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   
 install:  
-  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then
-      sudo apt-get install clang-tidy-5.0 -y;
-    fi
-  # - cd install_dependencies
-  # - ./install_libsodium.sh
-  # - ./install_relic_ubuntu_14_easy.sh
-  # - cd ..
-  # - gem install coveralls-lcov
-  # - sudo ldconfig
+  - cd install_dependencies
+  - ./install_libsodium.sh
+  - ./install_relic_ubuntu_14_easy.sh
+  - cd ..
+  - gem install coveralls-lcov
+  - sudo ldconfig
  
 script:
   - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then
@@ -53,5 +49,5 @@ script:
   
 
 after_success:
-  - ./coverage/gen_coverage.sh # get the code coverage
+  # - ./coverage/gen_coverage.sh # get the code coverage
   # - ./coverage/upload_report.sh # upload the report to coveralls

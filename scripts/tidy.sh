@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 if [[ -z $CLANG_TIDY ]]; then
 	CLANG_TIDY="clang-tidy"
 fi

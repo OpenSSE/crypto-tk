@@ -18,6 +18,7 @@ addons:
        - libgmp-dev
        - lcov
        - cppcheck
+       - clang-tidy
 
 
 env:
@@ -39,6 +40,7 @@ script:
     fi
   - if [ "${STATIC_ANALYSIS}" == "true" ]; then
       ./scripts/cppcheck.sh;
+      ./scripts/tidy.sh;
     fi
   
 

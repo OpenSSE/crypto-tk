@@ -26,7 +26,16 @@ env:
 
 before_install:
   - eval "${MATRIX_EVAL}"
+  - sudo wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+  - echo "deb deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  
   # - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  
+install:  
+  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then
+      sudo apt-get install clang-tidy-5.0 -y;
+    fi
   # - cd install_dependencies
   # - ./install_libsodium.sh
   # - ./install_relic_ubuntu_14_easy.sh

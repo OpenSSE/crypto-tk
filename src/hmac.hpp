@@ -23,6 +23,7 @@
 #include "key.hpp"
 #include "random.hpp"
 
+#include <cassert>
 #include <cstdint>
 #include <cstring>
 
@@ -30,9 +31,9 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+
 #include <sodium/utils.h>
 
-#include <cassert>
 
 namespace sse {
 

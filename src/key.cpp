@@ -19,8 +19,3 @@
 //
 
 #include "key.hpp"
-
-namespace sse {
-namespace crypto {
-}
-} // namespace sse

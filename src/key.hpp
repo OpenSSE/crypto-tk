@@ -84,8 +84,7 @@ class Key
     template<size_t K_SIZE>
     friend void tests::prg_test_key_derivation_consistency(); // NOLINT
     template<size_t L>
-    friend void tests::test_key_derivation_consistency(
-        size_t input_size); // NOLINT
+    friend void tests::test_key_derivation_consistency(size_t); // NOLINT
     template<size_t L, size_t M>
     friend void tests::test_key_derivation_consistency_array(); // NOLINT
 

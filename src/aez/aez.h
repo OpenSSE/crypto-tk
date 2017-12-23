@@ -9,8 +9,8 @@ extern "C" {
 #if __AES__                /* Defined by gcc/clang when compiling for AES-NI */
 /* ------------------------------------------------------------------------- */
 
-#include <stdint.h>
 #include <smmintrin.h>
+#include <stdint.h>
 #include <wmmintrin.h>
 #define block __m128i
 

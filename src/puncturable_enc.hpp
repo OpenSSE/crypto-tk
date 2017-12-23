@@ -69,6 +69,7 @@ using master_key_type = Key<kMasterKeySize>;
 /// @relatesalso PuncturableEncryption
 const static size_t kCiphertextSize = 90;
 /// @brief Type of a ciphertext created using puncturable encryption
+// cppcheck-suppress constStatement
 using ciphertext_type = std::array<uint8_t, kCiphertextSize>;
 
 

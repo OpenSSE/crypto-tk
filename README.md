@@ -1,5 +1,5 @@
 # OpenSSE's Cryptographic Toolkit
-
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=build&env=STATIC_ANALYSIS=false)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=static%20analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![Coverage Status](https://coveralls.io/repos/github/OpenSSE/crypto-tk/badge.svg)](https://coveralls.io/github/OpenSSE/crypto-tk)

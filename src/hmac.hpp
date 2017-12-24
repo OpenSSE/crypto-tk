@@ -190,9 +190,6 @@ void HMac<H, N>::hmac(const unsigned char* in,
 
     key_.unlock();
 
-    // set the buffer to 0x00
-    memset(buffer, 0, kHMACKeySize);
-
     // copy the key to the buffer
     memcpy(buffer, key_.data(), kKeySize);
 

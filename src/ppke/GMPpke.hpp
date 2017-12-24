@@ -27,6 +27,7 @@ constexpr unsigned int  kPPKEStatisticalSecurity = 32;
 constexpr static size_t kPPKEPrfOutputSize
     = relicxx::PairingGroup::kPrfOutputSize;
 
+// cppcheck-suppress constStatement
 using PPKE_HKDF = sse::crypto::HMac<sse::crypto::Hash, 12 * FP_BYTES>;
 
 using tag_type = std::array<uint8_t, kTagSize>;

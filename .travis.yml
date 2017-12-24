@@ -8,33 +8,68 @@ language: cpp
 os: linux
 dist: trusty
 sudo: required
+
+
 addons:
    apt:
-     sources:
+     sources: &basic_sources
        - ubuntu-toolchain-r-test
-     packages:
-       - g++-4.9
+       - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
+         key_url: 'http://llvm.org/apt/llvm-snapshot.gpg.key'
+     packages: &basic_deps
        - libssl-dev
        - libgmp-dev
        - lcov
 
 
-env:
-- MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+env: MATRIX_EVAL="" 
 
-before_install:
-  - eval "${MATRIX_EVAL}"
-  # - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+install:  
   - cd install_dependencies
   - ./install_libsodium.sh
   - ./install_relic_ubuntu_14_easy.sh
   - cd ..
   - gem install coveralls-lcov
   - sudo ldconfig
+
+
+matrix:
+   include:
+      - env: 
+          - STATIC_ANALYSIS=false
+        addons:
+            apt:
+              sources: *basic_sources
+              packages:
+                 - *basic_deps
+                 - g++-4.9 
+        before_install:
+           - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+        after_success:
+           - ./coverage/gen_coverage.sh # get the code coverage
+           - ./coverage/upload_report.sh # upload the report to coveralls
+
+                 
+      - env: 
+          - STATIC_ANALYSIS=true
+          - CLANG_TIDY=clang-tidy-5.0
+        addons:
+           apt:
+              sources: *basic_sources
+              packages:
+                 - *basic_deps
+                 - cppcheck
+                 - libclang-common-5.0-dev # to get the headers right
+                 - clang-tidy-5.0
+        script:
+           - ./scripts/cppcheck.sh 
+           - ./scripts/cppcheck.sh 
+  
  
 script:
-  - scons check debug=1 coverage=1 static_relic=1
+  - if [ "${STATIC_ANALYSIS}" == "false" ]; then
+      scons check debug=1 coverage=1 static_relic=1 sanitize_address=1 sanitize_undefined=1;
+    fi
+  
 
-after_success:
-  - ./coverage/gen_coverage.sh # get the code coverage
-  - ./coverage/upload_report.sh # upload the report to coveralls
+  

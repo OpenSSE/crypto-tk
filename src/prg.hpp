@@ -214,7 +214,7 @@ public:
     ///
     static inline std::string derive(Key<kKeySize>&& k, const size_t len)
     {
-        return Prg::derive(std::move(k), 0, len);
+        return derive(std::move(k), 0, len);
     };
 
     ///

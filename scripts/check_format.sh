@@ -11,6 +11,8 @@ FILES="$(ls -d src/* | grep "$PATTERN")"
 FILES+=$'\n'"$(ls -d src/hash/* | grep "$PATTERN")"
 FILES+=$'\n'"$(ls -d src/ppke/* | grep "$PATTERN")"
 FILES+=$'\n'"$(ls -d src/tdp_impl/* | grep "$PATTERN")"
+FILES+=$'\n'"$(ls -d tests/*.cpp)"
+FILES+=$'\n'"$(ls -d bench/*.cpp)"
 
 for file in $FILES ; do
     eval "$CLANG_FORMAT -i ${file}"

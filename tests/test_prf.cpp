@@ -18,13 +18,12 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "../src/hash.hpp"
 #include "../src/prf.hpp"
 #include "../src/random.hpp"
-#include "../src/hash.hpp"
 
-
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -32,44 +31,46 @@
 using namespace std;
 namespace tests {
 
-template <size_t N>
+template<size_t N>
 void test_prf_consistency(size_t input_size)
 {
     sse::crypto::Prf<N> prf;
-    
-    string in_s = sse::crypto::random_string(input_size);
-    auto out_s = prf.prf(in_s);
-    auto out_buf = prf.prf(reinterpret_cast<const uint8_t*>(in_s.data()), input_size);
-    
-    
+
+    string in_s  = sse::crypto::random_string(input_size);
+    auto   out_s = prf.prf(in_s);
+    auto   out_buf
+        = prf.prf(reinterpret_cast<const uint8_t*>(in_s.data()), input_size);
+
+
     ASSERT_EQ(out_s, out_buf);
 }
 
-template <size_t N, size_t L>
+template<size_t N, size_t L>
 void test_prf_consistency_array()
 {
     sse::crypto::Prf<N> prf;
-    
+
     std::array<uint8_t, L> in_arr;
     sse::crypto::random_bytes(in_arr);
-    
+
     auto out_buf = prf.prf(reinterpret_cast<const uint8_t*>(in_arr.data()), L);
     auto out_arr = prf.prf(in_arr);
 
-    
+
     ASSERT_EQ(out_arr, out_buf);
 }
-    
-template <size_t N>
+
+template<size_t N>
 void test_key_derivation_consistency(size_t input_size)
 {
     sse::crypto::Prf<N> prf;
-    
+
     string in_s = sse::crypto::random_string(input_size);
-    
-    auto out_array = prf.prf(in_s);
-    auto out_key_s = prf.derive_key(in_s);
-    auto out_key_buf = prf.derive_key(reinterpret_cast<const uint8_t*>(in_s.data()), input_size);
+
+    auto out_array   = prf.prf(in_s);
+    auto out_key_s   = prf.derive_key(in_s);
+    auto out_key_buf = prf.derive_key(
+        reinterpret_cast<const uint8_t*>(in_s.data()), input_size);
 
     out_key_s.unlock();
     ASSERT_NE(out_key_s.data(), nullptr);
@@ -86,16 +87,16 @@ void test_key_derivation_consistency(size_t input_size)
     out_key_buf.lock();
 }
 
-template <size_t N, size_t L>
+template<size_t N, size_t L>
 void test_key_derivation_consistency_array()
 {
     sse::crypto::Prf<N> prf;
-    
+
     std::array<uint8_t, L> in_arr;
     sse::crypto::random_bytes(in_arr);
 
     auto out_array = prf.prf(in_arr);
-    auto out_key = prf.derive_key(in_arr);
+    auto out_key   = prf.derive_key(in_arr);
     out_key.unlock();
     ASSERT_NE(out_key.data(), nullptr);
     if (out_key.data() != nullptr) {
@@ -104,10 +105,11 @@ void test_key_derivation_consistency_array()
     out_key.lock();
 }
 
-}
+} // namespace tests
 
-TEST(prf, consistency) {
-    for (size_t i = 1; i <= 2*sse::crypto::Hash::kDigestSize+20; i++) {
+TEST(prf, consistency)
+{
+    for (size_t i = 1; i <= 2 * sse::crypto::Hash::kDigestSize + 20; i++) {
         tests::test_prf_consistency<1>(i);
         tests::test_prf_consistency<10>(i);
         tests::test_prf_consistency<20>(i);
@@ -115,15 +117,16 @@ TEST(prf, consistency) {
         tests::test_prf_consistency<1024>(i);
         tests::test_prf_consistency<2000>(i);
     }
-    tests::test_prf_consistency_array<1,20>();
-    tests::test_prf_consistency_array<10,40>();
-    tests::test_prf_consistency_array<20,50>();
-    tests::test_prf_consistency_array<128,100>();
-    tests::test_prf_consistency_array<1024,200>();
+    tests::test_prf_consistency_array<1, 20>();
+    tests::test_prf_consistency_array<10, 40>();
+    tests::test_prf_consistency_array<20, 50>();
+    tests::test_prf_consistency_array<128, 100>();
+    tests::test_prf_consistency_array<1024, 200>();
 }
 
-TEST(prf, key_derivation_consistency) {
-    for (size_t i = 1; i <= 2*sse::crypto::Hash::kDigestSize+20; i++) {
+TEST(prf, key_derivation_consistency)
+{
+    for (size_t i = 1; i <= 2 * sse::crypto::Hash::kDigestSize + 20; i++) {
         tests::test_key_derivation_consistency<1>(i);
         tests::test_key_derivation_consistency<10>(i);
         tests::test_key_derivation_consistency<20>(i);
@@ -131,17 +134,17 @@ TEST(prf, key_derivation_consistency) {
         tests::test_key_derivation_consistency<1024>(i);
         tests::test_key_derivation_consistency<2000>(i);
     }
-    
-    tests::test_key_derivation_consistency_array<1,20>();
-    tests::test_key_derivation_consistency_array<10,40>();
-    tests::test_key_derivation_consistency_array<20,50>();
-    tests::test_key_derivation_consistency_array<128,100>();
-    tests::test_key_derivation_consistency_array<1024,200>();
+
+    tests::test_key_derivation_consistency_array<1, 20>();
+    tests::test_key_derivation_consistency_array<10, 40>();
+    tests::test_key_derivation_consistency_array<20, 50>();
+    tests::test_key_derivation_consistency_array<128, 100>();
+    tests::test_key_derivation_consistency_array<1024, 200>();
 }
 
-TEST(prf, exceptions) {
+TEST(prf, exceptions)
+{
     sse::crypto::Prf<20> prf;
-    
+
     ASSERT_THROW(prf.prf(nullptr, 0), std::invalid_argument);
 }
-

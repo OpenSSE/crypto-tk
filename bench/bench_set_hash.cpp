@@ -18,12 +18,11 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <benchmark/benchmark.h>
-
-
 #include "hash.hpp"
 #include "random.hpp"
 #include "set_hash.hpp"
+
+#include <benchmark/benchmark.h>
 
 #include <iostream>
 #include <vector>

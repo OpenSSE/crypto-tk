@@ -18,10 +18,10 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <benchmark/benchmark.h>
-
 #include "tdp_impl/tdp_impl_mbedtls.hpp"
 #include "tdp_impl/tdp_impl_openssl.hpp"
+
+#include <benchmark/benchmark.h>
 
 using sse::crypto::TdpImpl_mbedTLS;
 using sse::crypto::TdpImpl_OpenSSL;

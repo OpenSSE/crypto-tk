@@ -28,9 +28,8 @@
 
 #include "../src/cipher.hpp"
 
-
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -41,19 +40,19 @@ constexpr size_t kCipherKeySize = sse::crypto::Cipher::kKeySize;
 
 TEST(encryption, correctness)
 {
-	string in_enc = "This is a test input.";
-	string out_enc, out_dec;
-	
-	array<uint8_t,kCipherKeySize> k;
-	k.fill(0x00);
-	
+    string in_enc = "This is a test input.";
+    string out_enc, out_dec;
+
+    array<uint8_t, kCipherKeySize> k;
+    k.fill(0x00);
+
     sse::crypto::Cipher cipher(sse::crypto::Key<kCipherKeySize>(k.data()));
-	cipher.encrypt(in_enc, out_enc);
-	
-	string in_dec = string(out_enc);
-	
-	cipher.decrypt(in_dec, out_dec);
-	
+    cipher.encrypt(in_enc, out_enc);
+
+    string in_dec = string(out_enc);
+
+    cipher.decrypt(in_dec, out_dec);
+
     ASSERT_EQ(in_enc, out_dec);
 }
 
@@ -61,22 +60,24 @@ TEST(encryption, correctness)
 TEST(encryption, exception)
 {
     ASSERT_EQ(sse::crypto::Cipher::plaintext_length(0), 0);
-    ASSERT_EQ(sse::crypto::Cipher::plaintext_length(sse::crypto::Cipher::ciphertext_length(10)), 10);
+    ASSERT_EQ(sse::crypto::Cipher::plaintext_length(
+                  sse::crypto::Cipher::ciphertext_length(10)),
+              10);
 
     string in_enc = "";
     string out_enc, out_dec;
-    
-    array<uint8_t,sse::crypto::Cipher::kKeySize> k;
+
+    array<uint8_t, sse::crypto::Cipher::kKeySize> k;
     k.fill(0x00);
 
     sse::crypto::Cipher cipher(sse::crypto::Key<kCipherKeySize>(k.data()));
 
     ASSERT_THROW(cipher.encrypt(in_enc, out_enc), std::invalid_argument);
-    
-    string in_dec = string(3,'a');
-    
+
+    string in_dec = string(3, 'a');
+
     ASSERT_THROW(cipher.decrypt(in_dec, out_dec), std::invalid_argument);
-    
-    in_dec = string(300,'a'); // long enough to be a 'valid' ciphertext
+
+    in_dec = string(300, 'a'); // long enough to be a 'valid' ciphertext
     ASSERT_THROW(cipher.decrypt(in_dec, out_dec), std::runtime_error);
 }

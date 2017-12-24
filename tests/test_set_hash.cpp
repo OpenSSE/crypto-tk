@@ -184,7 +184,7 @@ TEST(set_hash, batch_constructor)
 {
     for (size_t i = 0; i < kNumTests; i++) {
         std::vector<std::string> samples(kNumEltsBatch);
-        SetHash        a;
+        SetHash                  a;
         for (auto& e : samples) {
             e = sse::crypto::random_string(kTestEltsSize);
             a.add_element(e);

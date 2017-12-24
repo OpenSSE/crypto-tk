@@ -24,6 +24,15 @@ addons:
 
 env: MATRIX_EVAL="" 
 
+install:  
+  - cd install_dependencies
+  - ./install_libsodium.sh
+  - ./install_relic_ubuntu_14_easy.sh
+  - cd ..
+  - gem install coveralls-lcov
+  - sudo ldconfig
+
+
 matrix:
    include:
       - env: 
@@ -36,6 +45,10 @@ matrix:
                  - g++-4.9 
         before_install:
            - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+        after_success:
+           - ./coverage/gen_coverage.sh # get the code coverage
+           - ./coverage/upload_report.sh # upload the report to coveralls
+
                  
       - env: 
           - STATIC_ANALYSIS=true
@@ -48,27 +61,15 @@ matrix:
                  - cppcheck
                  - libclang-common-5.0-dev # to get the headers right
                  - clang-tidy-5.0
-
+        script:
+           - ./scripts/cppcheck.sh 
+           - ./scripts/cppcheck.sh 
   
-install:  
-  - cd install_dependencies
-  - ./install_libsodium.sh
-  - ./install_relic_ubuntu_14_easy.sh
-  - cd ..
-  - gem install coveralls-lcov
-  - sudo ldconfig
  
 script:
-  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then
+  - if [ "${STATIC_ANALYSIS}" == "false" ]; then
       scons check debug=1 coverage=1 static_relic=1 sanitize_address=1 sanitize_undefined=1;
-    fi
-  - if [ "${STATIC_ANALYSIS}" == "true" ]; then
-      ./scripts/cppcheck.sh;
-      ./scripts/tidy.sh;
     fi
   
 
-after_success:
-  - ./coverage/gen_coverage.sh # get the code coverage
-  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then ./coverage/upload_report.sh; fi # upload the report to coveralls
   

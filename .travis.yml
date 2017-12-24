@@ -22,18 +22,22 @@ addons:
        - lcov
 
 
-env: MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" 
+env: MATRIX_EVAL="" 
 
 matrix:
    include:
-      - env: STATIC_ANALYSIS=false
+      - env: 
+          - STATIC_ANALYSIS=false
+          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
         addons:
             apt:
               sources: *basic_sources
               packages:
                  - *basic_deps
                  - g++-4.9 
-      - env: STATIC_ANALYSIS=true
+      - env: 
+          - STATIC_ANALYSIS=true
+          - CLANG_TIDY=clang-tidy-5.0
         addons:
            apt:
               sources: *basic_sources

@@ -4,6 +4,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/OpenSSE/crypto-tk/badge.svg)](https://coveralls.io/github/OpenSSE/crypto-tk)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1412/badge)](https://bestpractices.coreinfrastructure.org/projects/1412)
 
+
+[![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=Status&env=STATIC_ANALYSIS=false)](https://travis-ci.org/OpenSSE/crypto-tk)
+[![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=Static%20Analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
+
+
+
+
 The SSE protocols rely on high level cryptographic features such as pseudo-random functions, hash functions, encryption schemes, or incremental set hashing. The cryptographic layer provides interfaces and implementations of these features. 
 
 For now, the hash function and encryption implementations rely on OpenSSL. This might (and probably will) in the future. However, this will have no influence on the code written using this library: the interfaces to the cryptographic services are *opaque*. It means that all implementation details are hidden. In particular, even if the implementation changes, the header files shouldn't.

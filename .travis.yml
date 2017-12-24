@@ -28,13 +28,15 @@ matrix:
    include:
       - env: 
           - STATIC_ANALYSIS=false
-          - MATRIX_EVAL="export CC="gcc-4.9" CXX="g++-4.9""
         addons:
             apt:
               sources: *basic_sources
               packages:
                  - *basic_deps
                  - g++-4.9 
+        before_install:
+           - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+                 
       - env: 
           - STATIC_ANALYSIS=true
           - CLANG_TIDY=clang-tidy-5.0
@@ -46,11 +48,8 @@ matrix:
                  - cppcheck
                  - clang-tidy-5.0
 
-before_install:
-  - eval "${MATRIX_EVAL}"  
   
 install:  
-  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then sudo apt-get install g++-4.9; fi # upload the report to coveralls
   - cd install_dependencies
   - ./install_libsodium.sh
   - ./install_relic_ubuntu_14_easy.sh

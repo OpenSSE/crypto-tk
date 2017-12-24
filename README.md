@@ -5,8 +5,8 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1412/badge)](https://bestpractices.coreinfrastructure.org/projects/1412)
 
 
-[![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=Status&env=STATIC_ANALYSIS=false)](https://travis-ci.org/OpenSSE/crypto-tk)
-[![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=Static%20Analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
+[![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=build&env=STATIC_ANALYSIS=false)](https://travis-ci.org/OpenSSE/crypto-tk)
+[![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=static%20analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
 
 
 

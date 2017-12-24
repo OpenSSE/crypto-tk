@@ -46,6 +46,7 @@ matrix:
               packages:
                  - *basic_deps
                  - cppcheck
+                 - libclang-common-5.0-dev # to get the headers right
                  - clang-tidy-5.0
 
   

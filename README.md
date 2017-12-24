@@ -1,12 +1,11 @@
 # OpenSSE's Cryptographic Toolkit
 
-[![build status](https://travis-ci.org/OpenSSE/crypto-tk.svg?branch=master)](https://travis-ci.org/OpenSSE/crypto-tk) 
+[![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=build&env=STATIC_ANALYSIS=false)](https://travis-ci.org/OpenSSE/crypto-tk)
+[![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=static%20analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![Coverage Status](https://coveralls.io/repos/github/OpenSSE/crypto-tk/badge.svg)](https://coveralls.io/github/OpenSSE/crypto-tk)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1412/badge)](https://bestpractices.coreinfrastructure.org/projects/1412)
 
 
-[![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=build&env=STATIC_ANALYSIS=false)](https://travis-ci.org/OpenSSE/crypto-tk)
-[![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=ci_analysis&label=static%20analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
 
 
 

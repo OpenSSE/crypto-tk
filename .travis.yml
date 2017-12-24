@@ -28,7 +28,7 @@ matrix:
    include:
       - env: 
           - STATIC_ANALYSIS=false
-          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+          - MATRIX_EVAL="export CC="gcc-4.9" CXX="g++-4.9""
         addons:
             apt:
               sources: *basic_sources
@@ -48,7 +48,6 @@ matrix:
 
 before_install:
   - eval "${MATRIX_EVAL}"  
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   
 install:  
   - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then sudo apt-get install g++-4.9; fi # upload the report to coveralls

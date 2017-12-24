@@ -8,13 +8,15 @@ language: cpp
 os: linux
 dist: trusty
 sudo: required
+
+
 addons:
    apt:
-     sources:
+     sources: &basic_sources
        - ubuntu-toolchain-r-test
        - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
          key_url: 'http://llvm.org/apt/llvm-snapshot.gpg.key'
-     packages:
+     packages: &basic_deps
        - libssl-dev
        - libgmp-dev
        - lcov
@@ -27,12 +29,16 @@ matrix:
       - env: STATIC_ANALYSIS=false
         addons:
             apt:
+              sources: *basic_sources
               packages:
+                 - *basic_deps
                  - g++-4.9 
       - env: STATIC_ANALYSIS=true
         addons:
            apt:
+              sources: *basic_sources
               packages:
+                 - *basic_deps
                  - cppcheck
                  - clang-tidy-5.0
 

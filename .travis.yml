@@ -37,6 +37,7 @@ matrix:
    include:
       - env: 
           - STATIC_ANALYSIS=false
+          - RUN_CHECKS=true
         addons:
             apt:
               sources: *basic_sources
@@ -52,6 +53,7 @@ matrix:
                  
       - env: 
           - STATIC_ANALYSIS=true
+          - RUN_CHECKS=false
           - CLANG_TIDY=clang-tidy-5.0
         addons:
            apt:
@@ -64,10 +66,23 @@ matrix:
         script:
            - ./scripts/cppcheck.sh 
            - ./scripts/cppcheck.sh 
+
+      - env: 
+          - STATIC_ANALYSIS=false
+          - RUN_CHECKS=false
+          - CLANG_FORMAT=clang-format-5.0
+        addons:
+           apt:
+              sources: *basic_sources
+              packages:
+                 - clang-format-5.0
+        install: # do not compile the dependencies
+        script:
+           - ./scripts/check_format.sh 
   
  
 script:
-  - if [ "${STATIC_ANALYSIS}" == "false" ]; then
+  - if [ "${RUN_CHECKS}" == "true" ]; then
       scons check debug=1 coverage=1 static_relic=1 sanitize_address=1 sanitize_undefined=1;
     fi
   

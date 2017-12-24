@@ -24,13 +24,15 @@ addons:
 
 
 env:
-- MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" STATIC_ANALYSIS=true
+  - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" STATIC_ANALYSIS=false
+  - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" STATIC_ANALYSIS=true
 
 before_install:
   - eval "${MATRIX_EVAL}"  
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   
 install:  
+  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then sudo apt-get install g++-4.9; fi # upload the report to coveralls
   - cd install_dependencies
   - ./install_libsodium.sh
   - ./install_relic_ubuntu_14_easy.sh
@@ -49,5 +51,6 @@ script:
   
 
 after_success:
-  # - ./coverage/gen_coverage.sh # get the code coverage
-  # - ./coverage/upload_report.sh # upload the report to coveralls
+  - ./coverage/gen_coverage.sh # get the code coverage
+  - if [ ! "${STATIC_ANALYSIS}" == "true" ]; then ./coverage/upload_report.sh; fi # upload the report to coveralls
+  

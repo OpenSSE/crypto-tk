@@ -17,10 +17,10 @@ for file in $FILES ; do
 done
 
 INVALID_FORMAT_FILES=$(git diff --name-only | grep "$PATTERN")
+NUM_INVALID_FILE=$(echo $INVALID_FORMAT_FILES | wc -l)
 
-NUM_INVALID_FILE=$(echo -n $INVALID_FORMAT_FILES | wc -l)
 
-if [ $NUM_INVALID_FILE == "0" ]; then
+if [ -z $INVALID_FORMAT_FILES ]; then
     echo "All the source files are correctly formated."
 else
     echo "The following files are incorrectly formated:"

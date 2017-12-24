@@ -15,17 +15,26 @@ addons:
        - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
          key_url: 'http://llvm.org/apt/llvm-snapshot.gpg.key'
      packages:
-       - g++-4.9
        - libssl-dev
        - libgmp-dev
        - lcov
-       - cppcheck
-       - clang-tidy-5.0
 
 
-env:
-  - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" STATIC_ANALYSIS=false
-  - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" STATIC_ANALYSIS=true
+env: MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9" 
+
+matrix:
+   include:
+      - env: STATIC_ANALYSIS=false
+        addons:
+            apt:
+              packages:
+                 - g++-4.9 
+      - env: STATIC_ANALYSIS=true
+        addons:
+           apt:
+              packages:
+                 - cppcheck
+                 - clang-tidy-5.0
 
 before_install:
   - eval "${MATRIX_EVAL}"  

@@ -20,6 +20,10 @@
 
 #include "set_hash.hpp"
 
+#include "hash.hpp"
+
+#include <cstring>
+
 #include <exception>
 #include <iomanip>
 #include <iostream>
@@ -27,10 +31,6 @@
 #include <sodium/crypto_core_ed25519.h>
 #include <sodium/crypto_scalarmult_ed25519.h>
 #include <sodium/utils.h>
-
-#include <cstring>
-
-#include "hash.hpp"
 
 namespace sse {
 

@@ -56,7 +56,7 @@ DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
-# IncludeBlocks:   Regroup # Only supported by clang-format >= 6.0
+IncludeBlocks:   Regroup # Only supported by clang-format >= 6.0
 IncludeCategories:
   - Regex:           '^(<|")(sodium|openssl)/.*\.h'
     Priority:        4

@@ -162,15 +162,13 @@ void Prg::derive(const uint32_t offset,
 
 void Prg::derive(Key<kKeySize>&& k, const size_t len, std::string& out)
 {
-    unsigned char* data = new unsigned char[len];
+    std::vector<uint8_t> data(len);
 
-    Prg::PrgImpl::derive(std::move(k), 0, len, data);
-    out = std::string(reinterpret_cast<char*>(data), len);
+    Prg::PrgImpl::derive(std::move(k), 0, len, data.data());
+    out = std::string(reinterpret_cast<const char*>(data.data()), len);
 
     // erase the buffer
-    sodium_memzero(data, len);
-
-    delete[] data;
+    sodium_memzero(data.data(), len);
 }
 
 void Prg::derive(Key<kKeySize>&& k,

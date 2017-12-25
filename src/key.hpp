@@ -46,6 +46,12 @@ extern void test_key_derivation_consistency_array();
 namespace sse {
 namespace crypto {
 
+// forward declare some templates
+template<class Hash, uint16_t key_size>
+class HMac;
+template<uint16_t NBYTES>
+class Prf;
+
 void test_keys();
 
 /// @class Key

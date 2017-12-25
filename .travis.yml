@@ -83,7 +83,7 @@ matrix:
                  - clang-tidy-5.0
         script:
            - ./scripts/cppcheck.sh 
-           - ./scripts/cppcheck.sh 
+           - ./scripts/tidy.sh 
 
       - env: 
           - STATIC_ANALYSIS=false

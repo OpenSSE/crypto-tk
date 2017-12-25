@@ -164,7 +164,7 @@ void Cipher::CipherImpl::encrypt(const std::string& in, std::string& out)
 {
     if (in.size() == 0) {
         throw std::invalid_argument(
-                                    "The minimum number of bytes to encrypt is 1.");
+            "The minimum number of bytes to encrypt is 1.");
     }
 
     size_t         len   = in.size();
@@ -244,7 +244,8 @@ void Cipher::CipherImpl::decrypt(const std::string& in, std::string& out)
     size_t p_len = plaintext_length(len);
 
     std::vector<uint8_t> data(p_len);
-    decrypt(reinterpret_cast<const unsigned char*>(in.data()), len, data.data());
+    decrypt(
+        reinterpret_cast<const unsigned char*>(in.data()), len, data.data());
 
     out = std::string(reinterpret_cast<const char*>(data.data()), p_len);
 }

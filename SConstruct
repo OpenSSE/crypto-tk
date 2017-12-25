@@ -74,7 +74,7 @@ env.GCovInjectObjectEmitters()
 
 env.Append(CFLAGS=['-std=c99'])
 env.Append(CCFLAGS=['-march=native', '-fPIC'])
-env.Append(CXXFLAGS=['-std=c++14'])
+env.Append(CXXFLAGS=['-std=c++11'])
 
 # C(XX) warnings flags
 env.Append(CCFLAGS=['-Wall', '-Wcast-qual', '-Wdisabled-optimization', '-Wformat=2', '-Wmissing-declarations', '-Wmissing-include-dirs', '-Wredundant-decls', '-Wshadow', '-Wstrict-overflow=5', '-Wdeprecated', '-Wno-unused-function'])

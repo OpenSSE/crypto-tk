@@ -44,9 +44,6 @@ matrix:
               sources: *basic_sources
               packages:
                  - *basic_deps
-                 - g++-4.9 
-        before_install:
-           - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
         after_success:
            - ./coverage/gen_coverage.sh # get the code coverage
            - ./coverage/upload_report.sh # upload the report to coveralls

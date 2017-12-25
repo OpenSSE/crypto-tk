@@ -46,7 +46,7 @@ public:
                                         const punct::tag_type& tag);
 
 private:
-    const Gmppke ppke_;
+    const Gmppke ppke_{};
 
     sse::crypto::GmppkeSecretParameters        sp_;
     const sse::crypto::Prf<kPPKEPrfOutputSize> master_prf_;
@@ -136,7 +136,7 @@ public:
     bool decrypt(const punct::ciphertext_type& ct_bytes, uint64_t& m) const;
 
 private:
-    const Gmppke ppke_;
+    const Gmppke ppke_{};
 
     GmppkePrivateKey sk_;
 };

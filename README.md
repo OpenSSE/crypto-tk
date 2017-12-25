@@ -54,10 +54,11 @@ You can also replace the `-DARITH=gmp` option by `-DARITH=x64-asm-254` (for bett
 
 * [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The trapdoor permutation is based on RSA, and `libsse_crypto` can use OpenSSL to implement RSA. The code has been compiled and tested using OpenSSL 1.0.2.
 
-### Compiler/Assembler
+### Compiler
 
-`libsse_crypto` needs a compiler supporting C++14. 
-It has been successfully built and tested on Ubuntu 14 LTS using both clang 3.6 and gcc 4.9.3, and on Mac OS X.12 using clang 9.0.0.
+`libsse_crypto` needs a compiler supporting C++11. 
+You can easily check that `libsse_crypto` is successfully built on Ubuntu 14 LTS with gcc 4.8 using Travis.
+It has also been successfully built and tested on Ubuntu 16 LTS using both clang (versions 3.8, 4.0 and 5.0) and gcc (versions 4.8, 4.9 and 5.0) and on Mac OS X.12 using clang 9.0.0.
 
 ### Setting up your system
 Here is what is necessary to set your system up from scratch, and build `libsse_crypto` (you will need to build RELIC first though).

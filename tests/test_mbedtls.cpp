@@ -155,6 +155,10 @@ TEST(mbedTLS, bignum)
 
     ASSERT_EQ(mbedtls_mpi_gen_prime(&X, 2, 0, mbedTLS_rng_wrap, NULL),
               MBEDTLS_ERR_MPI_BAD_INPUT_DATA); // too small prime
+
+    mbedtls_mpi_free(&X);
+    mbedtls_mpi_free(&Y);
+    mbedtls_mpi_free(&Z);
 }
 
 // This test is derived from the mbedtls_rsa_self_test routine
@@ -377,6 +381,9 @@ TEST(mbedTLS, open_ssl_bn_to_mpi)
             ASSERT_TRUE(BN_is_bit_set(y, i) == mbedtls_mpi_get_bit(&z, i));
         }
     }
+
+    mbedtls_mpi_free(&z);
+    BN_free(y);
 }
 
 TEST(mbedTLS, mpi_to_open_ssl_bn)
@@ -399,6 +406,9 @@ TEST(mbedTLS, mpi_to_open_ssl_bn)
             ASSERT_TRUE(BN_is_bit_set(y, i) == mbedtls_mpi_get_bit(&z, i));
         }
     }
+
+    mbedtls_mpi_free(&z);
+    BN_free(y);
 }
 
 static bool cmp_mpi_bn(mbedtls_mpi* x, BIGNUM* y)
@@ -476,6 +486,10 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         // check that the public element are identical
         ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.N, openssl_pk_rsa->n));
         ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa.E, openssl_pk_rsa->e));
+
+        RSA_free(openssl_pk_rsa);
+        RSA_free(openssl_sk_rsa);
+        mbedtls_rsa_free(&mbedtls_rsa);
     }
 }
 
@@ -560,6 +574,10 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         // check that the keys are identical
         ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.N, openssl_rsa->n));
         ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
+
+        RSA_free(openssl_rsa);
+        mbedtls_rsa_free(&mbedtls_rsa_sk);
+        mbedtls_rsa_free(&mbedtls_rsa_pk);
     }
 }
 #endif
@@ -663,6 +681,12 @@ TEST(mbedTLS, rsa_errors)
     mbedtls_mpi_lset(&rsa.N, 3);
     ret = mbedtls_rsa_check_pubkey(&rsa);
     ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
+
+
+    mbedtls_rsa_free(&rsa);
+    mbedtls_rsa_free(&rsa_cp);
+    mbedtls_mpi_free(&a);
+    mbedtls_mpi_free(&tmp_mpi);
 }
 
 TEST(mbedTLS, pem_errors)
@@ -760,6 +784,9 @@ TEST(mbedTLS, pem_errors)
                                    2000,
                                    &o_len);
     ASSERT_EQ(ret, 0);
+
+    mbedtls_pk_free(&pk_ctx);
+    mbedtls_pem_free(&pem_ctx);
 }
 
 TEST(mbedTLS, pk_parse_errors)
@@ -884,4 +911,6 @@ owIDAQAB\n\
         null_bitstring_pk.length() + 1);
     ASSERT_EQ(ret,
               MBEDTLS_ERR_PK_INVALID_PUBKEY + MBEDTLS_ERR_ASN1_UNEXPECTED_TAG);
+
+    mbedtls_pk_free(&pk_ctx);
 }

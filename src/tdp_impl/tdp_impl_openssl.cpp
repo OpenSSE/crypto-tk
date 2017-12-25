@@ -72,12 +72,13 @@ TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(nullptr)
     rsa_key_ = PEM_read_bio_RSA_PUBKEY(mem, nullptr, nullptr, nullptr);
 
     if (rsa_key_ == nullptr) {
+        BIO_free(mem);
         throw std::runtime_error(
             "Error when initializing the RSA key from public key.");
     }
 
     // close and destroy the BIO
-    if (BIO_set_close(mem, BIO_NOCLOSE)
+    if (BIO_set_close(mem, BIO_CLOSE)
         != 1) // So BIO_free() leaves BUF_MEM alone
     {
         // always returns 1 ...
@@ -136,8 +137,10 @@ std::string TdpImpl_OpenSSL::public_key() const
     ret = PEM_write_bio_RSA_PUBKEY(bio, rsa_key_);
 
     if (ret != 1) {
-        throw std::runtime_error(
-            "Error when serializing the RSA public key."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        BIO_free(bio);
+        throw std::runtime_error("Error when serializing the RSA public key.");
+        /* LCOV_EXCL_START */
     }
 
 
@@ -148,13 +151,16 @@ std::string TdpImpl_OpenSSL::public_key() const
     int read_bytes = BIO_read(bio, buf, (int)len);
 
     if (read_bytes == 0) {
-        throw std::runtime_error(
-            "Error when reading BIO."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        BIO_free(bio);
+        free(buf);
+        throw std::runtime_error("Error when reading BIO.");
+        /* LCOV_EXCL_STOP */
     }
 
     std::string v(reinterpret_cast<const char*>(buf), len);
 
-    BIO_free_all(bio);
+    BIO_free(bio);
     free(buf);
 
     return v;
@@ -235,8 +241,11 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::
 
     ret = BN_rand_range(rnd, rsa_key_->n);
     if (ret != 1) {
+        /* LCOV_EXCL_START */
+        BN_free(rnd);
         throw std::runtime_error(
             "Invalid random number generation."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_STOP */
     }
     size_t offset = kMessageSpaceSize - BN_num_bytes(rnd);
 
@@ -317,14 +326,18 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL()
     BIGNUM*       bne = BN_new();
     ret               = BN_set_word(bne, e);
     if (ret != 1) {
-        throw std::runtime_error(
-            "Invalid BIGNUM initialization."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        BN_free(bne);
+        throw std::runtime_error("Invalid BIGNUM initialization.");
+        /* LCOV_EXCL_STOP */
     }
 
     ret = RSA_generate_key_ex(get_rsa_key(), RSA_MODULUS_SIZE, bne, nullptr);
     if (ret != 1) {
-        throw std::runtime_error(
-            "Invalid RSA key generation."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        BN_free(bne);
+        throw std::runtime_error("Invalid RSA key generation.");
+        /* LCOV_EXCL_STOP */
     }
 
     // initialize the useful variables
@@ -360,15 +373,17 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL(const std::string& sk)
     evpkey = PEM_read_bio_PrivateKey(mem, nullptr, nullptr, nullptr);
 
     if (evpkey == nullptr) {
+        BIO_free(mem);
         throw std::runtime_error("Error when reading the RSA private key.");
     }
 
     // read the key from the BIO
     set_rsa_key(EVP_PKEY_get1_RSA(evpkey));
+    EVP_PKEY_free(evpkey);
 
 
     // close and destroy the BIO
-    if (BIO_set_close(mem, BIO_NOCLOSE)
+    if (BIO_set_close(mem, BIO_CLOSE)
         != 1) // So BIO_free() leaves BUF_MEM alone
     {
         // always returns 1 ...
@@ -403,8 +418,10 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
     EVP_PKEY* evpkey = EVP_PKEY_new();
     ret              = EVP_PKEY_set1_RSA(evpkey, get_rsa_key());
     if (ret != 1) {
-        throw std::runtime_error(
-            "Invalid EVP initialization."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        EVP_PKEY_free(evpkey);
+        throw std::runtime_error("Invalid EVP initialization.");
+        /* LCOV_EXCL_STOP */
     }
 
     // initialize a buffer
@@ -414,8 +431,11 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
     ret = PEM_write_bio_PKCS8PrivateKey(
         bio, evpkey, nullptr, nullptr, 0, nullptr, nullptr);
     if (ret != 1) {
-        throw std::runtime_error(
-            "Failure when writing private KEY."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        EVP_PKEY_free(evpkey);
+        BIO_free(bio);
+        throw std::runtime_error("Failure when writing private KEY.");
+        /* LCOV_EXCL_STOP */
     }
 
     // put the buffer in a std::string
@@ -424,8 +444,13 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
 
     int read_bytes = BIO_read(bio, buf, (int)len);
     if (read_bytes == 0) {
-        throw std::runtime_error(
-            "Error when reading BIO."); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        EVP_PKEY_free(evpkey);
+        BIO_free(bio);
+        free(buf);
+
+        throw std::runtime_error("Error when reading BIO.");
+        /* LCOV_EXCL_STOP */
     }
 
 

@@ -222,6 +222,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::eval(
 
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
     mbedtls_mpi_lset(&x, 0); // erase the temporary variable
+    mbedtls_mpi_free(&x);
 
     return out;
 }
@@ -266,6 +267,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::
 
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
     mbedtls_mpi_lset(&x, 0);
+    mbedtls_mpi_free(&x);
 
     return out;
 }
@@ -314,6 +316,7 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::
 
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
     mbedtls_mpi_lset(&x, 0);
+    mbedtls_mpi_free(&x);
 
     return out;
 }
@@ -664,12 +667,20 @@ cleanup:
     mbedtls_mpi_lset(&y_q, 0);
     mbedtls_mpi_lset(&mpi_order, 0);
 
+    mbedtls_mpi_free(&x);
+    mbedtls_mpi_free(&d_p);
+    mbedtls_mpi_free(&d_q);
+    mbedtls_mpi_free(&y_p);
+    mbedtls_mpi_free(&y_q);
+    mbedtls_mpi_free(&mpi_order);
+
     if (ret != 0) {
         throw std::runtime_error(
             "Error during the modular exponentiation"); /* LCOV_EXCL_LINE */
     }
 
     mbedtls_mpi_lset(&y, 0); // erase the temporary variable
+    mbedtls_mpi_free(&y);
 
     return out;
 }
@@ -858,6 +869,7 @@ TdpMultPoolImpl_mbedTLS::eval_pool(
     mbedtls_mpi_write_binary(&x, out.data(), out.size());
 
     mbedtls_mpi_lset(&x, 0);
+    mbedtls_mpi_free(&x);
 
     return out;
 }

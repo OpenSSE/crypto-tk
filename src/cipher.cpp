@@ -23,6 +23,7 @@
 #include "random.hpp"
 
 #include <exception>
+#include <vector>
 
 #include <sodium/crypto_aead_chacha20poly1305.h>
 #include <sodium/crypto_generichash_blake2b.h>
@@ -122,11 +123,6 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in,
                                  const size_t&        len,
                                  unsigned char*       out)
 {
-    if (len == 0) {
-        throw std::invalid_argument(
-            "The minimum number of bytes to encrypt is 1.");
-    }
-
     uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
     unsigned long long c_len = 0; // NOLINT
 
@@ -166,6 +162,11 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in,
 
 void Cipher::CipherImpl::encrypt(const std::string& in, std::string& out)
 {
+    if (in.size() == 0) {
+        throw std::invalid_argument(
+            "The minimum number of bytes to encrypt is 1.");
+    }
+
     size_t         len   = in.size();
     size_t         c_len = ciphertext_length(len);
     unsigned char* data  = new unsigned char[c_len];
@@ -242,11 +243,11 @@ void Cipher::CipherImpl::decrypt(const std::string& in, std::string& out)
 
     size_t p_len = plaintext_length(len);
 
-    unsigned char* data = new unsigned char[p_len];
-    decrypt(reinterpret_cast<const unsigned char*>(in.data()), len, data);
+    std::vector<uint8_t> data(p_len);
+    decrypt(
+        reinterpret_cast<const unsigned char*>(in.data()), len, data.data());
 
-    out = std::string(reinterpret_cast<char*>(data), p_len);
-    delete[] data;
+    out = std::string(reinterpret_cast<const char*>(data.data()), p_len);
 }
 
 } // namespace crypto

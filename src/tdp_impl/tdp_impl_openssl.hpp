@@ -74,6 +74,7 @@ public:
 protected:
     TdpImpl_OpenSSL();
 
+    // cppcheck-suppress constStatement
     RSA* rsa_key_{nullptr};
 };
 

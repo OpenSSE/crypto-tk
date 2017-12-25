@@ -42,6 +42,7 @@ matrix:
       - env: 
           - STATIC_ANALYSIS=false
           - RUN_CHECKS=true
+          - COMPILER=gcc
           - SANITIZE_ADDRESS=0
           - SANITIZE_UNDEFINED=0
         compiler: gcc

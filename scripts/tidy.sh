@@ -3,6 +3,8 @@ if [[ -z $CLANG_TIDY ]]; then
 	CLANG_TIDY="clang-tidy"
 fi
 
+echo "Using "$CLANG_TIDY
+
 GLOBIGNORE='**/mbedtls/**' # do not look into mbedTLS code
 
 echo "Ignoring files in "$GLOBIGNORE

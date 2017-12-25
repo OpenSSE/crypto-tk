@@ -162,7 +162,7 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in,
 
 void Cipher::CipherImpl::encrypt(const std::string& in, std::string& out)
 {
-    if (in.size() == 0) {
+    if (in.empty()) {
         throw std::invalid_argument(
             "The minimum number of bytes to encrypt is 1.");
     }

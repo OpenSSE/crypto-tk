@@ -454,7 +454,7 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         openssl_sk_rsa = EVP_PKEY_get1_RSA(evpkey);
 
         // close and destroy the BIO
-        ASSERT_EQ(BIO_set_close(mem, BIO_NOCLOSE), 1);
+        ASSERT_EQ(BIO_set_close(mem, BIO_CLOSE), 1);
         BIO_free(mem);
         mem = NULL;
 
@@ -480,7 +480,7 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
 
 
         // close and destroy the BIO
-        ASSERT_EQ(BIO_set_close(mem, BIO_NOCLOSE), 1);
+        ASSERT_EQ(BIO_set_close(mem, BIO_CLOSE), 1);
         BIO_free(mem);
 
         // check that the public element are identical
@@ -531,6 +531,7 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         ASSERT_NE(BIO_read(bio, buf, (int)len), 0);
 
         EVP_PKEY_free(evpkey);
+
         BIO_free_all(bio);
 
         // create an mbedTLS key from the buffer
@@ -576,6 +577,7 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         ASSERT_TRUE(cmp_mpi_bn(&mbedtls_rsa_sk.E, openssl_rsa->e));
 
         RSA_free(openssl_rsa);
+        BN_free(bne);
         mbedtls_rsa_free(&mbedtls_rsa_sk);
         mbedtls_rsa_free(&mbedtls_rsa_pk);
     }

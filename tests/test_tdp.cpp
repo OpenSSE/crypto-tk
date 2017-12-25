@@ -477,91 +477,84 @@ static void test_tdp_impl_copy(const size_t test_count)
         TDP_INV tdp_inv_orig;
         TDP_INV tdp_inv_sk_copy(tdp_inv_orig.private_key());
 
-        //        TDP tdp_pk_copy(tdp_inv_orig.public_key());
-        //        TDP tdp_pk_copy_copy = tdp_pk_copy;
+        TDP tdp_pk_copy(tdp_inv_orig.public_key());
+        TDP tdp_pk_copy_copy = tdp_pk_copy;
 
 
-        //        TDP_POOL tdp_pool(tdp_inv_orig.public_key(), 2);
-        //        TDP_POOL tdp_pool_copy(tdp_pool);
+        TDP_POOL tdp_pool(tdp_inv_orig.public_key(), 2);
+        TDP_POOL tdp_pool_copy(tdp_pool);
 
-        //        tdp_pk_assign   = tdp_pk_copy_copy;
-        //        tdp_pool_assign = tdp_pool_copy;
+        tdp_pk_assign   = tdp_pk_copy_copy;
+        tdp_pool_assign = tdp_pool_copy;
 
-        //        // check that tdp inverse have the same private key
-        //        ASSERT_EQ(tdp_inv_sk_copy.private_key(),
-        //        tdp_inv_orig.private_key());
-        //
-        //        //        if (!is_implementation) {
-        //        //            ASSERT_EQ(tdp_inv_sk_assign.private_key(),
-        //        //            tdp_inv_orig.private_key());
-        //        //        }
-        //
-        //
-        //        // check that they have the same public key
-        //        ASSERT_EQ(tdp_inv_sk_copy.public_key(),
-        //        tdp_inv_orig.public_key());
-        //        ASSERT_EQ(tdp_pk_copy.public_key(),
-        //        tdp_inv_orig.public_key());
-        //        ASSERT_EQ(tdp_pk_copy_copy.public_key(),
-        //        tdp_inv_orig.public_key()); if (!is_implementation) {
-        //            //            ASSERT_EQ(tdp_inv_sk_assign.public_key(),
-        //            //            tdp_inv_orig.public_key());
-        //            ASSERT_EQ(tdp_pk_assign.public_key(),
-        //            tdp_inv_orig.public_key());
+        // check that tdp inverse have the same private key
+        ASSERT_EQ(tdp_inv_sk_copy.private_key(), tdp_inv_orig.private_key());
+
+        //        if (!is_implementation) {
+        //            ASSERT_EQ(tdp_inv_sk_assign.private_key(),
+        //            tdp_inv_orig.private_key());
         //        }
-        //
-        //        ASSERT_EQ(tdp_pool.public_key(), tdp_inv_orig.public_key());
-        //        ASSERT_EQ(tdp_pool_copy.public_key(),
-        //        tdp_inv_orig.public_key()); if (!is_implementation) {
-        //            ASSERT_EQ(tdp_pool_assign.public_key(),
-        //            tdp_inv_orig.public_key());
-        //        }
-        //
-        //        // for the pools, also check that they have the same size
-        //        ASSERT_EQ(tdp_pool_copy.maximum_order(),
-        //        tdp_pool.maximum_order()); if (!is_implementation) {
-        //            ASSERT_EQ(tdp_pool_assign.maximum_order(),
-        //                      tdp_pool.maximum_order());
-        //        }
-        //
-        //        std::array<uint8_t, 32> key =
-        //        sse::crypto::random_bytes<uint8_t, 32>();
-        //
-        //        for (size_t j = 0; j < 10; j++) {
-        //            std::array<uint8_t, 32> key1 = key;
-        //            std::array<uint8_t, 32> key2 = key;
-        //            std::array<uint8_t, 32> key3 = key;
-        //            //            std::array<uint8_t, 32> key4 = key;
-        //            std::array<uint8_t, 32> key5 = key;
-        //            std::array<uint8_t, 32> key6 = key;
-        //            std::array<uint8_t, 32> key7 = key;
-        //
-        //            string sample_orig = tdp_inv_orig.generate(
-        //                sse::crypto::Key<32>(key1.data()), std::to_string(j));
-        //            string sample_orig_copy = tdp_inv_orig.generate(
-        //                sse::crypto::Key<32>(key2.data()), std::to_string(j));
-        //            string sample_sk_copy = tdp_inv_orig.generate(
-        //                sse::crypto::Key<32>(key3.data()), std::to_string(j));
-        //            //            string sample_inv_assign =
-        //            //
-        //            tdp_inv_sk_assign.generate(sse::crypto::Key<32>(key4.data()),
-        //            //            std::to_string(j));
-        //            string sample_pk_copy = tdp_pk_copy.generate(
-        //                sse::crypto::Key<32>(key5.data()), std::to_string(j));
-        //            string sample_eq = tdp_pk_copy_copy.generate(
-        //                sse::crypto::Key<32>(key6.data()), std::to_string(j));
-        //            string sample_assign = tdp_pk_assign.generate(
-        //                sse::crypto::Key<32>(key7.data()), std::to_string(j));
-        //
-        //            ASSERT_EQ(sample_orig_copy, sample_orig);
-        //            ASSERT_EQ(sample_sk_copy, sample_orig);
-        //            ASSERT_EQ(sample_pk_copy, sample_orig);
-        //            ASSERT_EQ(sample_eq, sample_orig);
-        //            if (!is_implementation) {
-        //                //                ASSERT_EQ(sample_inv_assign,
-        //                sample_orig); ASSERT_EQ(sample_assign, sample_orig);
-        //            }
-        //        }
+
+
+        // check that they have the same public key
+        ASSERT_EQ(tdp_inv_sk_copy.public_key(), tdp_inv_orig.public_key());
+        ASSERT_EQ(tdp_pk_copy.public_key(), tdp_inv_orig.public_key());
+        ASSERT_EQ(tdp_pk_copy_copy.public_key(), tdp_inv_orig.public_key());
+        if (!is_implementation) {
+            //            ASSERT_EQ(tdp_inv_sk_assign.public_key(),
+            //            tdp_inv_orig.public_key());
+            ASSERT_EQ(tdp_pk_assign.public_key(), tdp_inv_orig.public_key());
+        }
+
+        ASSERT_EQ(tdp_pool.public_key(), tdp_inv_orig.public_key());
+        ASSERT_EQ(tdp_pool_copy.public_key(), tdp_inv_orig.public_key());
+        if (!is_implementation) {
+            ASSERT_EQ(tdp_pool_assign.public_key(), tdp_inv_orig.public_key());
+        }
+
+        // for the pools, also check that they have the same size
+        ASSERT_EQ(tdp_pool_copy.maximum_order(), tdp_pool.maximum_order());
+        if (!is_implementation) {
+            ASSERT_EQ(tdp_pool_assign.maximum_order(),
+                      tdp_pool.maximum_order());
+        }
+
+        std::array<uint8_t, 32> key = sse::crypto::random_bytes<uint8_t, 32>();
+
+        for (size_t j = 0; j < 10; j++) {
+            std::array<uint8_t, 32> key1 = key;
+            std::array<uint8_t, 32> key2 = key;
+            std::array<uint8_t, 32> key3 = key;
+            //            std::array<uint8_t, 32> key4 = key;
+            std::array<uint8_t, 32> key5 = key;
+            std::array<uint8_t, 32> key6 = key;
+            std::array<uint8_t, 32> key7 = key;
+
+            string sample_orig = tdp_inv_orig.generate(
+                sse::crypto::Key<32>(key1.data()), std::to_string(j));
+            string sample_orig_copy = tdp_inv_orig.generate(
+                sse::crypto::Key<32>(key2.data()), std::to_string(j));
+            string sample_sk_copy = tdp_inv_orig.generate(
+                sse::crypto::Key<32>(key3.data()), std::to_string(j));
+            //            string sample_inv_assign =
+            //            tdp_inv_sk_assign.generate(sse::crypto::Key<32>(key4.data()),
+            //            std::to_string(j));
+            string sample_pk_copy = tdp_pk_copy.generate(
+                sse::crypto::Key<32>(key5.data()), std::to_string(j));
+            string sample_eq = tdp_pk_copy_copy.generate(
+                sse::crypto::Key<32>(key6.data()), std::to_string(j));
+            string sample_assign = tdp_pk_assign.generate(
+                sse::crypto::Key<32>(key7.data()), std::to_string(j));
+
+            ASSERT_EQ(sample_orig_copy, sample_orig);
+            ASSERT_EQ(sample_sk_copy, sample_orig);
+            ASSERT_EQ(sample_pk_copy, sample_orig);
+            ASSERT_EQ(sample_eq, sample_orig);
+            if (!is_implementation) {
+                //                ASSERT_EQ(sample_inv_assign, sample_orig);
+                ASSERT_EQ(sample_assign, sample_orig);
+            }
+        }
     }
 }
 

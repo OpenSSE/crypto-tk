@@ -111,7 +111,9 @@ inline void TdpImpl_OpenSSL::set_rsa_key(RSA* k)
         throw std::invalid_argument(
             "Invalid input: k == nullptr."); /* LCOV_EXCL_LINE */
     }
-
+    if (rsa_key_ != nullptr) {
+        RSA_free(rsa_key_);
+    }
     rsa_key_ = k;
     RSA_blinding_off(rsa_key_);
 }

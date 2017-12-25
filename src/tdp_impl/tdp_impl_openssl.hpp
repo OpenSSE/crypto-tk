@@ -74,7 +74,7 @@ public:
 protected:
     TdpImpl_OpenSSL();
 
-    RSA* rsa_key_;
+    RSA* rsa_key_{nullptr};
 };
 
 class TdpInverseImpl_OpenSSL : public TdpImpl_OpenSSL,

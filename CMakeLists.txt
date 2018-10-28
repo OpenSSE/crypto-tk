@@ -1,19 +1,26 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.0)
+project (libsse_crypto VERSION 0.2 
+                       DESCRIPTION "OpenSSE's cryptographic library")
+
+
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 
-INCLUDE(CheckCCompilerFlag)
 
 # Build in Debug mode by default
 set(default_build_type "Debug")
 
+# Options
 option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
 
+# Load modules
 
-project ("OpenSSE's cryptographic library")
+include(CheckCCompilerFlag)
 include(CodeCoverage)
 include(FindDependencies)
 
+# We use CMake's integrated testing features
 enable_testing()
 
 set(C_WARNING_FLAGS "-Wall -Wextra")
@@ -56,13 +63,14 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories("src")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/"src")
 
 
 add_subdirectory(gtest)
 
 add_subdirectory(src)
 add_subdirectory(tests)
+# add_subdirectory(bench)
 
 if(OPENSSL_FOUND)
     add_executable(debug_tool main.cpp)
@@ -70,7 +78,3 @@ if(OPENSSL_FOUND)
 
     target_include_directories(debug_tool SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})
 endif()
-
-
-# add_subdirectory(tests)
-# add_subdirectory(bench)

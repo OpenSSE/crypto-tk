@@ -63,9 +63,9 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/"src")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-
+message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_subdirectory(gtest)
 
 add_subdirectory(src)

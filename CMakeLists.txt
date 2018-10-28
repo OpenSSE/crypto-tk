@@ -7,9 +7,12 @@ INCLUDE(CheckCCompilerFlag)
 # Build in Debug mode by default
 set(default_build_type "Debug")
 
+option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
+
 
 project ("OpenSSE's cryptographic library")
 include(CodeCoverage)
+include(FindDependencies)
 
 enable_testing()
 
@@ -54,15 +57,20 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories("src")
-include_directories("/usr/local/opt/openssl/include")
+
 
 add_subdirectory(gtest)
 
 add_subdirectory(src)
 add_subdirectory(tests)
 
-add_executable(debug_tool main.cpp)
-target_link_libraries(debug_tool libsse_crypto)
+if(OPENSSL_FOUND)
+    add_executable(debug_tool main.cpp)
+    target_link_libraries(debug_tool sse_crypto ${OPENSSL_CRYPTO_LIBRARY})
+
+    target_include_directories(debug_tool SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})
+endif()
+
 
 # add_subdirectory(tests)
 # add_subdirectory(bench)

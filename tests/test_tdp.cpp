@@ -117,24 +117,32 @@ template<typename TDP, typename TDP_INV, typename TDP_POOL>
 class conditional_tdp_test<TDP, TDP_INV, TDP_POOL, true>
 {
 public:
-    inline static std::string tdp_eval(const TDP& tdp, const std::string& in)
-    {
-        return std::string();
-    }
-
-    inline static std::string tdp_eval(const TDP_INV&     tdp_inv,
+    inline static std::string tdp_eval(__attribute__((unused)) const TDP& tdp,
+                                       __attribute__((unused))
                                        const std::string& in)
     {
         return std::string();
     }
 
-    inline static std::string tdp_eval(const TDP_POOL&    tdp_mult,
+    inline static std::string tdp_eval(__attribute__((unused))
+                                       const TDP_INV& tdp_inv,
+                                       __attribute__((unused))
                                        const std::string& in)
     {
         return std::string();
     }
 
-    inline static std::string tdp_invert(const TDP_INV&     tdp_inv,
+    inline static std::string tdp_eval(__attribute__((unused))
+                                       const TDP_POOL& tdp_mult,
+                                       __attribute__((unused))
+                                       const std::string& in)
+    {
+        return std::string();
+    }
+
+    inline static std::string tdp_invert(__attribute__((unused))
+                                         const TDP_INV& tdp_inv,
+                                         __attribute__((unused))
                                          const std::string& in)
     {
         return std::string();
@@ -148,9 +156,12 @@ public:
         tdp_mult.eval_pool(in, out, order);
     }
 
-    inline static std::string tdp_eval_pool(const TDP_POOL&    tdp_mult,
+    inline static std::string tdp_eval_pool(__attribute__((unused))
+                                            const TDP_POOL& tdp_mult,
+                                            __attribute__((unused))
                                             const std::string& in,
-                                            uint8_t            order)
+                                            __attribute__((unused))
+                                            uint8_t order)
     {
         return std::string();
     }
@@ -163,9 +174,12 @@ public:
         return tdp_mult.eval_pool(in, order);
     }
 
-    inline static std::string tdp_invert_mult(const TDP_INV&     tdp_inv,
+    inline static std::string tdp_invert_mult(__attribute__((unused))
+                                              const TDP_INV& tdp_inv,
+                                              __attribute__((unused))
                                               const std::string& in,
-                                              uint8_t            order)
+                                              __attribute__((unused))
+                                              uint8_t order)
     {
         return std::string();
     }
@@ -452,7 +466,7 @@ static void test_tdp_impl_multiple_inverse_2(const size_t test_count)
     string v1, v2;
 
     v2 = sample;
-    for (uint32_t j = 0; j < INV_MULT_COUNT; j++) {
+    for (uint32_t j = 0; j < test_count; j++) {
         tdp_inv.invert(v2, v2);
         tdp_inv.invert_mult(sample, v1, j + 1);
         ASSERT_EQ(v1, v2);

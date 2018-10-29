@@ -101,7 +101,9 @@ inline std::string random_string(const size_t length)
 /// @param len      Length of the buffer
 ///
 /// @return     Always return 0
-inline int mbedTLS_rng_wrap(void* arg, unsigned char* out, size_t len) noexcept
+inline int mbedTLS_rng_wrap(__attribute__((unused)) void* arg,
+                            unsigned char*                out,
+                            size_t                        len) noexcept
 {
     random_bytes(len, out);
     return 0;

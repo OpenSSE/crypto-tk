@@ -37,7 +37,9 @@
 #endif
 
 using namespace std;
-static int mbedTLS_rng_wrap(void* arg, unsigned char* out, size_t len)
+static int mbedTLS_rng_wrap(__attribute__((unused)) void* arg,
+                            unsigned char*                out,
+                            size_t                        len)
 {
     sse::crypto::random_bytes(len, out);
     return 0;

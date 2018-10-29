@@ -344,10 +344,10 @@ private:
     /// @brief Unlocks the key and gets its content
     ///
     /// Returns a pointer to the key data.
-    /// The caller has to relock the key after by calling unlock().
+    /// The caller has to re-lock the key after by calling unlock().
     ///
     /// @exception std::runtime_error The memory cannot be accessed: it is
-    /// absent (happens when the key has been modved) or cannot be unlocked.
+    /// absent (happens when the key has been moved) or cannot be unlocked.
     ///
     const uint8_t* unlock_get() const
     {

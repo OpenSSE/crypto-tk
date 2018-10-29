@@ -614,11 +614,11 @@ ostream& operator<<(ostream& s, const GT& gt)
     return s;
 }
 
-relicResourceHandle::relicResourceHandle(const bool& allowAlreadyInitilazed)
+relicResourceHandle::relicResourceHandle(const bool& allowAlreadyInitialized)
 {
     isInit = false;
     if (nullptr != core_get()) {
-        if (allowAlreadyInitilazed) {
+        if (allowAlreadyInitialized) {
             isInit = false; // someone else is holding the resource;
             return;
         }

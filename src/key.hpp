@@ -308,7 +308,7 @@ private:
     /// Returns true if the key content is nullptr.
     ///
     ///
-    const bool is_empty() const noexcept
+    bool is_empty() const noexcept
     {
         return content_ == nullptr;
     }
@@ -319,7 +319,7 @@ private:
     /// Returns true if the key is not read accessible.
     ///
     ///
-    const bool is_locked() const noexcept
+    bool is_locked() const noexcept
     {
         return is_locked_;
     }

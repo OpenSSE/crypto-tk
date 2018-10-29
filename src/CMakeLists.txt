@@ -24,3 +24,6 @@ if(RSA_IMPL_OPENSSL)
     add_compile_definitions(SSE_CRYPTO_TDP_IMPL=SSE_CRYPTO_TDP_IMPL_OPENSSL)
 endif()
 endif()
+
+# Generate PIC for the library
+set_target_properties(sse_crypto PROPERTIES POSITION_INDEPENDENT_CODE ON)

@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.1)
 project (libsse_crypto VERSION 0.2 
                        DESCRIPTION "OpenSSE's cryptographic library")
 
@@ -46,7 +46,7 @@ set(C_COVERAGE_FLAGS "--coverage -fno-inline -fno-inline-small-functions -fno-de
 set(LINK_COVERAGE_FLAGS "--coverage")
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -std=c++11 ${C_WARNING_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native ${C_WARNING_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native ${C_WARNING_FLAGS}")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g ${SANITIZER_FLAGS}")

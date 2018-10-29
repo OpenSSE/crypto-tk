@@ -14,8 +14,24 @@ add_library(sse_crypto SHARED
                 $<TARGET_OBJECTS:mbedTLS_lite> 
             )
 
-target_link_libraries(sse_crypto ${LIB_SODIUM} ${LIB_RELIC})
+# Use the appropriate compiler features
 
+target_compile_features(sse_crypto
+    PUBLIC
+        cxx_auto_type
+        cxx_nullptr
+        cxx_constexpr
+        cxx_defaulted_functions
+        cxx_deleted_functions
+        cxx_extern_templates
+        cxx_noexcept
+        cxx_static_assert
+        cxx_thread_local
+    PRIVATE
+        cxx_lambdas
+)
+
+target_link_libraries(sse_crypto ${LIB_SODIUM} ${LIB_RELIC})
 
 if(OPENSSL_FOUND)
     target_include_directories(sse_crypto SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})

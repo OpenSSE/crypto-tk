@@ -1,6 +1,3 @@
-set(CMAKE_MACOSX_RPATH 1)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
 
 add_subdirectory(mbedtls)
 

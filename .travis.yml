@@ -52,7 +52,7 @@ matrix:
               packages:
                  - *basic_deps
         after_success:
-           - ./coverage/gen_coverage.sh # get the code coverage
+          #  - ./coverage/gen_coverage.sh # get the code coverage
            - ./coverage/upload_report.sh # upload the report to coveralls
 
       - env: 
@@ -101,7 +101,11 @@ matrix:
  
 script:
   - if [ "${RUN_CHECKS}" == "true" ]; then
-      scons check debug=1 coverage=1 static_relic=1 sanitize_address=${SANITIZE_ADDRESS} sanitize_undefined=${SANITIZE_UNDEFINED};
+      mkdir build;
+      cd build;
+      cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug;
+      make check_coverage;
+      cd ..;
     fi
   
 

@@ -103,7 +103,7 @@ script:
   - if [ "${RUN_CHECKS}" == "true" ]; then
       mkdir build;
       cd build;
-      cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug;
+      cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..;
       make check_coverage;
       cd ..;
     fi

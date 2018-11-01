@@ -18,13 +18,13 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../src/mbedtls/asn1.h"
-#include "../src/mbedtls/base64.h"
-#include "../src/mbedtls/bignum.h"
-#include "../src/mbedtls/pem.h"
-#include "../src/mbedtls/pk.h"
-#include "../src/mbedtls/rsa.h"
-#include "../src/mbedtls/rsa_io.h"
+#include "mbedtls/asn1.h"
+#include "mbedtls/base64.h"
+#include "mbedtls/bignum.h"
+#include "mbedtls/pem.h"
+#include "mbedtls/pk.h"
+#include "mbedtls/rsa.h"
+#include "mbedtls/rsa_io.h"
 #include <opensse/crypto/random.hpp>
 
 #include "gtest/gtest.h"

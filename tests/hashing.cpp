@@ -26,9 +26,9 @@
  *  Reference vectors are taken from NIST's test vectors.
  ********/
 
-#include "../src/hash/blake2b.hpp"
-#include "../src/hash/sha512.hpp"
 #include "blake2_kat.h"
+#include "hash/blake2b.hpp"
+#include "hash/sha512.hpp"
 #include <opensse/crypto/hash.hpp>
 
 #include <array>

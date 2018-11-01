@@ -59,10 +59,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_subdirectory(gtest)
 
 add_subdirectory(src)
@@ -71,6 +68,9 @@ add_subdirectory(tests)
 
 if(OPENSSL_FOUND)
     add_executable(debug_tool main.cpp)
+
+    target_include_directories(debug_tool PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
     target_link_libraries(debug_tool sse_crypto ${OPENSSL_CRYPTO_LIBRARY})
 
     target_include_directories(debug_tool SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})

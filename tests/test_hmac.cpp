@@ -31,8 +31,8 @@
 //#include "../tests/test_hmac.hpp"
 
 #include "../src/hash/sha512.hpp"
-#include "../src/hmac.hpp"
-#include "../src/key.hpp"
+#include <opensse/crypto/hmac.hpp>
+#include <opensse/crypto/key.hpp>
 
 #include <iomanip>
 #include <iostream>

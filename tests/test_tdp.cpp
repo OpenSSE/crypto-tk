@@ -18,9 +18,9 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "../src/tdp.hpp"
 #include "../src/tdp_impl/tdp_impl_mbedtls.hpp"
 #include "../src/tdp_impl/tdp_impl_openssl.hpp"
+#include <opensse/crypto/tdp.hpp>
 
 #include <iomanip>
 #include <iostream>

@@ -19,7 +19,7 @@
 //
 
 #include "../src/ppke/GMPpke.hpp"
-#include "../src/puncturable_enc.hpp"
+#include <opensse/crypto/puncturable_enc.hpp>
 
 #include <iomanip>
 #include <iostream>

@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include "key.hpp"
 #include "mbedtls/bignum.h"
 #include "mbedtls/rsa.h"
-#include "prf.hpp"
 #include "tdp_impl.hpp"
+#include <opensse/crypto/key.hpp>
+#include <opensse/crypto/prf.hpp>
 
 #include <cstdint>
 

@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "random.hpp"
+#include <opensse/crypto/random.hpp>
 
 #include <cerrno>
 #include <cstdint>

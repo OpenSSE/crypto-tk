@@ -19,7 +19,7 @@
 //
 
 
-#include "src/utils.hpp"
+#include <opensse/crypto/utils.hpp>
 
 #include "gtest/gtest.h"
 

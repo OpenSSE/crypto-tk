@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "key.hpp"
+#include <opensse/crypto/key.hpp>
 
 #include <array>
 #include <string>

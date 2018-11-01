@@ -26,7 +26,7 @@
  *
  ********/
 
-#include "../src/cipher.hpp"
+#include <opensse/crypto/cipher.hpp>
 
 #include <iomanip>
 #include <iostream>

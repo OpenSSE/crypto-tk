@@ -8,12 +8,12 @@
 #ifndef GMPPKE_H_
 #define GMPPKE_H_
 
-#include "hash.hpp"
-#include "hmac.hpp"
-#include "key.hpp"
-#include "prf.hpp"
+#include "ppke/util.hpp"
 #include "relic_wrapper/relic_api.h"
-#include "util.hpp"
+#include <opensse/crypto/hash.hpp>
+#include <opensse/crypto/hmac.hpp>
+#include <opensse/crypto/key.hpp>
+#include <opensse/crypto/prf.hpp>
 
 #include <array>
 #include <utility>

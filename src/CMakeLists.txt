@@ -27,6 +27,20 @@ target_compile_features(sse_crypto
     PRIVATE
         cxx_lambdas
 )
+set(sse_crypto_build_include_dirs
+  "${CMAKE_SOURCE_DIR}/include"
+  "${CMAKE_SOURCE_DIR}")
+message(STATUS "${CMAKE_SOURCE_DIR}/include")
+message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(sse_crypto PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} 
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opensse/crypto)
+
+# target_include_directories(sse_crypto  PUBLIC
+#     "$<BUILD_INTERFACE:${sse_crypto_build_include_dirs}>"
+#     "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>")
 
 target_link_libraries(sse_crypto ${LIB_SODIUM} ${LIB_RELIC})
 

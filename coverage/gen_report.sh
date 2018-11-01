@@ -1,4 +1,6 @@
 #! /bin/sh
 set -ex
 
-genhtml -q -o coverage/report coverage/coverage.info
+cd build
+make lcov-geninfo
+make lcov-genhtml

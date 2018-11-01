@@ -42,15 +42,15 @@ if(WARNING_PSABI)
     set(C_WARNING_FLAGS "${C_WARNING_FLAGS} -Wno-error=psabi")
 endif()
 
-set(C_COVERAGE_FLAGS "--coverage -fno-inline -fno-inline-small-functions -fno-default-inline -Wno-ignored-optimization-argument")
-set(LINK_COVERAGE_FLAGS "--coverage")
+# set(C_COVERAGE_FLAGS "--coverage -fno-inline -fno-inline-small-functions -fno-default-inline -Wno-ignored-optimization-argument")
+# set(LINK_COVERAGE_FLAGS "--coverage")
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native ${C_WARNING_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native ${C_WARNING_FLAGS}")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
+# set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
 
 # Do some code coverage in Debug mode
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

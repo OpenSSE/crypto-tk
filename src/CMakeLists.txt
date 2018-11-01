@@ -11,6 +11,10 @@ add_library(sse_crypto SHARED
                 $<TARGET_OBJECTS:mbedTLS_lite> 
             )
 
+# Generate PIC for the library
+set_target_properties(mbedTLS_lite  PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(sse_crypto    PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 # Use the appropriate compiler features
 
 target_compile_features(sse_crypto
@@ -52,5 +56,3 @@ if(RSA_IMPL_OPENSSL)
 endif()
 endif()
 
-# Generate PIC for the library
-set_target_properties(sse_crypto PROPERTIES POSITION_INDEPENDENT_CODE ON)

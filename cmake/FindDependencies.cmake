@@ -13,3 +13,6 @@ else()
         message(FATAL_ERROR "OpenSSL's implementation of RSA was chosen and theb OpenSSL library was not found.")
     endif()
 endif()
+
+# GTest needs threading support
+find_package (Threads)

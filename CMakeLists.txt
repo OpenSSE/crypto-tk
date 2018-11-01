@@ -5,6 +5,7 @@ project (libsse_crypto VERSION 0.2
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/CMake-codecov/cmake")
 
 
 
@@ -17,8 +18,12 @@ option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
 # Load modules
 
 include(CheckCCompilerFlag)
-include(CodeCoverage)
+
+# Find all the dependencies for this project
 include(FindDependencies)
+
+# enable code coverage
+find_package(codecov)
 
 # We use CMake's integrated testing features
 enable_testing()
@@ -42,9 +47,6 @@ if(WARNING_PSABI)
     set(C_WARNING_FLAGS "${C_WARNING_FLAGS} -Wno-error=psabi")
 endif()
 
-# set(C_COVERAGE_FLAGS "--coverage -fno-inline -fno-inline-small-functions -fno-default-inline -Wno-ignored-optimization-argument")
-# set(LINK_COVERAGE_FLAGS "--coverage")
-
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native ${C_WARNING_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native ${C_WARNING_FLAGS}")
@@ -53,16 +55,17 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native ${C_WARNING_FLAGS}")
 # set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
 
 # Do some code coverage in Debug mode
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    APPEND_COVERAGE_COMPILER_FLAGS()
-    set(COVERAGE_EXCLUDES '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/gtest/*' '/usr/*' '*v1/*')
-endif()
+# if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#     set(COVERAGE_EXCLUDES '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/gtest/*' '/usr/*' '*v1/*')
+# endif()
 
 
+list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/gtest/*')
 
 add_subdirectory(gtest)
 
 add_subdirectory(src)
+
 add_subdirectory(tests)
 # add_subdirectory(bench)
 
@@ -75,3 +78,5 @@ if(OPENSSL_FOUND)
 
     target_include_directories(debug_tool SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})
 endif()
+
+coverage_evaluate()

@@ -103,8 +103,9 @@ script:
   - if [ "${RUN_CHECKS}" == "true" ]; then
       mkdir build;
       cd build;
-      cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..;
-      make VERBOSE=1 check_coverage;
+      cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On ..;
+      make VERBOSE=1;
+      ./tests/check;
       cd ..;
     fi
   

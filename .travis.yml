@@ -101,10 +101,11 @@ matrix:
  
 script:
   - if [ "${RUN_CHECKS}" == "true" ]; then
+      set -ex;
       mkdir build;
       cd build;
       cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On ..;
-      make VERBOSE=1;
+      make VERBOSE=1 check;
       ./tests/check;
       cd ..;
     fi

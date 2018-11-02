@@ -278,7 +278,7 @@ public:
     }
 
 protected:
-    T ct1;
+    T ct1{0};
 
     friend bool operator==(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y)
     {

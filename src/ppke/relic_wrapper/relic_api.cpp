@@ -870,6 +870,9 @@ GT PairingGroup::div(const GT& g, const GT& h) const
 
 int PairingGroup::div(const int& g, const int& h) const
 {
+    if (h == 0) {
+        throw RelicDividByZero("divide by zero");
+    }
     return g / h;
 }
 

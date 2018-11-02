@@ -9,7 +9,7 @@ GLOBIGNORE='**/mbedtls/**' # do not look into mbedTLS code
 
 echo "Ignoring files in "$GLOBIGNORE
 
-INCLUDES="-Ibuild -Isrc -I/usr/local/opt/openssl/include"
+INCLUDES="-Ibuild -Isrc -I/usr/local/opt/openssl/include -Isrc/include -Isrc/include/opensse/crypto"
 
 DEFINES="-DCHECK_TEMPLATE_INSTANTIATION  -DWITH_OPENSSL"
 
@@ -23,5 +23,5 @@ LINE_FILTER="''"
 
 eval "$CLANG_TIDY src/**/*.{h,c} -line-filter=$LINE_FILTER -- $CFLAGS $CCFLAGS $INCLUDES"
 
-eval "$CLANG_TIDY src/*.{hpp,cpp} src/**/*.{hpp,cpp} -line-filter=$LINE_FILTER -- $CFLAGS $CXXFLAGS $INCLUDES"
+eval "$CLANG_TIDY src/*.cpp src/**/*.{hpp,cpp} -line-filter=$LINE_FILTER -- $CFLAGS $CXXFLAGS $INCLUDES"
 

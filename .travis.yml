@@ -72,21 +72,21 @@ matrix:
                  - *basic_deps
 
                  
-      # - env: 
-      #     - STATIC_ANALYSIS=true
-      #     - RUN_CHECKS=false
-      #     - CLANG_TIDY=clang-tidy-5.0
-      #   addons:
-      #      apt:
-      #         sources: *basic_sources
-      #         packages:
-      #            - *basic_deps
-      #            - cppcheck
-      #            - libclang-common-5.0-dev # to get the headers right
-      #            - clang-tidy-5.0
-      #   script:
-      #      - ./scripts/cppcheck.sh 
-      #      - ./scripts/tidy.sh 
+      - env: 
+          - STATIC_ANALYSIS=true
+          - RUN_CHECKS=false
+          - CLANG_TIDY=clang-tidy-5.0
+        addons:
+           apt:
+              sources: *basic_sources
+              packages:
+                 - *basic_deps
+                 - cppcheck
+                 - libclang-common-5.0-dev # to get the headers right
+                 - clang-tidy-5.0
+        script:
+           - ./scripts/cppcheck.sh 
+           - ./scripts/tidy.sh 
 
       # - env: 
       #     - STATIC_ANALYSIS=false

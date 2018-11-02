@@ -6,6 +6,7 @@ project (libsse_crypto VERSION 0.2
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/CMake-codecov/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cmake")
 
 
 
@@ -24,6 +25,9 @@ include(FindDependencies)
 
 # enable code coverage
 find_package(codecov)
+
+# Find Sanitizers
+find_package(Sanitizers)
 
 # We use CMake's integrated testing features
 enable_testing()
@@ -65,8 +69,11 @@ list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_
 add_subdirectory(gtest)
 
 add_subdirectory(src)
+add_sanitizers(sse_crypto)
 
 add_subdirectory(tests)
+add_sanitizers(check)
+
 # add_subdirectory(bench)
 
 if(OPENSSL_FOUND)

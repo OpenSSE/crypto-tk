@@ -212,6 +212,11 @@ public:
 
     PuncturableDecryption(const PuncturableDecryption&) = delete;
 
+    // Avoid any assignment of decryption objects
+    PuncturableDecryption& operator=(const PuncturableDecryption& h) = delete;
+    PuncturableDecryption& operator=(PuncturableDecryption& h) = delete;
+
+
     ///
     /// @brief Destructor
     ///

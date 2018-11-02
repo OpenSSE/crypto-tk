@@ -43,12 +43,11 @@ std::string tag2string(const tag_type& tag)
 
 bool GmppkePrivateKey::isPuncturedOnTag(const tag_type& tag) const
 {
-    for (auto share : shares) {
-        if (share.sk4 == tag) {
-            return true;
-        }
-    }
-    return false;
+    return std::any_of(shares.cbegin(),
+                       shares.cend(),
+                       [&tag](const sse::crypto::GmppkePrivateKeyShare& share) {
+                           return share.sk4 == tag;
+                       });
 }
 
 void Gmppke::keygen(GmppkePublicKey&        pk,

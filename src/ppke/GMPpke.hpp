@@ -267,7 +267,7 @@ public:
     {
         ::memcpy(&ct1, bytes, sizeof(T));
     };
-    explicit GmmppkeCT(const PartialGmmppkeCT& c) : PartialGmmppkeCT(c)
+    explicit GmmppkeCT(const PartialGmmppkeCT& c) : PartialGmmppkeCT(c), ct1(0)
     {
     }
 
@@ -278,7 +278,7 @@ public:
     }
 
 protected:
-    T ct1{0};
+    T ct1;
 
     friend bool operator==(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y)
     {

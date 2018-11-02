@@ -27,6 +27,8 @@ env:
    global:
       - SANITIZE_ADDRESS=0 
       - SANITIZE_UNDEFINED=0
+      - ENABLE_COVERAGE=Off
+      - BUILD_TYPE=Debug
 
 install:  
   - cd install_dependencies
@@ -45,6 +47,7 @@ matrix:
           - COMPILER=gcc
           - SANITIZE_ADDRESS=0
           - SANITIZE_UNDEFINED=0
+          - ENABLE_COVERAGE=On
         compiler: gcc
         addons:
             apt:
@@ -100,15 +103,5 @@ matrix:
   
  
 script:
-  - if [ "${RUN_CHECKS}" == "true" ]; then
-      set -ex;
-      mkdir build;
-      cd build;
-      cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On ..;
-      make VERBOSE=1 check;
-      ./tests/check;
-      cd ..;
-    fi
-  
-
-  
+  - ./scripts/ci_build.sh
+  - if [ "${RUN_CHECKS}" == "true" ]; then ./build/tests/check; fi

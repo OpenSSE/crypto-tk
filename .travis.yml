@@ -88,18 +88,18 @@ matrix:
            - ./scripts/cppcheck.sh 
            - ./scripts/tidy.sh 
 
-      # - env: 
-      #     - STATIC_ANALYSIS=false
-      #     - RUN_CHECKS=false
-      #     - CLANG_FORMAT=clang-format-6.0
-      #   addons:
-      #      apt:
-      #         sources: *basic_sources
-      #         packages:
-      #            - clang-format-6.0
-      #   install: # do not compile the dependencies
-      #   script:
-      #      - ./scripts/check_format.sh 
+      - env: 
+          - STATIC_ANALYSIS=false
+          - RUN_CHECKS=false
+          - CLANG_FORMAT=clang-format-5.0
+        addons:
+           apt:
+              sources: *basic_sources
+              packages:
+                 - clang-format-5.0
+        install: # do not compile the dependencies
+        script:
+           - ./scripts/check_format.sh 
   
  
 script:

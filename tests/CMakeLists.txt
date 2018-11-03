@@ -4,7 +4,7 @@ endif()
 
 add_executable(check checks.cpp encryption.cpp hashing.cpp test_hmac.cpp test_mbedtls.cpp test_ppke.cpp test_prf.cpp test_prg.cpp test_prp.cpp test_set_hash.cpp test_tdp.cpp)
 
-target_link_libraries(check gtest sse_crypto ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(check gtest sse_crypto)
 target_include_directories(check PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.10.0") 

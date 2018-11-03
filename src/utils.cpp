@@ -46,7 +46,10 @@ static pthread_mutex_t* mutex_buf = nullptr;
  * @param    line    source file line number
  * @return    none
  */
-static void locking_function(int mode, int n, const char* file, int line)
+static void locking_function(int                                 mode,
+                             int                                 n,
+                             __attribute__((unused)) const char* file,
+                             __attribute__((unused)) int         line)
 {
     if ((mode & CRYPTO_LOCK) != 0) {
         pthread_mutex_lock(&mutex_buf[n]);
@@ -64,7 +67,7 @@ static void locking_function(int mode, int n, const char* file, int line)
 static unsigned long id_function()
 {
     // NOLINTNEXTLINE(google-runtime-int)
-    return static_cast<unsigned long>(pthread_self());
+    return reinterpret_cast<unsigned long>(pthread_self());
 }
 
 /**
@@ -73,8 +76,9 @@ static unsigned long id_function()
  * @param    file    source file name
  * @param    line    source file line number
  */
-static struct CRYPTO_dynlock_value* dyn_create_function(const char* file,
-                                                        int         line)
+static struct CRYPTO_dynlock_value* dyn_create_function(
+    __attribute__((unused)) const char* file,
+    __attribute__((unused)) int         line)
 {
     struct CRYPTO_dynlock_value* value;
 
@@ -100,10 +104,10 @@ err:
  * @param    line    source file line number
  * @return    none
  */
-static void dyn_lock_function(int                          mode,
-                              struct CRYPTO_dynlock_value* l,
-                              const char*                  file,
-                              int                          line)
+static void dyn_lock_function(int                                 mode,
+                              struct CRYPTO_dynlock_value*        l,
+                              __attribute__((unused)) const char* file,
+                              __attribute__((unused)) int         line)
 {
     if ((mode & CRYPTO_LOCK) != 0) {
         pthread_mutex_lock(&l->mutex);
@@ -121,9 +125,9 @@ static void dyn_lock_function(int                          mode,
  * @return    none
  */
 
-static void dyn_destroy_function(struct CRYPTO_dynlock_value* l,
-                                 const char*                  file,
-                                 int                          line)
+static void dyn_destroy_function(struct CRYPTO_dynlock_value*        l,
+                                 __attribute__((unused)) const char* file,
+                                 __attribute__((unused)) int         line)
 {
     pthread_mutex_destroy(&l->mutex);
     free(l);
@@ -144,8 +148,8 @@ static int init_locks()
     int i;
 
     /* static locks area */
-    mutex_buf = (pthread_mutex_t*)malloc(CRYPTO_num_locks()
-                                         * sizeof(pthread_mutex_t));
+    mutex_buf = static_cast<pthread_mutex_t*>(
+        malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t)));
     if (mutex_buf == nullptr) {
         return (-1);
     }

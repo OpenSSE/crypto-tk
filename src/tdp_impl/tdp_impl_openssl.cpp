@@ -64,7 +64,9 @@ TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(nullptr)
     // silence the warning
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-qual"
-    mem = BIO_new_mem_buf(((void*)pk.data()), (int)pk.length());
+    mem = BIO_new_mem_buf(
+        const_cast<void*>(reinterpret_cast<const void*>(pk.data())),
+        static_cast<int>(pk.length()));
 #pragma GCC diagnostic pop
 
     // read the key from the BIO
@@ -150,7 +152,7 @@ std::string TdpImpl_OpenSSL::public_key() const
     size_t len = BIO_ctrl_pending(bio);
     void*  buf = malloc(len);
 
-    int read_bytes = BIO_read(bio, buf, (int)len);
+    int read_bytes = BIO_read(bio, buf, static_cast<int>(len));
 
     if (read_bytes == 0) {
         /* LCOV_EXCL_START */
@@ -201,7 +203,7 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::eval(
     BN_CTX* ctx = BN_CTX_new();
 
     BIGNUM* x = BN_new();
-    BN_bin2bn(in.data(), (unsigned int)in.size(), x);
+    BN_bin2bn(in.data(), static_cast<unsigned int>(in.size()), x);
 
     BIGNUM* y = BN_new();
 
@@ -367,7 +369,9 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL(const std::string& sk)
     // silence the warning
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-qual"
-    mem = BIO_new_mem_buf(((void*)sk.data()), (int)sk.length());
+    mem = BIO_new_mem_buf(
+        const_cast<void*>(reinterpret_cast<const void*>(sk.data())),
+        static_cast<int>(sk.length()));
 #pragma GCC diagnostic pop
 
 
@@ -445,7 +449,7 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
     size_t len = BIO_ctrl_pending(bio);
     void*  buf = malloc(len);
 
-    int read_bytes = BIO_read(bio, buf, (int)len);
+    int read_bytes = BIO_read(bio, buf, static_cast<int>(len));
     if (read_bytes == 0) {
         /* LCOV_EXCL_START */
         EVP_PKEY_free(evpkey);
@@ -478,14 +482,14 @@ void TdpInverseImpl_OpenSSL::invert(const std::string& in,
                                     "be kMessageSpaceSize bytes long.");
     }
 
-    ret = RSA_private_decrypt((int)in.size(),
-                              (const unsigned char*)in.data(),
+    ret = RSA_private_decrypt(static_cast<int>(in.size()),
+                              reinterpret_cast<const unsigned char*>(in.data()),
                               rsa_out,
                               get_rsa_key(),
                               RSA_NO_PADDING);
 
 
-    out = std::string((char*)rsa_out, ret);
+    out = std::string(reinterpret_cast<char*>(rsa_out), ret);
 }
 
 std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpInverseImpl_OpenSSL::
@@ -493,8 +497,8 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpInverseImpl_OpenSSL::
 {
     std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> out;
 
-    RSA_private_decrypt((int)in.size(),
-                        (const unsigned char*)in.data(),
+    RSA_private_decrypt(static_cast<int>(in.size()),
+                        static_cast<const unsigned char*>(in.data()),
                         out.data(),
                         get_rsa_key(),
                         RSA_NO_PADDING);
@@ -530,7 +534,7 @@ TdpInverseImpl_OpenSSL::invert_mult(
     BN_mod_exp(d_q, get_rsa_key()->d, bn_order, q_1_, ctx);
 
     BIGNUM* x = BN_new();
-    BN_bin2bn(in.data(), (unsigned int)in.size(), x);
+    BN_bin2bn(in.data(), static_cast<unsigned int>(in.size()), x);
 
     BIGNUM* y_p = BN_new();
     BIGNUM* y_q = BN_new();
@@ -651,16 +655,16 @@ TdpMultPoolImpl_OpenSSL::eval_pool(
 
     if (order == 1) {
         // regular eval
-        RSA_public_encrypt((int)in.size(),
-                           (const unsigned char*)in.data(),
+        RSA_public_encrypt(static_cast<int>(in.size()),
+                           static_cast<const unsigned char*>(in.data()),
                            out.data(),
                            get_rsa_key(),
                            RSA_NO_PADDING);
 
     } else if (order <= maximum_order()) {
         // get the right RSA context, i.e. the one in keys_[order-1]
-        RSA_public_encrypt((int)in.size(),
-                           (const unsigned char*)in.data(),
+        RSA_public_encrypt(static_cast<int>(in.size()),
+                           static_cast<const unsigned char*>(in.data()),
                            out.data(),
                            keys_[order - 2],
                            RSA_NO_PADDING);

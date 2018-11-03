@@ -14,14 +14,15 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cm
 set(default_build_type "Debug")
 
 # Options
-option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
+option(opensse_ENABLE_WALL "Enable all warnings" ON)
+option(opensse_ENABLE_WEXTRA "Enable extra warnings" ON)
+option(opensse_ENABLE_WERROR "Make all warnings into errors" OFF)
+option(opensse_OPTIMIZE_FOR_NATIVE_ARCH "Enable compiler optimizations for the native processor architecture (if available)" ON)
 
 # Load modules
 
 include(CheckCCompilerFlag)
-
-# Find all the dependencies for this project
-include(FindDependencies)
+include(CheckCXXCompilerFlag)
 
 # enable code coverage
 find_package(codecov)
@@ -32,37 +33,45 @@ find_package(Sanitizers)
 # We use CMake's integrated testing features
 enable_testing()
 
-set(C_WARNING_FLAGS "-Wall -Wextra")
+if (opensse_ENABLE_WALL)
+  CHECK_CXX_COMPILER_FLAG("-Wall" COMPILER_OPT_WALL_SUPPORTED)
+  if (COMPILER_OPT_WALL_SUPPORTED)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+  endif()
+endif()
+
+if (opensse_ENABLE_WEXTRA)
+  CHECK_CXX_COMPILER_FLAG("-Wextra" COMPILER_OPT_WEXTRA_SUPPORTED)
+  if (COMPILER_OPT_WEXTRA_SUPPORTED)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+  endif()
+endif()
+
+if (opensse_ENABLE_WERROR)
+  CHECK_CXX_COMPILER_FLAG("-Werror" COMPILER_OPT_WERROR_SUPPORTED)
+  if (COMPILER_OPT_WERROR_SUPPORTED)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+  endif()
+endif()
+
+if (opensse_OPTIMIZE_FOR_NATIVE_ARCH)
+  CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+  if (COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+  endif()
+endif()
+
+
 
 CHECK_C_COMPILER_FLAG("-Wpsabi" WARNING_PSABI)
 if(WARNING_PSABI)
-    set(C_WARNING_FLAGS "${C_WARNING_FLAGS} -Wno-error=psabi")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=psabi")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=psabi")
 endif()
-
-CHECK_C_COMPILER_FLAG("-fsanitize-address-use-after-scope" SANITIZE_USE_AFTER_SCOPE)
-
-set(SANITIZER_FLAGS "-fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer")
-
-if(SANITIZE_USE_AFTER_SCOPE)
-    set(SANITIZER_FLAGS "${SANITIZER_FLAGS} -fsanitize-address-use-after-scope")
-endif()
-
-if(WARNING_PSABI)
-    set(C_WARNING_FLAGS "${C_WARNING_FLAGS} -Wno-error=psabi")
-endif()
-
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native ${C_WARNING_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native ${C_WARNING_FLAGS}")
-
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
-# set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
-
-# Do some code coverage in Debug mode
-# if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#     set(COVERAGE_EXCLUDES '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/gtest/*' '/usr/*' '*v1/*')
-# endif()
-
 
 list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/gtest/*')
 
@@ -70,9 +79,11 @@ add_subdirectory(gtest)
 
 add_subdirectory(src)
 add_sanitizers(sse_crypto)
+add_coverage(sse_crypto)
 
 add_subdirectory(tests)
 add_sanitizers(check)
+add_coverage(check)
 
 # add_subdirectory(bench)
 

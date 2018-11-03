@@ -13,7 +13,3 @@ else()
     add_test(check check)
 endif()
 
-add_coverage(check)
-
-# SETUP_TARGET_FOR_COVERAGE(NAME check_coverage EXECUTABLE check DEPENDENCIES check) 
-

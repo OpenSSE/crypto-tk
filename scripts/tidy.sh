@@ -1,27 +1,28 @@
 #! /bin/bash
+set -e
+
 if [[ -z $CLANG_TIDY ]]; then
 	CLANG_TIDY="clang-tidy"
 fi
 
 echo "Using "$CLANG_TIDY
 
+echo "Generate the compile commands"
+
+mkdir -p build
+cd build
+# For the static analysis, only focus on an AES NI-enabled target
+CFLAGS="-maes -DWITH_OPENSSL" CXXFLAGS="-maes -DWITH_OPENSSL" cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../src
+cd ..
+
+
 GLOBIGNORE='**/mbedtls/**' # do not look into mbedTLS code
 
 echo "Ignoring files in "$GLOBIGNORE
 
-INCLUDES="-Ibuild -Isrc -I/usr/local/opt/openssl/include -Isrc/include -Isrc/include/opensse/crypto"
-
-DEFINES="-DCHECK_TEMPLATE_INSTANTIATION  -DWITH_OPENSSL"
-
-CFLAGS="-march=native -O2 -fPIC -Wall -Wcast-qual -Wdisabled-optimization -Wformat=2 -Wmissing-declarations -Wmissing-include-dirs -Wredundant-decls -Wshadow -Wstrict-overflow=5 -Wdeprecated -Wno-unused-function"
-
-CCFLAGS="-std=c99"
-
-CXXFLAGS="-std=c++14 -Weffc++ -Wnon-virtual-dtor -Woverloaded-virtual -Wsign-promo"
-
 LINE_FILTER="''"
+set +e
 
-eval "$CLANG_TIDY src/**/*.{h,c} -line-filter=$LINE_FILTER -- $CFLAGS $CCFLAGS $INCLUDES"
-
-eval "$CLANG_TIDY src/*.cpp src/**/*.{hpp,cpp} -line-filter=$LINE_FILTER -- $CFLAGS $CXXFLAGS $INCLUDES"
+eval "$CLANG_TIDY -line-filter=$LINE_FILTER -p=build src/**/*.{h,c}"
+eval "$CLANG_TIDY -line-filter=$LINE_FILTER -p=build src/*.cpp src/**/*.{hpp,cpp}"
 

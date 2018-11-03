@@ -10,6 +10,7 @@ build
 build_test
 build_bench
 bin
+static_analysis
 
 debug_crypto
 check

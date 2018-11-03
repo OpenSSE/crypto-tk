@@ -73,6 +73,19 @@ if(WARNING_PSABI)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=psabi")
 endif()
 
+
+# This might be redundant with what is done in the main source
+# CMakeLists.txt file: we will look for OpenSSL there too.
+# Yet, sse_crypto's CMakeLists.txt file must be standalone, so
+# OpenSSL must be looked for in there, and, at the same time,
+# the WITH_OPENSSL is needed in the tests.
+include(FindOpenSSL)
+
+if (OPENSSL_FOUND)
+    add_definitions(-DWITH_OPENSSL)
+endif()
+
+
 list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/gtest/*')
 
 add_subdirectory(gtest)

@@ -52,9 +52,8 @@ static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize,
 
 // OpenSSL implementation of the trapdoor permutation
 
-TdpImpl_OpenSSL::TdpImpl_OpenSSL() : rsa_key_(nullptr)
-{
-}
+TdpImpl_OpenSSL::TdpImpl_OpenSSL() = default;
+
 TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(nullptr)
 {
     // create a BIO from the std::string
@@ -123,6 +122,7 @@ inline size_t TdpImpl_OpenSSL::rsa_size() const
     return (static_cast<size_t>(RSA_size(get_rsa_key())));
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 TdpImpl_OpenSSL::~TdpImpl_OpenSSL()
 {
     RSA_free(rsa_key_);
@@ -324,9 +324,9 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL()
 
     // generate a new random key
 
-    unsigned long e   = RSA_PK;
-    BIGNUM*       bne = BN_new();
-    ret               = BN_set_word(bne, e);
+    uint64_t e   = RSA_PK;
+    BIGNUM*  bne = BN_new();
+    ret          = BN_set_word(bne, e);
     if (ret != 1) {
         /* LCOV_EXCL_START */
         BN_free(bne);
@@ -405,6 +405,7 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL(const std::string& sk)
     BN_CTX_free(ctx);
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 TdpInverseImpl_OpenSSL::~TdpInverseImpl_OpenSSL()
 {
     BN_free(phi_);

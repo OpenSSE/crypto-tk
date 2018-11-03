@@ -60,9 +60,11 @@ static void locking_function(int mode, int n, const char* file, int line)
  *
  * @return    thread id
  */
+// NOLINTNEXTLINE(google-runtime-int)
 static unsigned long id_function()
 {
-    return ((unsigned long)pthread_self());
+    // NOLINTNEXTLINE(google-runtime-int)
+    return static_cast<unsigned long>(pthread_self());
 }
 
 /**
@@ -76,8 +78,8 @@ static struct CRYPTO_dynlock_value* dyn_create_function(const char* file,
 {
     struct CRYPTO_dynlock_value* value;
 
-    value = (struct CRYPTO_dynlock_value*)malloc(
-        sizeof(struct CRYPTO_dynlock_value));
+    value = reinterpret_cast<struct CRYPTO_dynlock_value*>(
+        malloc(sizeof(struct CRYPTO_dynlock_value)));
     if (value == nullptr) {
         goto err;
     }

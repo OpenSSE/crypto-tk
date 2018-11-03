@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include <stdexcept>
-using namespace std;
+
 namespace relicxx {
 
 void ro_error()
@@ -13,7 +13,7 @@ void ro_error()
 void error_if_relic_not_init()
 {
     if (nullptr == core_get()) {
-        throw ::runtime_error(
+        throw std::runtime_error(
             "\n\nERROR. relic core_get() returned null. Relic is probably not "
             "initialized.\n ??? DID YOU INITIALIZE LIBFORWARDSEC ???\n"
             "You need to initialize the library once per thread by grabbing an "
@@ -58,7 +58,7 @@ ZR::ZR(const char* str)
     bn_inits(order);
     g1_get_ord(order);
     isInit = true;
-    bn_read_str(z, (const char*)str, (int)strlen(str), DECIMAL);
+    bn_read_str(z, str, static_cast<int>(strlen(str)), DECIMAL);
     // bn_mod(z, z, order);
 }
 
@@ -70,7 +70,7 @@ ZR::ZR(const uint8_t* bytes, size_t len)
     g1_get_ord(order);
     isInit = true;
 
-    bn_read_bin(z, bytes, (int)len);
+    bn_read_bin(z, bytes, static_cast<int>(len));
 }
 
 void ZR::writeBytes(uint8_t* bytes) const
@@ -131,17 +131,6 @@ ZR operator*(const ZR& x, const ZR& y)
     return zr;
 }
 
-static int bn_is_one(bn_t a)
-{
-    if (a->used == 0) {
-        return 0; // false
-    }
-    if ((a->used == 1) && (a->dp[0] == 1)) {
-        return 1; // true
-    }
-    return 0; // false
-}
-
 ZR operator/(const ZR& x, const ZR& y)
 {
     if (bn_is_zero(y.z) != 0) {
@@ -179,7 +168,7 @@ ZR hashToZR(const bytes_vec& b)
     unsigned int  digest_len = SHA_LEN;
     unsigned char digest[digest_len + 1];
     memset(digest, 0, digest_len);
-    SHA_FUNC(digest, &data[0], (int)data.size());
+    SHA_FUNC(digest, &data[0], static_cast<int>(data.size()));
     bn_read_bin(zr.z, digest, digest_len);
     if (bn_cmp(zr.z, zr.order) == CMP_GT) {
         bn_mod(zr.z, zr.z, zr.order);
@@ -204,13 +193,13 @@ std::vector<uint8_t> ZR::getBytes() const
     return data;
 }
 
-ostream& operator<<(ostream& s, const ZR& zr)
+std::ostream& operator<<(std::ostream& s, const ZR& zr)
 {
     int  length = bn_size_str(zr.z, DECIMAL);
     char data[length + 1];
     memset(data, 0, length);
     bn_write_str(data, length, zr.z, DECIMAL);
-    string s1(data, length);
+    std::string s1(data, length);
     s << s1;
     memset(data, 0, length);
     return s;
@@ -370,12 +359,12 @@ void G1::writeBytes(uint8_t* bytes, bool compress) const
     g1_write_bin(bytes, l, g, compress);
 }
 
-ostream& operator<<(ostream& s, const G1& g1)
+std::ostream& operator<<(std::ostream& s, const G1& g1)
 {
     auto data = g1.getBytes();
     s << "0x";
     for (auto i : data) {
-        s << std::hex << (unsigned int)data[i];
+        s << std::hex << static_cast<unsigned int>(data[i]);
     }
     s << std::endl;
     return s;
@@ -477,12 +466,12 @@ void G2::writeBytes(uint8_t* bytes, bool compress) const
 }
 
 
-ostream& operator<<(ostream& s, const G2& g2)
+std::ostream& operator<<(std::ostream& s, const G2& g2)
 {
     auto data = g2.getBytes();
     s << "0x";
     for (auto i : data) {
-        s << std::hex << (unsigned int)data[i];
+        s << std::hex << static_cast<unsigned int>(data[i]);
     }
     s << std::endl;
     return s;
@@ -603,12 +592,12 @@ void GT::writeBytes(uint8_t* bytes, bool compress) const
     gt_write_bin(bytes, l, const_cast<GT*>(this)->g, compress);
 }
 
-ostream& operator<<(ostream& s, const GT& gt)
+std::ostream& operator<<(std::ostream& s, const GT& gt)
 {
     auto data = gt.getBytes();
     s << "0x";
     for (auto i : data) {
-        s << std::hex << (unsigned int)data[i];
+        s << std::hex << static_cast<unsigned int>(data[i]);
     }
     s << std::endl;
     return s;

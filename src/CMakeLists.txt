@@ -1,9 +1,12 @@
 cmake_minimum_required (VERSION 3.1)
 
+project (libsse_crypto VERSION 0.2 
+                       DESCRIPTION "OpenSSE's cryptographic library")
+
 option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
 
-
-find_library(LIB_SODIUM NAMES sodium)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
+find_package(Sodium REQUIRED)
 
 find_library(LIB_RELIC NAMES relic librelic_s.a)
 
@@ -58,7 +61,7 @@ target_include_directories(sse_crypto PUBLIC
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} 
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/sse/crypto)
 
-target_link_libraries(sse_crypto ${LIB_SODIUM} ${LIB_RELIC})
+target_link_libraries(sse_crypto sodium ${LIB_RELIC})
 
 if(OPENSSL_FOUND)
     target_include_directories(sse_crypto SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})
@@ -67,3 +70,43 @@ if(RSA_IMPL_OPENSSL)
     add_compile_definitions(SSE_CRYPTO_TDP_IMPL=SSE_CRYPTO_TDP_IMPL_OPENSSL)
 endif()
 endif()
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+install(TARGETS sse_crypto EXPORT OpenSSECryptoTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} 
+        )
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+
+# CMake magic
+
+install(EXPORT OpenSSECryptoTargets 
+        FILE OpenSSECryptoTargets.cmake
+        NAMESPACE OpenSSE::
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sse"
+        )
+export(TARGETS sse_crypto NAMESPACE OpenSSE:: FILE OpenSSECryptoTargets.cmake)
+
+configure_package_config_file(
+    cmake/OpenSSECryptConfig.cmake.in
+    OpenSSECryptoConfig.cmake
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sse"
+)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
+    VERSION ${libsse_crypto_VERSION}
+    COMPATIBILITY AnyNewerVersion
+    )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfig.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse
+        )
+
+install(DIRECTORY cmake/modules DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse)

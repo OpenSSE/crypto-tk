@@ -9,8 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 
 find_package(Sodium REQUIRED)
 find_package(OpenSSL 1.0.0) # Optional
-
-find_library(LIB_RELIC NAMES relic librelic_s.a)
+find_package(relic REQUIRED)
 
 
 if (OPENSSL_FOUND)
@@ -62,7 +61,7 @@ target_include_directories(sse_crypto PUBLIC
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} 
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/sse/crypto)
 
-target_link_libraries(sse_crypto sodium ${LIB_RELIC})
+target_link_libraries(sse_crypto sodium relic)
 
 if(OPENSSL_FOUND)
     target_link_libraries(sse_crypto OpenSSL::Crypto)

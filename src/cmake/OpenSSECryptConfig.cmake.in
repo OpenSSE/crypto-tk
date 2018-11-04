@@ -2,6 +2,7 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
 find_dependency(sodium)
+find_dependency(relic)
 
 if (@OPENSSL_FOUND@)
     find_dependency(OpenSSL)

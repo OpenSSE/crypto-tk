@@ -6,11 +6,12 @@ project (libsse_crypto VERSION 0.2
 option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
+
 find_package(Sodium REQUIRED)
+find_package(OpenSSL 1.0.0) # Optional
 
 find_library(LIB_RELIC NAMES relic librelic_s.a)
 
-include(FindOpenSSL)
 
 if (OPENSSL_FOUND)
     message (STATUS "OpenSSL Include directories:" ${OPENSSL_INCLUDE_DIR})
@@ -64,8 +65,7 @@ target_include_directories(sse_crypto PUBLIC
 target_link_libraries(sse_crypto sodium ${LIB_RELIC})
 
 if(OPENSSL_FOUND)
-    target_include_directories(sse_crypto SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})
-    target_link_libraries(sse_crypto ${OPENSSL_CRYPTO_LIBRARY})
+    target_link_libraries(sse_crypto OpenSSL::Crypto)
 if(RSA_IMPL_OPENSSL)
     add_compile_definitions(SSE_CRYPTO_TDP_IMPL=SSE_CRYPTO_TDP_IMPL_OPENSSL)
 endif()

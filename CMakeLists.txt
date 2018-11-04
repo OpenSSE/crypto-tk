@@ -77,7 +77,7 @@ endif()
 # Yet, sse_crypto's CMakeLists.txt file must be standalone, so
 # OpenSSL must be looked for in there, and, at the same time,
 # the WITH_OPENSSL is needed in the tests.
-include(FindOpenSSL)
+find_package(OpenSSL 1.0.0) # Optional
 
 if (OPENSSL_FOUND)
     add_definitions(-DWITH_OPENSSL)

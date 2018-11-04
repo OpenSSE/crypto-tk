@@ -10,6 +10,6 @@ def smart_concat(l1, l2):
         return l1 + l2
 
 files = Glob('*.cpp')
-objs = test_env.Object(files, CPPPATH = smart_concat(['../src/','../'], test_env.get('CPPPATH')))
+objs = test_env.Object(files, CPPPATH = smart_concat(['../src/','../','../src/include','../src/include/sse/crypto'], test_env.get('CPPPATH')))
 
 Return('objs')

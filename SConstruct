@@ -53,7 +53,7 @@ bld = Builder(action = run_test)
 ## Environment initialization and configuration
 
 env = Environment(tools = ['default', 'gcccov', 'doxygen'])
-env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
+# env['PRINT_CMD_LINE_FUNC'] = print_cmd_line
 env.Append(BUILDERS = {'Test' :  bld})
 env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
 
@@ -197,7 +197,7 @@ objects = SConscript('src/build.scons', exports=['env','smart_concat'], variant_
 
 Clean(objects, 'build')
 
-debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = smart_concat(['src'], env.get('CPPPATH')))
+debug = env.Program('debug_crypto',['main.cpp'] + objects, CPPPATH = smart_concat(['src','src/include','src/include/sse/crypto'], env.get('CPPPATH')))
 
 Default(debug)
 
@@ -219,7 +219,7 @@ library_build_prefix = 'library'
 shared_lib = shared_lib_env.SharedLibrary(library_build_prefix+'/lib/sse_crypto',objects);
 static_lib = lib_env.StaticLibrary(library_build_prefix+'/lib/sse_crypto',objects)
 
-headers = Glob('src/*.h') + Glob('src/*.hpp') + ['src/ppke/GMPpke.hpp']
+headers = Glob('src/include/sse/crypto/*.h') + Glob('src/sse/include/*.hpp')
 headers_lib = [lib_env.Install(library_build_prefix+'/include/sse/crypto', headers)]
 
 env.Clean(headers_lib,[library_build_prefix+'/include'])
@@ -239,7 +239,7 @@ Clean(test_objects, 'build_test')
 
 gtest_obj = test_env.Object('gtest/gtest-all.cc', CPPPATH=['.'])
 
-test_prog = test_env.Program('check', ['checks.cpp'] + objects + test_objects + gtest_obj)
+test_prog = test_env.Program('check', objects + test_objects + gtest_obj)
 
 test_run = test_env.Test('test_run', test_prog)
 Depends(test_run, test_prog)

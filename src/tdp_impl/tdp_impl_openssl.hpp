@@ -24,8 +24,8 @@
 #ifdef WITH_OPENSSL
 
 #include "tdp_impl.hpp"
-#include <opensse/crypto/key.hpp>
-#include <opensse/crypto/prf.hpp>
+#include <sse/crypto/key.hpp>
+#include <sse/crypto/prf.hpp>
 
 #include <cstdint>
 

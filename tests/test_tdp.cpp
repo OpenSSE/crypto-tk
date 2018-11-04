@@ -20,7 +20,7 @@
 
 #include "tdp_impl/tdp_impl_mbedtls.hpp"
 #include "tdp_impl/tdp_impl_openssl.hpp"
-#include <opensse/crypto/tdp.hpp>
+#include <sse/crypto/tdp.hpp>
 
 #include <iomanip>
 #include <iostream>

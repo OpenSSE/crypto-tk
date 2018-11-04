@@ -56,7 +56,7 @@ target_include_directories(sse_crypto PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} 
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opensse/crypto)
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/sse/crypto)
 
 target_link_libraries(sse_crypto ${LIB_SODIUM} ${LIB_RELIC})
 

@@ -18,9 +18,9 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <opensse/crypto/hash.hpp>
-#include <opensse/crypto/prf.hpp>
-#include <opensse/crypto/random.hpp>
+#include <sse/crypto/hash.hpp>
+#include <sse/crypto/prf.hpp>
+#include <sse/crypto/random.hpp>
 
 #include <iomanip>
 #include <iostream>

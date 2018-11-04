@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include <opensse/crypto/key.hpp>
-#include <opensse/crypto/random.hpp>
+#include <sse/crypto/key.hpp>
+#include <sse/crypto/random.hpp>
 
 #include <cassert>
 #include <cstdint>

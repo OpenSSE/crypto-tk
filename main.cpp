@@ -22,14 +22,6 @@
 #include "src/mbedtls/bignum.h"
 #include "src/mbedtls/rsa.h"
 #include "src/ppke/GMPpke.hpp"
-#include <opensse/crypto/hash.hpp>
-#include <opensse/crypto/hmac.hpp>
-#include <opensse/crypto/key.hpp>
-#include <opensse/crypto/prg.hpp>
-#include <opensse/crypto/random.hpp>
-#include <opensse/crypto/set_hash.hpp>
-#include <opensse/crypto/tdp.hpp>
-#include <opensse/crypto/utils.hpp>
 
 #include <chrono>
 #include <cstring>
@@ -38,6 +30,14 @@
 #include <array>
 #include <iomanip>
 #include <iostream>
+#include <sse/crypto/hash.hpp>
+#include <sse/crypto/hmac.hpp>
+#include <sse/crypto/key.hpp>
+#include <sse/crypto/prg.hpp>
+#include <sse/crypto/random.hpp>
+#include <sse/crypto/set_hash.hpp>
+#include <sse/crypto/tdp.hpp>
+#include <sse/crypto/utils.hpp>
 #include <string>
 #include <vector>
 

@@ -25,7 +25,8 @@
 #include "mbedtls/pk.h"
 #include "mbedtls/rsa.h"
 #include "mbedtls/rsa_io.h"
-#include <opensse/crypto/random.hpp>
+
+#include <sse/crypto/random.hpp>
 
 #include "gtest/gtest.h"
 

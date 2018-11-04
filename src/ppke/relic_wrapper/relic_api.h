@@ -13,7 +13,7 @@
 //#include <cereal/types/vector.hpp>
 //#include <cereal/archives/json.hpp>
 
-#include <opensse/crypto/prf.hpp>
+#include <sse/crypto/prf.hpp>
 
 #include <cstring> // for memcpy
 

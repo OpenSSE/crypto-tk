@@ -31,11 +31,11 @@
 //#include "../tests/test_hmac.hpp"
 
 #include "hash/sha512.hpp"
-#include <opensse/crypto/hmac.hpp>
-#include <opensse/crypto/key.hpp>
 
 #include <iomanip>
 #include <iostream>
+#include <sse/crypto/hmac.hpp>
+#include <sse/crypto/key.hpp>
 #include <string>
 
 #include "gtest/gtest.h"

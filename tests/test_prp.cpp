@@ -21,8 +21,8 @@
 #if __AES__ || __ARM_FEATURE_CRYPTO /* Defined by gcc/clang when compiling for \
                                        AES-NI */
 
-#include <opensse/crypto/prp.hpp>
-#include <opensse/crypto/random.hpp>
+#include <sse/crypto/prp.hpp>
+#include <sse/crypto/random.hpp>
 
 #include <iomanip>
 #include <iostream>

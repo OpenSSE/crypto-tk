@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include <opensse/crypto/hash.hpp>
-#include <opensse/crypto/hmac.hpp>
-#include <opensse/crypto/key.hpp>
-#include <opensse/crypto/random.hpp>
+#include <sse/crypto/hash.hpp>
+#include <sse/crypto/hmac.hpp>
+#include <sse/crypto/key.hpp>
+#include <sse/crypto/random.hpp>
 
 #include <cstdint>
 #include <cstring>

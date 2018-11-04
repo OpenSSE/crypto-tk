@@ -10,10 +10,10 @@
 
 #include "ppke/util.hpp"
 #include "relic_wrapper/relic_api.h"
-#include <opensse/crypto/hash.hpp>
-#include <opensse/crypto/hmac.hpp>
-#include <opensse/crypto/key.hpp>
-#include <opensse/crypto/prf.hpp>
+#include <sse/crypto/hash.hpp>
+#include <sse/crypto/hmac.hpp>
+#include <sse/crypto/key.hpp>
+#include <sse/crypto/prf.hpp>
 
 #include <array>
 #include <utility>

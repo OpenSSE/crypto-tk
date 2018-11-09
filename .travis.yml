@@ -31,7 +31,7 @@ env:
 install:  
   - cd install_dependencies
   - ./install_libsodium.sh
-  - ./install_relic_ubuntu_14_easy.sh
+  - ./install_relic_easy.sh
   - cd ..
   - gem install coveralls-lcov
   - sudo ldconfig

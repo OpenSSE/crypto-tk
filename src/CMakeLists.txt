@@ -70,6 +70,9 @@ if(RSA_IMPL_OPENSSL)
 endif()
 endif()
 
+
+# Installation
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
@@ -82,7 +85,7 @@ install(TARGETS sse_crypto EXPORT OpenSSECryptoTargets
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
-# CMake magic
+## CMake magic
 
 install(EXPORT OpenSSECryptoTargets 
         FILE OpenSSECryptoTargets.cmake
@@ -109,3 +112,39 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
         )
 
 install(DIRECTORY cmake/modules DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse)
+
+
+
+
+# Documentation 
+
+## From https://vicrucann.github.io/tutorials/quick-cmake-doxygen/
+## and https://nazavode.github.io/blog/cmake-doxygen-improved/
+
+# check if Doxygen is installed
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    # set input and output files
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    # request to configure the file
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    message("Doxygen build started")
+
+    SET( doxy_extra_files   ${CMAKE_CURRENT_SOURCE_DIR}/../README.md)
+    SET( doxy_html_index_file ${CMAKE_CURRENT_BINARY_DIR}/html/index.html)
+
+    add_custom_command(
+        OUTPUT ${doxy_html_index_file}
+        COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+        MAIN_DEPENDENCY ${doxyfile} ${doxyfile_in}
+        DEPENDS sse_crypto ${doxy_extra_files}
+        COMMENT "Generating HTML documentation with Doxygen"
+    )
+
+    add_custom_target(doc DEPENDS ${doxy_html_index_file})
+
+else (DOXYGEN_FOUND)
+  message("Doxygen need to be installed to generate the doxygen documentation")
+endif (DOXYGEN_FOUND)

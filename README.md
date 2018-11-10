@@ -166,6 +166,10 @@ To see all the available options, and interactively edit them, you can also use 
 
 For more information about how to use CMake, take a look at [CMake's FAQ](https://gitlab.kitware.com/cmake/community/wikis/FAQ), or at the [documentation](https://cmake.org/cmake/help/v3.0/index.html).
 
+## Documentation
+
+Documentation for the library's APIs can be built with Doxygen. There is a specific CMake target to build the documentation: use `$ make doc` to construct the HTML documentation. To display the documentation, open `build/src/doc/html/index.html`.
+
 ## Code coverage
 
 Code coverage is available by passing the `-DENABLE_COVERAGE=On` option to CMake. 
@@ -186,7 +190,7 @@ An HTML report will be available in the `build/lcov/html/selected_targets` direc
 
 ## Contributors
 
-An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbed TLS](https://tls.mbed.org))
+An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbedTLS](https://tls.mbed.org))
 
 The puncturable encryption code has been originally written by [Ian Miers](https://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
 
@@ -194,7 +198,7 @@ Unless otherwise stated, the rest of the code has been written by [Raphael Bost]
 
 ## Licensing
 
-mbed TLS is released under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
+mbedTLS is released under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
 
 Unless otherwise stated, the rest of the code is licensed under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl.html).
 

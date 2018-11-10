@@ -27,7 +27,7 @@ This is code for a **research project**. It **should not be used in practice**: 
 
 ## Building
 
-Building is done through [SConstruct](http://www.scons.org).
+Building is done using CMake. The minimum required version is CMake 3.1.
  
 
 ### Dependencies
@@ -67,26 +67,19 @@ Here is what is necessary to set your system up from scratch, and build `libsse_
 ```sh
  $ [sudo] add-apt-repository ppa:ubuntu-toolchain-r/test
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons g++-4.9 libtool libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential cmake3 libtool libssl-dev libgmp-dev 
 ```
 
-To set GCC 4.9 as the compiler, you have two options. Either set the environment variables `CC` and `CXX` to `gcc-4.9` and `g++-4.9` respectively, or edit the file `config.scons` to include the following lines:
-
-```python
-env['CC'] = 'gcc-4.9'
-env['CXX'] = 'g++-4.9'
-```
-
-Then, to install the three dependencies, you can either follow the instructions of their website (in particular for libsodium), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
-To do so, move to directory `install_dependencies`, and run `./install_sodium.sh` to download and install libsodium 1.0.16 and `./install_relic_ubuntu_14_easy.sh` to install RELIC with the `easy` arithmetic.
-If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respectively `./install_relic_ubuntu_14_gmp.sh` and `./install_relic_ubuntu_14_x64_asm.sh`.
+To install the three dependencies, you can either follow the instructions of their website (in particular for libsodium), or use the embedded install scripts. These might have to be modified to fit your needs (e.g. if you do not want to install RELIC system-wide, or if you are not a sudoer).
+To do so, move to directory `install_dependencies`, and run `./install_sodium.sh` to download and install libsodium 1.0.16 and `./install_relic_easy.sh` to install RELIC with the `easy` arithmetic.
+If you want to use the gmp arithmetic or the x64 assembly arithmetic, run respectively `./install_relic_gmp.sh` and `./install_relic_asm.sh`.
 
 
 #### Ubuntu 16.04 LTS
 
 ```sh
  $ [sudo] apt-get update
- $ [sudo] apt-get install build-essential scons libtool libssl-dev libgmp-dev 
+ $ [sudo] apt-get install build-essential cmake libtool libssl-dev libgmp-dev 
 ```
 
 You can then install libsodium as for Ubuntu 14.
@@ -98,75 +91,84 @@ For RELIC, use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh
  $ [sudo] xcode-select --install
 ```
 
-If you still haven't, you should get [Homebrew](http://brew.sh/). 
+If you still haven't, you should get [Homebrew](https://brew.sh/). 
 You will actually need it to install dependencies: 
 
 ```sh
- $ brew install scons cmake openssl gmp libsodium
+ $ brew install cmake openssl gmp libsodium
 ```
 
 You will only need to install RELIC, which can be done following the instructions found above, or use one of the scripts `install_relic_easy.sh`, `install_relic_gmp.sh`, or `install_relic_x64_asm.sh` depending on the arithmetic you prefer.
 
+### Basic build
+
+To build all of the targets with the default configuration in the `build` directory, run the following commands:
+
+```sh
+$ mkdir build && cd build
+$ cmake ..
+$ make
+```
+
 ### Targets
 
-Three targets can be built:
+The following targets can be built:
 
 * `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features). It is the default target, which can be built using only `scons`. 
 
 * `check`: unit tests. It uses [Google Test](https://github.com/google/googletest).
 
-* `lib`: the compiled library. It produces both the static and the shared versions of `libsse_crypto`, copied in the directory `library/lib`, together with the headers in `library/include`. If possible, unit tests are run before constructing the library.
+* `test`: runs the unit tests produced by the previous target.
 
-* `doc`: build the documentation (requires [Doxygen](http://www.doxygen.org/)).
+* `sse_crypto`: the compiled library.
 
-* `bench`: runs some benchmarks (requires [Google Benchmark](https://github.com/google/benchmark), which can be easily installed on Mac OS using Homebrew: ``brew install google-benchmark``).
+<!-- * `doc`: build the documentation (requires [Doxygen](https://www.doxygen.org/)). -->
+
+<!-- * `bench`: runs some benchmarks (requires [Google Benchmark](https://github.com/google/benchmark), which can be easily installed on Mac OS using Homebrew: ``brew install google-benchmark``). -->
 
 
-To build the library, just enter in your terminal
-``scons lib``.
+To only build the library, call ``make sse_crypto`` instead of just ``make``.
 
-### Building Configuration and Options 
+### Build Configuration and Options 
 
-The building script takes several options and can be easily configured to fit your system and your needs.
-
-#### Configuration
-
-The SConstruct files default values might not fit your system. For example, you might want to choose a specific C++ compiler.
-You can easily change these default values without modifying the SConstruct file itself. Instead, create a file called `config.scons` and change the values in this file. For example, say you want to use clang instead of your default gcc compiler and you placed the headers and shared library for RELIC in some directories that are not in the compiler's include path, say
-`~/relic/include` and `~/relic/lib`. Then you can use the following configuration file:
-
-```python
-Import('*')
-
-env['CC'] = 'clang'
-env['CXX'] = 'clang++'
-
-env.Append(CPPPATH=['~/relic/include'])
-env.Append(LIBPATH=['~/relic/lib'])
-```
-
-The `config.scons` will automatically be included by the main SConstruct script, and the options taken into account.
+As the library builds using CMake, the configuration is highly configurable.
+Like other CMake-based projects, options are set by passing `-DOPTION_NAME=value` to the `cmake` command.
+For example, for a debug build, use `-DCMAKE_BUILD_TYPE=Debug`.
+Also, you can change the compiler used for the project by setting the `CC` and `CXX` environment variables.
+For example, if you wish to use Clang, you can set the project up with the following command
+`CC=clang CXX=clang++ cmake ..`.
 
 
 #### Options
 
-The scons script takes the following options:
+This project's CMake takes the following options:
 
-*  `rsa_impl`: choose the RSA implementation. Available options are `rsa_impl=mbedTLS` and `rsa_impl=OpenSSL`. `mbedTLS` is the default option, and corresponds to the embedded implementation. `OpenSSL` requires OpenSSL's `libcrypto` to be available.
+*  `RSA_IMPL_OPENSSL=On|Off`: enables the RSA implementation using OpenSSL. Available options are `RSA_IMPL_OPENSSL=On` and `RSA_IMPL_OPENSSL=Off`. By default, the RSA implementation uses mbedTLS, which is believed to be more secure, but is slower.
+When `RSA_IMPL_OPENSSL` is set to `On`, the `libsse_crypto` links against `libcrypto`, and OpenSSL must be found by CMake (see next option).
 
-*  `static_relic`: choose to link between the static or the dynamic version of RELIC. This options is needed because RELIC's build script names the static library `relic_s` instead of `relic`. Use `static_relic=0` to link against the dynamic library, and `static_relic=1` for the static one. Uses the dynamic library by default.
+*  `OPENSSL_ROOT_DIR`: The location of the OpenSSL library. OpenSSL is necessary if `-DRSA_IMPL_OPENSSL=On` is passed to CMake. If you are on Mac OS, and that you used Homebrew to install OpenSSL, you will want pass the `-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl` option to CMake. Otherwise, it will not be able to find OpenSSL's library.
 
-*  `coverage`: `coverage=1` toggles on the flags needed for code coverage. Disabled by default.
+*  `ENABLE_COVERAGE=On|Off`: Respectively enables and disable the code coverage functionalities. Disabled by default.
 
-*  `run_check`: By default, when the `check` target is built, the tests are automatically run upon successful compilation. The option `run_check=0` disables this behavior.
+*  `SANITIZE_ADDRESS=On|Off`: Compiles the library with [AddressSanitizer (ASan)](https://github.com/google/sanitizers/wiki/AddressSanitizer) when set to `On`. Great to check for stack/heap buffer overflows, memory leaks, ... Disabled by default.
 
-*  `sanitize_address`: Compiles the library with [AddressSanitizer (ASan)](https://github.com/google/sanitizers/wiki/AddressSanitizer) when set to 1. Great to check for stack/heap buffer overflows, memory leaks, ... Disabled by default.
+*  `SANITIZE_UNDEFINED=On|Off`: When set to `On`, compiles the library with [UndefinedBehaviorSanitizer (UBSan)](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html). UBSan detects undefined behavior at runtime in your code. Disabled by default. 
 
-*  `sanitize_undefined`: When set to 1, compiles the library with [UndefinedBehaviorSanitizer (UBSan)](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html). UBSan detects undefined behavior at runtime in your code. Disabled by default. 
+*  `opensse_ENABLE_WALL=On|Off`: Toggles the `-Wall` compiler option. On by default
+
+*  `opensse_ENABLE_WEXTRA=On|Off`: Toggles the `-Wextra` compiler option. On by default
+
+*  `opensse_ENABLE_WERROR=On|Off`: Toggles the `-Werror` compiler option to turn all warnings into errors. Off by default
+
+*  `CMAKE_BUILD_TYPE`: Sets the build type. See [CMake's documentation](https://cmake.org/cmake/help/v3.12/variable/CMAKE_BUILD_TYPE.html) for more details. The `Debug` build type is used by default. Use `Release` for an optimized build.
+
+To see all the available options, and interactively edit them, you can also use the `ccmake` tool.
+
+For more information about how to use CMake, take a look at [CMake's FAQ](https://gitlab.kitware.com/cmake/community/wikis/FAQ), or at the [documentation](https://cmake.org/cmake/help/v3.0/index.html).
 
 ## Code coverage
 
-Code coverage is available using the `coverage=1` option in the building script. A report can be then generated the `coverage.sh` script (which uses lcov). 
+Code coverage is available by passing the `-DENABLE_COVERAGE=On` option to CMake. A report can be then generated with the `lcov-genhtml` target. 
 
 So to generate the code coverage for all the tests, first install lcov with
 `[sudo] apt-get install lcov` (on Ubuntu) or `brew install lcov` (on Mac OS). Then run
@@ -184,15 +186,15 @@ To cleanup the `coverage` directory, run `./cleanup.sh`.
 
 An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbed TLS](https://tls.mbed.org))
 
-The puncturable encryption code has been originally written by [Ian Miers](http://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
+The puncturable encryption code has been originally written by [Ian Miers](https://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
 
 Unless otherwise stated, the rest of the code has been written by [Raphael Bost](https://raphael.bost.fyi/).
 
 ## Licensing
 
-mbed TLS is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
+mbed TLS is released under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
 
-Unless otherwise stated, the rest of the code is licensed under the [GNU Affero General Public License v3](http://www.gnu.org/licenses/agpl.html).
+Unless otherwise stated, the rest of the code is licensed under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl.html).
 
-![AGPL](http://www.gnu.org/graphics/agplv3-88x31.png)
+![AGPL](https://www.gnu.org/graphics/agplv3-88x31.png)
 

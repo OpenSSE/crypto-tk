@@ -114,7 +114,7 @@ $ make
 
 The following targets can be built:
 
-* `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features). It is the default target, which can be built using only `scons`. 
+* `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features).
 
 * `check`: unit tests. It uses [Google Test](https://github.com/google/googletest).
 
@@ -168,19 +168,21 @@ For more information about how to use CMake, take a look at [CMake's FAQ](https:
 
 ## Code coverage
 
-Code coverage is available by passing the `-DENABLE_COVERAGE=On` option to CMake. A report can be then generated with the `lcov-genhtml` target. 
+Code coverage is available by passing the `-DENABLE_COVERAGE=On` option to CMake. 
+Once the tests have been run, a report can be then generated with the `lcov-genhtml` target. 
 
 So to generate the code coverage for all the tests, first install lcov with
 `[sudo] apt-get install lcov` (on Ubuntu) or `brew install lcov` (on Mac OS). Then run
 
 ```sh
-$ scons check coverage=1
-$ cd coverage
-$ ./gen_coverage.sh && ./gen_report.sh
+$ mkdir build && cd build
+$ cmake -DENABLE_COVERAGE=On .. 
+$ make 
+$ make test
+$ make lcov-geninfo && make lcov-genhtml
 ```
 
-The HTML report will be available in the `report` directory.
-To cleanup the `coverage` directory, run `./cleanup.sh`.
+An HTML report will be available in the `build/lcov/html/selected_targets` directory.
 
 ## Contributors
 

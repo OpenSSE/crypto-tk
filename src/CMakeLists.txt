@@ -113,6 +113,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
 
 install(DIRECTORY cmake/modules DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse)
 
+# Add an alias
+add_library(OpenSSE::crypto ALIAS sse_crypto)
 
 
 

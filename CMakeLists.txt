@@ -86,7 +86,11 @@ endif()
 
 list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/gtest/*')
 
-add_subdirectory(gtest)
+
+# To avoid building GTest twice
+if (NOT TARGET gtest)
+  add_subdirectory(externals/googletest)
+endif()
 
 add_subdirectory(src)
 add_sanitizers(sse_crypto)

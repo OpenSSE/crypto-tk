@@ -25,6 +25,16 @@ This library provides these APIs so that the SSE implementer has consistent high
 
 This is code for a **research project**. It **should not be used in practice**: the code lacks good C/C++ security practice, and it has never been externally reviewed.
 
+## Getting the Code
+
+You can get the code by cloning the code repository from GitHub. When you do so, be sure to also pull the submodules, or otherwise, nothing will compile: 
+
+```sh
+$ git clone https://github.com/OpenSSE/crypto-tk.git
+$ cd crypto-tk
+$ git submodule update --init --recursive
+```
+
 ## Building
 
 Building is done using CMake. The minimum required version is CMake 3.1.
@@ -190,10 +200,8 @@ An HTML report will be available in the `build/lcov/html/selected_targets` direc
 
 ## Contributors
 
-An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbedTLS](https://tls.mbed.org))
-
+An implementation of RSA (including key serialization functions) is embedded in `libsse_crypto`. It is originated from [mbedTLS](https://tls.mbed.org)).
 The puncturable encryption code has been originally written by [Ian Miers](https://www.cs.jhu.edu/~imiers/) as a part of [libforwardsec](https://github.com/imichaelmiers/libforwardsec).
-
 Unless otherwise stated, the rest of the code has been written by [Raphael Bost](https://raphael.bost.fyi/).
 
 ## Licensing

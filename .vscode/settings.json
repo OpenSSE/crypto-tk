@@ -1,0 +1,15 @@
+{
+    "cmake.configureOnOpen": true,
+    "files.associations": {
+        ".clang-format": "yaml",
+        ".clang-tidy": "yaml",
+        "SConstruct": "python",
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "cmake.configureArgs": [
+        "-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl",
+        "-DSANITIZE_ADDRESS=On",
+        "-DSANITIZE_UNDEFINED=On",
+        "-DENABLE_COVERAGE=On"
+    ]
+}

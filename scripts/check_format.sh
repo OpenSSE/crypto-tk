@@ -9,7 +9,7 @@ PATTERN=".*\\.\\(h\\|c\\|hpp\\|cpp\\)\$"
 
 FILES="$(ls -d src/* | grep "$PATTERN")"
 FILES+=$'\n'"$(ls -d src/hash/* | grep "$PATTERN")"
-FILES+=$'\n'"$(ls -d src/include/opensse/crypto/* | grep "$PATTERN")"
+FILES+=$'\n'"$(ls -d src/include/sse/crypto/* | grep "$PATTERN")"
 FILES+=$'\n'"$(ls -d src/ppke/* | grep "$PATTERN")"
 FILES+=$'\n'"$(ls -d src/tdp_impl/* | grep "$PATTERN")"
 FILES+=$'\n'"$(ls -d tests/*.cpp)"

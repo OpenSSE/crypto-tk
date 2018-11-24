@@ -36,6 +36,93 @@ using namespace std;
 
 #define ARITHMETIC_TEST_COUNT 100
 
+/// @brief Sets the top 8 bytes of the tag
+///
+/// Sets the top 8 bytes of the input tag to i (in big endian)
+///
+/// @param tag  The tag to be modified
+/// @param i    The 64 bits integer to put in the tag
+///
+/// @relatesalso PuncturableEncryption
+inline void set_top_64bits_be(sse::crypto::tag_type& tag, const uint64_t i)
+{
+    tag[15] = i & 0xFF;
+    tag[14] = (i >> 8) & 0xFF;
+    tag[13] = (i >> 16) & 0xFF;
+    tag[12] = (i >> 24) & 0xFF;
+    tag[11] = (i >> 32) & 0xFF;
+    tag[10] = (i >> 40) & 0xFF;
+    tag[9]  = (i >> 48) & 0xFF;
+    tag[8]  = (i >> 56) & 0xFF;
+}
+
+/// @brief Sets the bottom 8 bytes of the tag
+///
+/// Sets the bottom 8 bytes of the input tag to i (in little endian)
+///
+/// @param tag  The tag to be modified
+/// @param i    The 64 bits integer to put in the tag
+///
+/// @relatesalso PuncturableEncryption
+inline void set_bottom_64bits_le(sse::crypto::tag_type& tag, const uint64_t i)
+{
+    tag[0] = i & 0xFF;
+    tag[1] = (i >> 8) & 0xFF;
+    tag[2] = (i >> 16) & 0xFF;
+    tag[3] = (i >> 24) & 0xFF;
+    tag[4] = (i >> 32) & 0xFF;
+    tag[5] = (i >> 40) & 0xFF;
+    tag[6] = (i >> 48) & 0xFF;
+    tag[7] = (i >> 56) & 0xFF;
+}
+
+static sse::crypto::tag_type test_punctured_tag(uint64_t i)
+{
+    sse::crypto::tag_type punctured_tag{{0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00}};
+    set_top_64bits_be(punctured_tag, i);
+    punctured_tag[8] = 0xFF;
+
+    return punctured_tag;
+}
+
+static sse::crypto::tag_type test_encryption_tag(uint64_t i)
+{
+    sse::crypto::tag_type tag{{0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00}};
+    set_bottom_64bits_le(tag, i);
+
+    return tag;
+}
+
 TEST(relic, serialization_ZR)
 {
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
@@ -365,31 +452,8 @@ TEST(ppke, serialization)
     keyshares.push_back(ppke.sk0Gen(key_prf, sp, 0));
 
     for (; current_p_count < SERIALIZATION_PUNCT_COUNT; current_p_count++) {
-        sse::crypto::tag_type punctured_tag{{0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00}};
-        punctured_tag[15] = current_p_count & 0xFF;
-        punctured_tag[14] = (current_p_count >> 8) & 0xFF;
-        punctured_tag[13] = (current_p_count >> 16) & 0xFF;
-        punctured_tag[12] = (current_p_count >> 24) & 0xFF;
-        punctured_tag[11] = (current_p_count >> 32) & 0xFF;
-        punctured_tag[10] = (current_p_count >> 40) & 0xFF;
-        punctured_tag[9]  = (current_p_count >> 48) & 0xFF;
-        punctured_tag[8]  = 0xFF;
-
+        sse::crypto::tag_type punctured_tag
+            = test_punctured_tag(current_p_count);
 
         auto share
             = ppke.skShareGen(key_prf, sp, current_p_count + 1, punctured_tag);
@@ -422,30 +486,7 @@ TEST(ppke, serialization)
 
         sse::crypto::random_bytes(sizeof(M_type), (uint8_t*)&M);
 
-        sse::crypto::tag_type tag{{0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00}};
-        tag[0] = i & 0xFF;
-        tag[1] = (i >> 8) & 0xFF;
-        tag[2] = (i >> 16) & 0xFF;
-        tag[3] = (i >> 24) & 0xFF;
-        tag[4] = (i >> 32) & 0xFF;
-        tag[5] = (i >> 40) & 0xFF;
-        tag[6] = (i >> 48) & 0xFF;
-        tag[7] = (i >> 56) & 0xFF;
+        sse::crypto::tag_type tag = test_encryption_tag(i);
 
         auto ct = ppke.encrypt<M_type>(pk, M, tag);
 
@@ -479,30 +520,8 @@ TEST(ppke, probabilitic_correctness)
         if (p > current_p_count) {
             // add new punctures
             for (; current_p_count < p; current_p_count++) {
-                sse::crypto::tag_type punctured_tag{{0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00}};
-                punctured_tag[15] = current_p_count & 0xFF;
-                punctured_tag[14] = (current_p_count >> 8) & 0xFF;
-                punctured_tag[13] = (current_p_count >> 16) & 0xFF;
-                punctured_tag[12] = (current_p_count >> 24) & 0xFF;
-                punctured_tag[11] = (current_p_count >> 32) & 0xFF;
-                punctured_tag[10] = (current_p_count >> 40) & 0xFF;
-                punctured_tag[9]  = (current_p_count >> 48) & 0xFF;
-                punctured_tag[8]  = 0xFF;
+                sse::crypto::tag_type punctured_tag
+                    = test_punctured_tag(current_p_count);
 
                 ppke.puncture(pk, sk, punctured_tag);
             }
@@ -513,30 +532,7 @@ TEST(ppke, probabilitic_correctness)
 
             sse::crypto::random_bytes(sizeof(M_type), (uint8_t*)&M);
 
-            sse::crypto::tag_type tag{{0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00}};
-            tag[0] = i & 0xFF;
-            tag[1] = (i >> 8) & 0xFF;
-            tag[2] = (i >> 16) & 0xFF;
-            tag[3] = (i >> 24) & 0xFF;
-            tag[4] = (i >> 32) & 0xFF;
-            tag[5] = (i >> 40) & 0xFF;
-            tag[6] = (i >> 48) & 0xFF;
-            tag[7] = (i >> 56) & 0xFF;
+            sse::crypto::tag_type tag = test_encryption_tag(i);
 
             auto   ct     = ppke.encrypt<M_type>(pk, M, tag);
             auto   ct2    = ppke.encrypt<M_type>(sp, M, tag);
@@ -574,30 +570,8 @@ TEST(ppke, deterministic_correctness)
         if (p > current_p_count) {
             // add new punctures
             for (; current_p_count < p; current_p_count++) {
-                sse::crypto::tag_type punctured_tag{{0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00,
-                                                     0x00}};
-                punctured_tag[15] = current_p_count & 0xFF;
-                punctured_tag[14] = (current_p_count >> 8) & 0xFF;
-                punctured_tag[13] = (current_p_count >> 16) & 0xFF;
-                punctured_tag[12] = (current_p_count >> 24) & 0xFF;
-                punctured_tag[11] = (current_p_count >> 32) & 0xFF;
-                punctured_tag[10] = (current_p_count >> 40) & 0xFF;
-                punctured_tag[9]  = (current_p_count >> 48) & 0xFF;
-                punctured_tag[8]  = 0xFF;
+                sse::crypto::tag_type punctured_tag
+                    = test_punctured_tag(current_p_count);
 
                 auto share = ppke.skShareGen(
                     key_prf, sp, current_p_count + 1, punctured_tag);
@@ -613,30 +587,7 @@ TEST(ppke, deterministic_correctness)
 
             sse::crypto::random_bytes(sizeof(M_type), (uint8_t*)&M);
 
-            sse::crypto::tag_type tag{{0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00,
-                                       0x00}};
-            tag[0] = i & 0xFF;
-            tag[1] = (i >> 8) & 0xFF;
-            tag[2] = (i >> 16) & 0xFF;
-            tag[3] = (i >> 24) & 0xFF;
-            tag[4] = (i >> 32) & 0xFF;
-            tag[5] = (i >> 40) & 0xFF;
-            tag[6] = (i >> 48) & 0xFF;
-            tag[7] = (i >> 56) & 0xFF;
+            sse::crypto::tag_type tag = test_encryption_tag(i);
 
             auto   ct  = ppke.encrypt<M_type>(pk, M, tag);
             auto   ct2 = ppke.encrypt<M_type>(sp, M, tag);
@@ -684,30 +635,8 @@ TEST(puncturable, correctness)
     punctured_key.push_back(encryptor.initial_keyshare(0));
 
     for (; current_p_count < 5; current_p_count++) {
-        sse::crypto::tag_type punctured_tag{{0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00,
-                                             0x00}};
-        punctured_tag[15] = current_p_count & 0xFF;
-        punctured_tag[14] = (current_p_count >> 8) & 0xFF;
-        punctured_tag[13] = (current_p_count >> 16) & 0xFF;
-        punctured_tag[12] = (current_p_count >> 24) & 0xFF;
-        punctured_tag[11] = (current_p_count >> 32) & 0xFF;
-        punctured_tag[10] = (current_p_count >> 40) & 0xFF;
-        punctured_tag[9]  = (current_p_count >> 48) & 0xFF;
-        punctured_tag[8]  = 0xFF;
+        sse::crypto::tag_type punctured_tag
+            = test_punctured_tag(current_p_count);
 
 
         auto share = encryptor.inc_puncture(current_p_count + 1, punctured_tag);
@@ -723,31 +652,8 @@ TEST(puncturable, correctness)
     for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
         M_type M = i, dec_M;
 
-        sse::crypto::tag_type tag{{0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00,
-                                   0x00}};
-        tag[0] = i & 0xFF;
-        tag[1] = (i >> 8) & 0xFF;
-        tag[2] = (i >> 16) & 0xFF;
-        tag[3] = (i >> 24) & 0xFF;
-        tag[4] = (i >> 32) & 0xFF;
-        tag[5] = (i >> 40) & 0xFF;
-        tag[6] = (i >> 48) & 0xFF;
-        tag[7] = (i >> 56) & 0xFF;
-        tag[8] = 0xCC;
+        sse::crypto::tag_type tag = test_encryption_tag(i);
+        tag[8]                    = 0xCC;
 
         auto ct      = encryptor.encrypt(M, tag);
         bool success = decryptor.decrypt(ct, dec_M);

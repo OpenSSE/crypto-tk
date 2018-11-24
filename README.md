@@ -5,7 +5,7 @@
 [![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=static%20analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![Coverage Status](https://coveralls.io/repos/github/OpenSSE/crypto-tk/badge.svg)](https://coveralls.io/github/OpenSSE/crypto-tk)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1412/badge)](https://bestpractices.coreinfrastructure.org/projects/1412)
-
+[![CodeFactor](https://www.codefactor.io/repository/github/opensse/crypto-tk/badge)](https://www.codefactor.io/repository/github/opensse/crypto-tk)
 
 
 

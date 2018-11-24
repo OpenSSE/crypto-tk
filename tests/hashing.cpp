@@ -30,10 +30,11 @@
 #include "hash/blake2b.hpp"
 #include "hash/sha512.hpp"
 
+#include <sse/crypto/hash.hpp>
+
 #include <array>
 #include <iomanip>
 #include <iostream>
-#include <sse/crypto/hash.hpp>
 #include <string>
 
 #include "gtest/gtest.h"

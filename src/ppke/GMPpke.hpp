@@ -10,6 +10,7 @@
 
 #include "ppke/util.hpp"
 #include "relic_wrapper/relic_api.h"
+
 #include <sse/crypto/hash.hpp>
 #include <sse/crypto/hmac.hpp>
 #include <sse/crypto/key.hpp>

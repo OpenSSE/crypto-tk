@@ -26,9 +26,10 @@
  *
  ********/
 
+#include <sse/crypto/cipher.hpp>
+
 #include <iomanip>
 #include <iostream>
-#include <sse/crypto/cipher.hpp>
 #include <string>
 
 using namespace std;

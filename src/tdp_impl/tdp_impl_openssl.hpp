@@ -24,6 +24,7 @@
 #ifdef WITH_OPENSSL
 
 #include "tdp_impl.hpp"
+
 #include <sse/crypto/key.hpp>
 #include <sse/crypto/prf.hpp>
 

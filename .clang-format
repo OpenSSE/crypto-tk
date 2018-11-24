@@ -59,21 +59,21 @@ ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
 IncludeBlocks:   Regroup # Only supported by clang-format >= 6.0
 IncludeCategories:
   - Regex:           '^(<|")(sodium|openssl)/.*\.h'
-    Priority:        4
+    Priority:        5
   - Regex:           '^(<|")(gtest)/.*\.(h|hpp)'
-    Priority:        6
+    Priority:        7
   - Regex:           '^".*\.(h|hpp)"'
     Priority:        1
-  - Regex:           '^(<|")opensse/.*\.(h|hpp)'
-    Priority:        1
+  - Regex:           '^(<|")sse/.*\.(h|hpp)'
+    Priority:        2
   - Regex:           '^<.*\.h>'
-    Priority:        2
-  - Regex:           '^<c.*>'
-    Priority:        2
-  - Regex:           '^<.*'
     Priority:        3
+  - Regex:           '^<c.*>'
+    Priority:        3
+  - Regex:           '^<.*'
+    Priority:        4
   - Regex:           '.*'
-    Priority:        5
+    Priority:        6
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IndentCaseLabels: false
 IndentPPDirectives: None

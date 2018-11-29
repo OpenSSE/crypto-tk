@@ -82,7 +82,7 @@ static_assert(MULTI == OPENMP,
 // Do it ourself if necessary.
 
 #ifndef RELIC_BN_BYTES
-#define CEIL(RELIC_BN_BITS, 8)
+#define RELIC_BN_BYTES CEIL(RELIC_BN_BITS, 8)
 #endif
 
 namespace relicxx {

@@ -77,6 +77,14 @@ static_assert(MULTI == OPENMP,
 
 #define convert_str(a) a /* nothing */
 
+// Starting from commit 70884fc8b6d893bcc5fd41b8ca0c4d204e03f882, RELIC does not
+// define RELIC_BN_BYTES anymore.
+// Do it ourself if necessary.
+
+#ifndef RELIC_BN_BYTES
+#define CEIL(RELIC_BN_BITS, 8)
+#endif
+
 namespace relicxx {
 typedef std::vector<uint8_t> bytes_vec;
 void                         ro_error();

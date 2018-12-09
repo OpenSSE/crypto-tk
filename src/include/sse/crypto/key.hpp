@@ -110,6 +110,7 @@ public:
         if (content_ == nullptr) {
             throw std::bad_alloc(); /* LCOV_EXCL_LINE */
         }
+#ifdef ENABLE_MEMORY_LOCK
 
         random_bytes(N, content_);
         int err = sodium_mprotect_noaccess(content_);
@@ -119,6 +120,7 @@ public:
                                      + std::string(strerror(errno)));
         }
         is_locked_ = true;
+#endif
     }
 
     ///
@@ -148,6 +150,7 @@ public:
         memcpy(content_, key, N); // copy the content of the input key
         sodium_memzero(key, N);   // erase the content of the input key
 
+#ifdef ENABLE_MEMORY_LOCK
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
             throw std::runtime_error(/* LCOV_EXCL_LINE */
@@ -155,6 +158,7 @@ public:
                                      + std::string(strerror(errno)));
         }
         is_locked_ = true;
+#endif
     }
 
 
@@ -253,6 +257,7 @@ private:
 
         init_callback(content_); // use the callback to fill the key
 
+#ifdef ENABLE_MEMORY_LOCK
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
             throw std::runtime_error(/* LCOV_EXCL_LINE */
@@ -260,6 +265,7 @@ private:
                                      + std::string(strerror(errno)));
         }
         is_locked_ = true;
+#endif
     }
 
     ///
@@ -271,6 +277,7 @@ private:
     ///
     void lock() const
     {
+#ifdef ENABLE_MEMORY_LOCK
         if (content_ != nullptr && !is_locked_) {
             int err = sodium_mprotect_noaccess(content_);
             if (err == -1 && errno != ENOSYS) {
@@ -280,6 +287,7 @@ private:
             }
             is_locked_ = true;
         }
+#endif
     }
 
     ///
@@ -291,6 +299,7 @@ private:
     ///
     void unlock() const
     {
+#ifdef ENABLE_MEMORY_LOCK
         if (content_ != nullptr && is_locked_) {
             int err = sodium_mprotect_readonly(content_);
             if (err == -1 && errno != ENOSYS) {
@@ -300,6 +309,7 @@ private:
             }
             is_locked_ = false;
         }
+#endif
     }
 
     ///
@@ -321,7 +331,11 @@ private:
     ///
     bool is_locked() const noexcept
     {
+#ifdef ENABLE_MEMORY_LOCK
         return is_locked_;
+#else
+        return false;
+#endif
     }
 
     ///
@@ -334,7 +348,7 @@ private:
     ///
     const uint8_t* data() const
     {
-        if (is_locked_) {
+        if (is_locked()) {
             throw std::runtime_error("Memory is locked");
         }
         return content_;

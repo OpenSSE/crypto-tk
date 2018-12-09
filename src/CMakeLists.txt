@@ -22,6 +22,11 @@ else()
     endif()
 endif()
 
+
+# Add an option to choose, if the memory locking mechanisms shoudl be enabled.
+option(ENABLE_MEMORY_LOCK "Enable the memory locking mechanisms." ON)
+
+
 add_library(sse_crypto SHARED 
                 cipher.cpp key.cpp prg.cpp tdp.cpp prp.cpp hmac.cpp prf.cpp
                 puncturable_enc.cpp random.cpp utils.cpp set_hash.cpp
@@ -69,6 +74,11 @@ if(RSA_IMPL_OPENSSL)
     add_compile_definitions(SSE_CRYPTO_TDP_IMPL=SSE_CRYPTO_TDP_IMPL_OPENSSL)
 endif()
 endif()
+
+if(ENABLE_MEMORY_LOCK)
+    message(STATUS "Enable memory locks")
+    target_compile_definitions(sse_crypto PUBLIC ENABLE_MEMORY_LOCK)
+endif(ENABLE_MEMORY_LOCK)
 
 
 # Installation

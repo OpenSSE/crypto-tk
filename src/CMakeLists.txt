@@ -78,6 +78,8 @@ endif()
 if(ENABLE_MEMORY_LOCK)
     message(STATUS "Enable memory locks")
     target_compile_definitions(sse_crypto PUBLIC ENABLE_MEMORY_LOCK)
+else()
+    message(STATUS "Memory locks disabled")
 endif(ENABLE_MEMORY_LOCK)
 
 

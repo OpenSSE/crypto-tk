@@ -376,7 +376,7 @@ private:
     /// @brief Pointer to the key content
     uint8_t* content_;
     /// @brief Flag denoting if the content_ point is read_protected
-    mutable bool is_locked_;
+    mutable bool is_locked_{false};
 };
 } // namespace crypto
 } // namespace sse

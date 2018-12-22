@@ -1,5 +1,6 @@
 # OpenSSE's Cryptographic Toolkit
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b46061d2a09047e890f387d6b7ecb31d)](https://app.codacy.com/app/rbost/crypto-tk?utm_source=github.com&utm_medium=referral&utm_content=OpenSSE/crypto-tk&utm_campaign=Badge_Grade_Dashboard)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=gcc%20build&env=COMPILER=gcc)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=clang%20build&env=COMPILER=clang)](https://travis-ci.org/OpenSSE/crypto-tk)

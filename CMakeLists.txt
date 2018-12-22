@@ -100,7 +100,7 @@ add_coverage(check)
 # add_subdirectory(bench)
 
 if(OPENSSL_FOUND)
-    add_executable(debug_tool main.cpp)
+    add_executable(debug_tool EXCLUDE_FROM_ALL main.cpp)
 
     set_property(TARGET debug_tool PROPERTY CXX_STANDARD 11)
 

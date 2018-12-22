@@ -104,6 +104,25 @@ matrix:
            - cd $TRAVIS_BUILD_DIR
            - ./scripts/check_format.sh
 
+      - env:
+          - STATIC_ANALYSIS=false
+          - RUN_CHECKS=false
+          - COMPILER=gcc
+          - ENABLE_COVERAGE=Off
+        compiler: gcc
+        addons:
+            apt:
+              sources: *basic_sources
+              packages:
+                 - *basic_deps
+            coverity_scan:
+               project:
+                  name: "OpenSSE/crypto-tk"
+                  description: "Cryptographic toolkit for searchable encryption."
+               notification_email: raphael_bost@alumni.brown.edu
+               build_command: "make -j2"
+               branch_pattern: coverity_scan
+
 script:
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then VERBOSE=1 cmake --build .; fi
   - if [ "${RUN_CHECKS}" == "true" ]; then ./tests/check; fi

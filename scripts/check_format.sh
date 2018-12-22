@@ -4,29 +4,29 @@ if [[ -z $CLANG_FORMAT ]]; then
 	CLANG_FORMAT="clang-format"
 fi
 
+shopt -s extglob nullglob
 
-PATTERN=".*\\.\\(h\\|c\\|hpp\\|cpp\\)\$"
+FILES=(src/*.{h,c,hpp,cpp})
+FILES+=(src/include/sse/crypto/*.{h,c,hpp,cpp})
+FILES+=(src/hash/*.{h,c,hpp,cpp})
+FILES+=(src/ppke/*.{h,c,hpp,cpp})
+FILES+=(src/tdp_impl/*.{h,c,hpp,cpp})
+FILES+=(tests/*.{h,c,hpp,cpp})
+FILES+=(bench/*.{h,c,hpp,cpp})
 
-FILES="$(ls -d src/* | grep "$PATTERN")"
-FILES+=$'\n'"$(ls -d src/hash/* | grep "$PATTERN")"
-FILES+=$'\n'"$(ls -d src/include/sse/crypto/* | grep "$PATTERN")"
-FILES+=$'\n'"$(ls -d src/ppke/* | grep "$PATTERN")"
-FILES+=$'\n'"$(ls -d src/tdp_impl/* | grep "$PATTERN")"
-FILES+=$'\n'"$(ls -d tests/*.cpp)"
-FILES+=$'\n'"$(ls -d bench/*.cpp)"
-
-for file in $FILES ; do
+for file in "${FILES[@]}" ; do
     eval "$CLANG_FORMAT -i ${file}"
 done
 
+PATTERN=".*\\.\\(h\\|c\\|hpp\\|cpp\\)\$"
+
 INVALID_FORMAT_FILES=$(git diff --name-only | grep "$PATTERN")
-NUM_INVALID_FILE=$(echo $INVALID_FORMAT_FILES | wc -l)
 
 
-if [ -z $INVALID_FORMAT_FILES ]; then
+if [ -z "$INVALID_FORMAT_FILES" ]; then
     echo "All the source files are correctly formated."
 else
     echo "The following files are incorrectly formated:"
-    echo $INVALID_FORMAT_FILES
+    echo "$INVALID_FORMAT_FILES"
     exit 1
 fi

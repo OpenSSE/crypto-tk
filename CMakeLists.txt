@@ -85,6 +85,7 @@ list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_
 
 # To avoid building GTest twice
 if (NOT TARGET gtest)
+  set(BUILD_GMOCK OFF CACHE BOOL "Disable GMock" FORCE)
   add_subdirectory(externals/googletest)
 endif()
 

@@ -36,6 +36,11 @@ install:
   - gem install coveralls-lcov
   - sudo ldconfig
 
+before_script:
+   - mkdir -p build
+   - cd build
+   - cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_COVERAGE=${ENABLE_COVERAGE} -DSANITIZE_ADDRESS=On -DSANITIZE_UNDEFINED=On ..
+
 
 matrix:
    include:
@@ -95,7 +100,6 @@ matrix:
         script:
            - ./scripts/check_format.sh
 
-
 script:
-  - ./scripts/ci_build.sh
+  - VERBOSE=1 cmake --build .
   - if [ "${RUN_CHECKS}" == "true" ]; then ./build/tests/check; fi

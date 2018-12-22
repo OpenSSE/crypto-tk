@@ -6,6 +6,7 @@
 [![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=static%20analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![Coverage Status](https://coveralls.io/repos/github/OpenSSE/crypto-tk/badge.svg)](https://coveralls.io/github/OpenSSE/crypto-tk)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1412/badge)](https://bestpractices.coreinfrastructure.org/projects/1412)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5149d1eb77224a6e981d1b2f46bfb012)](https://www.codacy.com/app/rbost/crypto-tk?utm_source=github.com&utm_medium=referral&utm_content=OpenSSE/crypto-tk&utm_campaign=Badge_Grade)
 [![CodeFactor](https://www.codefactor.io/repository/github/opensse/crypto-tk/badge)](https://www.codefactor.io/repository/github/opensse/crypto-tk)
 
 The searchable encryption protocols rely on high level cryptographic features such as pseudo-random functions, hash functions, encryption schemes, or incremental set hashing. The cryptographic layer provides interfaces and implementations of these features.

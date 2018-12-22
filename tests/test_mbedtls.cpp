@@ -450,7 +450,7 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         ASSERT_EQ(mbedtls_rsa_write_key_pem(&mbedtls_rsa, buf, sizeof(buf)), 0);
 
         // create the OpenSSL key from the buffer
-        mem    = BIO_new_mem_buf(buf, (int)strlen((char*)buf));
+        mem    = BIO_new_mem_buf(buf, (int)strnlen((char*)buf, sizeof(buf)));
         evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
 
         ASSERT_FALSE(evpkey == NULL);

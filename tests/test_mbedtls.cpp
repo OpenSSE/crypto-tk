@@ -311,8 +311,8 @@ TEST(mbedTLS, key_serialization)
 
     MBEDTLS_MPI_CHK(mbedtls_rsa_write_key_pem(&rsa, buf, sizeof(buf)));
     // must include the \0 character in the string length
-    MBEDTLS_MPI_CHK(
-        mbedtls_rsa_parse_key(&rsa_cp, buf, strlen((char*)buf) + 1, 0, 0));
+    MBEDTLS_MPI_CHK(mbedtls_rsa_parse_key(
+        &rsa_cp, buf, strnlen((char*)buf, sizeof(buf)) + 1, 0, 0));
 
     // check that we parsed everthing correctly
     ASSERT_EQ(mbedtls_rsa_check_pubkey(&rsa_cp), 0);
@@ -332,8 +332,8 @@ TEST(mbedTLS, key_serialization)
     // serialize the PK
     MBEDTLS_MPI_CHK(mbedtls_rsa_write_pubkey_pem(&rsa, buf, sizeof(buf)));
     // must include the \0 character in the string length
-    MBEDTLS_MPI_CHK(
-        mbedtls_rsa_parse_public_key(&rsa_pk, buf, strlen((char*)buf) + 1));
+    MBEDTLS_MPI_CHK(mbedtls_rsa_parse_public_key(
+        &rsa_pk, buf, strnlen((char*)buf, sizeof(buf)) + 1));
 
     // check the public key
     ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.N, &rsa_pk.N) == 0);
@@ -477,7 +477,7 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
 
 
         // create the OpenSSL key from the buffer
-        mem            = BIO_new_mem_buf(buf, (int)strlen((char*)buf));
+        mem = BIO_new_mem_buf(buf, (int)strnlen((char*)buf, sizeof(buf)));
         openssl_pk_rsa = PEM_read_bio_RSA_PUBKEY(mem, NULL, NULL, NULL);
         ASSERT_FALSE(openssl_pk_rsa == NULL);
 
@@ -538,8 +538,11 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         BIO_free_all(bio);
 
         // create an mbedTLS key from the buffer
-        ASSERT_EQ(mbedtls_rsa_parse_key(
-                      &mbedtls_rsa_sk, buf, strlen((char*)buf) + 1, 0, 0),
+        ASSERT_EQ(mbedtls_rsa_parse_key(&mbedtls_rsa_sk,
+                                        buf,
+                                        strnlen((char*)buf, sizeof(buf)) + 1,
+                                        0,
+                                        0),
                   0);
 
 
@@ -570,9 +573,10 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         //        std::cout << v << std::endl;
 
         // create an mbedTLS key from the buffer
-        ASSERT_EQ(mbedtls_rsa_parse_public_key(
-                      &mbedtls_rsa_pk, buf, strlen((char*)buf) + 1),
-                  0);
+        ASSERT_EQ(
+            mbedtls_rsa_parse_public_key(
+                &mbedtls_rsa_pk, buf, strnlen((char*)buf, sizeof(buf)) + 1),
+            0);
 
 
         // check that the keys are identical

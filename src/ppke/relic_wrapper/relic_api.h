@@ -121,7 +121,6 @@ public:
     }
 
     explicit ZR(int);
-    explicit ZR(const char*);
     ZR(const uint8_t*, size_t);
     explicit ZR(const bn_t y)
     {

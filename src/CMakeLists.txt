@@ -63,7 +63,7 @@ target_compile_features(sse_crypto
 target_include_directories(sse_crypto PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} 
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/sse/crypto)
 
 target_link_libraries(sse_crypto sodium ${RELIC_LIBRARIES})
@@ -130,7 +130,7 @@ add_library(OpenSSE::crypto ALIAS sse_crypto)
 
 
 
-# Documentation 
+# Documentation
 
 ## From https://vicrucann.github.io/tutorials/quick-cmake-doxygen/
 ## and https://nazavode.github.io/blog/cmake-doxygen-improved/

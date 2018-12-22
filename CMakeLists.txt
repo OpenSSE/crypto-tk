@@ -102,6 +102,8 @@ add_coverage(check)
 if(OPENSSL_FOUND)
     add_executable(debug_tool main.cpp)
 
+    set_property(TARGET debug_tool PROPERTY CXX_STANDARD 11)
+
     target_include_directories(debug_tool PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
     target_link_libraries(debug_tool sse_crypto ${OPENSSL_CRYPTO_LIBRARY})

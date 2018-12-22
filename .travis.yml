@@ -27,6 +27,7 @@ env:
    global:
       - ENABLE_COVERAGE=Off
       - BUILD_TYPE=Debug
+      - secure: "duw9VsNsbzKZ/tPkL1D0u7TfCvkfh8XEIg9VM//YX4HNkKJqBhC6zFE5MDLJ1bFLpNUkC8NaIZmXEVTMWAnjDKTIaWTmDu3gTQsdNFIIiQKSY4avaHqnJvj7H8g/hEpJIZODlTTwnqS67FVKGbRPruk9gG7aO6F0xRkvr6GOGee2pWKi81b+kB2S08h5Biasr+9ZrRsd86MGgrKFLH4p+dwpSTTFLgJtgpcfJD5T0CTxACuBjYDodiVlfXYvU6NvyC38cPegRcE/D6wcxOet4+sIqgKCqzrIjA+d3mAXcdAOq0Fg8qb320PvGS/yfIdAbc13YkZ2wxteHsYm52hU3HGtEOSXuIZeUdZzag68mC6AOzSStWRiFOgwXwU+8dUGFOF8ccvLie0Se5hemX+A/lKeeutVq7G3Fs68RpISgSx9L7k/WOAf5QqBGToxqLuKwNt4h1NySQquCb2X2ctMu+MO+ODTMNOXEhA/jO0Se/1vx9esTAv0MLMLi119g/TvT5o+1oZAMLzeffN6hT7YbnbIWa8U4hwm9W6xOhmb/IOBXW0wftKK6Xx1+XBxHyUQU0tCx+u36+Jox7fpaIvW4uulC3rUhyzgTVjpE3JSNI6aomRVKRhBU/JPasarPkgoHQnnRdM3Mm998lij50uLup/zC/r/u+PXFtHxHJhgoH4="
 
 install:
   - cd install_dependencies
@@ -84,6 +85,7 @@ matrix:
                  - libclang-common-5.0-dev # to get the headers right
                  - clang-tidy-5.0
         script:
+           - cd $TRAVIS_BUILD_DIR
            - ./scripts/cppcheck.sh
            - ./scripts/tidy.sh
 
@@ -98,6 +100,7 @@ matrix:
                  - clang-format-5.0
         install: # do not compile the dependencies
         script:
+           - cd $TRAVIS_BUILD_DIR
            - ./scripts/check_format.sh
 
 script:

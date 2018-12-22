@@ -51,6 +51,17 @@ ZR::ZR(int x)
     }
 }
 
+ZR::ZR(const std::string& str)
+{
+    error_if_relic_not_init();
+    bn_inits(z);
+    bn_inits(order);
+    g1_get_ord(order);
+    isInit = true;
+    bn_read_str(z, str.c_str(), static_cast<int>(str.size()), DECIMAL);
+    // bn_mod(z, z, order);
+}
+
 ZR::ZR(const uint8_t* bytes, size_t len)
 {
     error_if_relic_not_init();

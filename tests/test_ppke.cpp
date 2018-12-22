@@ -143,8 +143,7 @@ TEST(relic, serialization_ZR)
             std::equal(vec_bytes.begin(), vec_bytes.end(), bytes.begin()));
 
         std::string i_str = std::to_string(i);
-        relicxx::ZR zr_str(reinterpret_cast<const uint8_t*>(i_str.c_str()),
-                           i_str.size());
+        relicxx::ZR zr_str(i_str);
         ASSERT_EQ(z, zr_str);
     }
 

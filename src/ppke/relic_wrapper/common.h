@@ -24,6 +24,10 @@ extern "C" {
 #define SHA_LEN 32
 #define SHA_FUNC md_map_sh256
 
+// clang-tidy considers this file as a C++ source
+// We use this trick so it still checks this header while not raising an error.
+
+// NOLINTNEXTLINE(modernize-use-using)
 typedef enum _status_t
 {
     ELEMENT_OK = 2,
@@ -82,8 +86,8 @@ enum Other_type
     gt_null(g);                                                                \
     gt_new(g);
 
-#define FP_STR FP_BYTES * 2 + 1
-#define G1_LEN (FP_BYTES * 2) + 2
+#define FP_STR (((((FP_BYTES * 2 + 1)))))
+#define G1_LEN ((((((FP_BYTES * 2) + 2)))))
 /* KSS_P508 */
 #define G2_LEN G1_LEN
 #define GT_LEN G1_LEN

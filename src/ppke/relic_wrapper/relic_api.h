@@ -1,25 +1,21 @@
 #ifndef RELIC_API_H
 #define RELIC_API_H
-#include <math.h>
-#include <stdlib.h>
+#include <sse/crypto/prf.hpp>
 
+#include <cmath>
+#include <cstdlib>
+#include <cstring> // for memcpy
+
+#include <algorithm> // for std::fill
+#include <array>
 #include <bitset>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
-#include <vector>
-//#include <cereal/types/vector.hpp>
-//#include <cereal/archives/json.hpp>
-
-#include <sse/crypto/prf.hpp>
-
-#include <cstring> // for memcpy
-
-#include <algorithm> // for std::fill
-#include <array>
 #include <type_traits> // for static assert
+#include <vector>
 
 // define classes
 #ifdef __cplusplus
@@ -86,13 +82,13 @@ static_assert(MULTI == OPENMP,
 #endif
 
 namespace relicxx {
-typedef std::vector<uint8_t> bytes_vec;
-void                         ro_error();
+using bytes_vec = std::vector<uint8_t>;
+void ro_error();
 
-const static std::string HASH_FUNCTION_STRINGS         = "0";
-const static std::string HASH_FUNCTION_BYTES_TO_Zr_CRH = "1";
-const static std::string HASH_FUNCTION_BYTES_TO_G1_ROM = "2";
-const static std::string HASH_FUNCTION_BYTES_TO_G2_ROM = "3";
+constexpr static uint8_t HASH_FUNCTION_STRINGS         = 0x00;
+constexpr static uint8_t HASH_FUNCTION_BYTES_TO_Zr_CRH = 0x01;
+constexpr static uint8_t HASH_FUNCTION_BYTES_TO_G1_ROM = 0x02;
+constexpr static uint8_t HASH_FUNCTION_BYTES_TO_G2_ROM = 0x03;
 
 class RelicDividByZero : public std::logic_error
 {
@@ -120,9 +116,9 @@ public:
         bn_set_dig(z, 1);
     }
 
-    explicit ZR(int);
+    explicit ZR(int /*x*/);
     explicit ZR(const std::string& str);
-    ZR(const uint8_t*, size_t);
+    ZR(const uint8_t* /*bytes*/, size_t /*len*/);
     explicit ZR(const bn_t y)
     {
         error_if_relic_not_init();
@@ -180,11 +176,20 @@ public:
     }
     ZR& operator=(const ZR& w)
     {
-        if (isInit == true) {
+        if (isInit) {
             bn_copy(z, w.z);
             bn_copy(order, w.order);
-        } else
-            ro_error();
+        } else {
+            {
+                {
+                    {
+                        {
+                            ro_error();
+                        }
+                    }
+                }
+            }
+        }
         return *this;
     }
 
@@ -194,48 +199,120 @@ public:
     std::vector<uint8_t> getBytes() const;
     void                 writeBytes(uint8_t* bytes) const;
 
-    friend ZR hashToZR(const bytes_vec&);
-    friend ZR power(const ZR&, int);
-    friend ZR power(const ZR&, const ZR&);
-    friend ZR operator-(const ZR&);
-    friend ZR operator-(const ZR&, const ZR&);
-    friend ZR operator+(const ZR&, const ZR&);
-    friend ZR operator*(const ZR&, const ZR&);
-    friend ZR operator/(const ZR&, const ZR&);
-    friend ZR operator&(const ZR&, const ZR&); // bitwise-AND
+    friend ZR hashToZR(const bytes_vec& /*b*/);
+    friend ZR power(const ZR& /*x*/, int /*r*/);
+    friend ZR power(const ZR& /*x*/, const ZR& /*r*/);
+    friend ZR operator-(const ZR& /*x*/);
+    friend ZR operator-(const ZR& /*x*/, const ZR& /*y*/);
+    friend ZR operator+(const ZR& /*x*/, const ZR& /*y*/);
+    friend ZR operator*(const ZR& /*x*/, const ZR& /*y*/);
+    friend ZR operator/(const ZR& /*x*/, const ZR& /*y*/);
+    friend ZR operator&(const ZR& /*a*/, const ZR& /*b*/); // bitwise-AND
     //    friend ZR operator|(const ZR&, const ZR&);  // bitwise-OR
     //    friend ZR operator^(const ZR&, const ZR&);  // bitwise-XOR
-    friend ZR operator<<(const ZR&, int);
-    friend ZR operator>>(const ZR&, int);
+    friend ZR operator<<(const ZR& /*a*/, int /*b*/);
+    friend ZR operator>>(const ZR& /*a*/, int /*b*/);
 
-    friend std::ostream& operator<<(std::ostream&, const ZR&);
+    friend std::ostream& operator<<(std::ostream& /*s*/, const ZR& /*zr*/);
     friend bool          operator==(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) == CMP_EQ)
-            return true;
-        else
-            return false;
+        if (bn_cmp(x.z, y.z) == CMP_EQ) {
+            {
+                {
+                    {
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        {
+            {
+                {
+                    {
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
     }
     friend bool operator!=(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) != CMP_EQ)
-            return true;
-        else
-            return false;
+        if (bn_cmp(x.z, y.z) != CMP_EQ) {
+            {
+                {
+                    {
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        {
+            {
+                {
+                    {
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
     }
     friend bool operator>(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) == CMP_GT)
-            return true;
-        else
-            return false;
+        if (bn_cmp(x.z, y.z) == CMP_GT) {
+            {
+                {
+                    {
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        {
+            {
+                {
+                    {
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
     }
     friend bool operator<(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) == CMP_LT)
-            return true;
-        else
-            return false;
+        if (bn_cmp(x.z, y.z) == CMP_LT) {
+            {
+                {
+                    {
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        {
+            {
+                {
+                    {
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
     }
 };
 
@@ -299,24 +376,41 @@ public:
 #endif
     G1& operator=(const G1& w)
     {
-        if (isInit == true)
-            g1_copy(g, w.g);
-        else
-            ro_error();
+        if (isInit) {
+            {
+                {
+                    {
+                        {
+                            g1_copy(g, w.g);
+                        }
+                    }
+                }
+            }
+        } else {
+            {
+                {
+                    {
+                        {
+                            ro_error();
+                        }
+                    }
+                }
+            }
+        }
         return *this;
     }
 
-    bool                 ismember(const bn_t) const;
-    std::vector<uint8_t> getBytes(bool compress = 0) const;
-    void                 writeBytes(uint8_t* bytes, bool compress = 0) const;
+    bool                 ismember(const bn_t /*order*/) const;
+    std::vector<uint8_t> getBytes(bool compress = false) const;
+    void writeBytes(uint8_t* bytes, bool compress = false) const;
 
 
-    friend G1            hashToG1(const bytes_vec&);
-    friend G1            power(const G1&, const ZR&);
-    friend G1            operator-(const G1&);
-    friend G1            operator-(const G1&, const G1&);
-    friend G1            operator+(const G1&, const G1&);
-    friend std::ostream& operator<<(std::ostream&, const G1&);
+    friend G1            hashToG1(const bytes_vec& /*b*/);
+    friend G1            power(const G1& /*g*/, const ZR& /*zr*/);
+    friend G1            operator-(const G1& /*x*/);
+    friend G1            operator-(const G1& /*x*/, const G1& /*y*/);
+    friend G1            operator+(const G1& /*x*/, const G1& /*y*/);
+    friend std::ostream& operator<<(std::ostream& /*s*/, const G1& /*g1*/);
     friend bool          operator==(const G1& x, const G1& y)
     {
         return g1_cmp(x.g, y.g) == CMP_EQ;
@@ -383,22 +477,39 @@ public:
 
     G2& operator=(const G2& w)
     {
-        if (isInit == true)
-            g2_copy(g, const_cast<G2&>(w).g);
-        else
-            ro_error();
+        if (isInit) {
+            {
+                {
+                    {
+                        {
+                            g2_copy(g, const_cast<G2&>(w).g);
+                        }
+                    }
+                }
+            }
+        } else {
+            {
+                {
+                    {
+                        {
+                            ro_error();
+                        }
+                    }
+                }
+            }
+        }
         return *this;
     }
-    bool                 ismember(bn_t);
-    std::vector<uint8_t> getBytes(bool compress = 0) const;
-    void                 writeBytes(uint8_t* bytes, bool compress = 0) const;
+    bool                 ismember(bn_t /*order*/);
+    std::vector<uint8_t> getBytes(bool compress = false) const;
+    void writeBytes(uint8_t* bytes, bool compress = false) const;
 
-    friend G2            hashToG2(const bytes_vec&);
-    friend G2            power(const G2&, const ZR&);
-    friend G2            operator-(const G2&);
-    friend G2            operator-(const G2&, const G2&);
-    friend G2            operator+(const G2&, const G2&);
-    friend std::ostream& operator<<(std::ostream& s, const G2&);
+    friend G2            hashToG2(const bytes_vec& /*b*/);
+    friend G2            power(const G2& /*g*/, const ZR& /*zr*/);
+    friend G2            operator-(const G2& /*x*/);
+    friend G2            operator-(const G2& /*x*/, const G2& /*y*/);
+    friend G2            operator+(const G2& /*x*/, const G2& /*y*/);
+    friend std::ostream& operator<<(std::ostream& s, const G2& /*g2*/);
     friend bool          operator==(const G2& x, const G2& y)
     {
         return g2_cmp(const_cast<G2&>(x).g, const_cast<G2&>(y).g) == CMP_EQ;
@@ -442,10 +553,27 @@ public:
 
     GT& operator=(const GT& x)
     {
-        if (isInit == true)
-            gt_copy(g, const_cast<GT&>(x).g);
-        else
-            ro_error();
+        if (isInit) {
+            {
+                {
+                    {
+                        {
+                            gt_copy(g, const_cast<GT&>(x).g);
+                        }
+                    }
+                }
+            }
+        } else {
+            {
+                {
+                    {
+                        {
+                            ro_error();
+                        }
+                    }
+                }
+            }
+        }
         return *this;
     }
 #ifdef RELICXX_MOVEGT
@@ -469,18 +597,18 @@ public:
     }
 #endif
 
-    bool                 ismember(bn_t);
-    std::vector<uint8_t> getBytes(bool compress = 0) const;
+    bool                 ismember(bn_t /*order*/);
+    std::vector<uint8_t> getBytes(bool compress = false) const;
     void getBytes(bool compress, const size_t out_len, uint8_t* out) const;
     void writeBytes(uint8_t* bytes, bool compress) const;
 
     friend GT            pairing(const G1&, const G1&);
-    friend GT            pairing(const G1&, const G2&);
-    friend GT            power(const GT&, const ZR&);
-    friend GT            operator-(const GT&);
-    friend GT            operator/(const GT&, const GT&);
-    friend GT            operator*(const GT&, const GT&);
-    friend std::ostream& operator<<(std::ostream& s, const GT&);
+    friend GT            pairing(const G1& /*g1*/, const G2& /*g2*/);
+    friend GT            power(const GT& /*g*/, const ZR& /*zr*/);
+    friend GT            operator-(const GT& /*g*/);
+    friend GT            operator/(const GT& /*x*/, const GT& /*y*/);
+    friend GT            operator*(const GT& /*x*/, const GT& /*y*/);
+    friend std::ostream& operator<<(std::ostream& s, const GT& /*gt*/);
     friend bool          operator==(const GT& x, const GT& y)
     {
         return gt_cmp(const_cast<GT&>(x).g, const_cast<GT&>(y).g) == CMP_EQ;
@@ -536,23 +664,23 @@ public:
     GT generatorGT() const;
 
 
-    bool ismember(ZR&);
-    bool ismember(G1&);
-    bool ismember(GT&);
-    bool ismember(G2&);
+    bool ismember(ZR& /*zr*/);
+    bool ismember(G1& /*g*/);
+    bool ismember(GT& /*g*/);
+    bool ismember(G2& /*g*/);
 
 
     G2 random(G2_type) const;
-    G2 mul(const G2&, const G2&) const;
-    G2 div(const G2&, const G2&) const;
-    G2 exp(const G2&, const ZR&) const;
-    G2 exp(const G2&, const int&) const;
-    GT pair(const G1&, const G2&) const;
-    GT pair(const G2&, const G1&) const;
+    G2 mul(const G2& /*g*/, const G2& /*h*/) const;
+    G2 div(const G2& /*g*/, const G2& /*h*/) const;
+    G2 exp(const G2& /*g*/, const ZR& /*r*/) const;
+    G2 exp(const G2& /*g*/, const int& /*r*/) const;
+    GT pair(const G1& /*g*/, const G2& /*h*/) const;
+    GT pair(const G2& /*h*/, const G1& /*g*/) const;
     ZR order() const; // returns the order of the group
 
     ZR hashListToZR(const std::string& str) const;
-    ZR hashListToZR(const bytes_vec&) const;
+    ZR hashListToZR(const bytes_vec& /*b*/) const;
 
     template<size_t N>
     ZR hashListToZR(const std::array<uint8_t, N>& arr) const
@@ -562,37 +690,37 @@ public:
     }
 
     G1 hashListToG1(const std::string& str) const;
-    G1 hashListToG1(const bytes_vec&) const;
-    G2 hashListToG2(const bytes_vec&) const;
+    G1 hashListToG1(const bytes_vec& /*b*/) const;
+    G2 hashListToG2(const bytes_vec& /*b*/) const;
 
     GT  pair(const G1&, const G1&) const;
-    int mul(const int&, const int&) const;
-    ZR  mul(const ZR&, const ZR&) const;
-    G1  mul(const G1&, const G1&) const;
-    GT  mul(const GT&, const GT&) const;
-    int div(const int&, const int&) const;
-    ZR  div(const int&, const ZR&) const;
-    ZR  div(const ZR&, const ZR&) const;
-    G1  div(const G1&, const G1&) const;
-    GT  div(const GT&, const GT&) const;
+    int mul(const int& /*g*/, const int& /*h*/) const;
+    ZR  mul(const ZR& /*g*/, const ZR& /*h*/) const;
+    G1  mul(const G1& /*g*/, const G1& /*h*/) const;
+    GT  mul(const GT& /*g*/, const GT& /*h*/) const;
+    int div(const int& /*g*/, const int& /*h*/) const;
+    ZR  div(const int& /*g*/, const ZR& /*h*/) const;
+    ZR  div(const ZR& /*g*/, const ZR& /*h*/) const;
+    G1  div(const G1& /*g*/, const G1& /*h*/) const;
+    GT  div(const GT& /*g*/, const GT& /*h*/) const;
 
-    ZR exp(const ZR&, const int&) const;
-    ZR exp(const ZR&, const ZR&) const;
-    G1 exp(const G1&, const ZR&) const;
-    G1 exp(const G1&, const int&) const;
-    GT exp(const GT&, const ZR&) const;
-    GT exp(const GT&, const int&) const;
+    ZR exp(const ZR& /*x*/, const int& /*y*/) const;
+    ZR exp(const ZR& /*x*/, const ZR& /*y*/) const;
+    G1 exp(const G1& /*g*/, const ZR& /*r*/) const;
+    G1 exp(const G1& /*g*/, const int& /*r*/) const;
+    GT exp(const GT& /*g*/, const ZR& /*r*/) const;
+    GT exp(const GT& /*g*/, const int& /*r*/) const;
 
-    ZR  add(const ZR&, const ZR&) const;
-    int add(const int&, const int&) const;
+    ZR  add(const ZR& /*g*/, const ZR& /*h*/) const;
+    int add(const int& /*g*/, const int& /*h*/) const;
 
-    int         sub(const int&, const int&) const;
-    ZR          sub(const ZR&, const ZR&) const;
-    ZR          neg(const ZR&) const;
-    ZR          inv(const ZR&) const;
-    G1          inv(const G1&) const;
-    G2          inv(const G2&) const;
-    GT          inv(const GT&) const;
+    int         sub(const int& /*g*/, const int& /*h*/) const;
+    ZR          sub(const ZR& /*g*/, const ZR& /*h*/) const;
+    ZR          neg(const ZR& /*r*/) const;
+    ZR          inv(const ZR& /*r*/) const;
+    G1          inv(const G1& /*g*/) const;
+    G2          inv(const G2& /*g*/) const;
+    GT          inv(const GT& /*g*/) const;
     std::string aes_key(const GT& g);
 
 private:

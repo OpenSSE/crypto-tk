@@ -158,17 +158,19 @@ ZR power(const ZR& x, const ZR& r)
 
 ZR hashToZR(const bytes_vec& b)
 {
-    bytes_vec data(b);
-    data.reserve(HASH_FUNCTION_BYTES_TO_Zr_CRH.size());
-    data.insert(data.begin(),
-                HASH_FUNCTION_BYTES_TO_Zr_CRH.begin(),
-                HASH_FUNCTION_BYTES_TO_Zr_CRH.end());
+    static_assert(sizeof(HASH_FUNCTION_BYTES_TO_G1_ROM) == 1,
+                  "Invalid type for HASH_FUNCTION_BYTES_TO_Zr_CRH. Its size "
+                  "should be 1 byte");
+
+    bytes_vec data(sizeof(HASH_FUNCTION_BYTES_TO_Zr_CRH) + b.size());
+    data[0] = HASH_FUNCTION_BYTES_TO_Zr_CRH;
+    std::copy(b.begin(), b.end(), data.begin() + 1);
 
     ZR            zr;
     unsigned int  digest_len = SHA_LEN;
     unsigned char digest[digest_len + 1];
     memset(digest, 0, digest_len);
-    SHA_FUNC(digest, &data[0], static_cast<int>(data.size()));
+    SHA_FUNC(digest, data.data(), static_cast<int>(data.size()));
     bn_read_bin(zr.z, digest, digest_len);
     if (bn_cmp(zr.z, zr.order) == CMP_GT) {
         bn_mod(zr.z, zr.z, zr.order);
@@ -317,14 +319,17 @@ G1 power(const G1& g, const ZR& zr)
 
 G1 hashToG1(const bytes_vec& b)
 {
-    G1        g1;
-    bytes_vec data(b);
-    data.reserve(HASH_FUNCTION_BYTES_TO_G1_ROM.size());
-    data.insert(data.begin(),
-                HASH_FUNCTION_BYTES_TO_G1_ROM.begin(),
-                HASH_FUNCTION_BYTES_TO_G1_ROM.end());
+    G1 g1;
+
+    static_assert(sizeof(HASH_FUNCTION_BYTES_TO_G1_ROM) == 1,
+                  "Invalid type for HASH_FUNCTION_BYTES_TO_G1_ROM. Its size "
+                  "should be 1 byte");
+    bytes_vec data(sizeof(HASH_FUNCTION_BYTES_TO_G1_ROM) + b.size());
+    data[0] = HASH_FUNCTION_BYTES_TO_G1_ROM;
+    std::copy(b.begin(), b.end(), data.begin() + 1);
+
     // map internally already hashes.
-    g1_map(g1.g, &data[0], (int)data.size());
+    g1_map(g1.g, data.data(), static_cast<int>(data.size()));
     return g1;
 }
 
@@ -422,14 +427,18 @@ G2 power(const G2& g, const ZR& zr)
 
 G2 hashToG2(const bytes_vec& b)
 {
-    G2        g2;
-    bytes_vec data(b);
-    data.reserve(HASH_FUNCTION_BYTES_TO_G2_ROM.size());
-    data.insert(data.begin(),
-                HASH_FUNCTION_BYTES_TO_G2_ROM.begin(),
-                HASH_FUNCTION_BYTES_TO_G2_ROM.end());
+    static_assert(sizeof(HASH_FUNCTION_BYTES_TO_G2_ROM) == 1,
+                  "Invalid type for HASH_FUNCTION_BYTES_TO_G1_ROM. Its size "
+                  "should be 1 byte");
+
+    G2 g2;
+
+    bytes_vec data(sizeof(HASH_FUNCTION_BYTES_TO_G1_ROM) + b.size());
+    data[0] = HASH_FUNCTION_BYTES_TO_G1_ROM;
+    std::copy(b.begin(), b.end(), data.begin() + 1);
+
     // map internally already hashes.
-    g2_map(g2.g, &data[0], (int)data.size());
+    g2_map(g2.g, data.data(), static_cast<int>(data.size()));
     return g2;
 }
 

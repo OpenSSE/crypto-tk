@@ -99,10 +99,11 @@ matrix:
               packages:
                  - clang-format-5.0
         install: # do not compile the dependencies
+        before_script: # do not run cmake
         script:
            - cd $TRAVIS_BUILD_DIR
            - ./scripts/check_format.sh
 
 script:
-  - VERBOSE=1 cmake --build .
-  - if [ "${RUN_CHECKS}" == "true" ]; then ./build/tests/check; fi
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then VERBOSE=1 cmake --build .; fi
+  - if [ "${RUN_CHECKS}" == "true" ]; then ./tests/check; fi

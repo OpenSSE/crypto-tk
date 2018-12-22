@@ -253,7 +253,6 @@ static block aez_hash(const aez_ctx_t *ctx, const char *n, unsigned nbytes, unsi
     block L2 = bswap16(tmp = double_block(bswap16(L)));
     block L4 = bswap16(tmp = double_block(tmp));
     
-    block delta3 = zero;
 
     /* Process abytes and nonce */
     offset = vxor(L,J8);
@@ -267,7 +266,7 @@ static block aez_hash(const aez_ctx_t *ctx, const char *n, unsigned nbytes, unsi
     sum = vxor(sum, aes4(vxor(offset,tmp),J,I,L,offset));
     
     offset = L4;
-    delta3 = aes4(vxor(offset,loadu(pad+32)),J,I,L,offset);
+    block delta3 = aes4(vxor(offset, loadu(pad + 32)), J, I, L, offset);
 
     return vxor(sum,delta3);
 }

@@ -12,7 +12,7 @@ The searchable encryption protocols rely on high level cryptographic features su
 
 ## Why a new crypto library
 
-A lot of great crypto libraries exist out there (*e.g.* [libsodium](https://github.com/jedisct1/libsodium)). Unfortunately, they do not offer the level of abstraction needed to implement searchable encryption schemes easily. Indeed, cryptographic objects such as pseudo-random functions, trapdoor permutations, pseudo-random generators, *etc*, are building blocks of such constructions, and OpenSSL or libsodium do not offer interfaces to such objects.
+A lot of great crypto libraries exist out there (_e.g._ [libsodium](https://github.com/jedisct1/libsodium)). Unfortunately, they do not offer the level of abstraction needed to implement searchable encryption schemes easily. Indeed, cryptographic objects such as pseudo-random functions, trapdoor permutations, pseudo-random generators, _etc_, are building blocks of such constructions, and OpenSSL or libsodium do not offer interfaces to such objects.
 
 This library provides these APIs so that the SSE implementer has consistent high-level crypto interfaces and does not have to care about the inner implementation of the blocks.
 
@@ -38,9 +38,9 @@ Building is done using CMake. The minimum required version is CMake 3.1.
 
 `libsse_crypto` uses the following dependencies
 
-* [libsodium](https://download.libsodium.org/doc/). libsodium version >=1.0.16 is necessary.
+-   [libsodium](https://download.libsodium.org/doc/). libsodium version >=1.0.16 is necessary.
 
-* [RELIC](https://github.com/relic-toolkit/relic) Some features (puncturable encryption) are based on cryptographic pairings. These are implemented using the RELIC toolkit. RELIC has many compilation options. To install RELIC, you can do the following:
+-   [RELIC](https://github.com/relic-toolkit/relic) Some features (puncturable encryption) are based on cryptographic pairings. These are implemented using the RELIC toolkit. RELIC has many compilation options. To install RELIC, you can do the following:
 
 ```sh
 git clone https://github.com/relic-toolkit/relic.git
@@ -55,7 +55,7 @@ You can also replace the `-DARITH=gmp` option by `-DARITH=x64-asm-254` (for bett
 
 #### Optional Dependencies
 
-* [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The trapdoor permutation is based on RSA, and `libsse_crypto` can use OpenSSL to implement RSA. The code has been compiled and tested using OpenSSL 1.0.2.
+-   [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The trapdoor permutation is based on RSA, and `libsse_crypto` can use OpenSSL to implement RSA. The code has been compiled and tested using OpenSSL 1.0.2.
 
 ### Compiler
 
@@ -118,15 +118,15 @@ make
 
 The following targets can be built:
 
-* `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features).
+-   `debug_crypto`: the executable constructed from the `main.cpp` file. It must be used as a debugging tool (to develop new features).
 
-* `check`: unit tests. It uses [Google Test](https://github.com/google/googletest).
+-   `check`: unit tests. It uses [Google Test](https://github.com/google/googletest).
 
-* `test`: runs the unit tests produced by the previous target.
+-   `test`: runs the unit tests produced by the previous target.
 
-* `sse_crypto`: the compiled library.
+-   `sse_crypto`: the compiled library.
 
-To only build the library, call ``make sse_crypto`` instead of just ``make``.
+To only build the library, call `make sse_crypto` instead of just `make`.
 
 ### Build Configuration and Options
 
@@ -141,23 +141,23 @@ For example, if you wish to use Clang, you can set the project up with the follo
 
 This project's CMake takes the following options:
 
-* `RSA_IMPL_OPENSSL=On|Off`: enables the RSA implementation using OpenSSL. Available options are `RSA_IMPL_OPENSSL=On` and `RSA_IMPL_OPENSSL=Off`. By default, the RSA implementation uses mbedTLS, which is believed to be more secure, but is slower. When `RSA_IMPL_OPENSSL` is set to `On`, the `libsse_crypto` links against `libcrypto`, and OpenSSL must be found by CMake (see next option).
+-   `RSA_IMPL_OPENSSL=On|Off`: enables the RSA implementation using OpenSSL. Available options are `RSA_IMPL_OPENSSL=On` and `RSA_IMPL_OPENSSL=Off`. By default, the RSA implementation uses mbedTLS, which is believed to be more secure, but is slower. When `RSA_IMPL_OPENSSL` is set to `On`, the `libsse_crypto` links against `libcrypto`, and OpenSSL must be found by CMake (see next option).
 
-* `OPENSSL_ROOT_DIR`: The location of the OpenSSL library. OpenSSL is necessary if `-DRSA_IMPL_OPENSSL=On` is passed to CMake. If you are on Mac OS, and that you used Homebrew to install OpenSSL, you will want pass the `-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl` option to CMake. Otherwise, it will not be able to find OpenSSL's library.
+-   `OPENSSL_ROOT_DIR`: The location of the OpenSSL library. OpenSSL is necessary if `-DRSA_IMPL_OPENSSL=On` is passed to CMake. If you are on Mac OS, and that you used Homebrew to install OpenSSL, you will want pass the `-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl` option to CMake. Otherwise, it will not be able to find OpenSSL's library.
 
-* `ENABLE_COVERAGE=On|Off`: Respectively enables and disable the code coverage functionalities. Disabled by default.
+-   `ENABLE_COVERAGE=On|Off`: Respectively enables and disable the code coverage functionalities. Disabled by default.
 
-* `SANITIZE_ADDRESS=On|Off`: Compiles the library with [AddressSanitizer (ASan)](https://github.com/google/sanitizers/wiki/AddressSanitizer) when set to `On`. Great to check for stack/heap buffer overflows, memory leaks, ... Disabled by default.
+-   `SANITIZE_ADDRESS=On|Off`: Compiles the library with [AddressSanitizer (ASan)](https://github.com/google/sanitizers/wiki/AddressSanitizer) when set to `On`. Great to check for stack/heap buffer overflows, memory leaks, ... Disabled by default.
 
-* `SANITIZE_UNDEFINED=On|Off`: When set to `On`, compiles the library with [UndefinedBehaviorSanitizer (UBSan)](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html). UBSan detects undefined behavior at runtime in your code. Disabled by default.
+-   `SANITIZE_UNDEFINED=On|Off`: When set to `On`, compiles the library with [UndefinedBehaviorSanitizer (UBSan)](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html). UBSan detects undefined behavior at runtime in your code. Disabled by default.
 
-* `opensse_ENABLE_WALL=On|Off`: Toggles the `-Wall` compiler option. On by default
+-   `opensse_ENABLE_WALL=On|Off`: Toggles the `-Wall` compiler option. On by default
 
-* `opensse_ENABLE_WEXTRA=On|Off`: Toggles the `-Wextra` compiler option. On by default
+-   `opensse_ENABLE_WEXTRA=On|Off`: Toggles the `-Wextra` compiler option. On by default
 
-* `opensse_ENABLE_WERROR=On|Off`: Toggles the `-Werror` compiler option to turn all warnings into errors. Off by default
+-   `opensse_ENABLE_WERROR=On|Off`: Toggles the `-Werror` compiler option to turn all warnings into errors. Off by default
 
-* `CMAKE_BUILD_TYPE`: Sets the build type. See [CMake's documentation](https://cmake.org/cmake/help/v3.12/variable/CMAKE_BUILD_TYPE.html) for more details. The `Debug` build type is used by default. Use `Release` for an optimized build.
+-   `CMAKE_BUILD_TYPE`: Sets the build type. See [CMake's documentation](https://cmake.org/cmake/help/v3.12/variable/CMAKE_BUILD_TYPE.html) for more details. The `Debug` build type is used by default. Use `Release` for an optimized build.
 
 To see all the available options, and interactively edit them, you can also use the `ccmake` tool.
 

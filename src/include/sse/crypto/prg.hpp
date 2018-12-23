@@ -249,7 +249,7 @@ public:
     /// @return             A new pseudo-randomly generated key.
     ///
     template<size_t K>
-    Key<K> derive_key(const uint16_t key_offset);
+    Key<K> derive_key(const uint16_t key_offset) const;
 
     ///
     /// @brief Derive multiple keys
@@ -339,7 +339,7 @@ private:
 };
 
 template<size_t K>
-Key<K> Prg::derive_key(const uint16_t key_offset)
+Key<K> Prg::derive_key(const uint16_t key_offset) const
 {
     static_assert(K < SIZE_MAX, "K is too large: K < SIZE_MAX");
 
@@ -462,7 +462,7 @@ std::vector<Key<K>> Prg::derive_keys(Key<kKeySize>&& k,
     extern template std::vector<Key<(N)>> Prg::derive_keys(                    \
         const uint16_t n_keys,                                                 \
         const uint16_t key_offset);                                            \
-    extern template Key<N> Prg::derive_key(const uint16_t key_offset);         \
+    extern template Key<N> Prg::derive_key(const uint16_t key_offset) const;   \
     extern template Key<N> Prg::derive_key(Key<kKeySize>&& k,                  \
                                            const uint16_t  key_offset);         \
     extern template std::vector<Key<(N)>> Prg::derive_keys(                    \
@@ -478,9 +478,9 @@ std::vector<Key<K>> Prg::derive_keys(Key<kKeySize>&& k,
     template std::vector<Key<(N)>> Prg::derive_keys(                           \
         const uint16_t n_keys,                                                 \
         const uint16_t key_offset);                                            \
-    template Key<N>                Prg::derive_key(const uint16_t key_offset); \
-    template Key<N>                Prg::derive_key(Key<kKeySize>&& k,          \
-                                    const uint16_t  key_offset); \
+    template Key<N> Prg::derive_key(const uint16_t key_offset) const;          \
+    template Key<N> Prg::derive_key(Key<kKeySize>&& k,                         \
+                                    const uint16_t  key_offset);                \
     template std::vector<Key<(N)>> Prg::derive_keys(Key<kKeySize>&& k,         \
                                                     const uint16_t  n_keys,    \
                                                     const uint16_t  key_offset \

@@ -26,6 +26,7 @@
 
 #include <cassert>
 
+#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <memory>
@@ -83,7 +84,6 @@ protected:
                                                    uint64_t   leaf)
     {
         assert(tree_height > base_depth + 1);
-        // std::cerr << "Leaf " << leaf << std::endl;
 
         if (tree_height == base_depth + 2) {
             // only one derivation to do
@@ -102,11 +102,9 @@ protected:
         RCPrfTreeNodeChild child = get_child(tree_height, leaf, base_depth);
         Key<kKeySize>      subkey
             = base_prg.derive_key<kKeySize>(static_cast<uint16_t>(child));
-        // std::cerr << (int)child << std::endl;
         // now proceed with the subkeys until we reach the leaf's parent
         for (uint8_t i = base_depth + 1; i < tree_height - 2; i++) {
-            child = get_child(tree_height, leaf, i);
-            // std::cerr << (int)child << std::endl;
+            child  = get_child(tree_height, leaf, i);
             subkey = Prg::derive_key<kKeySize>(std::move(subkey),
                                                static_cast<uint16_t>(child));
         }
@@ -115,7 +113,6 @@ protected:
 
         // finish by evaluating the leaf
         child = get_child(tree_height, leaf, tree_height - 2);
-        // std::cerr << (int)child << std::endl;
 
         Prg::derive(std::move(subkey),
                     static_cast<uint32_t>(child) * NBYTES,
@@ -171,7 +168,7 @@ public:
         }
         if (max < min) {
             throw std::invalid_argument(
-                "Invalid range: max is larger than min: max="
+                "Invalid range: min is larger than max: max="
                 + std::to_string(max) + ", min=" + std::to_string(min));
         }
         // uint64_t n_leaves = (sub)
@@ -197,13 +194,13 @@ public:
 
     virtual std::array<uint8_t, NBYTES> eval(uint64_t leaf) const = 0;
 
+
 protected:
     const depth_type tree_height_;
     const depth_type subtree_height_;
     const uint64_t   min_leaf_;
     const uint64_t   max_leaf_;
 };
-
 
 template<uint16_t NBYTES>
 class ConstrainedRCPrfInnerElement : public ConstrainedRCPrfElement<NBYTES>
@@ -323,29 +320,54 @@ class ConstrainedRCPrf : public RCPrfBase
 {
 public:
     ConstrainedRCPrf(
-        uint64_t min,
-        uint64_t max,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&&
             elements)
-        : min_leaf_(min), max_leaf_(max), elements_(std::move(elements))
+        : elements_(std::move(elements))
     {
+        if (elements_.size() == 0) {
+            throw std::invalid_argument(
+                "ConstrainedRCPrf constructor: Empty key elements vector");
+        }
+        // sort the elements
+        struct MinComparator
+        {
+            bool operator()(
+                const std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>& elt_1,
+                const std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>& elt_2)
+            {
+                return elt_1->min_leaf() < elt_2->min_leaf();
+            }
+        };
+        std::sort(elements_.begin(), elements_.end(), MinComparator());
+
+        // check that the elements are consecutive
+        for (auto it = elements_.begin() + 1; it != elements_.end(); ++it) {
+            if ((*(it - 1))->max_leaf() + 1 != (*it)->min_leaf()) {
+                throw std::invalid_argument("Non consecutive elements");
+            }
+        }
     }
 
     ConstrainedRCPrf(const ConstrainedRCPrf& cprf) = delete;
     ConstrainedRCPrf& operator=(const ConstrainedRCPrf& cprf) = delete;
 
     ConstrainedRCPrf(ConstrainedRCPrf&& cprf)
-        : min_leaf_(cprf.min_leaf_), max_leaf_(cprf.max_leaf_),
-          elements_(std::move(cprf.elements_))
+        : elements_(std::move(cprf.elements_))
     {
     }
 
+    uint64_t min_leaf() const
+    {
+        return elements_[0]->min_leaf();
+    }
+    uint64_t max_leaf() const
+    {
+        return elements_[elements_.size() - 1]->max_leaf();
+    }
 
     std::array<uint8_t, NBYTES> eval(uint64_t leaf) const;
 
 private:
-    const uint64_t                                                min_leaf_;
-    const uint64_t                                                max_leaf_;
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>> elements_;
 };
 
@@ -558,13 +580,23 @@ std::array<uint8_t, NBYTES> RCPrf<NBYTES>::eval(uint64_t leaf) const
 
     return RCPrfBase::derive_leaf<NBYTES>(root_prg_, tree_height_, 0, leaf);
 }
+
 template<uint16_t NBYTES>
 ConstrainedRCPrf<NBYTES> RCPrf<NBYTES>::constrain(uint64_t min,
                                                   uint64_t max) const
 {
-    // TODO: check bounds
-    // uint64_t max_range
-    // = (tree_height_ == 64) ? ~0 : ((1UL << tree_height_) - 1);
+    if (min > max) {
+        throw std::invalid_argument(
+            "RCPrf::constrain: Invalid range: min is larger than max: max="
+            + std::to_string(max) + ", min=" + std::to_string(min));
+    }
+    if (max >= RCPrfBase::leaf_count(tree_height_)) {
+        throw std::invalid_argument(
+            "RCPrf::constrain: range's maximum (=" + std::to_string(max)
+            + ") is too big. It must be strictly smaller than 2^(height-1) (="
+            + std::to_string(RCPrfBase::leaf_count(tree_height_)) + ")");
+    }
+
     uint64_t max_range = RCPrfBase::leaf_count(tree_height_) - 1;
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>
         constrained_elements;
@@ -577,7 +609,7 @@ ConstrainedRCPrf<NBYTES> RCPrf<NBYTES>::constrain(uint64_t min,
                                             max,
                                             constrained_elements);
 
-    return ConstrainedRCPrf<NBYTES>(min, max, std::move(constrained_elements));
+    return ConstrainedRCPrf<NBYTES>(std::move(constrained_elements));
 }
 
 } // namespace crypto

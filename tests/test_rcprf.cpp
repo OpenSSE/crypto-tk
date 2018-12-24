@@ -32,7 +32,7 @@ constexpr size_t kRCPrfKeySize = 32;
 
 TEST(rc_prf, constrain)
 {
-    constexpr uint8_t                  test_depth = 3;
+    constexpr uint8_t                  test_depth = 7;
     std::array<uint8_t, kRCPrfKeySize> k{
         {0x00}}; // fixed key for easy debugging and bug reproducing
     sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),

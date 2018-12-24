@@ -132,6 +132,13 @@ Prg::Prg(Key<kKeySize>&& k) : prg_imp_(new PrgImpl(std::move(k)))
 {
 }
 
+Prg::Prg(Prg&& c) noexcept
+{
+    delete prg_imp_;
+    prg_imp_   = c.prg_imp_;
+    c.prg_imp_ = nullptr;
+}
+
 Prg::~Prg()
 {
     delete prg_imp_;

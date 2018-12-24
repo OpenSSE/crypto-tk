@@ -75,6 +75,27 @@ TEST(rc_prf, eval_constrain_exceptions)
     // Exceptions raised by ConstrainedRCPrf::eval
     EXPECT_THROW(constrained_rc_prf.eval(range_min - 1), std::out_of_range);
     EXPECT_THROW(constrained_rc_prf.eval(range_max + 1), std::out_of_range);
+
+    // Exceptions raised by ConstrainedRCPrfLeafElement::eval
+    std::array<uint8_t, 16> buffer = sse::crypto::random_bytes<uint8_t, 16>();
+    sse::crypto::ConstrainedRCPrfLeafElement<16> leaf(
+        buffer, test_depth, 1, 1, 1);
+    EXPECT_THROW(leaf.eval(0), std::out_of_range);
+    EXPECT_THROW(leaf.eval(2), std::out_of_range);
+
+    // Exceptions raised by ConstrainedRCPrfInnerElement::eval
+    range_min              = 4;
+    range_max              = 7;
+    uint8_t subtree_height = 3;
+
+    sse::crypto::ConstrainedRCPrfInnerElement<16> elt(
+        sse::crypto::Key<kRCPrfKeySize>(),
+        test_depth,
+        subtree_height,
+        range_min,
+        range_max);
+    EXPECT_THROW(elt.eval(range_min - 1), std::out_of_range);
+    EXPECT_THROW(elt.eval(range_max + 1), std::out_of_range);
 }
 
 // Exceptions raised by the constructors
@@ -115,8 +136,8 @@ TEST(rc_prf, constructors_exceptions)
                      sse::crypto::Key<kRCPrfKeySize>(),
                      tree_height,
                      1,
-                     range_min,
-                     range_max),
+                     0, // the range and the height hav to be compatible
+                     0),
                  std::invalid_argument);
 
     // subtree height >= tree height
@@ -138,9 +159,34 @@ TEST(rc_prf, constructors_exceptions)
                  std::invalid_argument);
 
 
-    // Exceptions raised the ConstrainedRCPrfLeafElement constructor
+    // Exceptions raised by the ConstrainedRCPrfLeafElement constructor
+    // Invalid range size
     EXPECT_THROW(
         sse::crypto::ConstrainedRCPrfLeafElement<16> elt(
             std::array<uint8_t, 16>(), tree_height, 1, range_min, range_max),
         std::invalid_argument);
+    // Invalid tree height
+    // The range a the tree height have to be compatible
+    EXPECT_THROW(sse::crypto::ConstrainedRCPrfLeafElement<16> elt(
+                     std::array<uint8_t, 16>(), tree_height, 2, 0, 1),
+                 std::invalid_argument);
+
+
+    // Exceptions raised by the ConstrainedRCPrf constructor
+    std::vector<std::unique_ptr<sse::crypto::ConstrainedRCPrfElement<16>>>
+        empty_vec;
+
+    EXPECT_THROW(sse::crypto::ConstrainedRCPrf<16> cprf(std::move(empty_vec)),
+                 std::invalid_argument);
+
+
+    std::vector<std::unique_ptr<sse::crypto::ConstrainedRCPrfElement<16>>>
+        leaf_vec;
+    leaf_vec.emplace_back(new sse::crypto::ConstrainedRCPrfLeafElement<16>(
+        std::array<uint8_t, 16>(), tree_height, 1, 0, 0));
+    leaf_vec.emplace_back(new sse::crypto::ConstrainedRCPrfLeafElement<16>(
+        std::array<uint8_t, 16>(), tree_height, 1, 4, 4));
+
+    EXPECT_THROW(sse::crypto::ConstrainedRCPrf<16> cprf(std::move(leaf_vec)),
+                 std::invalid_argument);
 }

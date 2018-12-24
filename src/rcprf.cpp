@@ -19,4 +19,18 @@
 //
 
 
-// #include "rcprf.hpp"
+#include "rcprf.hpp"
+
+namespace sse {
+namespace crypto {
+template class ConstrainedRCPrfLeafElement<16>;
+template class ConstrainedRCPrfInnerElement<16>;
+template class ConstrainedRCPrf<16>;
+template class RCPrf<16>;
+
+template class ConstrainedRCPrfLeafElement<32>;
+template class ConstrainedRCPrfInnerElement<32>;
+template class ConstrainedRCPrf<32>;
+template class RCPrf<32>;
+} // namespace crypto
+} // namespace sse

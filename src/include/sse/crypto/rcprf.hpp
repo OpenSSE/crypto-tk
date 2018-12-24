@@ -251,13 +251,13 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrfInnerElement<NBYTES>::eval(
     uint64_t leaf) const
 {
     if (leaf < this->min_leaf_) {
-        std::out_of_range(
+        throw std::out_of_range(
             "Leaf index is less than the range's minimum: leaf index="
             + std::to_string(leaf)
             + ", range min=" + std::to_string(this->min_leaf_));
     }
     if (leaf > this->max_leaf_) {
-        std::out_of_range(
+        throw std::out_of_range(
             "Leaf index is bigger than the range's maximum: leaf index="
             + std::to_string(leaf)
             + ", range max=" + std::to_string(this->max_leaf_));
@@ -616,6 +616,16 @@ ConstrainedRCPrf<NBYTES> RCPrf<NBYTES>::constrain(uint64_t min,
 
     return ConstrainedRCPrf<NBYTES>(std::move(constrained_elements));
 }
+
+extern template class ConstrainedRCPrfLeafElement<16>;
+extern template class ConstrainedRCPrfInnerElement<16>;
+extern template class ConstrainedRCPrf<16>;
+extern template class RCPrf<16>;
+
+extern template class ConstrainedRCPrfLeafElement<32>;
+extern template class ConstrainedRCPrfInnerElement<32>;
+extern template class ConstrainedRCPrf<32>;
+extern template class RCPrf<32>;
 
 } // namespace crypto
 } // namespace sse

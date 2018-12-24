@@ -132,16 +132,13 @@ Prg::Prg(Key<kKeySize>&& k) : prg_imp_(new PrgImpl(std::move(k)))
 {
 }
 
-Prg::Prg(Prg&& c) noexcept
+Prg::Prg(Prg&& c) noexcept : prg_imp_(std::move(c.prg_imp_))
 {
-    delete prg_imp_;
-    prg_imp_   = c.prg_imp_;
-    c.prg_imp_ = nullptr;
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 Prg::~Prg()
 {
-    delete prg_imp_;
 }
 
 void Prg::derive(const uint32_t offset,

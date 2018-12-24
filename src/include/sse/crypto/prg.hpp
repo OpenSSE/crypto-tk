@@ -26,6 +26,7 @@
 #include <cstdint>
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -337,8 +338,8 @@ public:
 
 
 private:
-    class PrgImpl;     // not defined in the header
-    PrgImpl* prg_imp_; // opaque pointer
+    class PrgImpl;                     // not defined in the header
+    std::unique_ptr<PrgImpl> prg_imp_; // opaque pointer
 };
 
 template<size_t K>

@@ -103,56 +103,27 @@ static void prg_derivation(const unsigned char* key,
     }
 }
 
-class Prg::PrgImpl
-{
-public:
-    PrgImpl() = delete;
-
-    inline explicit PrgImpl(Key<kKeySize>&& key);
-
-    inline void derive(const uint32_t offset,
-                       const size_t   len,
-                       unsigned char* out) const;
-
-    inline void derive(const uint32_t offset,
-                       const size_t   len,
-                       std::string&   out) const;
-
-    inline static void derive(Key<kKeySize>&& k,
-                              const uint32_t  offset,
-                              const size_t    len,
-                              unsigned char*  out);
-
-private:
-    Key<kKeySize> key_;
-};
-
-
-Prg::Prg(Key<kKeySize>&& k) : prg_imp_(new PrgImpl(std::move(k)))
-{
-}
-
-Prg::Prg(Prg&& c) noexcept : prg_imp_(std::move(c.prg_imp_))
-{
-}
-
-// NOLINTNEXTLINE(modernize-use-equals-default)
-Prg::~Prg()
-{
-}
 
 void Prg::derive(const uint32_t offset,
                  const size_t   len,
                  std::string&   out) const
 {
-    prg_imp_->derive(offset, len, out);
+    unsigned char* data = new unsigned char[len];
+
+    derive(offset, len, data);
+    out = std::string(reinterpret_cast<char*>(data), len);
+
+    // erase the buffer
+    sodium_memzero(data, len);
+
+    delete[] data;
 }
 
 std::string Prg::derive(const uint32_t offset, const size_t len) const
 {
     std::string out;
 
-    prg_imp_->derive(offset, len, out);
+    derive(offset, len, out);
 
     return out;
 }
@@ -161,14 +132,19 @@ void Prg::derive(const uint32_t offset,
                  const size_t   len,
                  unsigned char* out) const
 {
-    prg_imp_->derive(offset, len, out);
+    if (len == 0) {
+        return;
+    }
+
+    prg_derivation(key_.unlock_get(), offset, len, out);
+    key_.lock();
 }
 
 void Prg::derive(Key<kKeySize>&& k, const size_t len, std::string& out)
 {
     std::vector<uint8_t> data(len);
 
-    Prg::PrgImpl::derive(std::move(k), 0, len, data.data());
+    derive(std::move(k), 0, len, data.data());
     out = std::string(reinterpret_cast<const char*>(data.data()), len);
 
     // erase the buffer
@@ -180,7 +156,16 @@ void Prg::derive(Key<kKeySize>&& k,
                  const size_t    len,
                  unsigned char*  out)
 {
-    Prg::PrgImpl::derive(std::move(k), offset, len, out);
+    if (k.is_empty()) {
+        throw std::invalid_argument("PRG input key is empty");
+    }
+
+    Key<kKeySize> local_key(
+        std::move(k)); // make sure the input key cannot be reused
+
+    prg_derivation(local_key.unlock_get(), offset, len, out);
+
+    local_key.lock();
 }
 
 void Prg::derive(Key<kKeySize>&& k,
@@ -190,7 +175,7 @@ void Prg::derive(Key<kKeySize>&& k,
 {
     unsigned char* data = new unsigned char[len];
 
-    Prg::PrgImpl::derive(std::move(k), offset, len, data);
+    derive(std::move(k), offset, len, data);
     out = std::string(reinterpret_cast<char*>(data), len);
 
     // erase the buffer
@@ -205,7 +190,7 @@ std::string Prg::derive(Key<kKeySize>&& k,
 {
     unsigned char* data = new unsigned char[len];
 
-    Prg::PrgImpl::derive(std::move(k), offset, len, data);
+    derive(std::move(k), offset, len, data);
     std::string out = std::string(reinterpret_cast<char*>(data), len);
 
     // erase the buffer
@@ -214,60 +199,6 @@ std::string Prg::derive(Key<kKeySize>&& k,
     delete[] data;
     return out;
 }
-
-
-// Prg implementation
-
-Prg::PrgImpl::PrgImpl(Key<kKeySize>&& key) : key_(std::move(key))
-{
-}
-
-
-void Prg::PrgImpl::derive(const uint32_t offset,
-                          const size_t   len,
-                          unsigned char* out) const
-{
-    if (len == 0) {
-        return;
-    }
-
-    prg_derivation(key_.unlock_get(), offset, len, out);
-    key_.lock();
-}
-
-void Prg::PrgImpl::derive(const uint32_t offset,
-                          const size_t   len,
-                          std::string&   out) const
-{
-    unsigned char* data = new unsigned char[len];
-
-    derive(offset, len, data);
-    out = std::string(reinterpret_cast<char*>(data), len);
-
-    // erase the buffer
-    sodium_memzero(data, len);
-
-    delete[] data;
-}
-
-
-void Prg::PrgImpl::derive(Key<kKeySize>&& k,
-                          const uint32_t  offset,
-                          const size_t    len,
-                          unsigned char*  out)
-{
-    if (k.is_empty()) {
-        throw std::invalid_argument("PRG input key is empty");
-    }
-
-    Key<kKeySize> local_key(
-        std::move(k)); // make sure the input key cannot be reused
-
-    prg_derivation(local_key.unlock_get(), offset, len, out);
-
-    local_key.lock();
-}
-
 
 } // namespace crypto
 

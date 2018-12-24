@@ -58,20 +58,17 @@ public:
     /// @param k    The key used to initialize the PRG.
     ///             Upon return, k is empty
     ///
-    explicit Prg(Key<kKeySize>&& k);
+    explicit Prg(Key<kKeySize>&& k) : key_(std::move(k)){};
 
     ///
     /// @brief Move constructor
     ///
     /// @param c The moved PRG
     ///
-    Prg(Prg&& c) noexcept;
+    Prg(Prg&& c) noexcept = default;
 
     // we should not be able to duplicate Prg objects
     Prg(const Prg& c) = delete;
-
-    /// @ brief Destructor.
-    ~Prg();
 
     // Avoid any assignement of Prg objects
     Prg& operator=(const Prg& h) = delete;
@@ -338,8 +335,9 @@ public:
 
 
 private:
-    class PrgImpl;                     // not defined in the header
-    std::unique_ptr<PrgImpl> prg_imp_; // opaque pointer
+    class PrgImpl; // not defined in the header
+    // std::unique_ptr<PrgImpl> prg_imp_; // opaque pointer
+    Key<kKeySize> key_;
 };
 
 template<size_t K>

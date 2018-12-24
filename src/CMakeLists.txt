@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1)
 
-project (libsse_crypto VERSION 0.2 
+project (libsse_crypto VERSION 0.2
                        DESCRIPTION "OpenSSE's cryptographic library")
 
 option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)

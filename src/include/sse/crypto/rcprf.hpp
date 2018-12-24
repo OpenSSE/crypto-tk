@@ -431,7 +431,7 @@ void RCPrfBase::generate_constrained_subkeys(
                                                          subtree_height - 1,
                                                          subtree_min,
                                                          subtree_mid));
-            constrained_elements.emplace_back(std::move(elt));
+            constrained_elements.push_back(std::move(elt));
         } else {
             // otherwise, recurse on the left subtree
             // take care that the selected span for the left subtree can be
@@ -463,7 +463,7 @@ void RCPrfBase::generate_constrained_subkeys(
                                                          subtree_height - 1,
                                                          subtree_mid + 1,
                                                          subtree_max));
-            constrained_elements.emplace_back(std::move(elt));
+            constrained_elements.push_back(std::move(elt));
         } else {
             // again, be careful with the min value of the selected range of the
             // recursive call

@@ -28,6 +28,8 @@
 
 #include <exception>
 #include <iostream>
+#include <memory>
+#include <vector>
 
 namespace sse {
 namespace crypto {

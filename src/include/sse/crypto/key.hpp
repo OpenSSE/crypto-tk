@@ -115,9 +115,10 @@ public:
         random_bytes(N, content_);
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
-            throw std::runtime_error(/* LCOV_EXCL_LINE */
-                                     "Error when locking memory: "
+            /* LCOV_EXCL_START */
+            throw std::runtime_error("Error when locking memory: "
                                      + std::string(strerror(errno)));
+            /* LCOV_EXCL_STOP */
         }
         is_locked_ = true;
 #endif
@@ -153,9 +154,10 @@ public:
 #ifdef ENABLE_MEMORY_LOCK
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
-            throw std::runtime_error(/* LCOV_EXCL_LINE */
-                                     "Error when locking memory: "
+            /* LCOV_EXCL_START */
+            throw std::runtime_error("Error when locking memory: "
                                      + std::string(strerror(errno)));
+            /* LCOV_EXCL_STOP */
         }
         is_locked_ = true;
 #endif
@@ -260,9 +262,10 @@ private:
 #ifdef ENABLE_MEMORY_LOCK
         int err = sodium_mprotect_noaccess(content_);
         if (err == -1 && errno != ENOSYS) {
-            throw std::runtime_error(/* LCOV_EXCL_LINE */
-                                     "Error when locking memory: "
+            /* LCOV_EXCL_START */
+            throw std::runtime_error("Error when locking memory: "
                                      + std::string(strerror(errno)));
+            /* LCOV_EXCL_STOP */
         }
         is_locked_ = true;
 #endif
@@ -281,9 +284,10 @@ private:
         if (content_ != nullptr && !is_locked_) {
             int err = sodium_mprotect_noaccess(content_);
             if (err == -1 && errno != ENOSYS) {
-                throw std::runtime_error(/* LCOV_EXCL_LINE */
-                                         "Error when locking memory: "
+                /* LCOV_EXCL_START */
+                throw std::runtime_error("Error when locking memory: "
                                          + std::string(strerror(errno)));
+                /* LCOV_EXCL_STOP */
             }
             is_locked_ = true;
         }
@@ -303,9 +307,10 @@ private:
         if (content_ != nullptr && is_locked_) {
             int err = sodium_mprotect_readonly(content_);
             if (err == -1 && errno != ENOSYS) {
-                throw std::runtime_error(/* LCOV_EXCL_LINE */
-                                         "Error when locking memory: "
+                /* LCOV_EXCL_START */
+                throw std::runtime_error("Error when locking memory: "
                                          + std::string(strerror(errno)));
+                /* LCOV_EXCL_STOP */
             }
             is_locked_ = false;
         }

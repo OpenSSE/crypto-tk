@@ -135,12 +135,10 @@ protected:
             constrained_elements);
 
     template<uint16_t NBYTES>
-    static void generate_leaf(
+    static void generate_leaf_from_parent(
         const Prg&       base_prg,
         const depth_type tree_height,
-        const depth_type subtree_height,
         const uint64_t   subtree_min,
-        const uint64_t   subtree_max,
         const uint64_t   min,
         const uint64_t   max,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
@@ -382,12 +380,10 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrf<NBYTES>::eval(uint64_t leaf) const
     throw std::invalid_argument("Leaf not in any element range");
 }
 template<uint16_t NBYTES>
-void RCPrfBase::generate_leaf(
+void RCPrfBase::generate_leaf_from_parent(
     const Prg&       base_prg,
     const depth_type tree_height,
-    const depth_type subtree_height,
     const uint64_t   subtree_min,
-    const uint64_t   subtree_max,
     const uint64_t   min,
     const uint64_t   max,
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
@@ -402,7 +398,7 @@ void RCPrfBase::generate_leaf(
 
     std::unique_ptr<ConstrainedRCPrfLeafElement<NBYTES>> elt(
         new ConstrainedRCPrfLeafElement<NBYTES>(
-            std::move(buffer), tree_height, subtree_height - 1, min, max));
+            std::move(buffer), tree_height, 1, min, max));
     constrained_elements.emplace_back(std::move(elt));
 }
 
@@ -424,14 +420,8 @@ void RCPrfBase::generate_constrained_subkeys(
         // single leaf to generate
 
         assert(min == max);
-        RCPrfBase::generate_leaf(base_prg,
-                                 tree_height,
-                                 subtree_height,
-                                 subtree_min,
-                                 subtree_max,
-                                 min,
-                                 max,
-                                 constrained_elements);
+        RCPrfBase::generate_leaf_from_parent(
+            base_prg, tree_height, subtree_min, min, max, constrained_elements);
         return;
     }
 

@@ -347,8 +347,10 @@ Key<K> Prg::derive_key(const uint16_t key_offset) const
 
     if (key_offset > static_cast<size_t>(0U)
         && K >= static_cast<size_t>(SIZE_MAX) / key_offset) {
-        throw std::invalid_argument("Key offset too large." /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Key offset too large."
                                     " key_offset*K >= SIZE_MAX.");
+        /* LCOV_EXCL_STOP */
     }
 
     auto fill_callback = [this, key_offset](uint8_t* key_content) {
@@ -365,8 +367,10 @@ Key<K> Prg::derive_key(Key<kKeySize>&& k, const uint16_t key_offset)
 
     if (key_offset > static_cast<size_t>(0U)
         && K >= static_cast<size_t>(SIZE_MAX) / key_offset) {
-        throw std::invalid_argument("Key offset too large." /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Key offset too large."
                                     " key_offset*K >= SIZE_MAX.");
+        /* LCOV_EXCL_STOP */
     }
 
     auto fill_callback = [&k, key_offset](uint8_t* key_content) {
@@ -382,14 +386,17 @@ std::vector<Key<K>> Prg::derive_keys(const uint16_t n_keys,
 {
     if (n_keys > static_cast<size_t>(0U)
         && K >= static_cast<size_t>(SIZE_MAX) / n_keys) {
-        throw std::invalid_argument(/* LCOV_EXCL_LINE */
-                                    "Too many keys to derive. "
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Too many keys to derive. "
                                     "n_keys*K >= SIZE_MAX.");
+        /* LCOV_EXCL_STOP */
     }
     if (key_offset > static_cast<size_t>(0U)
         && K >= static_cast<size_t>(SIZE_MAX) / key_offset) {
-        throw std::invalid_argument("Key offset too large." /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Key offset too large."
                                     " key_offset*K >= SIZE_MAX.");
+        /* LCOV_EXCL_STOP */
     }
 
     if (n_keys == 0) {
@@ -426,14 +433,17 @@ std::vector<Key<K>> Prg::derive_keys(Key<kKeySize>&& k,
     }
     if (n_keys > static_cast<size_t>(0U)
         && K >= static_cast<size_t>(SIZE_MAX) / n_keys) {
-        throw std::invalid_argument(/* LCOV_EXCL_LINE */
-                                    "Too many keys to derive. "
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Too many keys to derive. "
                                     "n_keys*K >= SIZE_MAX.");
+        /* LCOV_EXCL_STOP */
     }
     if (key_offset > static_cast<size_t>(0U)
         && K >= static_cast<size_t>(SIZE_MAX) / key_offset) {
-        throw std::invalid_argument("Key offset too large." /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Key offset too large."
                                     " key_offset*K >= SIZE_MAX.");
+        /* LCOV_EXCL_STOP */
     }
 
 

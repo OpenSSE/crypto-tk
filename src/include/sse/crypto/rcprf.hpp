@@ -58,6 +58,11 @@ public:
         return (1UL << (height - 1));
     }
 
+    static constexpr uint64_t leaf_count_generic(const depth_type height)
+    {
+        return (1UL << (height - 1));
+    }
+
 protected:
     enum RCPrfTreeNodeChild : uint8_t
     {
@@ -157,8 +162,11 @@ public:
           max_leaf_(max)
     {
         if (subtree_height == 0) {
+            /* LCOV_EXCL_START */
+            // already covered by the subclasses
             throw std::invalid_argument("Subtree height should be strictly "
                                         "larger than 0.");
+            /* LCOV_EXCL_STOP */
         }
         if (subtree_height >= height) {
             throw std::invalid_argument(
@@ -169,7 +177,6 @@ public:
                 "Invalid range: min is larger than max: max="
                 + std::to_string(max) + ", min=" + std::to_string(min));
         }
-        // uint64_t n_leaves = (sub)
         if ((max - min + 1) != RCPrfBase::leaf_count(subtree_height_)) {
             throw std::invalid_argument(
                 "Invalid range: the range's width "
@@ -372,12 +379,20 @@ private:
 template<uint16_t NBYTES>
 std::array<uint8_t, NBYTES> ConstrainedRCPrf<NBYTES>::eval(uint64_t leaf) const
 {
+    if (leaf < min_leaf() || leaf > max_leaf()) {
+        throw std::out_of_range(
+            "ConstrainedRCPrf::eval: Leaf (=" + std::to_string(leaf)
+            + ") out of constrained range (" + std::to_string(min_leaf()) + ", "
+            + std::to_string(max_leaf()) + ")");
+    }
     for (const auto& elt : elements_) {
         if (elt->min_leaf() <= leaf && leaf <= elt->max_leaf()) {
             return elt->eval(leaf);
         }
     }
-    throw std::invalid_argument("Leaf not in any element range");
+    /* LCOV_EXCL_START */
+    throw std::runtime_error("ConstrainedRCPrf::eval: invalid state");
+    /* LCOV_EXCL_STOP */
 }
 template<uint16_t NBYTES>
 void RCPrfBase::generate_leaf_from_parent(
@@ -565,7 +580,7 @@ template<uint16_t NBYTES>
 std::array<uint8_t, NBYTES> RCPrf<NBYTES>::eval(uint64_t leaf) const
 {
     if (leaf >> tree_height_ != 0) {
-        throw std::invalid_argument("Invalid node index: leaf > 2^height -1.");
+        throw std::out_of_range("Invalid node index: leaf > 2^height -1.");
     }
 
     return RCPrfBase::derive_leaf<NBYTES>(root_prg_, tree_height_, 0, leaf);
@@ -581,7 +596,7 @@ ConstrainedRCPrf<NBYTES> RCPrf<NBYTES>::constrain(uint64_t min,
             + std::to_string(max) + ", min=" + std::to_string(min));
     }
     if (max >= RCPrfBase::leaf_count(tree_height_)) {
-        throw std::invalid_argument(
+        throw std::out_of_range(
             "RCPrf::constrain: range's maximum (=" + std::to_string(max)
             + ") is too big. It must be strictly smaller than 2^(height-1) (="
             + std::to_string(RCPrfBase::leaf_count(tree_height_)) + ")");

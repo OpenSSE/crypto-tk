@@ -30,13 +30,25 @@
 
 constexpr size_t kRCPrfKeySize = 32;
 
-TEST(rc_prf, basic)
+TEST(rc_prf, constrain)
 {
-    constexpr uint8_t               test_depth = 5;
-    sse::crypto::Key<kRCPrfKeySize> k;
-    sse::crypto::RCPrf<16>          rc_prf(std::move(k), test_depth);
+    constexpr uint8_t                  test_depth = 7;
+    std::array<uint8_t, kRCPrfKeySize> k{
+        {0x00}}; // fixed key for easy debugging and bug reproducing
+    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
+                                  test_depth);
 
-    for (size_t i = 0; i < (1UL << test_depth); i++) {
-        auto out = rc_prf.eval(i);
+    for (uint64_t min = 0; min < sse::crypto::RCPrfBase::leaf_count(test_depth);
+         min++) {
+        for (uint64_t max = min;
+             max < sse::crypto::RCPrfBase::leaf_count(test_depth);
+             max++) {
+            auto constrained_prf = rc_prf.constrain(min, max);
+            for (uint64_t leaf = min; leaf <= max; leaf++) {
+                auto out             = rc_prf.eval(leaf);
+                auto out_constrained = constrained_prf.eval(leaf);
+                ASSERT_EQ(out, out_constrained);
+            }
+        }
     }
 }

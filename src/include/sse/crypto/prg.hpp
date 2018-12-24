@@ -59,12 +59,18 @@ public:
     ///
     explicit Prg(Key<kKeySize>&& k);
 
-    // we should not be able to duplicate Prg objects
-    Prg(const Prg& c)  = delete;
-    Prg(Prg& c)        = delete;
-    Prg(const Prg&& c) = delete;
-    Prg(Prg&& c)       = delete;
+    ///
+    /// @brief Move constructor
+    ///
+    /// @param c The moved PRG
+    ///
+    Prg(Prg&& c) noexcept : prg_imp_(c.prg_imp_)
+    {
+        c.prg_imp_ = nullptr;
+    }
 
+    // we should not be able to duplicate Prg objects
+    Prg(const Prg& c) = delete;
 
     /// @ brief Destructor.
     ~Prg();

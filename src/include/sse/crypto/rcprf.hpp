@@ -38,15 +38,43 @@ namespace crypto {
 template<uint16_t NBYTES>
 class ConstrainedRCPrfElement;
 
+/// @class RCPrfBase
+/// @brief Base class for the Range-Constrained PRF implementation.
+///
+/// The RCPrfBase class implements the common tree algorithms used in the RC-PRF
+/// implementation. It is not meant to be instantiated.
+///
 class RCPrfBase
 {
     // TODO: put the tree height in RCPrfBase
 public:
-    static constexpr uint8_t kKeySize    = 32;
-    using depth_type                     = uint8_t;
-    static constexpr uint8_t  kMaxHeight = 8 * sizeof(depth_type);
-    static constexpr uint64_t kMaxLeaves = 1UL << (kMaxHeight - 1);
+    /// @brief Type used for the tree depth.
+    using depth_type = uint8_t;
 
+    /// @brief Returns the number of leaves supported by a tree of the given
+    /// height
+    ///
+    /// @param height The height of the tree
+    ///
+    static constexpr uint64_t leaf_count_generic(const depth_type height)
+    {
+        return (1UL << (height - 1));
+    }
+
+    /// @brief Size (in bytes) of a RC-PRF key
+    static constexpr uint8_t kKeySize = 32;
+    /// @brief Maximum height supported by the tree construction.
+    static constexpr depth_type kMaxHeight = 8 * sizeof(depth_type);
+    /// @brief  Maximum number of leaves (i.e. the size of the message space)
+    ///         supported by the construction.
+    static constexpr uint64_t kMaxLeaves = (1UL << (kMaxHeight - 1));
+
+    /// @brief Returns the practical number of leaves supported by a tree of the
+    /// given height. The height is limited to 65, i.e. the construction cannot
+    /// support more than 2^64 leaves.
+    ///
+    /// @param height The height of the tree.
+    ///
     static inline uint64_t leaf_count(const depth_type height)
     {
         if (height == 0) {
@@ -55,21 +83,32 @@ public:
         if (height >= 65) {
             return ~0;
         }
-        return (1UL << (height - 1));
+        return leaf_count_generic(height);
     }
 
-    static constexpr uint64_t leaf_count_generic(const depth_type height)
-    {
-        return (1UL << (height - 1));
-    }
 
 protected:
+    /// @brief Type encoding a choice of child in a binary tree.
     enum RCPrfTreeNodeChild : uint8_t
     {
         LeftChild  = 0,
         RightChild = 1
     };
 
+    ///
+    /// @brief Compute the direction of the root-to-leaf path at a given depth
+    ///
+    /// When following the root-to-leaf path, return which of the left of the
+    /// right child of the node at the given depth we have to take next.
+    ///
+    /// @param tree_height  The height of the tree
+    /// @param leaf         The leaf to go to from the tree's root
+    /// @param node_depth   The depth of the node on the root-to-leaf path (a 0
+    ///                     node-depth points to the root, a tree_height-1 depth
+    ///                     is the leaf).
+    ///
+    /// @return             The child to go to in the root-to-leaf path.
+    ///
     static inline RCPrfTreeNodeChild get_child(depth_type tree_height,
                                                uint64_t   leaf,
                                                depth_type node_depth)
@@ -82,6 +121,23 @@ protected:
         return ((leaf & mask) == 0) ? LeftChild : RightChild;
     }
 
+    ///
+    /// @brief Derive a leaf from an inner node
+    ///
+    /// Derive a leaf from an inner node represented by a Prg object. This Prg
+    /// uses the content of the node as its key.
+    ///
+    /// @tparam NBYTES     The size in bytes of the generated leaf value.
+    ///
+    /// @param base_prg    The Prg object representing the node and using the
+    ///                    node's content as its key.
+    /// @param tree_height The height of the tree.
+    /// @param base_depth  The depth of the starting node (a 0
+    ///                    depth points to the root, a tree_height-1 depth
+    ///                    corresponds to a leaf).
+    /// @param leaf        The leaf to derive.
+    ///
+    /// @return An NBYTES buffer with the leaf's value.
     template<uint16_t NBYTES>
     static std::array<uint8_t, NBYTES> derive_leaf(const Prg& base_prg,
                                                    depth_type tree_height,
@@ -127,6 +183,34 @@ protected:
         return result;
     }
 
+    ///
+    /// @brief Generate the constrained key necessary to derive the tree's
+    ///        leaves in the specified range.
+    ///
+    /// Computes the nodes necessary to derive all the leaves in the given
+    /// range. The starting node is not necessary the root of the tree and is
+    /// represented by the base_prg object.
+    ///
+    /// @tparam NBYTES     The size in bytes of the tree's leaves.
+    ///
+    /// @param base_prg        The Prg object representing the node to start the
+    ///                        generation from. Must not necessary be the root.
+    /// @param tree_height     The height of the tree.
+    /// @param subtree_height  The height of the base node rooted subtree. A
+    ///                        height of tree_height represents the entire tree,
+    /// @param subtree_min     The minimum leaf index supported by the subtree
+    ///                        rooted at the base node.
+    /// @param subtree_max     The maximum leaf index supported by the subtree
+    ///                        rooted at the base node.
+    /// @param min             The minimum value of the leaves index being able
+    ///                        to be generated from the output of the algorithm.
+    /// @param max             The maximum value of the leaves index being able
+    ///                        to be generated from the output of the algorithm.
+    ///
+    /// @param[out] constrained_elements   The vector of nodes necessary to
+    ///                                    generate the leaves with index
+    ///                                    between min and max
+    ///
     template<uint16_t NBYTES>
     static void generate_constrained_subkeys(
         const Prg&       base_prg,
@@ -139,21 +223,74 @@ protected:
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
             constrained_elements);
 
+    ///
+    /// @brief Generate a leaf from its parent node.
+    ///
+    /// Computes the leaf given as input from its parent node, represented by
+    /// the base_prg object. This function is a specialization of the
+    /// generate_constrained_subkeys function for height 2 subtrees.
+    ///
+    /// @tparam NBYTES     The size in bytes of the tree's leaves.
+    ///
+    /// @param base_prg        The Prg object representing the parent node of
+    ///                        the leaf to generate.
+    /// @param tree_height     The height of the tree.
+    /// @param subtree_min     The minimum leaf index supported by the subtree
+    ///                        (of height two) rooted at the base node. The
+    ///                        subtree's maximum leaf index does not have to be
+    ///                        specified: we know it is subtree_min+1.
+    /// @param leaf            The index of the leaf to generate.
+    ///
+    /// @param[out] constrained_elements   The vector of nodes in which the leaf
+    ///                                    to generate will be put.
+    ///
     template<uint16_t NBYTES>
     static void generate_leaf_from_parent(
         const Prg&       base_prg,
         const depth_type tree_height,
         const uint64_t   subtree_min,
-        const uint64_t   min,
-        const uint64_t   max,
+        const uint64_t   leaf,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
             constrained_elements);
 };
 
+static_assert(RCPrfBase::kMaxLeaves
+                  == RCPrfBase::leaf_count_generic(RCPrfBase::kMaxHeight),
+              "Computation of the maximum number of leaves is not consistent");
+
+/// @class ConstrainedRCPrfElement
+/// @brief Abstract class representing RC-PRF constrained keys elements, i.e.
+/// nodes of the tree.
+///
+/// @tparam NBYTES The size in bytes of the tree's leaves.
+///
+/// The ConstrainedRCPrfElement class implements bounds checking during
+/// construction and declares an evaluation function that has to be overridden
+/// by subclasses.
+///
 template<uint16_t NBYTES>
 class ConstrainedRCPrfElement : public RCPrfBase
 {
 public:
+    ///
+    /// @brief Constructor
+    ///
+    /// Creates a ConstrainedRCPrfElement representing a subtree of given height
+    /// and spanning over the specified leaves range.
+    ///
+    /// @param tree_height     The height of the tree.
+    /// @param subtree_height  The height of the subtree represented by the
+    ///                        element.
+    /// @param min             The minimum leaf index spanned by the subtree.
+    /// @param max             The maximum leaf index spanned by the subtree.
+    ///
+    /// @exception std::invalid_argument       The input subtree height is 0.
+    /// @exception std::invalid_argument       The input subtree height is
+    ///                                        larger than the tree height.
+    /// @exception std::invalid_argument       The maximum leaf index is
+    ///                                        strictly smaller than the minimum
+    ///                                        leaf index.
+    ///
     ConstrainedRCPrfElement(depth_type height,
                             depth_type subtree_height,
                             uint64_t   min,
@@ -188,15 +325,27 @@ public:
     }
 
 public:
+    /// @brief Returns the minimum leaf index supported by the element.
     uint64_t min_leaf() const
     {
         return min_leaf_;
     }
+
+    /// @brief Returns the maximum leaf index supported by the element.
     uint64_t max_leaf() const
     {
         return max_leaf_;
     }
 
+    /// @brief Evaluate the Range-Constrained PRF
+    ///
+    /// Returns the value of the specified leaf computed from the constrained
+    /// key element.
+    ///
+    /// @param leaf The index of the leaf to evaluate.
+    ///
+    /// @return A buffer containing the value of the leaf.
+    ///
     virtual std::array<uint8_t, NBYTES> eval(uint64_t leaf) const = 0;
 
 
@@ -399,12 +548,11 @@ void RCPrfBase::generate_leaf_from_parent(
     const Prg&       base_prg,
     const depth_type tree_height,
     const uint64_t   subtree_min,
-    const uint64_t   min,
-    const uint64_t   max,
+    const uint64_t   leaf,
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
         constrained_elements)
 {
-    RCPrfTreeNodeChild child = (min == subtree_min) ? LeftChild : RightChild;
+    RCPrfTreeNodeChild child = (leaf == subtree_min) ? LeftChild : RightChild;
     std::array<uint8_t, NBYTES> buffer;
 
     base_prg.derive(
@@ -413,7 +561,7 @@ void RCPrfBase::generate_leaf_from_parent(
 
     std::unique_ptr<ConstrainedRCPrfLeafElement<NBYTES>> elt(
         new ConstrainedRCPrfLeafElement<NBYTES>(
-            std::move(buffer), tree_height, 1, min, max));
+            std::move(buffer), tree_height, 1, leaf, leaf));
     constrained_elements.emplace_back(std::move(elt));
 }
 
@@ -436,7 +584,7 @@ void RCPrfBase::generate_constrained_subkeys(
 
         assert(min == max);
         RCPrfBase::generate_leaf_from_parent(
-            base_prg, tree_height, subtree_min, min, max, constrained_elements);
+            base_prg, tree_height, subtree_min, min, constrained_elements);
         return;
     }
 

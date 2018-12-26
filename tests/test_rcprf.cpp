@@ -99,7 +99,7 @@ TEST(rc_prf, double_constrain)
     }
 }
 
-// Exceptions that should be raised by using the normal APIs
+// Exceptions that can be raised by using the normal APIs
 TEST(rc_prf, eval_constrain_exceptions)
 {
     constexpr uint8_t                  test_depth = 7;
@@ -143,6 +143,55 @@ TEST(rc_prf, eval_constrain_exceptions)
         range_max);
     EXPECT_THROW(elt.eval(range_min - 1), std::out_of_range);
     EXPECT_THROW(elt.eval(range_max + 1), std::out_of_range);
+}
+
+// Exceptions that can be raised when re-constaining an already constrained
+// RC-PRF
+TEST(rc_prf, reconstrain_exceptions)
+{
+    constexpr uint8_t                  test_depth = 7;
+    std::array<uint8_t, kRCPrfKeySize> k{{0x00}};
+    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
+                                  test_depth);
+
+    uint64_t range_min = 4;
+    uint64_t range_max = 8;
+
+    auto constrained_prf = rc_prf.constrain(range_min, range_max);
+
+    EXPECT_THROW(constrained_prf.constrain(range_min, range_max + 1),
+                 std::out_of_range);
+    EXPECT_THROW(constrained_prf.constrain(range_min - 1, range_max),
+                 std::out_of_range);
+
+
+    // Test the inner node exception
+    range_min = sse::crypto::RCPrfParams::leaf_count(test_depth - 2);
+    range_max = 2 * sse::crypto::RCPrfParams::leaf_count(test_depth - 2) - 1;
+    std::vector<std::unique_ptr<sse::crypto::ConstrainedRCPrfElement<16>>>
+        constrained_elements;
+
+    sse::crypto::ConstrainedRCPrfInnerElement<16> elt(
+        sse::crypto::Key<kRCPrfKeySize>(),
+        test_depth,
+        test_depth - 2,
+        range_min,
+        range_max);
+
+
+    EXPECT_THROW(elt.generate_constrained_subkeys(
+                     range_min - 1, range_max, constrained_elements),
+                 std::out_of_range);
+    EXPECT_THROW(elt.generate_constrained_subkeys(
+                     range_min, range_max + 1, constrained_elements),
+                 std::out_of_range);
+
+    sse::crypto::ConstrainedRCPrfLeafElement<16> leaf(
+        std::array<uint8_t, 16>(), test_depth, 1);
+    EXPECT_THROW(leaf.generate_constrained_subkeys(0, 1, constrained_elements),
+                 std::out_of_range);
+    EXPECT_THROW(leaf.generate_constrained_subkeys(1, 2, constrained_elements),
+                 std::out_of_range);
 }
 
 // Exceptions raised by the constructors

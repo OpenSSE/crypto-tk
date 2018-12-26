@@ -39,18 +39,28 @@ template<uint16_t NBYTES>
 class ConstrainedRCPrfElement;
 
 ///
-/// @class RCPrfBase
-/// @brief Base class for the Range-Constrained PRF implementation.
+/// @class RCPrfParams
 ///
-/// The RCPrfBase class implements the common tree algorithms used in the RC-PRF
-/// implementation. It is not meant to be instantiated.
+/// @brief  Class encapsulating all the parameters and types necessary to the
+///         Range-Constrained PRF implementation.
 ///
-class RCPrfBase
+/// The RCPrfParams class defines the types, constants and (very) generic
+/// functions necessary to the Range-Constrained PRF tree-based implementation.
+/// It is not meant to be instantiated.
+
+///
+struct RCPrfParams
 {
-    // TODO: put the tree height in RCPrfBase
-public:
     /// @brief Type used for the tree depth.
     using depth_type = uint8_t;
+
+    /// @brief Size (in bytes) of a RC-PRF key
+    static constexpr uint8_t kKeySize = 32;
+    /// @brief Maximum height supported by the tree construction.
+    static constexpr depth_type kMaxHeight = 8 * sizeof(depth_type);
+    /// @brief  Maximum number of leaves (i.e. the size of the message space)
+    ///         supported by the construction.
+    static constexpr uint64_t kMaxLeaves = (1UL << (kMaxHeight - 1));
 
     /// @brief Returns the number of leaves supported by a tree of the given
     /// height
@@ -61,14 +71,6 @@ public:
     {
         return (1UL << (height - 1));
     }
-
-    /// @brief Size (in bytes) of a RC-PRF key
-    static constexpr uint8_t kKeySize = 32;
-    /// @brief Maximum height supported by the tree construction.
-    static constexpr depth_type kMaxHeight = 8 * sizeof(depth_type);
-    /// @brief  Maximum number of leaves (i.e. the size of the message space)
-    ///         supported by the construction.
-    static constexpr uint64_t kMaxLeaves = (1UL << (kMaxHeight - 1));
 
     /// @brief Returns the practical number of leaves supported by a tree of the
     /// given height. The height is limited to 65, i.e. the construction cannot
@@ -87,6 +89,29 @@ public:
         return leaf_count_generic(height);
     }
 
+    /// @brief Type encoding a choice of child in a binary tree.
+    enum RCPrfTreeNodeChild : uint8_t
+    {
+        LeftChild  = 0,
+        RightChild = 1
+    };
+};
+
+static_assert(RCPrfParams::kMaxLeaves
+                  == RCPrfParams::leaf_count_generic(RCPrfParams::kMaxHeight),
+              "Computation of the maximum number of leaves is not consistent");
+
+
+///
+/// @class RCPrfBase
+/// @brief Base class for the Range-Constrained PRF implementation.
+///
+/// The RCPrfBase class implements the common tree algorithms used in the RC-PRF
+/// implementation. It is not meant to be instantiated.
+///
+class RCPrfBase : public RCPrfParams
+{
+public:
     RCPrfBase() = delete;
     ///
     /// @brief Constructor
@@ -120,13 +145,6 @@ public:
     }
 
 protected:
-    /// @brief Type encoding a choice of child in a binary tree.
-    enum RCPrfTreeNodeChild : uint8_t
-    {
-        LeftChild  = 0,
-        RightChild = 1
-    };
-
     ///
     /// @brief Compute the direction of the root-to-leaf path at a given depth
     ///
@@ -244,10 +262,6 @@ protected:
 private:
     const depth_type tree_height_;
 };
-
-static_assert(RCPrfBase::kMaxLeaves
-                  == RCPrfBase::leaf_count_generic(RCPrfBase::kMaxHeight),
-              "Computation of the maximum number of leaves is not consistent");
 
 
 template<uint16_t NBYTES>

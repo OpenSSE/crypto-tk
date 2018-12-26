@@ -234,6 +234,13 @@ TEST(rc_prf, constructors_exceptions)
                      0, // the range and the height hav to be compatible
                      0),
                  std::invalid_argument);
+    EXPECT_THROW(sse::crypto::ConstrainedRCPrfInnerElement<16> elt(
+                     sse::crypto::Prg(sse::crypto::Key<kRCPrfKeySize>()),
+                     tree_height,
+                     1,
+                     0, // the range and the height hav to be compatible
+                     0),
+                 std::invalid_argument);
 
     // subtree height >= tree height
     EXPECT_THROW(sse::crypto::ConstrainedRCPrfInnerElement<16> elt(

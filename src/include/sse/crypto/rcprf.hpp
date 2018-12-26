@@ -138,6 +138,7 @@ public:
     {
     }
 
+    /* LCOV_EXCL_START */
     ///
     /// @brief Copy constructor
     ///
@@ -147,7 +148,7 @@ public:
     /// @brief Move constructor
     ///
     RCPrfBase(RCPrfBase&& rcprf) noexcept = default;
-
+    /* LCOV_EXCL_STOP */
 
     ///
     /// @brief Return the height of the represented tree
@@ -538,6 +539,7 @@ public:
         const ConstrainedRCPrfInnerElement& cprf)
         = delete;
 
+    /* LCOV_EXCL_START */
     ///
     /// @brief Move constructor
     ///
@@ -549,6 +551,7 @@ public:
           base_prg_(std::move(cprf.base_prg_))
     {
     }
+    /* LCOV_EXCL_STOP */
 
     ///
     /// @brief Destructor
@@ -672,6 +675,7 @@ public:
         const ConstrainedRCPrfLeafElement& cprf)
         = delete;
 
+    /* LCOV_EXCL_START */
     ///
     /// @brief Move constructor
     ///
@@ -683,6 +687,7 @@ public:
           leaf_buffer_(std::move(cprf.leaf_buffer_))
     {
     }
+    /* LCOV_EXCL_STOP */
 
     ///
     /// @brief Destructor
@@ -822,6 +827,7 @@ public:
     ConstrainedRCPrf(const ConstrainedRCPrf& cprf) = delete;
     ConstrainedRCPrf& operator=(const ConstrainedRCPrf& cprf) = delete;
 
+    /* LCOV_EXCL_START */
     ///
     /// @brief Move constructor
     ///
@@ -832,6 +838,7 @@ public:
           elements_(std::move(cprf.elements_))
     {
     }
+    /* LCOV_EXCL_STOP */
 
     /// @brief Returns the minimum leaf index supported by the constrained
     /// RC-PRF.

@@ -152,7 +152,7 @@ public:
     ///
     /// @brief Move constructor
     ///
-    RCPrfBase(RCPrfBase&& rcprf) = default;
+    RCPrfBase(RCPrfBase&& rcprf) noexcept = default;
 
 
     ///
@@ -417,6 +417,8 @@ public:
         }
     }
 
+    virtual ~ConstrainedRCPrfElement() = default;
+
 public:
     /// @brief Returns the minimum leaf index supported by the element.
     uint64_t min_leaf() const
@@ -540,18 +542,23 @@ public:
     ///
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
-    ConstrainedRCPrfInnerElement(ConstrainedRCPrfInnerElement&& cprf)
+    ConstrainedRCPrfInnerElement(ConstrainedRCPrfInnerElement&& cprf) noexcept
         : ConstrainedRCPrfElement<NBYTES>(
               std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
           base_prg_(std::move(cprf.base_prg_))
     {
     }
 
+    ///
+    /// @brief Destructor
+    ///
+    ~ConstrainedRCPrfInnerElement() override = default;
+
     // Already documented by the parent class
     std::array<uint8_t, NBYTES> eval(uint64_t leaf) const override;
 
     // Already documented by the parent class
-    virtual void generate_constrained_subkeys(
+    void generate_constrained_subkeys(
         const uint64_t min,
         const uint64_t max,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
@@ -669,12 +676,17 @@ public:
     ///
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
-    ConstrainedRCPrfLeafElement(ConstrainedRCPrfLeafElement&& cprf)
+    ConstrainedRCPrfLeafElement(ConstrainedRCPrfLeafElement&& cprf) noexcept
         : ConstrainedRCPrfElement<NBYTES>(
               std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
           leaf_buffer_(std::move(cprf.leaf_buffer_))
     {
     }
+
+    ///
+    /// @brief Destructor
+    ///
+    ~ConstrainedRCPrfLeafElement() override = default;
 
     // Already documented by the superclass
     std::array<uint8_t, NBYTES> eval(uint64_t leaf) const override;
@@ -744,7 +756,7 @@ public:
         const std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
             elements)
     {
-        if (elements.size() == 0) {
+        if (elements.empty()) {
             throw std::invalid_argument("Empty key elements vector");
         }
         RCPrfParams::depth_type h = elements[0]->tree_height();
@@ -780,7 +792,7 @@ public:
     ///                                     have the same tree height (and hence
     ///                                     cannot come from the same tree).
     ///
-    ConstrainedRCPrf(
+    explicit ConstrainedRCPrf(
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&&
             elements)
         : RCPrfBase<NBYTES>(get_element_height(elements)),
@@ -814,7 +826,7 @@ public:
     ///
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
-    ConstrainedRCPrf(ConstrainedRCPrf&& cprf)
+    ConstrainedRCPrf(ConstrainedRCPrf&& cprf) noexcept
         : RCPrfBase<NBYTES>(std::forward<RCPrfBase<NBYTES>>(cprf)),
           elements_(std::move(cprf.elements_))
     {
@@ -1151,7 +1163,7 @@ public:
     ConstrainedRCPrf<NBYTES> constrain(uint64_t min, uint64_t max) const;
 
     // Already commented in the superclass
-    virtual void generate_constrained_subkeys(
+    void generate_constrained_subkeys(
         const uint64_t min,
         const uint64_t max,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&

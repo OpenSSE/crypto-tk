@@ -149,9 +149,8 @@ TEST(rc_prf, eval_constrain_exceptions)
 // RC-PRF
 TEST(rc_prf, reconstrain_exceptions)
 {
-    constexpr uint8_t                  test_depth = 7;
-    std::array<uint8_t, kRCPrfKeySize> k{{0x00}};
-    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
+    constexpr uint8_t      test_depth = 7;
+    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(),
                                   test_depth);
 
     uint64_t range_min = 4;

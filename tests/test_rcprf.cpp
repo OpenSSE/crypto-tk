@@ -30,6 +30,40 @@
 
 constexpr size_t kRCPrfKeySize = 32;
 
+TEST(rc_prf, parameters)
+{
+    // leaf count
+    EXPECT_EQ(sse::crypto::RCPrfParams::max_leaf_index(0), 0);
+    constexpr sse::crypto::RCPrfParams::depth_type max_depth = ~0;
+    for (sse::crypto::RCPrfParams::depth_type i
+         = sse::crypto::RCPrfParams::kMaxHeight;
+         i < max_depth;
+         i++) {
+        ASSERT_EQ(sse::crypto::RCPrfParams::max_leaf_index(i), ~0UL);
+    }
+    ASSERT_EQ(sse::crypto::RCPrfParams::max_leaf_index(max_depth), ~0UL);
+
+    // range intersection
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 3, 8));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 5, 8));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 3, 6));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 5, 6));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(3, 8, 4, 7));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(5, 8, 4, 7));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(3, 6, 4, 7));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(5, 6, 4, 7));
+
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 3, 7));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 4, 8));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 4, 6));
+    EXPECT_TRUE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 5, 7));
+
+    EXPECT_FALSE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 8, 9));
+    EXPECT_FALSE(sse::crypto::RCPrfParams::ranges_intersect(4, 7, 1, 2));
+    EXPECT_FALSE(sse::crypto::RCPrfParams::ranges_intersect(8, 9, 4, 7));
+    EXPECT_FALSE(sse::crypto::RCPrfParams::ranges_intersect(1, 2, 4, 7));
+}
+
 TEST(rc_prf, constrain)
 {
     constexpr uint8_t                  test_depth = 7;
@@ -39,16 +73,16 @@ TEST(rc_prf, constrain)
                                   test_depth);
 
     for (uint64_t min = 0;
-         min < sse::crypto::RCPrfParams::leaf_count(test_depth);
+         min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
          min++) {
         uint64_t maximal_range
-            = sse::crypto::RCPrfParams::leaf_count(test_depth);
+            = sse::crypto::RCPrfParams::max_leaf_index(test_depth);
         if (min == 0) {
             // we cannot constrain the key to the range [0,
-            // leaf_count(test_depth]
+            // max_leaf_index(test_depth)]
             maximal_range--;
         }
-        for (uint64_t max = min; max < maximal_range; max++) {
+        for (uint64_t max = min; max <= maximal_range; max++) {
             auto constrained_prf = rc_prf.constrain(min, max);
             for (uint64_t leaf = min; leaf <= max; leaf++) {
                 auto out             = rc_prf.eval(leaf);
@@ -68,16 +102,16 @@ TEST(rc_prf, double_constrain)
                                   test_depth);
 
     for (uint64_t min = 0;
-         min < sse::crypto::RCPrfParams::leaf_count(test_depth);
+         min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
          min++) {
         uint64_t maximal_range
-            = sse::crypto::RCPrfParams::leaf_count(test_depth);
+            = sse::crypto::RCPrfParams::max_leaf_index(test_depth);
         if (min == 0) {
             // we cannot constrain the key to the range [0,
             // leaf_count(test_depth]
             maximal_range--;
         }
-        for (uint64_t max = min; max < maximal_range; max++) {
+        for (uint64_t max = min; max <= maximal_range; max++) {
             auto constrained_prf = rc_prf.constrain(min, max);
 
             // reconstrain the PRF
@@ -154,7 +188,7 @@ TEST(rc_prf, reconstrain_exceptions)
                                   test_depth);
 
     uint64_t range_min = 4;
-    uint64_t range_max = 8;
+    uint64_t range_max = 7;
 
     auto constrained_prf = rc_prf.constrain(range_min, range_max);
 
@@ -165,8 +199,9 @@ TEST(rc_prf, reconstrain_exceptions)
 
 
     // Test the inner node exception
-    range_min = sse::crypto::RCPrfParams::leaf_count(test_depth - 2);
-    range_max = 2 * sse::crypto::RCPrfParams::leaf_count(test_depth - 2) - 1;
+    range_min = sse::crypto::RCPrfParams::max_leaf_index(test_depth - 2) + 1;
+    range_max
+        = 2 * sse::crypto::RCPrfParams::max_leaf_index(test_depth - 2) + 1;
     std::vector<std::unique_ptr<sse::crypto::ConstrainedRCPrfElement<16>>>
         constrained_elements;
 
@@ -213,7 +248,7 @@ TEST(rc_prf, constructors_exceptions)
     constexpr uint8_t  subtree_height = 3;
     constexpr uint8_t  tree_height    = subtree_height + 1;
     static_assert(
-        range_max - range_min + 1
+        range_max - range_min
             == sse::crypto::RCPrfParams::leaf_count_generic(subtree_height),
         "The tested range and the subtree_height are not compatible");
 

@@ -23,6 +23,12 @@
 
 namespace sse {
 namespace crypto {
+
+
+constexpr uint8_t                 RCPrfParams::kKeySize;
+constexpr RCPrfParams::depth_type RCPrfParams::kMaxHeight;
+constexpr uint64_t                RCPrfParams::kMaxLeafIndex;
+
 template class ConstrainedRCPrfLeafElement<16>;
 template class ConstrainedRCPrfInnerElement<16>;
 template class ConstrainedRCPrf<16>;

@@ -59,36 +59,39 @@ struct RCPrfParams
     /// @brief Size (in bytes) of a RC-PRF key
     static constexpr uint8_t kKeySize = 32;
     /// @brief Maximum height supported by the tree construction.
-    static constexpr depth_type kMaxHeight = 8 * sizeof(depth_type);
-    /// @brief  Maximum number of leaves (i.e. the size of the message space)
+    static constexpr depth_type kMaxHeight = 65;
+    static_assert(kMaxHeight - 1 <= 8 * sizeof(uint64_t),
+                  "Invalid maximum height.");
+    /// @brief  Maximum index of a leaf (i.e. the maximum input of the PRF)
     ///         supported by the construction.
-    static constexpr uint64_t kMaxLeaves = (1UL << (kMaxHeight - 1));
+    static constexpr uint64_t kMaxLeafIndex
+        = ~0UL; // = (1UL << (kMaxHeight - 1)) - 1;
 
-    /// @brief Returns the number of leaves supported by a tree of the given
-    /// height
+    /// @brief Returns the maximum index of a leaf supported by a tree
+    /// of the given height
     ///
     /// @param height The height of the tree
     ///
-    static constexpr uint64_t leaf_count_generic(const depth_type height)
+    static constexpr uint64_t max_leaf_index_generic(const depth_type height)
     {
-        return (1UL << (height - 1));
+        return (1UL << (height - 1)) - 1;
     }
 
-    /// @brief Returns the practical number of leaves supported by a tree of the
-    /// given height. The height is limited to 65, i.e. the construction cannot
-    /// support more than 2^64 leaves.
+    /// @brief Returns the maximum index of a leaf in a tree of the given
+    /// height. The height is limited to 65, i.e. the construction cannot
+    /// support more than 2^64 leaves, and the leaf index cannot go over 2^64-1
     ///
     /// @param height The height of the tree.
     ///
-    static inline uint64_t leaf_count(const depth_type height)
+    static inline uint64_t max_leaf_index(const depth_type height)
     {
         if (height == 0) {
             return 0;
         }
-        if (height >= 65) {
-            return ~0;
+        if (height >= kMaxHeight) {
+            return ~0UL;
         }
-        return leaf_count_generic(height);
+        return max_leaf_index_generic(height);
     }
 
 
@@ -107,9 +110,11 @@ struct RCPrfParams
     };
 };
 
-static_assert(RCPrfParams::kMaxLeaves
-                  == RCPrfParams::leaf_count_generic(RCPrfParams::kMaxHeight),
-              "Computation of the maximum number of leaves is not consistent");
+// static_assert(RCPrfParams::kMaxLeaves
+//                   ==
+//                   RCPrfParams::leaf_count_generic(RCPrfParams::kMaxHeight),
+//               "Computation of the maximum number of leaves is not
+//               consistent");
 
 
 ///
@@ -402,15 +407,15 @@ public:
                 "Invalid range: min is larger than max: max="
                 + std::to_string(max) + ", min=" + std::to_string(min));
         }
-        if ((max - min + 1)
-            != RCPrfParams::leaf_count(this->subtree_height())) {
+        if ((max - min)
+            != RCPrfParams::max_leaf_index(this->subtree_height())) {
             throw std::invalid_argument(
                 "Invalid range: the range's width "
                 "should be 2^(subtree_height - 1): range's width="
                 + std::to_string(max - min + 1) + "(max=" + std::to_string(max)
                 + ", min=" + std::to_string(min) + "), expected width = "
                 + std::to_string(
-                      RCPrfParams::leaf_count(this->subtree_height())));
+                      RCPrfParams::max_leaf_index(this->subtree_height()) + 1));
         }
     }
 
@@ -1215,23 +1220,23 @@ void RCPrf<NBYTES>::generate_constrained_subkeys(
             "RCPrf::constrain: Invalid range: min is larger than max: max="
             + std::to_string(max) + ", min=" + std::to_string(min));
     }
-    if (max >= RCPrfParams::leaf_count(this->tree_height())) {
+    if (max > RCPrfParams::max_leaf_index(this->tree_height())) {
         throw std::out_of_range(
             "RCPrf::constrain: range's maximum (=" + std::to_string(max)
             + ") is too big. It must be strictly smaller than 2^(height-1) "
               "(="
-            + std::to_string(RCPrfParams::leaf_count(this->tree_height()))
+            + std::to_string(RCPrfParams::max_leaf_index(this->tree_height()))
             + ")");
     }
 
-    if (max == RCPrfParams::leaf_count(this->tree_height()) - 1 && min == 0) {
+    if (max == RCPrfParams::max_leaf_index(this->tree_height()) && min == 0) {
         throw std::out_of_range(
             "RCPrf::constrain: the input range (" + std::to_string(min) + ", "
             + std::to_string(max)
             + ") is the complete range supported by the PRF.");
     }
 
-    uint64_t max_range = RCPrfParams::leaf_count(this->tree_height()) - 1;
+    uint64_t max_range = RCPrfParams::max_leaf_index(this->tree_height());
     RCPrfBase<NBYTES>::generate_constrained_subkeys_from_node(
         root_prg_,
         this->tree_height(),

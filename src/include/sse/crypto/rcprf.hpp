@@ -87,6 +87,37 @@ public:
         return leaf_count_generic(height);
     }
 
+    RCPrfBase() = delete;
+    ///
+    /// @brief Constructor
+    ///
+    /// Constructs a RCPrfBase object representing a tree of the given height
+    ///
+    /// @param height   The height of the tree to construct. A single node tree
+    ///                 (i.e. a tree consisting only in a leaf) has height 1.
+    ///
+    explicit RCPrfBase(const depth_type height) noexcept : tree_height_(height)
+    {
+    }
+
+    ///
+    /// @brief Copy constructor
+    ///
+    RCPrfBase(const RCPrfBase& rcprf) = default;
+
+    ///
+    /// @brief Move constructor
+    ///
+    RCPrfBase(RCPrfBase&& rcprf) = default;
+
+
+    ///
+    /// @brief Return the height of the represented tree
+    ///
+    inline depth_type tree_height() const
+    {
+        return tree_height_;
+    }
 
 protected:
     /// @brief Type encoding a choice of child in a binary tree.
@@ -102,7 +133,6 @@ protected:
     /// When following the root-to-leaf path, return which of the left of the
     /// right child of the node at the given depth we have to take next.
     ///
-    /// @param tree_height  The height of the tree
     /// @param leaf         The leaf to go to from the tree's root
     /// @param node_depth   The depth of the node on the root-to-leaf path (a 0
     ///                     node-depth points to the root, a tree_height-1 depth
@@ -110,14 +140,13 @@ protected:
     ///
     /// @return             The child to go to in the root-to-leaf path.
     ///
-    static inline RCPrfTreeNodeChild get_child(depth_type tree_height,
-                                               uint64_t   leaf,
-                                               depth_type node_depth)
+    inline RCPrfTreeNodeChild get_child(uint64_t   leaf,
+                                        depth_type node_depth) const
     {
         // the -2 term comes from two facts:
         // - the minimum valid tree height is 1 (single note)
         // - the maximum depth of a node is tree_height-1
-        uint64_t mask = 1UL << (tree_height - node_depth - 2);
+        uint64_t mask = 1UL << (tree_height() - node_depth - 2);
 
         return ((leaf & mask) == 0) ? LeftChild : RightChild;
     }
@@ -132,7 +161,6 @@ protected:
     ///
     /// @param base_prg    The Prg object representing the node and using the
     ///                    node's content as its key.
-    /// @param tree_height The height of the tree.
     /// @param base_depth  The depth of the starting node (a 0
     ///                    depth points to the root, a tree_height-1 depth
     ///                    corresponds to a leaf).
@@ -140,50 +168,9 @@ protected:
     ///
     /// @return An NBYTES buffer with the leaf's value.
     template<uint16_t NBYTES>
-    static std::array<uint8_t, NBYTES> derive_leaf(const Prg& base_prg,
-                                                   depth_type tree_height,
-                                                   depth_type base_depth,
-                                                   uint64_t   leaf)
-    {
-        assert(tree_height > base_depth + 1);
-
-        if (tree_height == base_depth + 2) {
-            // only one derivation to do
-            RCPrfTreeNodeChild child = get_child(tree_height, leaf, base_depth);
-            std::array<uint8_t, NBYTES> result;
-
-            // finish by evaluating the leaf
-            base_prg.derive(
-                static_cast<uint32_t>(child) * NBYTES, NBYTES, result.data());
-
-            return result;
-        }
-
-        assert(tree_height - base_depth > 2);
-        // the first step is done from the base PRG
-        RCPrfTreeNodeChild child = get_child(tree_height, leaf, base_depth);
-        Key<kKeySize>      subkey
-            = base_prg.derive_key<kKeySize>(static_cast<uint16_t>(child));
-        // now proceed with the subkeys until we reach the leaf's parent
-        for (uint8_t i = base_depth + 1; i < tree_height - 2; i++) {
-            child  = get_child(tree_height, leaf, i);
-            subkey = Prg::derive_key<kKeySize>(std::move(subkey),
-                                               static_cast<uint16_t>(child));
-        }
-
-        std::array<uint8_t, NBYTES> result;
-
-        // finish by evaluating the leaf
-        child = get_child(tree_height, leaf, tree_height - 2);
-
-        Prg::derive(std::move(subkey),
-                    static_cast<uint32_t>(child) * NBYTES,
-                    NBYTES,
-                    result.data());
-
-        return result;
-    }
-
+    std::array<uint8_t, NBYTES> derive_leaf(const Prg& base_prg,
+                                            depth_type base_depth,
+                                            uint64_t   leaf) const;
     ///
     /// @brief Generate the constrained key necessary to derive the tree's
     ///        leaves in the specified range.
@@ -196,7 +183,6 @@ protected:
     ///
     /// @param base_prg        The Prg object representing the node to start the
     ///                        generation from. Must not necessary be the root.
-    /// @param tree_height     The height of the tree.
     /// @param subtree_height  The height of the base node rooted subtree. A
     ///                        height of tree_height represents the entire tree,
     /// @param subtree_min     The minimum leaf index supported by the subtree
@@ -213,16 +199,15 @@ protected:
     ///                                    between min and max
     ///
     template<uint16_t NBYTES>
-    static void generate_constrained_subkeys(
+    void generate_constrained_subkeys(
         const Prg&       base_prg,
-        const depth_type tree_height,
         const depth_type subtree_height,
         const uint64_t   subtree_min,
         const uint64_t   subtree_max,
         const uint64_t   min,
         const uint64_t   max,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-            constrained_elements);
+            constrained_elements) const;
 
     ///
     /// @brief Generate a leaf from its parent node.
@@ -235,7 +220,6 @@ protected:
     ///
     /// @param base_prg        The Prg object representing the parent node of
     ///                        the leaf to generate.
-    /// @param tree_height     The height of the tree.
     /// @param subtree_min     The minimum leaf index supported by the subtree
     ///                        (of height two) rooted at the base node. The
     ///                        subtree's maximum leaf index does not have to be
@@ -246,18 +230,66 @@ protected:
     ///                                    to generate will be put.
     ///
     template<uint16_t NBYTES>
-    static void generate_leaf_from_parent(
-        const Prg&       base_prg,
-        const depth_type tree_height,
-        const uint64_t   subtree_min,
-        const uint64_t   leaf,
+    void generate_leaf_from_parent(
+        const Prg&     base_prg,
+        const uint64_t subtree_min,
+        const uint64_t leaf,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-            constrained_elements);
+            constrained_elements) const;
+
+private:
+    const depth_type tree_height_;
 };
 
 static_assert(RCPrfBase::kMaxLeaves
                   == RCPrfBase::leaf_count_generic(RCPrfBase::kMaxHeight),
               "Computation of the maximum number of leaves is not consistent");
+
+
+template<uint16_t NBYTES>
+std::array<uint8_t, NBYTES> RCPrfBase::derive_leaf(const Prg& base_prg,
+                                                   depth_type base_depth,
+                                                   uint64_t   leaf) const
+{
+    assert(this->tree_height() > base_depth + 1);
+
+    if (this->tree_height() == base_depth + 2) {
+        // only one derivation to do
+        RCPrfTreeNodeChild          child = get_child(leaf, base_depth);
+        std::array<uint8_t, NBYTES> result;
+
+        // finish by evaluating the leaf
+        base_prg.derive(
+            static_cast<uint32_t>(child) * NBYTES, NBYTES, result.data());
+
+        return result;
+    }
+
+    assert(this->tree_height() - base_depth > 2);
+    // the first step is done from the base PRG
+    RCPrfTreeNodeChild child = get_child(leaf, base_depth);
+    Key<kKeySize>      subkey
+        = base_prg.derive_key<kKeySize>(static_cast<uint16_t>(child));
+    // now proceed with the subkeys until we reach the leaf's parent
+    for (uint8_t i = base_depth + 1; i < this->tree_height() - 2; i++) {
+        child  = get_child(leaf, i);
+        subkey = Prg::derive_key<kKeySize>(std::move(subkey),
+                                           static_cast<uint16_t>(child));
+    }
+
+    std::array<uint8_t, NBYTES> result;
+
+    // finish by evaluating the leaf
+    child = get_child(leaf, tree_height() - 2);
+
+    Prg::derive(std::move(subkey),
+                static_cast<uint32_t>(child) * NBYTES,
+                NBYTES,
+                result.data());
+
+    return result;
+}
+
 
 ///
 /// @class ConstrainedRCPrfElement
@@ -297,7 +329,7 @@ public:
                             depth_type subtree_height,
                             uint64_t   min,
                             uint64_t   max)
-        : tree_height_(height), subtree_height_(subtree_height), min_leaf_(min),
+        : RCPrfBase(height), subtree_height_(subtree_height), min_leaf_(min),
           max_leaf_(max)
     {
         if (subtree_height == 0) {
@@ -307,7 +339,7 @@ public:
                                         "larger than 0.");
             /* LCOV_EXCL_STOP */
         }
-        if (subtree_height >= height) {
+        if (subtree_height >= this->tree_height()) {
             throw std::invalid_argument(
                 "Subtree height is not smaller than the tree height");
         }
@@ -353,7 +385,6 @@ public:
 
 
 protected:
-    const depth_type tree_height_;
     const depth_type subtree_height_;
     const uint64_t   min_leaf_;
     const uint64_t   max_leaf_;
@@ -376,7 +407,6 @@ public:
     /// Creates a ConstrainedRCPrfInnerElement representing a subtree of given
     /// height and spanning over the specified leaves range.
     ///
-    /// @param tree_height     The height of the tree.
     /// @param subtree_height  The height of the subtree represented by the
     ///                        element.
     /// @param min             The minimum leaf index spanned by the subtree.
@@ -415,10 +445,8 @@ public:
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
     ConstrainedRCPrfInnerElement(ConstrainedRCPrfInnerElement&& cprf)
-        : ConstrainedRCPrfElement<NBYTES>(cprf.tree_height_,
-                                          cprf.subtree_height_,
-                                          cprf.min_leaf_,
-                                          cprf.max_leaf_),
+        : ConstrainedRCPrfElement<NBYTES>(
+              std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
           base_prg_(std::move(cprf.base_prg_))
     {
     }
@@ -447,9 +475,11 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrfInnerElement<NBYTES>::eval(
             + ", range max=" + std::to_string(this->max_leaf_));
     }
 
-    uint8_t base_depth = this->tree_height_ - this->subtree_height_;
-    return RCPrfBase::derive_leaf<NBYTES>(
-        base_prg_, this->tree_height_, base_depth, leaf);
+    uint8_t base_depth = this->tree_height() - this->subtree_height_;
+
+    // we use this trick to avoid compilation errors (at least on clang)
+    return static_cast<const ConstrainedRCPrfInnerElement<NBYTES>*>(this)
+        ->RCPrfBase::derive_leaf<NBYTES>(base_prg_, base_depth, leaf);
 }
 
 ///
@@ -496,10 +526,8 @@ public:
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
     ConstrainedRCPrfLeafElement(ConstrainedRCPrfLeafElement&& cprf)
-        : ConstrainedRCPrfElement<NBYTES>(cprf.tree_height_,
-                                          cprf.subtree_height_,
-                                          cprf.min_leaf_,
-                                          cprf.max_leaf_),
+        : ConstrainedRCPrfElement<NBYTES>(
+              std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
           leaf_buffer_(std::move(cprf.leaf_buffer_))
     {
     }
@@ -541,30 +569,52 @@ template<uint16_t NBYTES>
 class ConstrainedRCPrf : public RCPrfBase
 {
 public:
+    static depth_type get_element_height(
+        const std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
+            elements)
+    {
+        if (elements.size() == 0) {
+            throw std::invalid_argument("Empty key elements vector");
+        }
+        depth_type h = elements[0]->tree_height();
+
+        for (auto it = elements.begin() + 1; it != elements.end(); ++it) {
+            if (h != (*it)->tree_height()) {
+                throw std::invalid_argument(
+                    "Inconsistent tree heights: all the elements do not have "
+                    "the same tree height.");
+            }
+        }
+
+        return h;
+    }
     ///
     /// @brief Constructor
     ///
-    /// Creates a ConstrainedRCPrf from a vector of key elements (i.e. a set of
-    /// tree nodes).
+    /// Creates a ConstrainedRCPrf from a vector of key elements (i.e. a set
+    /// of tree nodes).
     ///
-    /// @param elements     The vector containing the key elements. The vector
-    ///                     is moved, and thus invalidated by the constructor.
+    /// @param elements     The vector containing the key elements. The
+    /// vector
+    ///                     is moved, and thus invalidated by the
+    ///                     constructor.
     ///
     /// @exception std::invalid_argument    The vector is empty.
+    /// @exception std::invalid_argument    The elements in the vector do
+    ///                                     not span over a single range, but at
+    ///                                     least two: the spans of the
+    ///                                     elements in the vector are not
+    ///                                     consecutive.
     /// @exception std::invalid_argument    The elements in the vector do not
-    ///                                     span over a single range, but at
-    ///                                     least two: the spans of the elements
-    ///                                     in the vector are not consecutive.
+    ///                                     have the same tree height (and hence
+    ///                                     cannot come from the same tree).
     ///
     ConstrainedRCPrf(
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&&
             elements)
-        : elements_(std::move(elements))
+        : RCPrfBase(get_element_height(elements)),
+          elements_(std::move(elements))
     {
-        if (elements_.size() == 0) {
-            throw std::invalid_argument(
-                "ConstrainedRCPrf constructor: Empty key elements vector");
-        }
         // sort the elements
         struct MinComparator
         {
@@ -594,7 +644,8 @@ public:
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
     ConstrainedRCPrf(ConstrainedRCPrf&& cprf)
-        : elements_(std::move(cprf.elements_))
+        : RCPrfBase(std::forward<RCPrfBase>(cprf)),
+          elements_(std::move(cprf.elements_))
     {
     }
 
@@ -654,12 +705,11 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrf<NBYTES>::eval(uint64_t leaf) const
 
 template<uint16_t NBYTES>
 void RCPrfBase::generate_leaf_from_parent(
-    const Prg&       base_prg,
-    const depth_type tree_height,
-    const uint64_t   subtree_min,
-    const uint64_t   leaf,
+    const Prg&     base_prg,
+    const uint64_t subtree_min,
+    const uint64_t leaf,
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-        constrained_elements)
+        constrained_elements) const
 {
     RCPrfTreeNodeChild child = (leaf == subtree_min) ? LeftChild : RightChild;
     std::array<uint8_t, NBYTES> buffer;
@@ -670,21 +720,20 @@ void RCPrfBase::generate_leaf_from_parent(
 
     std::unique_ptr<ConstrainedRCPrfLeafElement<NBYTES>> elt(
         new ConstrainedRCPrfLeafElement<NBYTES>(
-            std::move(buffer), tree_height, leaf));
+            std::move(buffer), this->tree_height(), leaf));
     constrained_elements.emplace_back(std::move(elt));
 }
 
 template<uint16_t NBYTES>
 void RCPrfBase::generate_constrained_subkeys(
     const Prg&       base_prg,
-    const depth_type tree_height,
     const depth_type subtree_height,
     const uint64_t   subtree_min,
     const uint64_t   subtree_max,
     const uint64_t   min,
     const uint64_t   max,
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-        constrained_elements)
+        constrained_elements) const
 {
     if (subtree_height <= 2) {
         // we are in a 'special' case, that we want to separate to simplify the
@@ -693,7 +742,7 @@ void RCPrfBase::generate_constrained_subkeys(
 
         assert(min == max);
         RCPrfBase::generate_leaf_from_parent(
-            base_prg, tree_height, subtree_min, min, constrained_elements);
+            base_prg, subtree_min, min, constrained_elements);
         return;
     }
 
@@ -711,7 +760,7 @@ void RCPrfBase::generate_constrained_subkeys(
 
             std::unique_ptr<ConstrainedRCPrfInnerElement<NBYTES>> elt(
                 new ConstrainedRCPrfInnerElement<NBYTES>(std::move(subkey),
-                                                         tree_height,
+                                                         tree_height(),
                                                          subtree_height - 1,
                                                          subtree_min,
                                                          subtree_mid));
@@ -721,14 +770,13 @@ void RCPrfBase::generate_constrained_subkeys(
             // take care that the selected span for the left subtree can be
             // [min, subtree_mid] if max > subtree_mid (i.e. the range spans on
             // both subtrees)
-            RCPrfBase::generate_constrained_subkeys(Prg(std::move(subkey)),
-                                                    tree_height,
-                                                    subtree_height - 1,
-                                                    subtree_min,
-                                                    subtree_mid,
-                                                    min,
-                                                    std::min(max, subtree_mid),
-                                                    constrained_elements);
+            this->generate_constrained_subkeys(Prg(std::move(subkey)),
+                                               subtree_height - 1,
+                                               subtree_min,
+                                               subtree_mid,
+                                               min,
+                                               std::min(max, subtree_mid),
+                                               constrained_elements);
         }
     }
 
@@ -743,7 +791,7 @@ void RCPrfBase::generate_constrained_subkeys(
 
             std::unique_ptr<ConstrainedRCPrfInnerElement<NBYTES>> elt(
                 new ConstrainedRCPrfInnerElement<NBYTES>(std::move(subkey),
-                                                         tree_height,
+                                                         tree_height(),
                                                          subtree_height - 1,
                                                          subtree_mid + 1,
                                                          subtree_max));
@@ -751,15 +799,13 @@ void RCPrfBase::generate_constrained_subkeys(
         } else {
             // again, be careful with the min value of the selected range of the
             // recursive call
-            RCPrfBase::generate_constrained_subkeys(
-                Prg(std::move(subkey)),
-                tree_height,
-                subtree_height - 1,
-                subtree_mid + 1,
-                subtree_max,
-                std::max(min, subtree_mid + 1),
-                max,
-                constrained_elements);
+            this->generate_constrained_subkeys(Prg(std::move(subkey)),
+                                               subtree_height - 1,
+                                               subtree_mid + 1,
+                                               subtree_max,
+                                               std::max(min, subtree_mid + 1),
+                                               max,
+                                               constrained_elements);
         }
     }
 }
@@ -797,7 +843,7 @@ public:
     /// @exception std::invalid_argument       height is not between 1 and 64
     ///
     RCPrf(Key<kKeySize>&& key, depth_type height)
-        : root_prg_(std::move(key)), tree_height_(height)
+        : RCPrfBase(height), root_prg_(std::move(key))
     {
         if (height == 0) {
             throw std::invalid_argument(
@@ -853,18 +899,17 @@ public:
     ConstrainedRCPrf<NBYTES> constrain(uint64_t min, uint64_t max) const;
 
 private:
-    Prg              root_prg_;
-    const depth_type tree_height_;
+    Prg root_prg_;
 };
 
 template<uint16_t NBYTES>
 std::array<uint8_t, NBYTES> RCPrf<NBYTES>::eval(uint64_t leaf) const
 {
-    if (leaf >> tree_height_ != 0) {
+    if (leaf >> this->tree_height() != 0) {
         throw std::out_of_range("Invalid node index: leaf > 2^height -1.");
     }
 
-    return RCPrfBase::derive_leaf<NBYTES>(root_prg_, tree_height_, 0, leaf);
+    return this->derive_leaf<NBYTES>(root_prg_, 0, leaf);
 }
 
 template<uint16_t NBYTES>
@@ -876,25 +921,24 @@ ConstrainedRCPrf<NBYTES> RCPrf<NBYTES>::constrain(uint64_t min,
             "RCPrf::constrain: Invalid range: min is larger than max: max="
             + std::to_string(max) + ", min=" + std::to_string(min));
     }
-    if (max >= RCPrfBase::leaf_count(tree_height_)) {
+    if (max >= RCPrfBase::leaf_count(this->tree_height())) {
         throw std::out_of_range(
             "RCPrf::constrain: range's maximum (=" + std::to_string(max)
             + ") is too big. It must be strictly smaller than 2^(height-1) "
               "(="
-            + std::to_string(RCPrfBase::leaf_count(tree_height_)) + ")");
+            + std::to_string(RCPrfBase::leaf_count(this->tree_height())) + ")");
     }
 
-    uint64_t max_range = RCPrfBase::leaf_count(tree_height_) - 1;
+    uint64_t max_range = RCPrfBase::leaf_count(this->tree_height()) - 1;
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>
         constrained_elements;
-    RCPrfBase::generate_constrained_subkeys(root_prg_,
-                                            tree_height_,
-                                            tree_height_,
-                                            0,
-                                            max_range,
-                                            min,
-                                            max,
-                                            constrained_elements);
+    this->generate_constrained_subkeys(root_prg_,
+                                       this->tree_height(),
+                                       0,
+                                       max_range,
+                                       min,
+                                       max,
+                                       constrained_elements);
 
     return ConstrainedRCPrf<NBYTES>(std::move(constrained_elements));
 }

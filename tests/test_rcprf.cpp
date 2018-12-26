@@ -175,4 +175,13 @@ TEST(rc_prf, constructors_exceptions)
 
     EXPECT_THROW(sse::crypto::ConstrainedRCPrf<16> cprf(std::move(leaf_vec)),
                  std::invalid_argument);
+
+
+    leaf_vec.empty();
+    leaf_vec.emplace_back(new sse::crypto::ConstrainedRCPrfLeafElement<16>(
+        std::array<uint8_t, 16>(), tree_height, 0));
+    leaf_vec.emplace_back(new sse::crypto::ConstrainedRCPrfLeafElement<16>(
+        std::array<uint8_t, 16>(), tree_height + 1, 1));
+    EXPECT_THROW(sse::crypto::ConstrainedRCPrf<16> cprf(std::move(leaf_vec)),
+                 std::invalid_argument);
 }

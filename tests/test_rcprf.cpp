@@ -38,10 +38,11 @@ TEST(rc_prf, constrain)
     sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
                                   test_depth);
 
-    for (uint64_t min = 0; min < sse::crypto::RCPrfBase::leaf_count(test_depth);
+    for (uint64_t min = 0;
+         min < sse::crypto::RCPrfParams::leaf_count(test_depth);
          min++) {
         for (uint64_t max = min;
-             max < sse::crypto::RCPrfBase::leaf_count(test_depth);
+             max < sse::crypto::RCPrfParams::leaf_count(test_depth);
              max++) {
             auto constrained_prf = rc_prf.constrain(min, max);
             for (uint64_t leaf = min; leaf <= max; leaf++) {
@@ -118,7 +119,7 @@ TEST(rc_prf, constructors_exceptions)
     constexpr uint8_t  tree_height    = subtree_height + 1;
     static_assert(
         range_max - range_min + 1
-            == sse::crypto::RCPrfBase::leaf_count_generic(subtree_height),
+            == sse::crypto::RCPrfParams::leaf_count_generic(subtree_height),
         "The tested range and the subtree_height are not compatible");
 
     // min > max

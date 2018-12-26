@@ -41,14 +41,59 @@ TEST(rc_prf, constrain)
     for (uint64_t min = 0;
          min < sse::crypto::RCPrfParams::leaf_count(test_depth);
          min++) {
-        for (uint64_t max = min;
-             max < sse::crypto::RCPrfParams::leaf_count(test_depth);
-             max++) {
+        uint64_t maximal_range
+            = sse::crypto::RCPrfParams::leaf_count(test_depth);
+        if (min == 0) {
+            // we cannot constrain the key to the range [0,
+            // leaf_count(test_depth]
+            maximal_range--;
+        }
+        for (uint64_t max = min; max < maximal_range; max++) {
             auto constrained_prf = rc_prf.constrain(min, max);
             for (uint64_t leaf = min; leaf <= max; leaf++) {
                 auto out             = rc_prf.eval(leaf);
                 auto out_constrained = constrained_prf.eval(leaf);
                 ASSERT_EQ(out, out_constrained);
+            }
+        }
+    }
+}
+
+TEST(rc_prf, double_constrain)
+{
+    constexpr uint8_t                  test_depth = 5;
+    std::array<uint8_t, kRCPrfKeySize> k{
+        {0x00}}; // fixed key for easy debugging and bug reproducing
+    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
+                                  test_depth);
+
+    for (uint64_t min = 0;
+         min < sse::crypto::RCPrfParams::leaf_count(test_depth);
+         min++) {
+        uint64_t maximal_range
+            = sse::crypto::RCPrfParams::leaf_count(test_depth);
+        if (min == 0) {
+            // we cannot constrain the key to the range [0,
+            // leaf_count(test_depth]
+            maximal_range--;
+        }
+        for (uint64_t max = min; max < maximal_range; max++) {
+            auto constrained_prf = rc_prf.constrain(min, max);
+
+            // reconstrain the PRF
+            for (uint64_t subrange_min = min; subrange_min <= max;
+                 subrange_min++) {
+                for (uint64_t subrange_max = subrange_min; subrange_max <= max;
+                     subrange_max++) {
+                    auto reconstrained_prf
+                        = constrained_prf.constrain(subrange_min, subrange_max);
+                    for (uint64_t leaf = subrange_min; leaf <= subrange_max;
+                         leaf++) {
+                        auto out             = constrained_prf.eval(leaf);
+                        auto out_constrained = reconstrained_prf.eval(leaf);
+                        ASSERT_EQ(out, out_constrained);
+                    }
+                }
             }
         }
     }
@@ -69,6 +114,8 @@ TEST(rc_prf, eval_constrain_exceptions)
     // Exceptions raised by RCPrf::constrain
     EXPECT_THROW(rc_prf.constrain(3, 2), std::invalid_argument);
     EXPECT_THROW(rc_prf.constrain(0, 1UL << test_depth), std::out_of_range);
+    EXPECT_THROW(rc_prf.constrain(0, (1UL << (test_depth - 1)) - 1),
+                 std::out_of_range);
 
     uint64_t range_min = 4, range_max = 9;
     auto     constrained_rc_prf = rc_prf.constrain(range_min, range_max);

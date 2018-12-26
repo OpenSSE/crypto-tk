@@ -35,6 +35,10 @@
 namespace sse {
 namespace crypto {
 
+// forward declare a template
+template<uint16_t NBYTES>
+class ConstrainedRCPrfInnerElement;
+
 /// @class Prg
 /// @brief Pseudorandom generator.
 ///
@@ -43,6 +47,9 @@ namespace crypto {
 ///
 class Prg
 {
+    template<uint16_t NBYTES>
+    friend class ConstrainedRCPrfInnerElement;
+
 public:
     /// @brief Size (in bytes) of a PRG key
     static constexpr uint8_t kKeySize = 32;
@@ -333,10 +340,9 @@ public:
         derive(std::move(k), offset, N, out.data());
     }
 
-
 private:
-    class PrgImpl; // not defined in the header
-    // std::unique_ptr<PrgImpl> prg_imp_; // opaque pointer
+    Prg duplicate() const;
+
     Key<kKeySize> key_;
 };
 

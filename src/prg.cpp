@@ -200,6 +200,16 @@ std::string Prg::derive(Key<kKeySize>&& k,
     return out;
 }
 
+Prg Prg::duplicate() const
+{
+    std::array<uint8_t, kKeySize> buffer;
+
+    memcpy(buffer.data(), key_.unlock_get(), kKeySize);
+    key_.lock();
+
+    return Prg(Key<kKeySize>(buffer.data()));
+}
+
 } // namespace crypto
 
 } // namespace sse

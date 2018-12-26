@@ -183,6 +183,7 @@ protected:
     ///
     /// @param base_prg        The Prg object representing the node to start the
     ///                        generation from. Must not necessary be the root.
+    /// @param tree_height     The height of the tree.
     /// @param subtree_height  The height of the base node rooted subtree. A
     ///                        height of tree_height represents the entire tree,
     /// @param subtree_min     The minimum leaf index supported by the subtree
@@ -199,27 +200,29 @@ protected:
     ///                                    between min and max
     ///
     template<uint16_t NBYTES>
-    void generate_constrained_subkeys(
+    static void generate_constrained_subkeys_from_node(
         const Prg&       base_prg,
+        const depth_type tree_height,
         const depth_type subtree_height,
         const uint64_t   subtree_min,
         const uint64_t   subtree_max,
         const uint64_t   min,
         const uint64_t   max,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-            constrained_elements) const;
+            constrained_elements);
 
     ///
     /// @brief Generate a leaf from its parent node.
     ///
     /// Computes the leaf given as input from its parent node, represented by
     /// the base_prg object. This function is a specialization of the
-    /// generate_constrained_subkeys function for height 2 subtrees.
+    /// generate_constrained_subkeys_from_node function for height 2 subtrees.
     ///
     /// @tparam NBYTES     The size in bytes of the tree's leaves.
     ///
     /// @param base_prg        The Prg object representing the parent node of
     ///                        the leaf to generate.
+    /// @param tree_height     The height of the tree.
     /// @param subtree_min     The minimum leaf index supported by the subtree
     ///                        (of height two) rooted at the base node. The
     ///                        subtree's maximum leaf index does not have to be
@@ -230,12 +233,13 @@ protected:
     ///                                    to generate will be put.
     ///
     template<uint16_t NBYTES>
-    void generate_leaf_from_parent(
-        const Prg&     base_prg,
-        const uint64_t subtree_min,
-        const uint64_t leaf,
+    static void generate_leaf_from_parent(
+        const Prg&       base_prg,
+        const depth_type tree_height,
+        const uint64_t   subtree_min,
+        const uint64_t   leaf,
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-            constrained_elements) const;
+            constrained_elements);
 
 private:
     const depth_type tree_height_;
@@ -705,11 +709,12 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrf<NBYTES>::eval(uint64_t leaf) const
 
 template<uint16_t NBYTES>
 void RCPrfBase::generate_leaf_from_parent(
-    const Prg&     base_prg,
-    const uint64_t subtree_min,
-    const uint64_t leaf,
+    const Prg&       base_prg,
+    const depth_type tree_height,
+    const uint64_t   subtree_min,
+    const uint64_t   leaf,
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-        constrained_elements) const
+        constrained_elements)
 {
     RCPrfTreeNodeChild child = (leaf == subtree_min) ? LeftChild : RightChild;
     std::array<uint8_t, NBYTES> buffer;
@@ -720,20 +725,21 @@ void RCPrfBase::generate_leaf_from_parent(
 
     std::unique_ptr<ConstrainedRCPrfLeafElement<NBYTES>> elt(
         new ConstrainedRCPrfLeafElement<NBYTES>(
-            std::move(buffer), this->tree_height(), leaf));
+            std::move(buffer), tree_height, leaf));
     constrained_elements.emplace_back(std::move(elt));
 }
 
 template<uint16_t NBYTES>
-void RCPrfBase::generate_constrained_subkeys(
+void RCPrfBase::generate_constrained_subkeys_from_node(
     const Prg&       base_prg,
+    const depth_type tree_height,
     const depth_type subtree_height,
     const uint64_t   subtree_min,
     const uint64_t   subtree_max,
     const uint64_t   min,
     const uint64_t   max,
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
-        constrained_elements) const
+        constrained_elements)
 {
     if (subtree_height <= 2) {
         // we are in a 'special' case, that we want to separate to simplify the
@@ -742,7 +748,7 @@ void RCPrfBase::generate_constrained_subkeys(
 
         assert(min == max);
         RCPrfBase::generate_leaf_from_parent(
-            base_prg, subtree_min, min, constrained_elements);
+            base_prg, tree_height, subtree_min, min, constrained_elements);
         return;
     }
 
@@ -760,7 +766,7 @@ void RCPrfBase::generate_constrained_subkeys(
 
             std::unique_ptr<ConstrainedRCPrfInnerElement<NBYTES>> elt(
                 new ConstrainedRCPrfInnerElement<NBYTES>(std::move(subkey),
-                                                         tree_height(),
+                                                         tree_height,
                                                          subtree_height - 1,
                                                          subtree_min,
                                                          subtree_mid));
@@ -770,13 +776,15 @@ void RCPrfBase::generate_constrained_subkeys(
             // take care that the selected span for the left subtree can be
             // [min, subtree_mid] if max > subtree_mid (i.e. the range spans on
             // both subtrees)
-            this->generate_constrained_subkeys(Prg(std::move(subkey)),
-                                               subtree_height - 1,
-                                               subtree_min,
-                                               subtree_mid,
-                                               min,
-                                               std::min(max, subtree_mid),
-                                               constrained_elements);
+            RCPrfBase::generate_constrained_subkeys_from_node(
+                Prg(std::move(subkey)),
+                tree_height,
+                subtree_height - 1,
+                subtree_min,
+                subtree_mid,
+                min,
+                std::min(max, subtree_mid),
+                constrained_elements);
         }
     }
 
@@ -791,7 +799,7 @@ void RCPrfBase::generate_constrained_subkeys(
 
             std::unique_ptr<ConstrainedRCPrfInnerElement<NBYTES>> elt(
                 new ConstrainedRCPrfInnerElement<NBYTES>(std::move(subkey),
-                                                         tree_height(),
+                                                         tree_height,
                                                          subtree_height - 1,
                                                          subtree_mid + 1,
                                                          subtree_max));
@@ -799,13 +807,15 @@ void RCPrfBase::generate_constrained_subkeys(
         } else {
             // again, be careful with the min value of the selected range of the
             // recursive call
-            this->generate_constrained_subkeys(Prg(std::move(subkey)),
-                                               subtree_height - 1,
-                                               subtree_mid + 1,
-                                               subtree_max,
-                                               std::max(min, subtree_mid + 1),
-                                               max,
-                                               constrained_elements);
+            RCPrfBase::generate_constrained_subkeys_from_node(
+                Prg(std::move(subkey)),
+                tree_height,
+                subtree_height - 1,
+                subtree_mid + 1,
+                subtree_max,
+                std::max(min, subtree_mid + 1),
+                max,
+                constrained_elements);
         }
     }
 }
@@ -932,13 +942,14 @@ ConstrainedRCPrf<NBYTES> RCPrf<NBYTES>::constrain(uint64_t min,
     uint64_t max_range = RCPrfBase::leaf_count(this->tree_height()) - 1;
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>
         constrained_elements;
-    this->generate_constrained_subkeys(root_prg_,
-                                       this->tree_height(),
-                                       0,
-                                       max_range,
-                                       min,
-                                       max,
-                                       constrained_elements);
+    RCPrfBase::generate_constrained_subkeys_from_node(root_prg_,
+                                                      tree_height(),
+                                                      tree_height(),
+                                                      0,
+                                                      max_range,
+                                                      min,
+                                                      max,
+                                                      constrained_elements);
 
     return ConstrainedRCPrf<NBYTES>(std::move(constrained_elements));
 }

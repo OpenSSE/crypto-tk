@@ -92,18 +92,12 @@ struct RCPrfParams
     }
 
 
-    static bool ranges_intersect(uint64_t min_1,
-                                 uint64_t max_1,
-                                 uint64_t min_2,
-                                 uint64_t max_2)
+    inline static constexpr bool ranges_intersect(uint64_t min_1,
+                                                  uint64_t max_1,
+                                                  uint64_t min_2,
+                                                  uint64_t max_2)
     {
-        if (min_1 > max_2) {
-            return false;
-        }
-        if (min_2 > max_1) {
-            return false;
-        }
-        return true;
+        return (min_1 <= max_2) && (min_2 <= max_1);
     }
     /// @brief Type encoding a choice of child in a binary tree.
     enum RCPrfTreeNodeChild : uint8_t
@@ -407,19 +401,20 @@ public:
                 "Invalid range: min is larger than max: max="
                 + std::to_string(max) + ", min=" + std::to_string(min));
         }
-        if ((max - min + 1) != RCPrfParams::leaf_count(subtree_height_)) {
+        if ((max - min + 1)
+            != RCPrfParams::leaf_count(this->subtree_height())) {
             throw std::invalid_argument(
                 "Invalid range: the range's width "
                 "should be 2^(subtree_height - 1): range's width="
                 + std::to_string(max - min + 1) + "(max=" + std::to_string(max)
                 + ", min=" + std::to_string(min) + "), expected width = "
-                + std::to_string(RCPrfParams::leaf_count(subtree_height_)));
+                + std::to_string(
+                      RCPrfParams::leaf_count(this->subtree_height())));
         }
     }
 
     virtual ~ConstrainedRCPrfElement() = default;
 
-public:
     /// @brief Returns the minimum leaf index supported by the element.
     uint64_t min_leaf() const
     {
@@ -432,11 +427,17 @@ public:
         return max_leaf_;
     }
 
+    /// @brief Returns the height of the subtree represented by the element
+    RCPrfParams::depth_type subtree_height() const
+    {
+        return subtree_height_;
+    }
+
     ///
     /// @brief Evaluate the Range-Constrained PRF
     ///
-    /// Returns the value of the specified leaf computed from the constrained
-    /// key element.
+    /// Returns the value of the specified leaf computed from the
+    /// constrained key element.
     ///
     /// @param leaf The index of the leaf to evaluate.
     ///
@@ -445,7 +446,7 @@ public:
     virtual std::array<uint8_t, NBYTES> eval(uint64_t leaf) const = 0;
 
 
-protected:
+private:
     const RCPrfParams::depth_type subtree_height_;
     const uint64_t                min_leaf_;
     const uint64_t                max_leaf_;
@@ -572,20 +573,20 @@ template<uint16_t NBYTES>
 std::array<uint8_t, NBYTES> ConstrainedRCPrfInnerElement<NBYTES>::eval(
     uint64_t leaf) const
 {
-    if (leaf < this->min_leaf_) {
+    if (leaf < this->min_leaf()) {
         throw std::out_of_range(
             "Leaf index is less than the range's minimum: leaf index="
             + std::to_string(leaf)
-            + ", range min=" + std::to_string(this->min_leaf_));
+            + ", range min=" + std::to_string(this->min_leaf()));
     }
-    if (leaf > this->max_leaf_) {
+    if (leaf > this->max_leaf()) {
         throw std::out_of_range(
             "Leaf index is bigger than the range's maximum: leaf index="
             + std::to_string(leaf)
-            + ", range max=" + std::to_string(this->max_leaf_));
+            + ", range max=" + std::to_string(this->max_leaf()));
     }
 
-    uint8_t base_depth = this->tree_height() - this->subtree_height_;
+    uint8_t base_depth = this->tree_height() - this->subtree_height();
 
     // we use this trick to avoid compilation errors (at least on clang)
     return static_cast<const ConstrainedRCPrfInnerElement<NBYTES>*>(this)
@@ -614,7 +615,7 @@ void ConstrainedRCPrfInnerElement<NBYTES>::generate_constrained_subkeys(
             new ConstrainedRCPrfInnerElement<NBYTES>(
                 std::move(base_prg_.duplicate()),
                 this->tree_height(),
-                this->subtree_height_,
+                this->subtree_height(),
                 this->min_leaf(),
                 this->max_leaf()));
         constrained_elements.push_back(std::move(elt));
@@ -625,7 +626,7 @@ void ConstrainedRCPrfInnerElement<NBYTES>::generate_constrained_subkeys(
     RCPrfBase<NBYTES>::generate_constrained_subkeys_from_node(
         base_prg_,
         this->tree_height(),
-        this->subtree_height_,
+        this->subtree_height(),
         this->min_leaf(),
         this->max_leaf(),
         min,
@@ -706,10 +707,10 @@ template<uint16_t NBYTES>
 std::array<uint8_t, NBYTES> ConstrainedRCPrfLeafElement<NBYTES>::eval(
     uint64_t leaf) const
 {
-    if (leaf != this->min_leaf_) {
+    if (leaf != this->min_leaf()) {
         throw std::out_of_range(
             "Invalid leaf value in 'eval': leaf(=" + std::to_string(leaf)
-            + ") should be equal to min(=" + std::to_string(this->min_leaf_)
+            + ") should be equal to min(=" + std::to_string(this->min_leaf())
             + ")");
     }
     return leaf_buffer_;
@@ -722,16 +723,16 @@ void ConstrainedRCPrfLeafElement<NBYTES>::generate_constrained_subkeys(
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
         constrained_elements) const
 {
-    if (min != this->min_leaf_ || max != this->min_leaf_) {
+    if (min != this->min_leaf() || max != this->min_leaf()) {
         throw std::out_of_range(
             "ConstrainedRCPrfLeafElement::constrain: the input range ("
             + std::to_string(min) + ", " + std::to_string(max)
             + ") is not reduced to the leaf index "
-            + std::to_string(this->min_leaf_));
+            + std::to_string(this->min_leaf()));
     }
     std::unique_ptr<ConstrainedRCPrfLeafElement<NBYTES>> elt(
         new ConstrainedRCPrfLeafElement<NBYTES>(
-            leaf_buffer_, this->tree_height(), this->min_leaf_));
+            leaf_buffer_, this->tree_height(), this->min_leaf()));
     constrained_elements.emplace_back(std::move(elt));
 }
 

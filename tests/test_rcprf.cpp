@@ -249,7 +249,7 @@ TEST(rc_prf, constructors_exceptions)
     constexpr uint8_t  tree_height    = subtree_height + 1;
     static_assert(
         range_max - range_min
-            == sse::crypto::RCPrfParams::leaf_count_generic(subtree_height),
+            == sse::crypto::RCPrfParams::max_leaf_index_generic(subtree_height),
         "The tested range and the subtree_height are not compatible");
 
     // min > max

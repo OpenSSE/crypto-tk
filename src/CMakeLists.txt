@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1)
 
-project (libsse_crypto VERSION 0.2 
+project (libsse_crypto VERSION 0.2
                        DESCRIPTION "OpenSSE's cryptographic library")
 
 option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
@@ -27,17 +27,17 @@ endif()
 option(ENABLE_MEMORY_LOCK "Enable the memory locking mechanisms." ON)
 
 
-add_library(sse_crypto SHARED 
+add_library(sse_crypto SHARED
                 cipher.cpp key.cpp prg.cpp tdp.cpp prp.cpp hmac.cpp prf.cpp
-                puncturable_enc.cpp random.cpp utils.cpp set_hash.cpp
+                puncturable_enc.cpp random.cpp utils.cpp set_hash.cpp rcprf.cpp
                 hash.cpp hash/blake2b.cpp hash/sha512.cpp
                 ppke/GMPpke.cpp ppke/util.cpp ppke/relic_wrapper/relic_api.cpp
                 tdp_impl/tdp_impl_mbedtls.cpp tdp_impl/tdp_impl_openssl.cpp
                 aez/aez.c
-                mbedtls/asn1write.c mbedtls/bignum.c 
+                mbedtls/asn1write.c mbedtls/bignum.c
                 mbedtls/pk.c mbedtls/pkparse.c mbedtls/rsa_io.c
-                mbedtls/asn1parse.c mbedtls/base64.c mbedtls/pem.c 
-                mbedtls/pk_wrap.c mbedtls/rsa.c           
+                mbedtls/asn1parse.c mbedtls/base64.c mbedtls/pem.c
+                mbedtls/pk_wrap.c mbedtls/rsa.c
             )
 
 # Generate PIC for the library

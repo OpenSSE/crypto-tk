@@ -57,6 +57,7 @@ matrix:
               packages:
                  - *basic_deps
         after_success:
+           - cd $TRAVIS_BUILD_DIR
            - ./coverage/gen_coverage.sh # get the code coverage
            - ./coverage/upload_report.sh # upload the report to coveralls
 
@@ -124,5 +125,5 @@ matrix:
                branch_pattern: coverity_scan
 
 script:
-  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then VERBOSE=1 cmake --build .; fi
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ] && [ "${TRAVIS_BRANCH}" != "coverity_scan" ]; then VERBOSE=1 cmake --build .; fi
   - if [ "${RUN_CHECKS}" == "true" ]; then ./tests/check; fi

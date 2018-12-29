@@ -48,7 +48,7 @@ endif()
 if (opensse_ENABLE_WERROR)
   CHECK_CXX_COMPILER_FLAG("-Werror" COMPILER_OPT_WERROR_SUPPORTED)
   if (COMPILER_OPT_WERROR_SUPPORTED)
-      add_compile_options(-Werror)
+      add_compile_options(-Werror -Wno-error=unknown-pragmas)
   endif()
 endif()
 

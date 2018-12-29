@@ -315,7 +315,7 @@ TEST(rc_prf, constructors_exceptions)
                  std::invalid_argument);
 
 
-    leaf_vec.empty();
+    leaf_vec.clear();
     leaf_vec.emplace_back(new sse::crypto::ConstrainedRCPrfLeafElement<16>(
         std::array<uint8_t, 16>(), tree_height, 0));
     leaf_vec.emplace_back(new sse::crypto::ConstrainedRCPrfLeafElement<16>(

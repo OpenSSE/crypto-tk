@@ -94,7 +94,7 @@ public:
     /// Destructs the Prp object and erase its key.
     ///
     ///
-    ~Prp();
+    // ~Prp();
 
     // we should not be able to duplicate Fpe objects
     Prp(const Prp& c)  = delete;
@@ -141,7 +141,21 @@ public:
     ///
     /// @brief PRP evaluation
     ///
-    /// Evaluates the pseudo random permutation on the input 64 bits integer.
+    /// Evaluates the pseudo random permutation on a buffer.
+    ///
+    /// @param in           The input of the PRP.
+    /// @param len          The length of the in buffer.
+    /// @param[out] out     The output of the PRP evaluation.
+    ///
+    /// @exception std::runtime_error The Prp class is not available.
+    ///
+
+    void encrypt(const uint8_t* in, const unsigned int len, uint8_t* out);
+    ///
+    /// @brief PRP evaluation
+    ///
+    /// Evaluates the pseudo random permutation on the input 64 bits
+    /// integer.
     ///
     /// @param in    The input of the PRP.
     /// @return      The evaluation of PRP(in).
@@ -173,6 +187,21 @@ public:
     /// @exception std::runtime_error The Prp class is not available.
     ///
     std::string decrypt(const std::string& in);
+
+
+    ///
+    /// @brief PRP inversion
+    ///
+    /// Inverts the pseudo random permutation on the input buffer.
+    ///
+    /// @param in   The input for the PRP inversion.
+    /// @param len          The length of the in buffer.
+    /// @param[out] out     The output of the PRP inversion.
+    ///
+    /// @exception std::runtime_error The Prp class is not available.
+    ///
+    void decrypt(const uint8_t* in, const unsigned int len, uint8_t* out);
+
     ///
     /// @brief PRP inversion
     ///
@@ -201,9 +230,9 @@ public:
     Prp& operator=(Prp& h) = delete;
 
 private:
-    class PrpImpl;     // not defined in the header
-    PrpImpl* prp_imp_; // opaque pointer
+    static constexpr uint8_t kContextSize = 112;
 
+    Key<kContextSize> aez_ctx_;
 
     ///
     /// @brief Initialize the availability flag.

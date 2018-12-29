@@ -40,47 +40,11 @@ namespace crypto {
 
 bool Prp::is_available__ = false;
 
-#if __AES__ || __ARM_FEATURE_CRYPTO
-class Prp::PrpImpl
-{
-public:
-    PrpImpl();
+#if !(__AES__ || __ARM_FEATURE_CRYPTO)
 
-    explicit PrpImpl(Key<kKeySize>&& k);
+#error("PRP is not available without CPU support for AES instructions")
 
-    void encrypt(const unsigned char* in,
-                 const unsigned int&  len,
-                 unsigned char*       out);
-    void encrypt(const std::string& in, std::string& out);
-    void decrypt(const unsigned char* in,
-                 const unsigned int&  len,
-                 unsigned char*       out);
-    void decrypt(const std::string& in, std::string& out);
-
-private:
-    Key<sizeof(aez_ctx_t)> aez_ctx_;
-};
-
-#else
-#pragma message("PRP is not available without CPU support for AES instructions")
-
-class Prp::PrpImpl
-{
-public:
-    PrpImpl(){};
-
-    explicit PrpImpl(Key<kKeySize>&& k){};
-
-    void encrypt(const unsigned char* in,
-                 const unsigned int&  len,
-                 unsigned char*       out){};
-    void encrypt(const std::string& in, std::string& out){};
-    void decrypt(const unsigned char* in,
-                 const unsigned int&  len,
-                 unsigned char*       out){};
-    void decrypt(const std::string& in, std::string& out){};
-};
-#endif /* __AES__ || __ARM_FEATURE_CRYPTO */
+#endif /* !(__AES__ || __ARM_FEATURE_CRYPTO) */
 
 void Prp::compute_is_available() noexcept
 {
@@ -92,95 +56,15 @@ void Prp::compute_is_available() noexcept
 #endif
 }
 
-Prp::Prp() : prp_imp_(Prp::is_available() ? new PrpImpl() : nullptr)
+Prp::Prp()
 {
+    static_assert(kContextSize == sizeof(aez_ctx_t),
+                  "Prp: kContextSize and the aez_ctx_t size do not match");
+
     if (!Prp::is_available()) {
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
     }
-}
-
-
-Prp::Prp(Key<kKeySize>&& k)
-    : prp_imp_(Prp::is_available() ? new PrpImpl(std::move(k)) : nullptr)
-{
-    if (!Prp::is_available()) {
-        throw std::runtime_error("PRP are unavailable: AES hardware "
-                                 "acceleration not supported by the CPU");
-    }
-}
-
-
-Prp::~Prp()
-{
-    delete prp_imp_;
-}
-
-void Prp::encrypt(const std::string& in, std::string& out)
-{
-    prp_imp_->encrypt(in, out);
-}
-
-std::string Prp::encrypt(const std::string& in)
-{
-    std::string out;
-    prp_imp_->encrypt(in, out);
-    return out;
-}
-
-uint32_t Prp::encrypt(const uint32_t in)
-{
-    uint32_t out;
-    prp_imp_->encrypt(reinterpret_cast<const unsigned char*>(&in),
-                      sizeof(uint32_t),
-                      reinterpret_cast<unsigned char*>(&out));
-    return out;
-}
-
-uint64_t Prp::encrypt_64(const uint64_t in)
-{
-    uint64_t out;
-    prp_imp_->encrypt(reinterpret_cast<const unsigned char*>(&in),
-                      sizeof(uint64_t),
-                      reinterpret_cast<unsigned char*>(&out));
-    return out;
-}
-
-
-void Prp::decrypt(const std::string& in, std::string& out)
-{
-    prp_imp_->decrypt(in, out);
-}
-
-std::string Prp::decrypt(const std::string& in)
-{
-    std::string out;
-    prp_imp_->decrypt(in, out);
-    return out;
-}
-
-uint32_t Prp::decrypt(const uint32_t in)
-{
-    uint32_t out;
-    prp_imp_->decrypt(reinterpret_cast<const unsigned char*>(&in),
-                      sizeof(uint32_t),
-                      reinterpret_cast<unsigned char*>(&out));
-    return out;
-}
-
-uint64_t Prp::decrypt_64(const uint64_t in)
-{
-    uint64_t out;
-    prp_imp_->decrypt(reinterpret_cast<const unsigned char*>(&in),
-                      sizeof(uint64_t),
-                      reinterpret_cast<unsigned char*>(&out));
-    return out;
-}
-
-#if __AES__ || __ARM_FEATURE_CRYPTO
-
-Prp::PrpImpl::PrpImpl()
-{
     auto callback = [](uint8_t* key_content) {
         Key<kKeySize> r_key;
         aez_setup(static_cast<const unsigned char*>(r_key.unlock_get()),
@@ -191,21 +75,75 @@ Prp::PrpImpl::PrpImpl()
     aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
 }
 
-Prp::PrpImpl::PrpImpl(Key<kKeySize>&& k)
+
+Prp::Prp(Key<kKeySize>&& k)
 {
+    if (!Prp::is_available()) {
+        throw std::runtime_error("PRP are unavailable: AES hardware "
+                                 "acceleration not supported by the CPU");
+    }
     auto callback = [&k](uint8_t* key_content) {
         aez_setup(static_cast<const unsigned char*>(k.unlock_get()),
                   48,
                   reinterpret_cast<aez_ctx_t*>(key_content));
     };
 
-    aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
+    aez_ctx_ = Key<kContextSize>(callback);
     k.erase();
 }
 
-void Prp::PrpImpl::encrypt(const unsigned char* in,
-                           const unsigned int&  len,
-                           unsigned char*       out)
+std::string Prp::encrypt(const std::string& in)
+{
+    std::string out;
+    encrypt(in, out);
+    return out;
+}
+
+uint32_t Prp::encrypt(const uint32_t in)
+{
+    uint32_t out;
+    encrypt(reinterpret_cast<const unsigned char*>(&in),
+            sizeof(uint32_t),
+            reinterpret_cast<unsigned char*>(&out));
+    return out;
+}
+
+uint64_t Prp::encrypt_64(const uint64_t in)
+{
+    uint64_t out;
+    encrypt(reinterpret_cast<const unsigned char*>(&in),
+            sizeof(uint64_t),
+            reinterpret_cast<unsigned char*>(&out));
+    return out;
+}
+
+
+std::string Prp::decrypt(const std::string& in)
+{
+    std::string out;
+    decrypt(in, out);
+    return out;
+}
+
+uint32_t Prp::decrypt(const uint32_t in)
+{
+    uint32_t out;
+    decrypt(reinterpret_cast<const unsigned char*>(&in),
+            sizeof(uint32_t),
+            reinterpret_cast<unsigned char*>(&out));
+    return out;
+}
+
+uint64_t Prp::decrypt_64(const uint64_t in)
+{
+    uint64_t out;
+    decrypt(reinterpret_cast<const unsigned char*>(&in),
+            sizeof(uint64_t),
+            reinterpret_cast<unsigned char*>(&out));
+    return out;
+}
+
+void Prp::encrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 {
     if (!Prp::is_available()) {
         throw std::runtime_error("PRP is unavailable: AES hardware "
@@ -236,7 +174,7 @@ void Prp::PrpImpl::encrypt(const unsigned char* in,
                 reinterpret_cast<char*>(out));
 }
 
-void Prp::PrpImpl::encrypt(const std::string& in, std::string& out)
+void Prp::encrypt(const std::string& in, std::string& out)
 {
     if (!Prp::is_available()) {
         throw std::runtime_error("PRP is unavailable: AES hardware "
@@ -246,9 +184,11 @@ void Prp::PrpImpl::encrypt(const std::string& in, std::string& out)
     size_t len = in.size();
 
     if (len > UINT_MAX) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error(
             "The maximum input length of Format Preserving Encryption is "
-            "UINT_MAX"); /* LCOV_EXCL_LINE */
+            "UINT_MAX");
+        /* LCOV_EXCL_STOP */
     }
 
     unsigned char* data = new unsigned char[len];
@@ -260,9 +200,7 @@ void Prp::PrpImpl::encrypt(const std::string& in, std::string& out)
     delete[] data;
 }
 
-void Prp::PrpImpl::decrypt(const unsigned char* in,
-                           const unsigned int&  len,
-                           unsigned char*       out)
+void Prp::decrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 {
     if (!Prp::is_available()) {
         throw std::runtime_error("PRP is unavailable: AES hardware "
@@ -296,7 +234,7 @@ void Prp::PrpImpl::decrypt(const unsigned char* in,
     aez_ctx_.lock();
 }
 
-void Prp::PrpImpl::decrypt(const std::string& in, std::string& out)
+void Prp::decrypt(const std::string& in, std::string& out)
 {
     if (!Prp::is_available()) {
         throw std::runtime_error("PRP is unavailable: AES hardware "
@@ -306,9 +244,11 @@ void Prp::PrpImpl::decrypt(const std::string& in, std::string& out)
     size_t len = in.size();
 
     if (len > UINT_MAX) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error(
             "The maximum input length of Format Preserving Encryption is "
-            "UINT_MAX"); /* LCOV_EXCL_LINE */
+            "UINT_MAX");
+        /* LCOV_EXCL_STOP */
     }
 
     unsigned char* data = new unsigned char[len];
@@ -320,8 +260,6 @@ void Prp::PrpImpl::decrypt(const std::string& in, std::string& out)
     out = std::string(reinterpret_cast<const char*>(data), len);
     delete[] data;
 }
-
-#endif /* __AES__ || __ARM_FEATURE_CRYPTO */
 
 } // namespace crypto
 } // namespace sse

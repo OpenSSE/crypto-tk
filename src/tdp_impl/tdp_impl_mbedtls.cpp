@@ -545,7 +545,7 @@ TdpInverseImpl_mbedTLS::invert_mult(
     // we have to reimplement everything by hand here
     // for the moment, this is not a very secure implementation:
     // it does not use blinding when available
-#warning Potentially insecure RSA implementation
+#pragma message("Potentially insecure RSA implementation")
     if (order == 0) {
         return in;
     }

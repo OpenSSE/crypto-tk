@@ -62,7 +62,7 @@ private:
 };
 
 #else
-#warning PRP is not available without CPU support for AES instructions
+#pragma message("PRP is not available without CPU support for AES instructions")
 
 class Prp::PrpImpl
 {

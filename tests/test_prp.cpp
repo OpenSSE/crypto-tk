@@ -119,5 +119,5 @@ TEST(prp, consistency_64)
 }
 
 #else
-#warning PRP is disabled (requires support of AES instructions)
+#pragma message("PRP is disabled (requires support of AES instructions)")
 #endif

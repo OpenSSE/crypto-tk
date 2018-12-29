@@ -366,12 +366,19 @@ void G1::writeBytes(uint8_t* bytes, bool compress) const
 
 std::ostream& operator<<(std::ostream& s, const G1& g1)
 {
+    // Save the format of the stream
+    std::ios_base::fmtflags saved_flags(s.flags());
+
     auto data = g1.getBytes();
     s << "0x";
     for (auto i : data) {
         s << std::hex << static_cast<unsigned int>(data[i]);
     }
     s << std::endl;
+
+    // Reset the flags
+    s.flags(saved_flags);
+
     return s;
 }
 
@@ -477,12 +484,19 @@ void G2::writeBytes(uint8_t* bytes, bool compress) const
 
 std::ostream& operator<<(std::ostream& s, const G2& g2)
 {
+    // Save the format of the stream
+    std::ios_base::fmtflags saved_flags(s.flags());
+
     auto data = g2.getBytes();
     s << "0x";
     for (auto i : data) {
         s << std::hex << static_cast<unsigned int>(data[i]);
     }
     s << std::endl;
+
+    // Reset the flags
+    s.flags(saved_flags);
+
     return s;
 }
 
@@ -603,12 +617,19 @@ void GT::writeBytes(uint8_t* bytes, bool compress) const
 
 std::ostream& operator<<(std::ostream& s, const GT& gt)
 {
+    // Save the format of the stream
+    std::ios_base::fmtflags saved_flags(s.flags());
+
     auto data = gt.getBytes();
     s << "0x";
     for (auto i : data) {
         s << std::hex << static_cast<unsigned int>(data[i]);
     }
     s << std::endl;
+
+    // Reset the flags
+    s.flags(saved_flags);
+
     return s;
 }
 

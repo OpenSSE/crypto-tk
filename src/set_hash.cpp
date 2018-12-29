@@ -141,11 +141,18 @@ std::array<uint8_t, SetHash::kSetHashSize> SetHash::data() const
 std::ostream& operator<<(std::ostream& os, const SetHash& h)
 {
     auto d = h.set_hash_imp_->data();
+
+    // Save the format of the stream
+    std::ios_base::fmtflags saved_flags(os.flags());
+
     for (uint8_t b : d) {
         os << std::hex << std::setw(2) << std::setfill('0')
            << static_cast<uint>(b);
     }
-    os << std::dec;
+
+    // Reset the flags
+    os.flags(saved_flags);
+
     return os;
 }
 /* LCOV_EXCL_STOP */

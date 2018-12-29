@@ -53,12 +53,25 @@ class SetHash
 public:
     /// @brief Size of the bytes representation of a SetHash
     static constexpr size_t kSetHashSize = 32;
+
+    /// @brief The infinite curve point, representing an empty set.
+    static constexpr std::array<uint8_t, kSetHashSize> kECInfinitePoint
+        = {{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+
     ///
     /// @brief Constructor
     ///
     /// Creates and initializes a SetHash for an empty set.
     ///
-    SetHash();
+    // the initial state is the infinite point
+    // we directly copy kECInfinitePoint: calling
+    // crypto_scalarmult_ed25519_base(set_hash_state_, scalar_zero__)
+    // will generate a differente byte string as the one obtained by computing
+    // crypto_core_ed25519_sub(_,b,b) (computing b-b). Indeed,
+    // crypto_core_ed25519_sub(x,b,b) sets x to kECInfinitePoint.
+    SetHash() = default;
 
     ///
     /// @brief Constructor
@@ -73,12 +86,12 @@ public:
     ///
     /// @brief Copy constructor
     ///
-    SetHash(const SetHash& o);
+    SetHash(const SetHash& o) = default;
 
     ///
     /// @brief Move constructor
     ///
-    SetHash(SetHash&& o) noexcept;
+    SetHash(SetHash&& o) noexcept = default;
 
     ///
     /// @brief Constructor
@@ -89,10 +102,6 @@ public:
     ///
     explicit SetHash(const std::vector<std::string>& in_set);
 
-    ///
-    /// @brief Destructor
-    ///
-    ~SetHash();
 
     ///
     /// @brief Hash a new element in the set hash
@@ -143,7 +152,7 @@ public:
     ///
     /// @return The array representing the set hash
     ///
-    std::array<uint8_t, kSetHashSize> data() const;
+    const std::array<uint8_t, kSetHashSize>& data() const;
 
 
     ///
@@ -164,10 +173,12 @@ public:
     /// @param h    The element to assign
     /// @return     The assigned object
     ///
-    SetHash& operator=(const SetHash& h);
+    SetHash& operator=(const SetHash& h) = default;
 
     ///
     /// @brief Comparison operator
+    ///
+    /// Compare set hashes. The comparison is done in constant time.
     ///
     /// @param h    The element to compare
     /// @return     true if h and the object have the same hash, false otherwise
@@ -178,13 +189,16 @@ public:
     /// @brief Comparison operator
     /// @param h    The element to compare
     /// @return     false if h and the object have the same hash,
-    ///             true otherwise
+    ///             true otherwise. The comparison is done in constant time
     ///
     bool operator!=(const SetHash& h) const;
 
 private:
-    class SetHashImpl;          // not defined in the header
-    SetHashImpl* set_hash_imp_; // opaque pointer
+    static void gen_curve_point(std::array<uint8_t, kSetHashSize>& p,
+                                const uint8_t*                     buf,
+                                const size_t                       len);
+
+    std::array<uint8_t, kSetHashSize> set_hash_state_{kECInfinitePoint};
 };
 
 } // namespace crypto

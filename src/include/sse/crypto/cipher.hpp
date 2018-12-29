@@ -139,10 +139,50 @@ public:
                                               : 0;
     }
 
+    ///
+    /// @brief Encrypt a plaintext
+    ///
+    /// Computes the encryption of the input plaintext.
+    ///
+    /// @tparam NBYTES The size of the plaintext
+    ///
+    /// @param in    The plaintext to be encrypted.
+    /// @param out   The computed ciphertext.
+    ///
+    ///
+    template<size_t NBYTES,
+             typename = typename std::enable_if<(NBYTES > 0)>::type>
+    void encrypt(const std::array<uint8_t, NBYTES>&              in,
+                 std::array<uint8_t, ciphertext_length(NBYTES)>& out) const
+        noexcept
+    {
+        encrypt(in.data(), NBYTES, out.data());
+    }
+
+    ///
+    /// @brief Encrypt a plaintext
+    ///
+    /// Computes the encryption of the input plaintext.
+    ///
+    /// @tparam NBYTES The size of the plaintext
+    ///
+    /// @param in    The ciphertext to be decrypted.
+    /// @param out   The computed plaintext.
+    ///
+    /// @exception std::runtime_error       The decryption failed: invalid tag
+    ///
+    template<size_t NBYTES,
+             typename = typename std::enable_if<(NBYTES > 0)>::type>
+    void decrypt(const std::array<uint8_t, ciphertext_length(NBYTES)>& in,
+                 std::array<uint8_t, NBYTES>& out) const
+    {
+        decrypt(in.data(), ciphertext_length(NBYTES), out.data());
+    }
+
 private:
     void encrypt(const unsigned char* in,
                  const size_t&        len,
-                 unsigned char*       out) const;
+                 unsigned char*       out) const noexcept;
     void decrypt(const unsigned char* in,
                  const size_t&        len,
                  unsigned char*       out) const;

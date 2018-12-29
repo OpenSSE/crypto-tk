@@ -59,7 +59,7 @@ Cipher::Cipher(Key<kKeySize>&& k) : key_(std::move(k))
 
 void Cipher::encrypt(const unsigned char* in,
                      const size_t&        len,
-                     unsigned char*       out) const
+                     unsigned char*       out) const noexcept
 {
     uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
     unsigned long long c_len = 0; // NOLINT

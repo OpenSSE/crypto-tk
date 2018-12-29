@@ -56,6 +56,43 @@ TEST(encryption, correctness)
     ASSERT_EQ(in_enc, out_dec);
 }
 
+TEST(encryption, array_correctness)
+{
+    std::array<uint8_t, 16> in, in_dec;
+    std::array<uint8_t, 48> out;
+
+    memset(in.data(), 0xFF, in.size());
+
+    array<uint8_t, kCipherKeySize> k;
+    k.fill(0x00);
+
+    sse::crypto::Cipher cipher(sse::crypto::Key<kCipherKeySize>(k.data()));
+    cipher.encrypt(in, out);
+
+    cipher.decrypt(out, in_dec);
+
+    ASSERT_EQ(in, in_dec);
+}
+
+TEST(encryption, compat)
+{
+    std::array<uint8_t, 16> in, in_dec;
+    std::array<uint8_t, 48> out;
+
+    memset(in.data(), 0xFF, in.size());
+
+
+    sse::crypto::Cipher cipher((sse::crypto::Key<kCipherKeySize>()));
+
+    cipher.encrypt(in, out);
+    std::string out_s(out.begin(), out.end()), in_dec_s;
+
+    cipher.decrypt(out, in_dec);
+    cipher.decrypt(out_s, in_dec_s);
+
+    EXPECT_EQ(in_dec_s, std::string(in_dec.begin(), in_dec.end()));
+}
+
 
 TEST(encryption, exception)
 {

@@ -88,19 +88,16 @@ public:
     ///
     explicit Prp(Key<kKeySize>&& k);
 
-    ///
-    /// @brief Destructor
-    ///
-    /// Destructs the Prp object and erase its key.
-    ///
-    ///
-    // ~Prp();
-
     // we should not be able to duplicate Fpe objects
-    Prp(const Prp& c)  = delete;
-    Prp(Prp& c)        = delete;
-    Prp(const Prp&& c) = delete;
-    Prp(Prp&& c)       = delete;
+    Prp(const Prp& c) = delete;
+    Prp(Prp& c)       = delete;
+
+    ///
+    /// @brief Move constructor
+    ///
+    /// @brief c The Prp object to be moved
+    ///
+    Prp(Prp&& c) noexcept = default;
 
     ///
     /// @brief PRP evaluation

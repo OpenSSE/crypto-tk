@@ -535,6 +535,7 @@ static int insecure_mod_exp(mbedtls_mpi*       X,
         MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(&base, &base, N));
     }
 
+// cppcheck-suppress unusedLabel
 cleanup:
     mbedtls_mpi_free(&base);
     return ret;

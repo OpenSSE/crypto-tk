@@ -21,6 +21,9 @@
 
 #include <sse/crypto/utils.hpp>
 
+#include <exception>
+#include <iostream>
+
 #include "gtest/gtest.h"
 
 //  Google Test takes care of everything
@@ -28,8 +31,14 @@
 
 int main(int argc, char* argv[])
 {
-    sse::crypto::init_crypto_lib();
-
+    try {
+        sse::crypto::init_crypto_lib();
+    } catch (const std::runtime_error& e) {
+        std::cerr
+            << "Error during the initialization of the cryptographic library:\n"
+            << e.what();
+        return -1;
+    }
     ::testing::InitGoogleTest(&argc, argv);
     int rv = RUN_ALL_TESTS();
 

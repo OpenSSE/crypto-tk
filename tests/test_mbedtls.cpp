@@ -37,6 +37,8 @@
 #include <openssl/rsa.h>
 #endif
 
+#define ASSERT_MPI(f) ASSERT_EQ(f, 0)
+
 using namespace std;
 static int mbedTLS_rng_wrap(__attribute__((unused)) void* arg,
                             unsigned char*                out,
@@ -45,6 +47,7 @@ static int mbedTLS_rng_wrap(__attribute__((unused)) void* arg,
     sse::crypto::random_bytes(len, out);
     return 0;
 }
+
 TEST(mbedTLS, bignum)
 {
     // mbedTLS already provides some tests
@@ -94,9 +97,9 @@ TEST(mbedTLS, bignum)
         mbedtls_mpi_fill_random(NULL, MBEDTLS_MPI_MAX_SIZE + 1, NULL, NULL),
         MBEDTLS_ERR_MPI_BAD_INPUT_DATA);
 
-    mbedtls_mpi_lset(&X, 4);
-    mbedtls_mpi_lset(&Y, 5);
-    mbedtls_mpi_lset(&Z, -8);
+    ASSERT_MPI(mbedtls_mpi_lset(&X, 4));
+    ASSERT_MPI(mbedtls_mpi_lset(&Y, 5));
+    ASSERT_MPI(mbedtls_mpi_lset(&Z, -8));
     mbedtls_mpi_uint r;
 
     ASSERT_EQ(mbedtls_mpi_sub_abs(&X, &X, &Y), MBEDTLS_ERR_MPI_NEGATIVE_VALUE);
@@ -127,32 +130,32 @@ TEST(mbedTLS, bignum)
     ASSERT_EQ(mbedtls_mpi_exp_mod(NULL, &Z, &Y, &X, NULL),
               MBEDTLS_ERR_MPI_BAD_INPUT_DATA); // even exponent
 
-    mbedtls_mpi_lset(&X, 3);
+    ASSERT_MPI(mbedtls_mpi_lset(&X, 3));
     ASSERT_EQ(mbedtls_mpi_exp_mod(&Z, &Z, &X, &Y, NULL), 0); // negative operand
     ASSERT_EQ(mbedtls_mpi_cmp_int(&Z, 3), 0);
 
-    mbedtls_mpi_lset(&Z, -8);
+    ASSERT_MPI(mbedtls_mpi_lset(&Z, -8));
     ASSERT_EQ(mbedtls_mpi_inv_mod(NULL, &X, &Z),
               MBEDTLS_ERR_MPI_BAD_INPUT_DATA); // negative moduli
 
 
-    mbedtls_mpi_lset(&Z, 6);
+    ASSERT_MPI(mbedtls_mpi_lset(&Z, 6));
     ASSERT_EQ(mbedtls_mpi_inv_mod(NULL, &X, &Z),
               MBEDTLS_ERR_MPI_NOT_ACCEPTABLE); // GCD != 1
 
 
     // primes
-    mbedtls_mpi_lset(&X, 0);
+    ASSERT_MPI(mbedtls_mpi_lset(&X, 0));
     ASSERT_EQ(mbedtls_mpi_is_prime(&X, NULL, NULL),
               MBEDTLS_ERR_MPI_NOT_ACCEPTABLE);
-    mbedtls_mpi_lset(&X, 1);
+    ASSERT_MPI(mbedtls_mpi_lset(&X, 1));
     ASSERT_EQ(mbedtls_mpi_is_prime(&X, NULL, NULL),
               MBEDTLS_ERR_MPI_NOT_ACCEPTABLE);
-    mbedtls_mpi_lset(&X, 2);
+    ASSERT_MPI(mbedtls_mpi_lset(&X, 2));
     ASSERT_EQ(mbedtls_mpi_is_prime(&X, NULL, NULL), 0);
-    mbedtls_mpi_lset(&X, 3);
+    ASSERT_MPI(mbedtls_mpi_lset(&X, 3));
     ASSERT_EQ(mbedtls_mpi_is_prime(&X, NULL, NULL), 0);
-    mbedtls_mpi_lset(&X, 4);
+    ASSERT_MPI(mbedtls_mpi_lset(&X, 4));
     ASSERT_EQ(mbedtls_mpi_is_prime(&X, NULL, NULL),
               MBEDTLS_ERR_MPI_NOT_ACCEPTABLE);
 
@@ -226,7 +229,6 @@ TEST(mbedTLS, bignum)
 
 #define MBED_RSA_TEST_COUNT 100
 
-#define ASSERT_MPI(f) ASSERT_EQ(f, 0)
 
 TEST(mbedTLS, basic_rsa)
 {
@@ -237,6 +239,8 @@ TEST(mbedTLS, basic_rsa)
     unsigned char       c_buffer[KEY_LEN];
 
     mbedtls_rsa_init(&rsa, 0, 0);
+    mbedtls_mpi_init(&a);
+    mbedtls_mpi_init(&c);
 
     rsa.len = KEY_LEN;
     MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&rsa.N, 16, RSA_N));
@@ -252,9 +256,6 @@ TEST(mbedTLS, basic_rsa)
     ASSERT_EQ(mbedtls_rsa_check_privkey(&rsa), 0);
 
     ASSERT_EQ(rsa.len, KEY_LEN);
-
-    mbedtls_mpi_init(&a);
-    mbedtls_mpi_init(&c);
 
     for (size_t t_count = 0; t_count < MBED_RSA_TEST_COUNT; t_count++) {
         ASSERT_MPI(

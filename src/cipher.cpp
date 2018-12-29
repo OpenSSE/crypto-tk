@@ -39,89 +39,27 @@ static constexpr uint8_t
     hash_personal__[crypto_generichash_blake2b_PERSONALBYTES]
     = "encryption_key";
 
-class Cipher::CipherImpl
-{
-public:
-    CipherImpl() = delete;
+static_assert(crypto_generichash_blake2b_KEYBYTES == Cipher::kKeySize,
+              "Invalid Cipher key size");
 
-    explicit CipherImpl(Key<kKeySize>&& k) noexcept;
+static_assert(NONCE_SIZE + crypto_aead_chacha20poly1305_IETF_ABYTES
+                  == Cipher::kCiphertextExpansion,
+              "Invalid Cipher expansion constant");
 
-    ~CipherImpl() = default;
 
-    inline static size_t ciphertext_length(const size_t plaintext_len) noexcept
-    {
-        return plaintext_len + NONCE_SIZE
-               + crypto_aead_chacha20poly1305_IETF_ABYTES;
-    };
-
-    inline static size_t plaintext_length(const size_t c_len) noexcept
-    {
-        if (c_len > NONCE_SIZE + crypto_aead_chacha20poly1305_IETF_ABYTES) {
-            return c_len - NONCE_SIZE
-                   - crypto_aead_chacha20poly1305_IETF_ABYTES;
-        }
-        return 0;
-    };
-
-    void encrypt(const unsigned char* in,
-                 const size_t&        len,
-                 unsigned char*       out);
-    void encrypt(const std::string& in, std::string& out);
-    void decrypt(const unsigned char* in,
-                 const size_t&        len,
-                 unsigned char*       out);
-    void decrypt(const std::string& in, std::string& out);
-
-private:
-    static_assert(crypto_generichash_blake2b_KEYBYTES == kKeySize,
-                  "Invalid Cipher key size");
-    Key<crypto_generichash_blake2b_KEYBYTES> key_;
-};
-
-Cipher::Cipher(Key<kKeySize>&& k) : cipher_imp_(new CipherImpl(std::move(k)))
+Cipher::Cipher(Key<kKeySize>&& k) : key_(std::move(k))
 {
 }
-
-Cipher::~Cipher()
-{
-    delete cipher_imp_;
-}
-
-void Cipher::encrypt(const std::string& in, std::string& out)
-{
-    cipher_imp_->encrypt(in, out);
-}
-void Cipher::decrypt(const std::string& in, std::string& out)
-{
-    cipher_imp_->decrypt(in, out);
-}
-
-size_t Cipher::ciphertext_length(const size_t plaintext_len) noexcept
-{
-    return Cipher::CipherImpl::ciphertext_length(plaintext_len);
-}
-
-size_t Cipher::plaintext_length(const size_t c_len) noexcept
-{
-    return Cipher::CipherImpl::plaintext_length(c_len);
-}
-
-// Cipher implementation
-
-#define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
 // Compute maximum number of blocks that can be encrypted with the same key
 // This number comes from the security reduction of CTR mode (2^48 blocks at
 // most to retain 32 bits of security) and from the IV length (not more than
 // 2^(8*kIVSize) different IVs)
 
-Cipher::CipherImpl::CipherImpl(Key<kKeySize>&& k) noexcept : key_(std::move(k))
-{
-}
 
-void Cipher::CipherImpl::encrypt(const unsigned char* in,
-                                 const size_t&        len,
-                                 unsigned char*       out)
+void Cipher::encrypt(const unsigned char* in,
+                     const size_t&        len,
+                     unsigned char*       out) const
 {
     uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
     unsigned long long c_len = 0; // NOLINT
@@ -160,7 +98,7 @@ void Cipher::CipherImpl::encrypt(const unsigned char* in,
     sodium_memzero(chacha_key, crypto_aead_chacha20poly1305_KEYBYTES);
 }
 
-void Cipher::CipherImpl::encrypt(const std::string& in, std::string& out)
+void Cipher::encrypt(const std::string& in, std::string& out)
 {
     if (in.empty()) {
         throw std::invalid_argument(
@@ -180,9 +118,9 @@ void Cipher::CipherImpl::encrypt(const std::string& in, std::string& out)
     delete[] data;
 }
 
-void Cipher::CipherImpl::decrypt(const unsigned char* in,
-                                 const size_t&        len,
-                                 unsigned char*       out)
+void Cipher::decrypt(const unsigned char* in,
+                     const size_t&        len,
+                     unsigned char*       out) const
 {
     if (len < ciphertext_length(0)) {
         throw std::invalid_argument(
@@ -231,7 +169,7 @@ void Cipher::CipherImpl::decrypt(const unsigned char* in,
     }
 }
 
-void Cipher::CipherImpl::decrypt(const std::string& in, std::string& out)
+void Cipher::decrypt(const std::string& in, std::string& out)
 {
     size_t len = in.size();
 

@@ -48,17 +48,17 @@ public:
     /// @brief Cipher key size (in bytes)
     static constexpr uint8_t kKeySize = 32;
 
+    static constexpr size_t kCiphertextExpansion = 32;
+
     Cipher() = delete;
 
     // we should not be able to duplicate Cipher objects
-    Cipher(const Cipher& c)  = delete;
-    Cipher(Cipher& c)        = delete;
-    Cipher(const Cipher&& c) = delete;
-    Cipher(Cipher&& c)       = delete;
+    Cipher(const Cipher& c) = delete;
+    Cipher(Cipher& c)       = delete;
+
 
     // Again, avoid any assignement of Cipher objects
     Cipher& operator=(const Cipher& h) = delete;
-    Cipher& operator=(Cipher& h) = delete;
 
     ///
     /// @brief Constructor
@@ -72,13 +72,8 @@ public:
     ///
     explicit Cipher(Key<kKeySize>&& k);
 
-    ///
-    /// @brief Destructor
-    ///
-    /// Destructs the Cipher object and erase its key.
-    ///
-    ///
-    ~Cipher();
+    /// @brief Move constructor
+    Cipher(Cipher&& c) noexcept = default;
 
     ///
     /// @brief Encrypt a plaintext
@@ -120,7 +115,11 @@ public:
     /// @return Length of the ciphertext, that is the length of the plaintext +
     /// the length of the nonce + the length of the tag
     ///
-    static size_t ciphertext_length(const size_t plaintext_len) noexcept;
+    static constexpr size_t ciphertext_length(
+        const size_t plaintext_len) noexcept
+    {
+        return plaintext_len + kCiphertextExpansion;
+    }
 
     ///
     /// @brief Compute the length of a plaintext
@@ -134,13 +133,21 @@ public:
     /// the length of the nonce - the length of the tag (or 0 if this quantity
     /// is negative)
     ///
-    static size_t plaintext_length(const size_t c_len) noexcept;
+    static constexpr size_t plaintext_length(const size_t c_len) noexcept
+    {
+        return (c_len > kCiphertextExpansion) ? (c_len - kCiphertextExpansion)
+                                              : 0;
+    }
 
 private:
-    /// @class CipherImpl
-    /// @brief Hidden Cipher implementation
-    class CipherImpl;
-    CipherImpl* cipher_imp_; // opaque pointer
+    void encrypt(const unsigned char* in,
+                 const size_t&        len,
+                 unsigned char*       out) const;
+    void decrypt(const unsigned char* in,
+                 const size_t&        len,
+                 unsigned char*       out) const;
+
+    Key<kKeySize> key_;
 };
 
 } // namespace crypto

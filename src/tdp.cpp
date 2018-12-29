@@ -87,8 +87,7 @@ Tdp::Tdp(const std::string& pk) : tdp_imp_(new TdpImpl_Current(pk))
 {
 }
 
-Tdp::Tdp(const Tdp& t)
-    : tdp_imp_(static_cast<const TdpImpl*>(t.tdp_imp_.get())->duplicate())
+Tdp::Tdp(const Tdp& t) : tdp_imp_(t.tdp_imp_->duplicate())
 {
 }
 
@@ -100,7 +99,7 @@ Tdp::~Tdp()
 Tdp& Tdp::operator=(const Tdp& t)
 {
     if ((this != &t) && (tdp_imp_ != t.tdp_imp_)) {
-        tdp_imp_ = static_cast<const TdpImpl*>(t.tdp_imp_.get())->duplicate();
+        tdp_imp_ = t.tdp_imp_->duplicate();
     }
 
     return *this;
@@ -288,18 +287,14 @@ TdpMultPool::TdpMultPool(const std::string& pk, const uint8_t size)
 }
 
 TdpMultPool::TdpMultPool(const TdpMultPool& pool)
-    : tdp_pool_imp_(
-          static_cast<const TdpMultPoolImpl*>(pool.tdp_pool_imp_.get())
-              ->duplicate_pool())
+    : tdp_pool_imp_(pool.tdp_pool_imp_->duplicate_pool())
 {
 }
 
 TdpMultPool& TdpMultPool::operator=(const TdpMultPool& t)
 {
     if ((this != &t) && (tdp_pool_imp_ != t.tdp_pool_imp_)) {
-        tdp_pool_imp_
-            = static_cast<const TdpMultPoolImpl*>(t.tdp_pool_imp_.get())
-                  ->duplicate_pool();
+        tdp_pool_imp_ = t.tdp_pool_imp_->duplicate_pool();
     }
     return *this;
 }

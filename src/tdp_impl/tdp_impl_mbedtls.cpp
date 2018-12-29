@@ -513,26 +513,29 @@ static int insecure_mod_exp(mbedtls_mpi*       X,
                             const uint64_t     E,
                             const mbedtls_mpi* N)
 {
-    int ret = 0;
-    mbedtls_mpi_lset(X, 1);
+    int      ret = 0;
+    uint64_t exp = E;
+
     mbedtls_mpi base;
     mbedtls_mpi_init(&base);
 
-    uint64_t exp = E;
+    MBEDTLS_MPI_CHK(mbedtls_mpi_lset(X, 1));
 
-    mbedtls_mpi_copy(&base, A);
-    mbedtls_mpi_mod_mpi(&base, &base, N);
+
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&base, A));
+    MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(&base, &base, N));
 
     while (exp > 0) {
         if (exp % 2 == 1) {
-            mbedtls_mpi_mul_mpi(X, X, &base);
-            mbedtls_mpi_mod_mpi(X, X, N);
+            MBEDTLS_MPI_CHK(mbedtls_mpi_mul_mpi(X, X, &base));
+            MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(X, X, N));
         }
         exp >>= 1;
-        mbedtls_mpi_mul_mpi(&base, &base, &base);
-        mbedtls_mpi_mod_mpi(&base, &base, N);
+        MBEDTLS_MPI_CHK(mbedtls_mpi_mul_mpi(&base, &base, &base));
+        MBEDTLS_MPI_CHK(mbedtls_mpi_mod_mpi(&base, &base, N));
     }
 
+cleanup:
     mbedtls_mpi_free(&base);
     return ret;
 }

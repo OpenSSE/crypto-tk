@@ -88,23 +88,19 @@ Tdp::Tdp(const std::string& pk) : tdp_imp_(new TdpImpl_Current(pk))
 }
 
 Tdp::Tdp(const Tdp& t)
-    : tdp_imp_(new TdpImpl_Current(
-          *dynamic_cast<const TdpImpl_Current*>(t.tdp_imp_)))
+    : tdp_imp_(static_cast<const TdpImpl*>(t.tdp_imp_.get())->duplicate())
 {
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 Tdp::~Tdp()
 {
-    delete tdp_imp_;
-    tdp_imp_ = nullptr;
 }
 
 Tdp& Tdp::operator=(const Tdp& t)
 {
     if ((this != &t) && (tdp_imp_ != t.tdp_imp_)) {
-        delete tdp_imp_;
-        tdp_imp_ = new TdpImpl_Current(
-            *dynamic_cast<const TdpImpl_Current*>(t.tdp_imp_));
+        tdp_imp_ = static_cast<const TdpImpl*>(t.tdp_imp_.get())->duplicate();
     }
 
     return *this;
@@ -177,10 +173,9 @@ TdpInverse::TdpInverse(const std::string& sk)
 {
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 TdpInverse::~TdpInverse()
 {
-    delete tdp_inv_imp_;
-    tdp_inv_imp_ = nullptr;
 }
 
 std::string TdpInverse::public_key() const
@@ -293,26 +288,25 @@ TdpMultPool::TdpMultPool(const std::string& pk, const uint8_t size)
 }
 
 TdpMultPool::TdpMultPool(const TdpMultPool& pool)
-    : tdp_pool_imp_(new TdpMultPoolImpl_Current(
-          *dynamic_cast<const TdpMultPoolImpl_Current*>(pool.tdp_pool_imp_)))
+    : tdp_pool_imp_(
+          static_cast<const TdpMultPoolImpl*>(pool.tdp_pool_imp_.get())
+              ->duplicate_pool())
 {
 }
 
 TdpMultPool& TdpMultPool::operator=(const TdpMultPool& t)
 {
     if ((this != &t) && (tdp_pool_imp_ != t.tdp_pool_imp_)) {
-        delete tdp_pool_imp_;
-        tdp_pool_imp_ = new TdpMultPoolImpl_Current(
-            *dynamic_cast<const TdpMultPoolImpl_Current*>(t.tdp_pool_imp_));
+        tdp_pool_imp_
+            = static_cast<const TdpMultPoolImpl*>(t.tdp_pool_imp_.get())
+                  ->duplicate_pool();
     }
     return *this;
 }
 
-
+// NOLINTNEXTLINE(modernize-use-equals-default)
 TdpMultPool::~TdpMultPool()
 {
-    delete tdp_pool_imp_;
-    tdp_pool_imp_ = nullptr;
 }
 
 std::string TdpMultPool::public_key() const
@@ -378,13 +372,13 @@ std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(
 
 void TdpMultPool::eval(const std::string& in, std::string& out) const
 {
-    static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in, out);
+    static_cast<TdpImpl*>(tdp_pool_imp_.get())->eval(in, out);
 }
 
 std::string TdpMultPool::eval(const std::string& in) const
 {
     std::string out;
-    static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in, out);
+    static_cast<TdpImpl*>(tdp_pool_imp_.get())->eval(in, out);
 
     return out;
 }
@@ -392,7 +386,7 @@ std::string TdpMultPool::eval(const std::string& in) const
 std::array<uint8_t, Tdp::kMessageSize> TdpMultPool::eval(
     const std::array<uint8_t, kMessageSize>& in) const
 {
-    return static_cast<TdpImpl*>(tdp_pool_imp_)->eval(in);
+    return static_cast<TdpImpl*>(tdp_pool_imp_.get())->eval(in);
 }
 
 uint8_t TdpMultPool::maximum_order() const

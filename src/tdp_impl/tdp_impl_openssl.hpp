@@ -72,6 +72,8 @@ public:
         Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
         const std::string&                     seed) const override;
 
+    std::unique_ptr<TdpImpl> duplicate() const override;
+
 protected:
     TdpImpl_OpenSSL();
 
@@ -126,6 +128,8 @@ public:
                    const uint8_t      order) const override;
 
     uint8_t maximum_order() const override;
+
+    std::unique_ptr<TdpMultPoolImpl> duplicate_pool() const override;
 
 private:
     RSA** keys_;

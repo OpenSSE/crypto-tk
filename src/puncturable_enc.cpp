@@ -102,9 +102,9 @@ PuncturableEncryption::PuncturableEncryption(punct::master_key_type&& key)
 {
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 PuncturableEncryption::~PuncturableEncryption()
 {
-    delete penc_imp_;
 }
 
 punct::ciphertext_type PuncturableEncryption::encrypt(
@@ -166,9 +166,9 @@ PuncturableDecryption::PuncturableDecryption(
 {
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 PuncturableDecryption::~PuncturableDecryption()
 {
-    delete pdec_imp_;
 }
 
 

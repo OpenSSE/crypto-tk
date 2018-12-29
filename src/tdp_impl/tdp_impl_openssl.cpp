@@ -317,6 +317,12 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::
     return generate_array(prg, seed);
 }
 
+
+std::unique_ptr<TdpImpl> TdpImpl_OpenSSL::duplicate() const
+{
+    return std::unique_ptr<TdpImpl>(new TdpImpl_OpenSSL(*this));
+}
+
 TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL()
 {
     int ret;
@@ -699,6 +705,11 @@ void TdpMultPoolImpl_OpenSSL::eval_pool(const std::string& in,
 uint8_t TdpMultPoolImpl_OpenSSL::maximum_order() const
 {
     return keys_count_ + 1;
+}
+
+std::unique_ptr<TdpMultPoolImpl> TdpMultPoolImpl_OpenSSL::duplicate_pool() const
+{
+    return std::unique_ptr<TdpMultPoolImpl>(new TdpMultPoolImpl_OpenSSL(*this));
 }
 
 } // namespace crypto

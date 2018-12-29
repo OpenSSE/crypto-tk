@@ -23,6 +23,7 @@
 #include <sse/crypto/key.hpp>
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -127,6 +128,9 @@ public:
     ///
     ~PuncturableEncryption();
 
+    // Avoid any assignment of decryption objects
+    PuncturableEncryption& operator=(const PuncturableEncryption& h) = delete;
+
     ///
     /// @brief Encrypt a message
     ///
@@ -184,7 +188,7 @@ private:
     /// @brief Hidden puncturable encryption implementation
     class PEncImpl;
 
-    PEncImpl* penc_imp_; // opaque pointer
+    std::unique_ptr<PEncImpl> penc_imp_; // opaque pointer
 };
 
 /// @class PuncturableDecryption
@@ -214,7 +218,6 @@ public:
 
     // Avoid any assignment of decryption objects
     PuncturableDecryption& operator=(const PuncturableDecryption& h) = delete;
-    PuncturableDecryption& operator=(PuncturableDecryption& h) = delete;
 
 
     ///
@@ -242,7 +245,7 @@ private:
     /// @brief Hidden puncturable decryption implementation
     class PDecImpl;
 
-    PDecImpl* pdec_imp_; // opaque pointer
+    std::unique_ptr<PDecImpl> pdec_imp_; // opaque pointer
 };
 
 ///

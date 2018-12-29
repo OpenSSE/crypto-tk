@@ -344,6 +344,12 @@ std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpImpl_mbedTLS::
     return generate_array(prg, seed);
 }
 
+
+std::unique_ptr<TdpImpl> TdpImpl_mbedTLS::duplicate() const
+{
+    return std::unique_ptr<TdpImpl>(new TdpImpl_mbedTLS(*this));
+}
+
 TdpInverseImpl_mbedTLS::TdpInverseImpl_mbedTLS()
 {
     int ret;
@@ -901,6 +907,12 @@ void TdpMultPoolImpl_mbedTLS::eval_pool(const std::string& in,
 uint8_t TdpMultPoolImpl_mbedTLS::maximum_order() const
 {
     return keys_count_ + 1;
+}
+
+
+std::unique_ptr<TdpMultPoolImpl> TdpMultPoolImpl_mbedTLS::duplicate_pool() const
+{
+    return std::unique_ptr<TdpMultPoolImpl>(new TdpMultPoolImpl_mbedTLS(*this));
 }
 
 } // namespace crypto

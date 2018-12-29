@@ -27,6 +27,7 @@
 #include <cstdint>
 
 #include <array>
+#include <memory>
 #include <string>
 
 namespace sse {
@@ -257,7 +258,7 @@ public:
         const std::array<uint8_t, kMessageSize>& in) const;
 
 private:
-    TdpImpl* tdp_imp_; // opaque pointer
+    std::unique_ptr<TdpImpl> tdp_imp_; // opaque pointer
 };
 
 /// @class TdpInverse
@@ -559,7 +560,7 @@ public:
         uint32_t                                 order) const;
 
 private:
-    TdpInverseImpl* tdp_inv_imp_; // opaque pointer
+    std::unique_ptr<TdpInverseImpl> tdp_inv_imp_; // opaque pointer
 };
 
 /// @class TdpMultPool
@@ -832,7 +833,7 @@ public:
     uint8_t maximum_order() const;
 
 private:
-    TdpMultPoolImpl* tdp_pool_imp_; // opaque pointer
+    std::unique_ptr<TdpMultPoolImpl> tdp_pool_imp_; // opaque pointer
 };
 
 ///

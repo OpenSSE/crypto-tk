@@ -28,6 +28,7 @@
 #include <cstdint>
 
 #include <array>
+#include <memory>
 #include <string>
 
 namespace sse {
@@ -61,6 +62,8 @@ public:
     virtual std::array<uint8_t, kMessageSpaceSize> generate_array(
         Key<Prf<Tdp::kRSAPrfSize>::kKeySize>&& key,
         const std::string&                     seed) const = 0;
+
+    virtual std::unique_ptr<TdpImpl> duplicate() const = 0;
 };
 
 class TdpInverseImpl : virtual public TdpImpl
@@ -96,6 +99,8 @@ public:
                            const uint8_t      order) const = 0;
 
     virtual uint8_t maximum_order() const = 0;
+
+    virtual std::unique_ptr<TdpMultPoolImpl> duplicate_pool() const = 0;
 };
 
 

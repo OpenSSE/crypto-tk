@@ -1,20 +1,19 @@
 #ifndef COMMON_H
 #define COMMON_H
+
 #ifdef __cplusplus
 // gmp.h uses __cplusplus to decide if it's right to include c++ headers.
 // At last on osx  causes error: conflicting types for 'operator<<'.
 // including gmpxx.h prevents this issue.
-//#include <gmpxx.h>
-#define ___cplusplus __cplusplus
-#undef __cplusplus
+#include <gmpxx.h>
 extern "C" {
 #endif
+
 #include <relic/relic.h>
 #include <relic/relic_conf.h>
-#ifdef ___cplusplus
+
+#ifdef __cplusplus
 }
-#define __cplusplus ___cplusplus
-#undef ___cplusplus
 #endif
 
 #define POINT_COMPRESS 1

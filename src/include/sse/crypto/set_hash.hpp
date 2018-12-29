@@ -198,7 +198,7 @@ private:
                                 const uint8_t*                     buf,
                                 const size_t                       len);
 
-    std::array<uint8_t, kSetHashSize> set_hash_state_{kECInfinitePoint};
+    std::array<uint8_t, kSetHashSize> set_hash_state_ = kECInfinitePoint;
 };
 
 } // namespace crypto

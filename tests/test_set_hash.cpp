@@ -154,6 +154,10 @@ TEST(set_hash, associativity_remove)
 
 TEST(set_hash, identity)
 {
+    // an empty set should be represented by the infinite point
+    SetHash empty;
+    EXPECT_EQ(empty.data(), SetHash::kECInfinitePoint);
+
     for (size_t i = 0; i < kNumTests; i++) {
         SetHash a, b, c, I;
         ASSERT_EQ(a, b);

@@ -4,6 +4,7 @@
 [![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=gcc%20build&env=COMPILER=gcc)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![build status](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=clang%20build&env=COMPILER=clang)](https://travis-ci.org/OpenSSE/crypto-tk)
 [![static analysis](https://badges.herokuapp.com/travis/OpenSSE/crypto-tk?branch=master&label=static%20analysis&env=STATIC_ANALYSIS=true)](https://travis-ci.org/OpenSSE/crypto-tk)
+[![Coverity](https://img.shields.io/coverity/scan/17513.svg)](https://scan.coverity.com/projects/opensse-crypto-tk)
 [![Coverage Status](https://coveralls.io/repos/github/OpenSSE/crypto-tk/badge.svg)](https://coveralls.io/github/OpenSSE/crypto-tk)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1412/badge)](https://bestpractices.coreinfrastructure.org/projects/1412)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5149d1eb77224a6e981d1b2f46bfb012)](https://www.codacy.com/app/rbost/crypto-tk?utm_source=github.com&utm_medium=referral&utm_content=OpenSSE/crypto-tk&utm_campaign=Badge_Grade)

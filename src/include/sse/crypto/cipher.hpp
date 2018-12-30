@@ -154,7 +154,6 @@ public:
              typename = typename std::enable_if<(NBYTES > 0)>::type>
     void encrypt(const std::array<uint8_t, NBYTES>&              in,
                  std::array<uint8_t, ciphertext_length(NBYTES)>& out) const
-        noexcept
     {
         encrypt(in.data(), NBYTES, out.data());
     }
@@ -182,7 +181,7 @@ public:
 private:
     void encrypt(const unsigned char* in,
                  const size_t&        len,
-                 unsigned char*       out) const noexcept;
+                 unsigned char*       out) const;
     void decrypt(const unsigned char* in,
                  const size_t&        len,
                  unsigned char*       out) const;

@@ -90,13 +90,16 @@ public:
     /// confidentiality and integrity of the wrapped object.
     ///
     /// @tparam CryptoClass     The class of the object to be wrapped. The class
-    ///                         must declare the kSerializedSize and
-    ///                         kPublicContextSize, and kWrappingTypeByte static
+    ///                         must declare the kSerializedSize, and
+    ///                         kPublicContextSize static
     ///                         variables and implement the void
     ///                         serialize(uint8_t*) const member function and
     ///                         std::array<uint8_t,
     ///                         kPublicContextSize>public_context() const static
     ///                         function.
+    ///                         The Wrapper::get_type_byte() static function
+    ///                         must be specialized for CryptoClass.
+
     ///
     /// @param c    The object to be wrapped.
     ///
@@ -116,13 +119,15 @@ public:
     /// ciphertext is invalid.
     ///
     /// @tparam CryptoClass     The class of the object to be wrapped. The class
-    ///                         must declare the kSerializedSize and
-    ///                         kPublicContextSize, and kWrappingTypeByte static
+    ///                         must declare the kSerializedSize, and
+    ///                         kPublicContextSize static
     ///                         variables and implement the void
     ///                         serialize(uint8_t*) const member function and
     ///                         std::array<uint8_t,
     ///                         kPublicContextSize>public_context() const static
     ///                         function.
+    ///                         The Wrapper::get_type_byte() static function
+    ///                         must be specialized for CryptoClass.
     ///
     /// @param c    The buffer containing the encrypted representation of the
     ///             object.
@@ -137,6 +142,10 @@ public:
         std::array<uint8_t,
                    kCiphertextExpansion + CryptoClass::kSerializedSize>& c_rep)
         const;
+
+
+    template<class CryptoClass>
+    static constexpr uint8_t get_type_byte();
 
 private:
     static constexpr uint16_t kEncryptionKeySize = 32U;
@@ -158,7 +167,7 @@ Wrapper::wrap(const CryptoClass& c) const
     // put the random IV at the beggining
     random_bytes(kRandomIVSize, buffer);
     // put the type byte after the IV
-    buffer[kRandomIVSize] = CryptoClass::kWrappingTypeByte;
+    buffer[kRandomIVSize] = Wrapper::get_type_byte<CryptoClass>();
     // copy the AD
     std::array<uint8_t, CryptoClass::kPublicContextSize> public_context
         = CryptoClass::public_context();
@@ -205,7 +214,7 @@ CryptoClass Wrapper::unwrap(
     memcpy(buffer, c_rep.data(), kRandomIVSize);
 
     // put the type byte after the IV
-    buffer[kRandomIVSize] = CryptoClass::kWrappingTypeByte;
+    buffer[kRandomIVSize] = Wrapper::get_type_byte<CryptoClass>();
 
     // copy the AD
     std::array<uint8_t, CryptoClass::kPublicContextSize> public_context

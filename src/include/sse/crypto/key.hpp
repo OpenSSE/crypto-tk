@@ -86,6 +86,7 @@ class Key
     friend class Prg;
     friend class Prp;
     friend class Cipher;
+    friend class Wrapper;
 
     template<size_t K_SIZE>
     friend void tests::prg_test_key_derivation_consistency(); // NOLINT

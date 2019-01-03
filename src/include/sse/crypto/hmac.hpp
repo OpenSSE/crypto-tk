@@ -83,7 +83,6 @@ public:
     {
     }
 
-    HMac(HMac<H, N>& hmac)       = delete;
     HMac(const HMac<H, N>& hmac) = delete;
 
     ///
@@ -103,18 +102,26 @@ public:
         }
     };
 
+    // deleted copy assignement operator
+    HMac(HMac<H, N>&& hmac) noexcept = default;
+
+    /// @brief Move assignment operator
+    HMac<H, N>& operator=(HMac<H, N>&& hmac) = default;
+
     ///
     /// @brief Evaluate HMac
     ///
-    /// Evaluates HMac on the input buffer and places the result in the output
-    /// buffer (and truncates the result it if necessary).
+    /// Evaluates HMac on the input buffer and places the result in the
+    /// output buffer (and truncates the result it if necessary).
     ///
     ///
     /// @param in       The input buffer. Must be non NULL.
     /// @param length   The size of the input buffer in bytes.
-    /// @param out      The output buffer. Must be non NULL, and larger than
+    /// @param out      The output buffer. Must be non NULL, and larger
+    /// than
     ///                 out_len bytes.
-    /// @param out_len  The size of the output buffer in bytes. Must be smaller
+    /// @param out_len  The size of the output buffer in bytes. Must be
+    /// smaller
     ///                 than kDigestSize.
     ///
     /// @exception std::invalid_argument       One of in or out is NULL

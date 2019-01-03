@@ -86,6 +86,16 @@ public:
     {
     }
 
+
+    // delete the copy constructor
+    Prf(const Prf<NBYTES>& key) = delete;
+
+    /// @brief Move constructor
+    Prf(Prf<NBYTES>&& prf) = default;
+
+    Prf<NBYTES>& operator=(Prf<NBYTES>&& prf) = default;
+    Prf<NBYTES>& operator=(const Prf<NBYTES>& prf) = delete;
+
     /// @brief Destructor.
     ~Prf() // NOLINT // using = default causes a linker error on Travis
     {

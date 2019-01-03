@@ -28,6 +28,7 @@
 #include <array>
 
 #include <sodium/crypto_stream_chacha20.h>
+#include <sodium/utils.h>
 
 namespace sse {
 namespace crypto {
@@ -105,6 +106,38 @@ public:
     std::array<uint8_t, kCiphertextExpansion + CryptoClass::kSerializedSize>
     wrap(const CryptoClass& c) const;
 
+
+    ///
+    /// @brief Unwrap a cryptographic object
+    ///
+    /// Unwraps a cryptographic object by decrypting it and deserialize the
+    /// result. Authenticated encryption is used to ensure confidentiality and
+    /// integrity of the wrapped object, and the function throws if the
+    /// ciphertext is invalid.
+    ///
+    /// @tparam CryptoClass     The class of the object to be wrapped. The class
+    ///                         must declare the kSerializedSize and
+    ///                         kPublicContextSize, and kWrappingTypeByte static
+    ///                         variables and implement the void
+    ///                         serialize(uint8_t*) const member function and
+    ///                         std::array<uint8_t,
+    ///                         kPublicContextSize>public_context() const static
+    ///                         function.
+    ///
+    /// @param c    The buffer containing the encrypted representation of the
+    ///             object.
+    ///
+    /// @return     The object represented by the encrypted buffer.
+    ///
+    /// @exception std::runtime_error   The decryption failed:
+    ///                                 invalid tag
+    ///
+    template<class CryptoClass>
+    CryptoClass unwrap(
+        std::array<uint8_t,
+                   kCiphertextExpansion + CryptoClass::kSerializedSize>& c_rep)
+        const;
+
 private:
     static constexpr uint16_t kEncryptionKeySize = 32U;
 
@@ -157,6 +190,66 @@ Wrapper::wrap(const CryptoClass& c) const
     return out;
 }
 
+template<class CryptoClass>
+CryptoClass Wrapper::unwrap(
+    std::array<uint8_t,
+               Wrapper::kCiphertextExpansion + CryptoClass::kSerializedSize>&
+        c_rep) const
+{
+    constexpr size_t buffer_size = kRandomIVSize + CryptoClass::kSerializedSize
+                                   + CryptoClass::kPublicContextSize
+                                   + 1; // the +1 is for the mandatory type byte
+    uint8_t* buffer = static_cast<uint8_t*>(sodium_malloc(buffer_size));
+
+    // copy the IV at the beggining of the buffer
+    memcpy(buffer, c_rep.data(), kRandomIVSize);
+
+    // put the type byte after the IV
+    buffer[kRandomIVSize] = CryptoClass::kWrappingTypeByte;
+
+    // copy the AD
+    std::array<uint8_t, CryptoClass::kPublicContextSize> public_context
+        = CryptoClass::public_context();
+    memcpy(buffer + kRandomIVSize + 1,
+           public_context.data(),
+           CryptoClass::kPublicContextSize);
+
+    // put the expected tag in a dedicated array
+    std::array<uint8_t, kTagSize> expected_tag;
+    expected_tag.data()
+        = c_rep.data() + kRandomIVSize + CryptoClass::kSerializedSize;
+
+    // decrypt the representation
+    crypto_stream_chacha20_ietf_xor(c_rep.data() + kRandomIVSize,
+                                    buffer + kRandomIVSize + 1
+                                        + CryptoClass::kPublicContextSize,
+                                    CryptoClass::kSerializedSize,
+                                    expected_tag.data(),
+                                    encryption_key_.unlock_get());
+    encryption_key_.lock();
+
+
+    // re-compute the tag
+    std::array<uint8_t, kTagSize> computed_tag
+        = tag_generator_.prf(buffer, buffer_size);
+
+    // check that the computed tag and the expected tag are the same
+    if (sodium_memcmp(expected_tag.data(), computed_tag.data(), kTagSize)
+        != 0) {
+        throw std::runtime_error("Wrapper: decryption failed, invalid tag!");
+    }
+
+    // Deserialize the buffer
+    CryptoClass c = CryptoClass::deserialize(buffer + kRandomIVSize + 1
+                                             + CryptoClass::kPublicContextSize);
+
+
+    // free the buffer and zero the entry
+    sodium_free(buffer);
+    sodium_memzero(c_rep.data(), c_rep.size());
+
+    return c;
+}
 
 // template<size_t N>
 // std::array<uint8_t, Wrapper::kCiphertextExpansion + N> Wrapper::encrypt_data(

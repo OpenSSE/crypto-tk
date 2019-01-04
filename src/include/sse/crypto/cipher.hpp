@@ -213,14 +213,14 @@ private:
     ///
     void serialize(uint8_t* out) const;
 
-    /// @brief Deserialize a buffer into a Prg object
+    /// @brief Deserialize a buffer into a Cipher object
     ///
-    /// This static function constructs a new Prg object out of the binary
+    /// This static function constructs a new Cipher object out of the binary
     /// representation of the input buffer in. The in buffer must be at least
     /// kSerializedSize bytes large.
     ///
     /// @param  in  The byte buffer containing the binary representation of the
-    ///             Prg object.
+    ///             Cipher object.
     static Cipher deserialize(uint8_t* in);
 
     Key<kKeySize> key_;

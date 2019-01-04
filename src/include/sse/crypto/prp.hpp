@@ -44,12 +44,29 @@ namespace crypto {
 
 class Prp
 {
+    friend class Wrapper;
+
 public:
     /// @internal
     friend void init_crypto_lib();
 
     /// @brief Prp key size (in bytes)
     static constexpr uint8_t kKeySize = 48;
+
+    /// @brief  Size (in bytes) of the serialized representation (used to wrap a
+    ///         Prg object).
+    static constexpr size_t kSerializedSize = 112;
+
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prg
+    ///         object).
+    static constexpr size_t kPublicContextSize = 0;
+
+
+    /// @brief The public context of a Prp object. It is an empty array.
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        return std::array<uint8_t, kPublicContextSize>();
+    }
 
     ///
     /// @brief Check availability of the Prp class
@@ -231,6 +248,8 @@ private:
 
     Key<kContextSize> aez_ctx_;
 
+    Prp(Key<kContextSize>&& context);
+
     ///
     /// @brief Initialize the availability flag.
     ///
@@ -241,6 +260,24 @@ private:
     ///
     ///
     static void compute_is_available() noexcept;
+
+    /// @brief Serialize the object in the given buffer
+    ///
+    /// @param[out] out The serialization buffer. It must be
+    ///                 at least kSerializedSize bytes large.
+
+    ///
+    void serialize(uint8_t* out) const;
+
+    /// @brief Deserialize a buffer into a Prg object
+    ///
+    /// This static function constructs a new Prg object out of the binary
+    /// representation of the input buffer in. The in buffer must be at least
+    /// kSerializedSize bytes large.
+    ///
+    /// @param  in  The byte buffer containing the binary representation of the
+    ///             Prg object.
+    static Prp deserialize(uint8_t* in);
 
     static bool is_available__;
 };

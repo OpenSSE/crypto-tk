@@ -96,6 +96,16 @@ Prp::Prp(Key<kKeySize>&& k)
     k.erase();
 }
 
+Prp::Prp(Key<kContextSize>&& context) : aez_ctx_(std::move(context))
+{
+    if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error("PRP are unavailable: AES hardware "
+                                 "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
+    }
+}
+
 std::string Prp::encrypt(const std::string& in)
 {
     std::string out;
@@ -272,6 +282,34 @@ void Prp::decrypt(const std::string& in, std::string& out)
     out = std::string(reinterpret_cast<const char*>(data), len);
     delete[] data;
 }
+
+void Prp::serialize(uint8_t* out) const
+{
+    static_assert(
+        kContextSize == kSerializedSize,
+        "Prp: AEZ context size and serialization size are not compatible");
+    if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error("PRP is unavailable: AES hardware "
+                                 "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
+    }
+    aez_ctx_.unlock();
+    aez_ctx_.serialize(out);
+    aez_ctx_.lock();
+}
+
+Prp Prp::deserialize(uint8_t* in)
+{
+    if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error("PRP is unavailable: AES hardware "
+                                 "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
+    }
+    return Prp(Key<kContextSize>(in));
+}
+
 
 } // namespace crypto
 } // namespace sse

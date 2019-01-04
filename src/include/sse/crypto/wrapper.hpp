@@ -344,6 +344,13 @@ struct Wrapper::TypeByte<Prg>
     static constexpr uint8_t value = 0x03;
 };
 
+class Prp;
+template<>
+struct Wrapper::TypeByte<Prp>
+{
+    static constexpr uint8_t value = 0x04;
+};
+
 
 } // namespace crypto
 } // namespace sse

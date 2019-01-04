@@ -123,9 +123,10 @@ void Cipher::decrypt(const unsigned char* in,
                      unsigned char*       out) const
 {
     if (len < ciphertext_length(0)) {
-        throw std::invalid_argument(
-            "The minimum number of bytes to decrypt is "
-            + std::to_string(ciphertext_length(0))); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("The minimum number of bytes to decrypt is "
+                                    + std::to_string(ciphertext_length(0)));
+        /* LCOV_EXCL_STOP */
     }
 
     uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];

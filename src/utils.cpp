@@ -70,6 +70,10 @@ static unsigned long id_function()
     return reinterpret_cast<unsigned long>(pthread_self());
 }
 
+// No multithreaded test is performed, hence no lock is used.
+// Disable the code coverage for the creation and destruction of OpenSSL locks
+/* LCOV_EXCL_START */
+
 /**
  * OpenSSL allocate and initialize dynamic crypto lock.
  *
@@ -133,6 +137,7 @@ static void dyn_destroy_function(struct CRYPTO_dynlock_value*        l,
     free(l);
 }
 
+/* LCOV_EXCL_STOP*/
 #endif
 
 
@@ -151,7 +156,9 @@ static int init_locks()
     mutex_buf = static_cast<pthread_mutex_t*>(
         malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t)));
     if (mutex_buf == nullptr) {
+        /* LCOV_EXCL_START */
         return (-1);
+        /* LCOV_EXCL_STOP */
     }
     for (i = 0; i < CRYPTO_num_locks(); i++) {
         pthread_mutex_init(&mutex_buf[i], nullptr);
@@ -174,7 +181,9 @@ static int kill_locks()
     int i;
 
     if (mutex_buf == nullptr) {
+        /* LCOV_EXCL_START */
         return (0);
+        /* LCOV_EXCL_STOP */
     }
 
     CRYPTO_set_dynlock_create_callback(nullptr);
@@ -193,10 +202,12 @@ static int kill_locks()
     return 0;
 }
 
+/* LCOV_EXCL_START */
 static void sodium_misuse_handler()
 {
     throw std::runtime_error("Sodium Misuse");
 }
+/* LCOV_EXCL_STOP */
 
 void init_crypto_lib()
 {
@@ -205,7 +216,9 @@ void init_crypto_lib()
     __relic_handle = new relicxx::relicResourceHandle(true);
 
     if (sodium_init() < 0) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("Unable to init libsodium");
+        /* LCOV_EXCL_STOP */
     }
     sodium_set_misuse_handler(sodium_misuse_handler);
 

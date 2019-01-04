@@ -62,8 +62,10 @@ Prp::Prp()
                   "Prp: kContextSize and the aez_ctx_t size do not match");
 
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
     auto callback = [](uint8_t* key_content) {
         Key<kKeySize> r_key;
@@ -79,8 +81,10 @@ Prp::Prp()
 Prp::Prp(Key<kKeySize>&& k)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP are unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
     auto callback = [&k](uint8_t* key_content) {
         aez_setup(static_cast<const unsigned char*>(k.unlock_get()),
@@ -146,8 +150,10 @@ uint64_t Prp::decrypt_64(const uint64_t in)
 void Prp::encrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
     char iv[16] = {0x00,
                    0x00,
@@ -177,8 +183,10 @@ void Prp::encrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 void Prp::encrypt(const std::string& in, std::string& out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
 
     size_t len = in.size();
@@ -203,8 +211,10 @@ void Prp::encrypt(const std::string& in, std::string& out)
 void Prp::decrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
 
     char iv[16] = {0x00,
@@ -237,8 +247,10 @@ void Prp::decrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 void Prp::decrypt(const std::string& in, std::string& out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
 
     size_t len = in.size();

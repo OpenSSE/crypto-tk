@@ -41,6 +41,44 @@ namespace crypto {
 /// To do so, it implements nonce-misuse resistant authenticated encryption (a
 /// variant of SIV with an additional random nonce).
 ///
+/// The objects meant to be wrapped must declare/implement
+///     - the constexpr size_t kSerializedSize static variable, which denotes
+///     the size of the binary representation of the object;
+///     - the constexpr size_t kPublicContextSize static variable, which denotes
+///     the size of the public context of the object (e.g. the number of output
+///     bytes of a PRF);
+///     - the void serialize(uint8_t* out) const member function, which writes
+///     the binary representation of the object into out;
+///     - the CryptoClass deserialize(uint8_t* in) static function, which
+///     outputs a new instance of the CryptoClass object, initialized with the
+///     content of the in buffer;
+///     - the std::array<uint8_t, kPublicContextSize> public_context() static
+///     function, which outputs the public context of the object, i.e. some
+///     public information related to the object (such as the number of output
+///     bytes of a PRF).
+/// Finally, the get_type_byte() templated member function must also be
+/// specialized for each wrappable object. It is **CRUCIAL** for security that
+/// each specialization outputs a different type byte: collision among type
+/// bytes could create a security threat.
+///
+/// More in detail, to encrypt an object, the Wrapper class creates a buffer
+/// whose layout is the following (the bottom row indicate the size in bytes):
+/// | item  | random IV     | type byte | public context     | serialization   |
+/// |-------|---------------|-----------|--------------------|-----------------|
+/// |size(B)| kRandomIVSize | 1         | kPublicContextSize | kSerializedSize |
+/// A PRF is applied to this buffer to compute the tag `T`, which is itself used
+/// as the initialization vector of the (unauthenticated) encryption scheme used
+/// to encrypt the serialization (currently ChaCha20 - IETF). The ciphertext is
+/// the concatenation (it that order) of the random IV, the encrypted
+/// serialization, and the tag.
+///
+/// The decryption does the inverse: it copies the random IV to a buffer,
+/// concatenates the object's class type byte and public context, and appends
+/// the decryption of the serialization part of the ciphertext (decrypted using
+/// the ciphertext's tag as the IV). The Wrapper class then computes the PRF on
+/// this buffer and checks, in constant time, that the ciphertext's tag is
+/// identical to the computed tag. If it is not the case, an exception is
+/// raised.
 class Wrapper
 {
 public:
@@ -66,8 +104,8 @@ public:
     /// After a call to the constructor, the input key is
     /// held by the Wrapper object, and cannot be re-used.
     ///
-    /// @param k    The key used to initialize the wrapper.
-    ///             Upon return, k is empty
+    /// @param key  The key used to initialize the wrapper.
+    ///             Upon return, key is empty
     ///
     Wrapper(Key<kKeySize>&& key);
 
@@ -104,6 +142,13 @@ public:
     ///
     /// @return A buffer containing the encrypted representation of the wrapped
     ///         object
+    // Using an auto return type avoids a compile-time error on gcc, which is
+    // not able to match the templated member declaration and its definition. It
+    // seems it is due to the fact that we use CryptoClass::kSerializedSize in
+    // the return type. Also, clang has no problem compiling the more natural
+    // declaration:
+    // template<class CryptoClass> std::array<uint8_t, kCiphertextExpansion
+    // + CryptoClass::kSerializedSize> wrap(const CryptoClass& c) const;
     template<class CryptoClass>
     auto wrap(const CryptoClass& c)
         -> std::array<uint8_t,
@@ -271,43 +316,6 @@ CryptoClass Wrapper::unwrap(
 
     return c;
 }
-
-// template<size_t N>
-// std::array<uint8_t, Wrapper::kCiphertextExpansion + N> Wrapper::encrypt_data(
-//     const uint8_t* data,
-//     const uint8_t* additional_data,
-//     const size_t   ad_length)
-// {
-//     const size_t buffer_size = kRandomIVSize + N + ad_length;
-//     uint8_t*     buffer = static_cast<uint8_t*>(sodium_malloc(buffer_size));
-
-//     // put the random IV at the beggining
-//     random_bytes(kRandomIVSize, buffer);
-//     // copy the AD ...
-//     memcpy(buffer + kRandomIVSize, additional_data, ad_length);
-//     // ... and the message
-//     memcpy(buffer + kRandomIVSize + ad_length, data, N);
-
-//     std::array<uint8_t, kCiphertextExpansion + N> out;
-
-//     // copy the tag at the beggining of the output
-//     memcpy(out.data(), buffer, kRandomIVSize);
-//     // compute the tag and put it at the end of the ciphertext
-//     std::array<uint8_t, kTagSize> tag = tag_generator_.prf(buffer,
-//     buffer_size); std::copy(tag.begin(), tag.end(), out.end() - kTagSize);
-
-//     // encrypt the secret part of the buffer
-//     crypto_stream_chacha20_ietf_xor(out.data() + kRandomIVSize,
-//                                     buffer + kRandomIVSize,
-//                                     N,
-//                                     tag.data(),
-//                                     encryption_key_.unlock_get());
-//     encryption_key_.lock();
-
-//     sodium_free(buffer);
-
-//     return out;
-// }
 
 // Specializations of the get_type_byte() template
 

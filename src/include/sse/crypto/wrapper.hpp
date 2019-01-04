@@ -99,26 +99,27 @@ public:
     ///                         function.
     ///                         The Wrapper::get_type_byte() static function
     ///                         must be specialized for CryptoClass.
-
     ///
     /// @param c    The object to be wrapped.
     ///
     /// @return A buffer containing the encrypted representation of the wrapped
     ///         object
     template<class CryptoClass>
-    std::array<uint8_t, kCiphertextExpansion + CryptoClass::kSerializedSize>
-    wrap(const CryptoClass& c) const;
-
+    auto wrap(const CryptoClass& c)
+        -> std::array<uint8_t,
+                      kCiphertextExpansion
+                          + CryptoClass::kSerializedSize> const;
 
     ///
     /// @brief Unwrap a cryptographic object
     ///
     /// Unwraps a cryptographic object by decrypting it and deserialize the
-    /// result. Authenticated encryption is used to ensure confidentiality and
-    /// integrity of the wrapped object, and the function throws if the
+    /// result. Authenticated encryption is used to ensure confidentiality
+    /// and integrity of the wrapped object, and the function throws if the
     /// ciphertext is invalid.
     ///
-    /// @tparam CryptoClass     The class of the object to be wrapped. The class
+    /// @tparam CryptoClass     The class of the object to be wrapped. The
+    /// class
     ///                         must declare the kSerializedSize, and
     ///                         kPublicContextSize static
     ///                         variables and implement the CryptoClass
@@ -129,8 +130,8 @@ public:
     ///                         The Wrapper::get_type_byte() static function
     ///                         must be specialized for CryptoClass.
     ///
-    /// @param c    The buffer containing the encrypted representation of the
-    ///             object.
+    /// @param c    The buffer containing the encrypted representation of
+    ///             the object.
     ///
     /// @return     The object represented by the encrypted buffer.
     ///
@@ -155,9 +156,9 @@ private:
 };
 
 template<class CryptoClass>
-std::array<uint8_t,
-           Wrapper::kCiphertextExpansion + CryptoClass::kSerializedSize>
-Wrapper::wrap(const CryptoClass& c) const
+auto Wrapper::wrap(const CryptoClass& c)
+    -> std::array<uint8_t,
+                  kCiphertextExpansion + CryptoClass::kSerializedSize> const
 {
     constexpr size_t buffer_size = kRandomIVSize + CryptoClass::kSerializedSize
                                    + CryptoClass::kPublicContextSize
@@ -308,7 +309,7 @@ CryptoClass Wrapper::unwrap(
 //     return out;
 // }
 
-// Implementation of the get_type_byte() template
+// Specializations of the get_type_byte() template
 
 class Prg;
 template<>

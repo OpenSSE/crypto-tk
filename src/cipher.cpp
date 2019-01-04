@@ -189,5 +189,17 @@ void Cipher::decrypt(const std::string& in, std::string& out)
     out = std::string(reinterpret_cast<const char*>(data.data()), p_len);
 }
 
+void Cipher::serialize(uint8_t* out) const
+{
+    key_.unlock();
+    key_.serialize(out);
+    key_.lock();
+}
+
+Cipher Cipher::deserialize(uint8_t* in)
+{
+    return Cipher(Key<kKeySize>(in));
+}
+
 } // namespace crypto
 } // namespace sse

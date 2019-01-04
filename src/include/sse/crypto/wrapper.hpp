@@ -321,7 +321,14 @@ CryptoClass Wrapper::unwrap(
 }
 
 // Specializations of the Wrapper::TypeByte<CryptoClass> template
-// Specializations of the get_type_byte() template
+
+class Cipher;
+template<>
+struct Wrapper::TypeByte<Cipher>
+{
+    static constexpr uint8_t value = 0x01;
+};
+
 
 class Prg;
 template<>

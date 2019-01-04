@@ -210,6 +210,18 @@ Prg Prg::duplicate() const
     return Prg(Key<kKeySize>(buffer.data()));
 }
 
+void Prg::serialize(uint8_t* out) const
+{
+    key_.unlock();
+    key_.serialize(out);
+    key_.lock();
+}
+
+Prg Prg::deserialize(uint8_t* in)
+{
+    return Prg(Key<kKeySize>(in));
+}
+
 } // namespace crypto
 
 } // namespace sse

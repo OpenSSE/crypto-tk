@@ -95,7 +95,7 @@ public:
     ///                         variables and implement the void
     ///                         serialize(uint8_t*) const member function and
     ///                         std::array<uint8_t,
-    ///                         kPublicContextSize>public_context() const static
+    ///                         kPublicContextSize>public_context() static
     ///                         function.
     ///                         The Wrapper::get_type_byte() static function
     ///                         must be specialized for CryptoClass.
@@ -121,10 +121,10 @@ public:
     /// @tparam CryptoClass     The class of the object to be wrapped. The class
     ///                         must declare the kSerializedSize, and
     ///                         kPublicContextSize static
-    ///                         variables and implement the void
-    ///                         serialize(uint8_t*) const member function and
+    ///                         variables and implement the CryptoClass
+    ///                         deserialize(uint8_t*) static function and
     ///                         std::array<uint8_t,
-    ///                         kPublicContextSize>public_context() const static
+    ///                         kPublicContextSize>public_context() static
     ///                         function.
     ///                         The Wrapper::get_type_byte() static function
     ///                         must be specialized for CryptoClass.
@@ -163,32 +163,39 @@ Wrapper::wrap(const CryptoClass& c) const
                                    + CryptoClass::kPublicContextSize
                                    + 1; // the +1 is for the mandatory type byte
     uint8_t* buffer = static_cast<uint8_t*>(sodium_malloc(buffer_size));
+    // std::array<uint8_t, buffer_size> buffer;
 
     // put the random IV at the beggining
     random_bytes(kRandomIVSize, buffer);
     // put the type byte after the IV
     buffer[kRandomIVSize] = Wrapper::get_type_byte<CryptoClass>();
     // copy the AD
-    std::array<uint8_t, CryptoClass::kPublicContextSize> public_context
-        = CryptoClass::public_context();
-    memcpy(buffer + kRandomIVSize + 1,
-           public_context.data(),
-           CryptoClass::kPublicContextSize);
+
+    if (CryptoClass::kPublicContextSize > 0) {
+        std::array<uint8_t, CryptoClass::kPublicContextSize> public_context
+            = CryptoClass::public_context();
+        memcpy(buffer + kRandomIVSize + 1,
+               public_context.data(),
+               CryptoClass::kPublicContextSize);
+    }
     // Serialize the object in the buffer
-    c.serialize(buffer + kRandomIVSize + 1 + CryptoClass::kPublicContextSize);
+    constexpr size_t serialization_offset
+        = +kRandomIVSize + 1 + CryptoClass::kPublicContextSize;
+    c.serialize(buffer + serialization_offset);
 
     std::array<uint8_t, kCiphertextExpansion + CryptoClass::kSerializedSize>
         out;
 
-    // copy the tag at the beggining of the output
+    // copy the IV at the beggining of the output
     memcpy(out.data(), buffer, kRandomIVSize);
+
     // compute the tag and put it at the end of the ciphertext
     std::array<uint8_t, kTagSize> tag = tag_generator_.prf(buffer, buffer_size);
-    std::copy(tag.begin(), tag.end(), out.end() - kTagSize);
+    std::copy_n(tag.begin(), kTagSize, out.end() - kTagSize);
 
     // encrypt the secret part of the buffer
     crypto_stream_chacha20_ietf_xor(out.data() + kRandomIVSize,
-                                    buffer + kRandomIVSize,
+                                    buffer + serialization_offset,
                                     CryptoClass::kSerializedSize,
                                     tag.data(),
                                     encryption_key_.unlock_get());
@@ -209,29 +216,33 @@ CryptoClass Wrapper::unwrap(
                                    + CryptoClass::kPublicContextSize
                                    + 1; // the +1 is for the mandatory type byte
     uint8_t* buffer = static_cast<uint8_t*>(sodium_malloc(buffer_size));
+    // std::array<uint8_t, buffer_size> buffer;
 
     // copy the IV at the beggining of the buffer
     memcpy(buffer, c_rep.data(), kRandomIVSize);
+    // std::copy_n(c_rep.begin(), kRandomIVSize, buffer.begin());
 
     // put the type byte after the IV
     buffer[kRandomIVSize] = Wrapper::get_type_byte<CryptoClass>();
 
     // copy the AD
-    std::array<uint8_t, CryptoClass::kPublicContextSize> public_context
-        = CryptoClass::public_context();
-    memcpy(buffer + kRandomIVSize + 1,
-           public_context.data(),
-           CryptoClass::kPublicContextSize);
-
+    if (CryptoClass::kPublicContextSize > 0) {
+        std::array<uint8_t, CryptoClass::kPublicContextSize> public_context
+            = CryptoClass::public_context();
+        memcpy(buffer + kRandomIVSize + 1,
+               public_context.data(),
+               CryptoClass::kPublicContextSize);
+    }
     // put the expected tag in a dedicated array
     std::array<uint8_t, kTagSize> expected_tag;
-    expected_tag.data()
-        = c_rep.data() + kRandomIVSize + CryptoClass::kSerializedSize;
+    std::copy_n(c_rep.end() - kTagSize, kTagSize, expected_tag.begin());
 
     // decrypt the representation
-    crypto_stream_chacha20_ietf_xor(c_rep.data() + kRandomIVSize,
-                                    buffer + kRandomIVSize + 1
-                                        + CryptoClass::kPublicContextSize,
+    constexpr size_t serialization_offset
+        = +kRandomIVSize + 1 + CryptoClass::kPublicContextSize;
+
+    crypto_stream_chacha20_ietf_xor(buffer + serialization_offset,
+                                    c_rep.data() + kRandomIVSize,
                                     CryptoClass::kSerializedSize,
                                     expected_tag.data(),
                                     encryption_key_.unlock_get());
@@ -296,6 +307,16 @@ CryptoClass Wrapper::unwrap(
 
 //     return out;
 // }
+
+// Implementation of the get_type_byte() template
+
+class Prg;
+template<>
+constexpr uint8_t Wrapper::get_type_byte<Prg>()
+{
+    return 0x01;
+}
+
 
 } // namespace crypto
 } // namespace sse

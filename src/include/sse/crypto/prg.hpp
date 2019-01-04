@@ -50,9 +50,26 @@ class Prg
     template<uint16_t NBYTES>
     friend class ConstrainedRCPrfInnerElement;
 
+    friend class Wrapper;
+
 public:
     /// @brief Size (in bytes) of a PRG key
     static constexpr uint8_t kKeySize = 32;
+
+    /// @brief  Size (in bytes) of the serialized representation (used to wrap a
+    ///         Prg object).
+    static constexpr size_t kSerializedSize = kKeySize;
+
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prg
+    ///         object).
+    static constexpr size_t kPublicContextSize = 0;
+
+
+    /// @brief The public context of a Prg object. It is an empty array.
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        return std::array<uint8_t, kPublicContextSize>();
+    }
 
     Prg() = delete;
     ///
@@ -342,6 +359,24 @@ public:
 
 private:
     Prg duplicate() const;
+
+    /// @brief Serialize the object in the given buffer
+    ///
+    /// @param[out] out The serialization buffer. It must be
+    ///                 at least kSerializedSize bytes large.
+
+    ///
+    void serialize(uint8_t* out) const;
+
+    /// @brief Deserialize a buffer into a Prg object
+    ///
+    /// This static function constructs a new Prg object out of the binary
+    /// representation of the input buffer in. The in buffer must be at least
+    /// kSerializedSize bytes large.
+    ///
+    /// @param  in  The byte buffer containing the binary representation of the
+    ///             Prg object.
+    static Prg deserialize(uint8_t* in);
 
     Key<kKeySize> key_;
 };

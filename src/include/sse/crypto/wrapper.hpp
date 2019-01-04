@@ -56,10 +56,11 @@ namespace crypto {
 ///     function, which outputs the public context of the object, i.e. some
 ///     public information related to the object (such as the number of output
 ///     bytes of a PRF).
-/// Finally, the get_type_byte() templated member function must also be
-/// specialized for each wrappable object. It is **CRUCIAL** for security that
-/// each specialization outputs a different type byte: collision among type
-/// bytes could create a security threat.
+/// Finally, the Wrapper::TypeByte<CryptoClass> templated member
+/// struct must also be specialized for each wrappable object, to define a
+/// unique `value` static value.It is **CRUCIAL** for security that each
+/// specialization outputs a different type byte: collision among type bytes
+/// could create a security threat.
 ///
 /// More in detail, to encrypt an object, the Wrapper class creates a buffer
 /// whose layout is the following (the bottom row indicate the size in bytes):
@@ -135,8 +136,8 @@ public:
     ///                         std::array<uint8_t,
     ///                         kPublicContextSize>public_context() static
     ///                         function.
-    ///                         The Wrapper::get_type_byte() static function
-    ///                         must be specialized for CryptoClass.
+    ///                         The Wrapper::TypeByte<CryptoClass> static
+    ///                         struct must be specialized for CryptoClass.
     ///
     /// @param c    The object to be wrapped.
     ///
@@ -172,8 +173,8 @@ public:
     ///                         std::array<uint8_t,
     ///                         kPublicContextSize>public_context() static
     ///                         function.
-    ///                         The Wrapper::get_type_byte() static function
-    ///                         must be specialized for CryptoClass.
+    ///                         The Wrapper::TypeByte<CryptoClass> static
+    ///                         struct must be specialized for CryptoClass.
     ///
     /// @param c    The buffer containing the encrypted representation of
     ///             the object.
@@ -189,11 +190,13 @@ public:
                    kCiphertextExpansion + CryptoClass::kSerializedSize>& c_rep)
         const;
 
-
-    template<class CryptoClass>
-    static constexpr uint8_t get_type_byte();
-
 private:
+    template<class CryptoClass>
+    struct TypeByte
+    {
+        static constexpr uint8_t value = 0x00;
+    };
+
     static constexpr uint16_t kEncryptionKeySize = 32U;
 
     Prf<kTagSize>           tag_generator_;
@@ -214,7 +217,7 @@ auto Wrapper::wrap(const CryptoClass& c)
     // put the random IV at the beggining
     random_bytes(kRandomIVSize, buffer);
     // put the type byte after the IV
-    buffer[kRandomIVSize] = Wrapper::get_type_byte<CryptoClass>();
+    buffer[kRandomIVSize] = Wrapper::TypeByte<CryptoClass>::value;
     // copy the AD
 
     if (CryptoClass::kPublicContextSize > 0) {
@@ -269,7 +272,7 @@ CryptoClass Wrapper::unwrap(
     // std::copy_n(c_rep.begin(), kRandomIVSize, buffer.begin());
 
     // put the type byte after the IV
-    buffer[kRandomIVSize] = Wrapper::get_type_byte<CryptoClass>();
+    buffer[kRandomIVSize] = Wrapper::TypeByte<CryptoClass>::value;
 
     // copy the AD
     if (CryptoClass::kPublicContextSize > 0) {
@@ -317,14 +320,15 @@ CryptoClass Wrapper::unwrap(
     return c;
 }
 
+// Specializations of the Wrapper::TypeByte<CryptoClass> template
 // Specializations of the get_type_byte() template
 
 class Prg;
 template<>
-constexpr uint8_t Wrapper::get_type_byte<Prg>()
+struct Wrapper::TypeByte<Prg>
 {
-    return 0x01;
-}
+    static constexpr uint8_t value = 0x03;
+};
 
 
 } // namespace crypto

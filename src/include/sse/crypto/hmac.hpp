@@ -39,6 +39,10 @@ namespace sse {
 
 namespace crypto {
 
+// forward declare the Prf class so we can use is as a friend
+template<uint16_t NBYTES>
+class Prf;
+
 
 /// @class HMac
 /// @brief Hash-based message authentication code.
@@ -54,6 +58,9 @@ namespace crypto {
 template<class H, uint16_t N>
 class HMac
 {
+    template<uint16_t NBYTES>
+    friend class Prf;
+
 public:
     /// @brief Maximum key size (in bytes) of the H-HMac instantiation
     static constexpr uint16_t kHMACKeySize = H::kBlockSize;

@@ -56,12 +56,31 @@ namespace crypto {
 template<uint16_t NBYTES>
 class Prf
 {
+    friend class Wrapper;
+
 public:
     /// @brief PRF key size (in bytes)
     static constexpr uint8_t kKeySize = 32;
 
     static_assert(kKeySize <= Hash::kBlockSize,
                   "The PRF key is too large for the hash block size");
+
+    /// @brief  Size (in bytes) of the serialized representation (used to wrap a
+    ///         Prg object).
+    static constexpr size_t kSerializedSize = kKeySize;
+
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prg
+    ///         object).
+    static constexpr size_t kPublicContextSize = sizeof(uint16_t);
+
+
+    /// @brief  The public context of a Prf object. It is an array containing
+    ///         the output length (NBYTES).
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        return std::array<uint8_t, kPublicContextSize>{
+            {((NBYTES >> 8) & 0xFF), (NBYTES & 0XFF)}};
+    }
 
     ///
     /// @brief Constructor
@@ -194,6 +213,19 @@ public:
 
 private:
     /// @internal
+
+    void serialize(uint8_t* out) const
+    {
+        base_.key_.unlock();
+        base_.key_.serialize(out);
+        base_.key_.lock();
+    }
+
+    static Prf<NBYTES> deserialize(uint8_t* in)
+    {
+        return Prf<NBYTES>(Key<kKeySize>(in));
+    }
+
     /// @brief Inner implementation of the PRF
     using PrfBase = HMac<Hash, kKeySize>;
 

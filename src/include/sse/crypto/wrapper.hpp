@@ -329,6 +329,13 @@ struct Wrapper::TypeByte<Cipher>
     static constexpr uint8_t value = 0x01;
 };
 
+template<uint16_t NBYTES>
+class Prf;
+template<uint16_t NBYTES>
+struct Wrapper::TypeByte<Prf<NBYTES>>
+{
+    static constexpr uint8_t value = 0x02;
+};
 
 class Prg;
 template<>

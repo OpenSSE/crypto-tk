@@ -21,6 +21,7 @@
 #include <sse/crypto/hash.hpp>
 #include <sse/crypto/prf.hpp>
 #include <sse/crypto/random.hpp>
+#include <sse/crypto/wrapper.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -105,6 +106,35 @@ void test_key_derivation_consistency_array()
     out_key.lock();
 }
 
+template<size_t N>
+void test_wrapping()
+{
+    constexpr size_t kNTests = 1000;
+    // Create new wrapper
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+    // Create a Prg object
+    sse::crypto::Prf<N> base_prf;
+
+
+    // wrap the object
+    auto prf_rep = wrapper.wrap(base_prf);
+
+    // unwrap the object
+    sse::crypto::Prf<N> unwrapped_prf
+        = wrapper.unwrap<sse::crypto::Prf<N>>(prf_rep);
+
+
+    for (size_t i = 1; i < kNTests + 1; i++) {
+        std::string in   = sse::crypto::random_string(10 * i);
+        auto        out1 = base_prf.prf(in);
+        auto        out2 = unwrapped_prf.prf(in);
+
+        ASSERT_EQ(out1, out2);
+    }
+}
+
 } // namespace tests
 
 TEST(prf, consistency)
@@ -140,6 +170,16 @@ TEST(prf, key_derivation_consistency)
     tests::test_key_derivation_consistency_array<20, 50>();
     tests::test_key_derivation_consistency_array<128, 100>();
     tests::test_key_derivation_consistency_array<1024, 200>();
+}
+
+TEST(prf, wrapping)
+{
+    tests::test_wrapping<1>();
+    tests::test_wrapping<10>();
+    tests::test_wrapping<20>();
+    tests::test_wrapping<128>();
+    tests::test_wrapping<1024>();
+    tests::test_wrapping<2000>();
 }
 
 TEST(prf, exceptions)

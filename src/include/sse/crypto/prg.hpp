@@ -56,10 +56,6 @@ public:
     /// @brief Size (in bytes) of a PRG key
     static constexpr uint8_t kKeySize = 32;
 
-    /// @brief  Size (in bytes) of the serialized representation (used to wrap a
-    ///         Prg object).
-    static constexpr size_t kSerializedSize = kKeySize;
-
     /// @brief  Size (in bytes) of the public context (used to wrap a Prg
     ///         object).
     static constexpr size_t kPublicContextSize = 0;
@@ -360,6 +356,16 @@ public:
 private:
     Prg duplicate() const;
 
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    constexpr size_t serialized_size() const noexcept
+    {
+        return kKeySize;
+    }
+
     /// @brief Serialize the object in the given buffer
     ///
     /// @param[out] out The serialization buffer. It must be
@@ -374,9 +380,10 @@ private:
     /// representation of the input buffer in. The in buffer must be at least
     /// kSerializedSize bytes large.
     ///
-    /// @param  in  The byte buffer containing the binary representation of the
-    ///             Prg object.
-    static Prg deserialize(uint8_t* in);
+    /// @param  in      The byte buffer containing the binary representation of
+    ///                 the Cipher object.
+    /// @param  in_size The size of the in buffer.
+    static Prg deserialize(uint8_t* in, const size_t in_size);
 
     Key<kKeySize> key_;
 };

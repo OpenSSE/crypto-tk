@@ -65,10 +65,6 @@ public:
     static_assert(kKeySize <= Hash::kBlockSize,
                   "The PRF key is too large for the hash block size");
 
-    /// @brief  Size (in bytes) of the serialized representation (used to wrap a
-    ///         Prg object).
-    static constexpr size_t kSerializedSize = kKeySize;
-
     /// @brief  Size (in bytes) of the public context (used to wrap a Prg
     ///         object).
     static constexpr size_t kPublicContextSize = sizeof(uint16_t);
@@ -214,6 +210,16 @@ public:
 private:
     /// @internal
 
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    constexpr size_t serialized_size() const noexcept
+    {
+        return kKeySize;
+    }
+
     void serialize(uint8_t* out) const
     {
         base_.key_.unlock();
@@ -221,8 +227,15 @@ private:
         base_.key_.lock();
     }
 
-    static Prf<NBYTES> deserialize(uint8_t* in)
+    static Prf<NBYTES> deserialize(uint8_t* in, const size_t in_size)
     {
+        if (in_size != kKeySize) {
+            /* LCOV_EXCL_START */
+            throw std::invalid_argument("Prf::deserialize: the deserialization "
+                                        "buffer size should be Prf::kKeySize.");
+            /* LCOV_EXCL_STOP */
+        }
+
         return Prf<NBYTES>(Key<kKeySize>(in));
     }
 

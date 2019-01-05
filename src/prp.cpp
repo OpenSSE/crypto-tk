@@ -285,9 +285,6 @@ void Prp::decrypt(const std::string& in, std::string& out)
 
 void Prp::serialize(uint8_t* out) const
 {
-    static_assert(
-        kContextSize == kSerializedSize,
-        "Prp: AEZ context size and serialization size are not compatible");
     if (!Prp::is_available()) {
         /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
@@ -299,7 +296,7 @@ void Prp::serialize(uint8_t* out) const
     aez_ctx_.lock();
 }
 
-Prp Prp::deserialize(uint8_t* in)
+Prp Prp::deserialize(uint8_t* in, const size_t in_size)
 {
     if (!Prp::is_available()) {
         /* LCOV_EXCL_START */
@@ -307,6 +304,13 @@ Prp Prp::deserialize(uint8_t* in)
                                  "acceleration not supported by the CPU");
         /* LCOV_EXCL_STOP */
     }
+    if (in_size != kContextSize) {
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Prp::deserialize: the deserialization "
+                                    "buffer size should be Prp::kContextSize.");
+        /* LCOV_EXCL_STOP */
+    }
+
     return Prp(Key<kContextSize>(in));
 }
 

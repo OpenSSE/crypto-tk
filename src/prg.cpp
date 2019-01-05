@@ -217,8 +217,15 @@ void Prg::serialize(uint8_t* out) const
     key_.lock();
 }
 
-Prg Prg::deserialize(uint8_t* in)
+Prg Prg::deserialize(uint8_t* in, const size_t in_size)
 {
+    if (in_size != kKeySize) {
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Prg::deserialize: the deserialization "
+                                    "buffer size should be Prg::kKeySize.");
+        /* LCOV_EXCL_STOP */
+    }
+
     return Prg(Key<kKeySize>(in));
 }
 

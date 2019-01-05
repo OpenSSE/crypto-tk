@@ -26,6 +26,8 @@
 
 #include <algorithm>
 #include <array>
+#include <exception>
+#include <vector>
 
 #include <sodium/crypto_stream_chacha20.h>
 #include <sodium/utils.h>
@@ -151,10 +153,7 @@ public:
     // template<class CryptoClass> std::array<uint8_t, kCiphertextExpansion
     // + CryptoClass::kSerializedSize> wrap(const CryptoClass& c) const;
     template<class CryptoClass>
-    auto wrap(const CryptoClass& c)
-        -> std::array<uint8_t,
-                      kCiphertextExpansion
-                          + CryptoClass::kSerializedSize> const;
+    auto wrap(const CryptoClass& c) -> std::vector<uint8_t> const;
 
     ///
     /// @brief Unwrap a cryptographic object
@@ -185,10 +184,7 @@ public:
     ///                                 invalid tag
     ///
     template<class CryptoClass>
-    CryptoClass unwrap(
-        std::array<uint8_t,
-                   kCiphertextExpansion + CryptoClass::kSerializedSize>& c_rep)
-        const;
+    CryptoClass unwrap(std::vector<uint8_t>& c_rep) const;
 
 private:
     template<class CryptoClass>
@@ -204,13 +200,12 @@ private:
 };
 
 template<class CryptoClass>
-auto Wrapper::wrap(const CryptoClass& c)
-    -> std::array<uint8_t,
-                  kCiphertextExpansion + CryptoClass::kSerializedSize> const
+auto Wrapper::wrap(const CryptoClass& c) -> std::vector<uint8_t> const
 {
-    constexpr size_t buffer_size = kRandomIVSize + CryptoClass::kSerializedSize
-                                   + CryptoClass::kPublicContextSize
-                                   + 1; // the +1 is for the mandatory type byte
+    const size_t serialized_size = c.serialized_size();
+    const size_t buffer_size     = kRandomIVSize + serialized_size
+                               + CryptoClass::kPublicContextSize
+                               + 1; // the +1 is for the mandatory type byte
     uint8_t* buffer = static_cast<uint8_t*>(sodium_malloc(buffer_size));
     // std::array<uint8_t, buffer_size> buffer;
 
@@ -232,8 +227,7 @@ auto Wrapper::wrap(const CryptoClass& c)
         = +kRandomIVSize + 1 + CryptoClass::kPublicContextSize;
     c.serialize(buffer + serialization_offset);
 
-    std::array<uint8_t, kCiphertextExpansion + CryptoClass::kSerializedSize>
-        out;
+    std::vector<uint8_t> out(kCiphertextExpansion + serialized_size);
 
     // copy the IV at the beggining of the output
     memcpy(out.data(), buffer, kRandomIVSize);
@@ -245,7 +239,7 @@ auto Wrapper::wrap(const CryptoClass& c)
     // encrypt the secret part of the buffer
     crypto_stream_chacha20_ietf_xor(out.data() + kRandomIVSize,
                                     buffer + serialization_offset,
-                                    CryptoClass::kSerializedSize,
+                                    serialized_size,
                                     tag.data(),
                                     encryption_key_.unlock_get());
     encryption_key_.lock();
@@ -256,14 +250,17 @@ auto Wrapper::wrap(const CryptoClass& c)
 }
 
 template<class CryptoClass>
-CryptoClass Wrapper::unwrap(
-    std::array<uint8_t,
-               Wrapper::kCiphertextExpansion + CryptoClass::kSerializedSize>&
-        c_rep) const
+CryptoClass Wrapper::unwrap(std::vector<uint8_t>& c_rep) const
 {
-    constexpr size_t buffer_size = kRandomIVSize + CryptoClass::kSerializedSize
-                                   + CryptoClass::kPublicContextSize
-                                   + 1; // the +1 is for the mandatory type byte
+    if (c_rep.size() <= kCiphertextExpansion) {
+        throw std::invalid_argument(
+            "Wrapper::unwrap: wrapper size is too small.");
+    }
+
+    const size_t data_size   = c_rep.size() - kCiphertextExpansion;
+    const size_t buffer_size = kRandomIVSize + data_size
+                               + CryptoClass::kPublicContextSize
+                               + 1; // the +1 is for the mandatory type byte
     uint8_t* buffer = static_cast<uint8_t*>(sodium_malloc(buffer_size));
     // std::array<uint8_t, buffer_size> buffer;
 
@@ -292,7 +289,7 @@ CryptoClass Wrapper::unwrap(
 
     crypto_stream_chacha20_ietf_xor(buffer + serialization_offset,
                                     c_rep.data() + kRandomIVSize,
-                                    CryptoClass::kSerializedSize,
+                                    data_size,
                                     expected_tag.data(),
                                     encryption_key_.unlock_get());
     encryption_key_.lock();
@@ -309,8 +306,9 @@ CryptoClass Wrapper::unwrap(
     }
 
     // Deserialize the buffer
-    CryptoClass c = CryptoClass::deserialize(buffer + kRandomIVSize + 1
-                                             + CryptoClass::kPublicContextSize);
+    CryptoClass c = CryptoClass::deserialize(
+        buffer + kRandomIVSize + 1 + CryptoClass::kPublicContextSize,
+        data_size);
 
 
     // free the buffer and zero the entry

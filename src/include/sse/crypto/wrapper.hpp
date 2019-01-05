@@ -44,16 +44,17 @@ namespace crypto {
 /// variant of SIV with an additional random nonce).
 ///
 /// The objects meant to be wrapped must declare/implement
-///     - the constexpr size_t kSerializedSize static variable, which denotes
-///     the size of the binary representation of the object;
 ///     - the constexpr size_t kPublicContextSize static variable, which denotes
 ///     the size of the public context of the object (e.g. the number of output
 ///     bytes of a PRF);
+///     - the size_t serialized_size() const member function, which outputs the
+///     number of bytes necessary to encode the object;
 ///     - the void serialize(uint8_t* out) const member function, which writes
 ///     the binary representation of the object into out;
-///     - the CryptoClass deserialize(uint8_t* in) static function, which
-///     outputs a new instance of the CryptoClass object, initialized with the
-///     content of the in buffer;
+///     - the CryptoClass deserialize(uint8_t* in, size_t in_size) static
+///     function, which outputs a new instance of the CryptoClass object,
+///     initialized with the content of the in buffer, which is in_size bytes
+///     wide;
 ///     - the std::array<uint8_t, kPublicContextSize> public_context() static
 ///     function, which outputs the public context of the object, i.e. some
 ///     public information related to the object (such as the number of output
@@ -68,7 +69,7 @@ namespace crypto {
 /// whose layout is the following (the bottom row indicate the size in bytes):
 /// | item  | random IV     | type byte | public context     | serialization   |
 /// |-------|---------------|-----------|--------------------|-----------------|
-/// |size(B)| kRandomIVSize | 1         | kPublicContextSize | kSerializedSize |
+/// |size(B)| kRandomIVSize | 1         | kPublicContextSize |serialized_size()|
 /// A PRF is applied to this buffer to compute the tag `T`, which is itself used
 /// as the initialization vector of the (unauthenticated) encryption scheme used
 /// to encrypt the serialization (currently ChaCha20 - IETF). The ciphertext is
@@ -131,11 +132,10 @@ public:
     /// confidentiality and integrity of the wrapped object.
     ///
     /// @tparam CryptoClass     The class of the object to be wrapped. The class
-    ///                         must declare the kSerializedSize, and
-    ///                         kPublicContextSize static
-    ///                         variables and implement the void
-    ///                         serialize(uint8_t*) const member function and
-    ///                         std::array<uint8_t,
+    ///                         must declare the kPublicContextSize static
+    ///                         variable and implement the size_t
+    ///                         serialized_size(), and void serialize(uint8_t*)
+    ///                         const member functions and std::array<uint8_t,
     ///                         kPublicContextSize>public_context() static
     ///                         function.
     ///                         The Wrapper::TypeByte<CryptoClass> static
@@ -158,11 +158,10 @@ public:
     ///
     /// @tparam CryptoClass     The class of the object to be wrapped. The
     /// class
-    ///                         must declare the kSerializedSize, and
-    ///                         kPublicContextSize static
-    ///                         variables and implement the CryptoClass
-    ///                         deserialize(uint8_t*) static function and
-    ///                         std::array<uint8_t,
+    ///                         must declare the kPublicContextSize static
+    ///                         variable, and implement the CryptoClass
+    ///                         deserialize(uint8_t*, size_t) static function
+    ///                         and std::array<uint8_t,
     ///                         kPublicContextSize>public_context() static
     ///                         function.
     ///                         The Wrapper::TypeByte<CryptoClass> static

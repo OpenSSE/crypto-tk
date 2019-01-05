@@ -145,15 +145,8 @@ public:
     ///
     /// @return A buffer containing the encrypted representation of the wrapped
     ///         object
-    // Using an auto return type avoids a compile-time error on gcc, which is
-    // not able to match the templated member declaration and its definition. It
-    // seems it is due to the fact that we use CryptoClass::kSerializedSize in
-    // the return type. Also, clang has no problem compiling the more natural
-    // declaration:
-    // template<class CryptoClass> std::array<uint8_t, kCiphertextExpansion
-    // + CryptoClass::kSerializedSize> wrap(const CryptoClass& c) const;
     template<class CryptoClass>
-    auto wrap(const CryptoClass& c) -> std::vector<uint8_t> const;
+    std::vector<uint8_t> wrap(const CryptoClass& c) const;
 
     ///
     /// @brief Unwrap a cryptographic object
@@ -200,7 +193,7 @@ private:
 };
 
 template<class CryptoClass>
-auto Wrapper::wrap(const CryptoClass& c) -> std::vector<uint8_t> const
+std::vector<uint8_t> Wrapper::wrap(const CryptoClass& c) const
 {
     const size_t serialized_size = c.serialized_size();
     const size_t buffer_size     = kRandomIVSize + serialized_size

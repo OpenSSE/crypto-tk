@@ -207,7 +207,7 @@ private:
     ///
     /// @return The size in bytes of the buffer needed to serialize the object.
     ///
-    constexpr size_t serialized_size() const noexcept
+    size_t serialized_size() const noexcept
     {
         return kKeySize;
     }

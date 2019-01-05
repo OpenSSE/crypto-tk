@@ -196,7 +196,9 @@ void Cipher::serialize(uint8_t* out) const
     key_.lock();
 }
 
-Cipher Cipher::deserialize(uint8_t* in, const size_t in_size)
+Cipher Cipher::deserialize(uint8_t*     in,
+                           const size_t in_size,
+                           size_t&      n_bytes_read)
 {
     if (in_size != kKeySize) {
         /* LCOV_EXCL_START */
@@ -204,7 +206,7 @@ Cipher Cipher::deserialize(uint8_t* in, const size_t in_size)
                                     "buffer size should be Cipher::kKeySize.");
         /* LCOV_EXCL_STOP */
     }
-
+    n_bytes_read += kKeySize;
     return Cipher(Key<kKeySize>(in));
 }
 

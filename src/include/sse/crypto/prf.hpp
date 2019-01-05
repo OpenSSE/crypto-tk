@@ -65,7 +65,7 @@ public:
     static_assert(kKeySize <= Hash::kBlockSize,
                   "The PRF key is too large for the hash block size");
 
-    /// @brief  Size (in bytes) of the public context (used to wrap a Prg
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prf
     ///         object).
     static constexpr size_t kPublicContextSize = sizeof(uint16_t);
 
@@ -227,7 +227,9 @@ private:
         base_.key_.lock();
     }
 
-    static Prf<NBYTES> deserialize(uint8_t* in, const size_t in_size)
+    static Prf<NBYTES> deserialize(uint8_t*     in,
+                                   const size_t in_size,
+                                   size_t&      n_bytes_read)
     {
         if (in_size != kKeySize) {
             /* LCOV_EXCL_START */
@@ -235,6 +237,7 @@ private:
                                         "buffer size should be Prf::kKeySize.");
             /* LCOV_EXCL_STOP */
         }
+        n_bytes_read = kKeySize;
 
         return Prf<NBYTES>(Key<kKeySize>(in));
     }

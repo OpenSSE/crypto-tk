@@ -296,7 +296,7 @@ void Prp::serialize(uint8_t* out) const
     aez_ctx_.lock();
 }
 
-Prp Prp::deserialize(uint8_t* in, const size_t in_size)
+Prp Prp::deserialize(uint8_t* in, const size_t in_size, size_t& n_bytes_read)
 {
     if (!Prp::is_available()) {
         /* LCOV_EXCL_START */
@@ -310,6 +310,7 @@ Prp Prp::deserialize(uint8_t* in, const size_t in_size)
                                     "buffer size should be Prp::kContextSize.");
         /* LCOV_EXCL_STOP */
     }
+    n_bytes_read = kContextSize;
 
     return Prp(Key<kContextSize>(in));
 }

@@ -60,7 +60,6 @@ public:
     ///         object).
     static constexpr size_t kPublicContextSize = 0;
 
-
     /// @brief The public context of a Prg object. It is an empty array.
     static constexpr std::array<uint8_t, kPublicContextSize> public_context()
     {
@@ -370,8 +369,6 @@ private:
     ///
     /// @param[out] out The serialization buffer. It must be
     ///                 at least kSerializedSize bytes large.
-
-    ///
     void serialize(uint8_t* out) const;
 
     /// @brief Deserialize a buffer into a Prg object
@@ -381,12 +378,16 @@ private:
     /// kSerializedSize bytes large.
     ///
     /// @param  in      The byte buffer containing the binary representation of
-    ///                 the Cipher object.
+    ///                 the Prg object.
     /// @param  in_size The size of the in buffer.
+    /// @param  n_bytes_read    The number of bytes from in read during the
+    ///                         deserialization
     ///
     /// @exception  std::invalid_argument   The size of the in buffer (in_size)
     ///                                     is smaller than kKeySize
-    static Prg deserialize(uint8_t* in, const size_t in_size);
+    static Prg deserialize(uint8_t*     in,
+                           const size_t in_size,
+                           size_t&      n_bytes_read);
 
     Key<kKeySize> key_;
 };

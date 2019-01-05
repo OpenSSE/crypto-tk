@@ -51,10 +51,10 @@ namespace crypto {
 ///     number of bytes necessary to encode the object;
 ///     - the void serialize(uint8_t* out) const member function, which writes
 ///     the binary representation of the object into out;
-///     - the CryptoClass deserialize(uint8_t* in, size_t in_size) static
-///     function, which outputs a new instance of the CryptoClass object,
-///     initialized with the content of the in buffer, which is in_size bytes
-///     wide;
+///     - the CryptoClass deserialize(uint8_t* in, size_t in_size, size_t
+///     n_bytes_read) static function, which outputs a new instance of the
+///     CryptoClass object, initialized with the content of the in buffer, which
+///     is in_size bytes wide, and put the number of read bytes in n_bytes_read;
 ///     - the std::array<uint8_t, kPublicContextSize> public_context() static
 ///     function, which outputs the public context of the object, i.e. some
 ///     public information related to the object (such as the number of output
@@ -160,8 +160,8 @@ public:
     /// class
     ///                         must declare the kPublicContextSize static
     ///                         variable, and implement the CryptoClass
-    ///                         deserialize(uint8_t*, size_t) static function
-    ///                         and std::array<uint8_t,
+    ///                         deserialize(uint8_t*, size_t, size_t&) static
+    ///                         function and std::array<uint8_t,
     ///                         kPublicContextSize>public_context() static
     ///                         function.
     ///                         The Wrapper::TypeByte<CryptoClass> static
@@ -294,14 +294,26 @@ CryptoClass Wrapper::unwrap(std::vector<uint8_t>& c_rep) const
     // check that the computed tag and the expected tag are the same
     if (sodium_memcmp(expected_tag.data(), computed_tag.data(), kTagSize)
         != 0) {
-        throw std::runtime_error("Wrapper: decryption failed, invalid tag!");
+        throw std::runtime_error(
+            "Wrapper::unwrap: decryption failed, invalid tag!");
     }
 
     // Deserialize the buffer
-    CryptoClass c = CryptoClass::deserialize(
+    size_t      bytes_read = 0;
+    CryptoClass c          = CryptoClass::deserialize(
         buffer + kRandomIVSize + 1 + CryptoClass::kPublicContextSize,
-        data_size);
+        data_size,
+        bytes_read);
 
+    if (bytes_read != data_size) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error(
+            "Wrapper::unwrap: the number of read bytes ("
+            + std::to_string(bytes_read)
+            + ") is different from the number of data bytes ("
+            + std::to_string(data_size) + ")");
+        /* LCOV_EXCL_STOP */
+    }
 
     // free the buffer and zero the entry
     sodium_free(buffer);

@@ -304,7 +304,7 @@ Prp Prp::deserialize(uint8_t* in, const size_t in_size, size_t& n_bytes_read)
                                  "acceleration not supported by the CPU");
         /* LCOV_EXCL_STOP */
     }
-    if (in_size != kContextSize) {
+    if (in_size < kContextSize) {
         /* LCOV_EXCL_START */
         throw std::invalid_argument("Prp::deserialize: the deserialization "
                                     "buffer size should be Prp::kContextSize.");

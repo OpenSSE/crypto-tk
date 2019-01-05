@@ -231,7 +231,7 @@ private:
                                    const size_t in_size,
                                    size_t&      n_bytes_read)
     {
-        if (in_size != kKeySize) {
+        if (in_size < kKeySize) {
             /* LCOV_EXCL_START */
             throw std::invalid_argument("Prf::deserialize: the deserialization "
                                         "buffer size should be Prf::kKeySize.");

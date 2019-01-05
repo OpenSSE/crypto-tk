@@ -463,13 +463,21 @@ private:
     /// subtree height, the minimum leaf and the maximum leaf.
     void serialize_element_info(uint8_t* out) const noexcept
     {
-        *(reinterpret_cast<RCPrfParams::depth_type*>(out))
-            = this->subtree_height();
-        *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)))
-            = this->min_leaf();
-        *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)
-                                      + sizeof(uint64_t)))
-            = this->max_leaf();
+        // *(reinterpret_cast<RCPrfParams::depth_type*>(out))
+        // = this->subtree_height();
+        // *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)))
+        // = this->min_leaf();
+        // *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)
+        //   + sizeof(uint64_t)))
+        // = this->max_leaf();
+
+        memcpy(out, &this->subtree_height_, sizeof(this->subtree_height_));
+        memcpy(out + sizeof(this->subtree_height_),
+               &this->min_leaf_,
+               sizeof(this->min_leaf_));
+        memcpy(out + sizeof(this->subtree_height_) + sizeof(this->min_leaf_),
+               &this->max_leaf_,
+               sizeof(this->max_leaf_));
     }
 
     static void deserialize_element_info(
@@ -478,11 +486,18 @@ private:
         uint64_t&                min_leaf,
         uint64_t&                max_leaf) noexcept
     {
-        subtree_height = *(reinterpret_cast<RCPrfParams::depth_type*>(in));
-        min_leaf       = *(
-            reinterpret_cast<uint64_t*>(in + sizeof(RCPrfParams::depth_type)));
-        max_leaf = *(reinterpret_cast<uint64_t*>(
-            in + sizeof(RCPrfParams::depth_type) + sizeof(uint64_t)));
+        // subtree_height = *(reinterpret_cast<RCPrfParams::depth_type*>(in));
+        // min_leaf       = *(
+        //     reinterpret_cast<uint64_t*>(in +
+        //     sizeof(RCPrfParams::depth_type)));
+        // max_leaf = *(reinterpret_cast<uint64_t*>(
+        //     in + sizeof(RCPrfParams::depth_type) + sizeof(uint64_t)));
+
+        memcpy(&subtree_height, in, sizeof(subtree_height_));
+        memcpy(&min_leaf, in + sizeof(subtree_height), sizeof(min_leaf));
+        memcpy(&max_leaf,
+               in + sizeof(subtree_height) + sizeof(min_leaf),
+               sizeof(max_leaf));
     }
 
     /// @brief  Returns the size (in bytes) of the serialized representation of
@@ -870,6 +885,8 @@ void ConstrainedRCPrfLeafElement<NBYTES>::generate_constrained_subkeys(
 template<uint16_t NBYTES>
 class ConstrainedRCPrf : public RCPrfBase<NBYTES>
 {
+    friend class Wrapper;
+
 public:
     static RCPrfParams::depth_type get_element_height(
         const std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
@@ -1161,11 +1178,19 @@ void ConstrainedRCPrf<NBYTES>::serialize(uint8_t* out) const
 {
     uint8_t* offset_out = out;
 
-    *(reinterpret_cast<RCPrfParams::depth_type*>(offset_out))
-        = this->tree_height(); // the tree depth
+    // *(reinterpret_cast<RCPrfParams::depth_type*>(offset_out))
+    // = this->tree_height();
+
+    RCPrfParams::depth_type th = this->tree_height();
+    memcpy(offset_out, &th,
+           sizeof(RCPrfParams::depth_type)); // the tree depth
     offset_out += sizeof(RCPrfParams::depth_type);
 
-    *(reinterpret_cast<uint32_t*>(offset_out)) = elements_.size();
+    // *(reinterpret_cast<uint32_t*>(offset_out)) = elements_.size();
+
+    uint32_t elt_size = elements_.size();
+    memcpy(offset_out, &elt_size,
+           sizeof(uint32_t));       // the tree depth
     offset_out += sizeof(uint32_t); // the number of elements
 
     // for each element:
@@ -1186,7 +1211,7 @@ ConstrainedRCPrf<NBYTES> ConstrainedRCPrf<NBYTES>::deserialize(
     const size_t in_size,
     size_t&      n_bytes_read)
 {
-    size_t min_size
+    constexpr size_t min_size
         = sizeof(RCPrfParams::depth_type) + sizeof(uint32_t)
           + ConstrainedRCPrfElement<NBYTES>::kSerializedElementInfoSize;
 
@@ -1202,16 +1227,21 @@ ConstrainedRCPrf<NBYTES> ConstrainedRCPrf<NBYTES>::deserialize(
     uint8_t* offset_in       = in;
     size_t   remaining_bytes = in_size;
 
-    RCPrfParams::depth_type tree_height
-        = *(reinterpret_cast<RCPrfParams::depth_type*>(offset_in));
-    offset_in += sizeof(RCPrfParams::depth_type);
-    remaining_bytes -= sizeof(RCPrfParams::depth_type);
-    n_bytes_read = sizeof(RCPrfParams::depth_type);
+    RCPrfParams::depth_type tree_height;
+    uint32_t                n_elts;
 
-    uint32_t n_elts = *(reinterpret_cast<uint32_t*>(offset_in));
-    offset_in += sizeof(uint32_t);
-    remaining_bytes -= sizeof(uint32_t);
-    n_bytes_read += sizeof(uint32_t);
+
+    // = *(reinterpret_cast<RCPrfParams::depth_type*>(offset_in));
+    memcpy(&tree_height, offset_in, sizeof(tree_height));
+    offset_in += sizeof(tree_height);
+    remaining_bytes -= sizeof(tree_height);
+    n_bytes_read = sizeof(tree_height);
+
+    // uint32_t n_elts = *(reinterpret_cast<uint32_t*>(offset_in));
+    memcpy(&n_elts, offset_in, sizeof(n_elts));
+    offset_in += sizeof(n_elts);
+    remaining_bytes -= sizeof(n_elts);
+    n_bytes_read += sizeof(n_elts);
 
 
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>

@@ -25,6 +25,7 @@
 #include <sse/crypto/prg.hpp>
 
 #include <cassert>
+#include <cstring>
 
 #include <algorithm>
 #include <exception>
@@ -453,6 +454,51 @@ public:
 
 
 private:
+    /// @brief Size of an element's basic informations. The element's
+    /// information are the subtree height, the min leaf and the max leaf
+    static constexpr size_t kSerializedElementInfoSize
+        = sizeof(RCPrfParams::depth_type) + 2 * sizeof(uint64_t);
+
+    /// @brief Copies the element's information in the buffer, starting with the
+    /// subtree height, the minimum leaf and the maximum leaf.
+    void serialize_element_info(uint8_t* out) const noexcept
+    {
+        *(reinterpret_cast<RCPrfParams::depth_type*>(out))
+            = this->subtree_height();
+        *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)))
+            = this->min_leaf();
+        *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)
+                                      + sizeof(uint64_t)))
+            = this->max_leaf();
+    }
+
+    static void deserialize_element_info(
+        uint8_t*                 in,
+        RCPrfParams::depth_type& subtree_height,
+        uint64_t&                min_leaf,
+        uint64_t&                max_leaf) noexcept
+    {
+        subtree_height = *(reinterpret_cast<RCPrfParams::depth_type*>(in));
+        min_leaf       = *(
+            reinterpret_cast<uint64_t*>(in + sizeof(RCPrfParams::depth_type)));
+        max_leaf = *(reinterpret_cast<uint64_t*>(
+            in + sizeof(RCPrfParams::depth_type) + sizeof(uint64_t)));
+    }
+
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    virtual size_t serialized_size() const noexcept = 0;
+
+    /// @brief Serialize the object in the given buffer
+    ///
+    /// @param[out] out The serialization buffer. It must be
+    ///                 at least serialized_size() bytes large.
+    virtual void serialize(uint8_t* out) const = 0;
+
+
     const RCPrfParams::depth_type subtree_height_;
     const uint64_t                min_leaf_;
     const uint64_t                max_leaf_;
@@ -468,6 +514,8 @@ private:
 template<uint16_t NBYTES>
 class ConstrainedRCPrfInnerElement : public ConstrainedRCPrfElement<NBYTES>
 {
+    friend class ConstrainedRCPrf<NBYTES>;
+
 public:
     ///
     /// @brief Constructor
@@ -575,6 +623,33 @@ public:
 
 private:
     Prg base_prg_;
+
+    size_t serialized_size() const noexcept override
+    {
+        return base_prg_.serialized_size();
+    }
+
+    void serialize(uint8_t* out) const override
+    {
+        base_prg_.serialize(out);
+    }
+
+    static ConstrainedRCPrfInnerElement<NBYTES> deserialize(
+        RCPrfParams::depth_type height,
+        RCPrfParams::depth_type subtree_height,
+        uint64_t                min,
+        uint64_t                max,
+        uint8_t*                in,
+        size_t                  in_size,
+        size_t&                 n_bytes_read)
+    {
+        return ConstrainedRCPrfInnerElement<NBYTES>(
+            Prg::deserialize(in, in_size, n_bytes_read),
+            height,
+            subtree_height,
+            min,
+            max);
+    }
 };
 
 template<uint16_t NBYTES>
@@ -651,6 +726,8 @@ void ConstrainedRCPrfInnerElement<NBYTES>::generate_constrained_subkeys(
 template<uint16_t NBYTES>
 class ConstrainedRCPrfLeafElement : public ConstrainedRCPrfElement<NBYTES>
 {
+    friend class ConstrainedRCPrf<NBYTES>;
+
 public:
     ///
     /// @brief Constructor
@@ -711,6 +788,37 @@ public:
 
 private:
     std::array<uint8_t, NBYTES> leaf_buffer_;
+
+    size_t serialized_size() const noexcept override
+    {
+        return NBYTES;
+    }
+
+    void serialize(uint8_t* out) const override
+    {
+        memcpy(out, leaf_buffer_.data(), NBYTES);
+    }
+
+    static ConstrainedRCPrfLeafElement<NBYTES> deserialize(
+        RCPrfParams::depth_type height,
+        uint64_t                leaf,
+        uint8_t*                in,
+        size_t                  in_size,
+        size_t&                 n_bytes_read)
+    {
+        /* LCOV_EXCL_START */
+        if (in_size < NBYTES) {
+            throw std::invalid_argument("ConstrainedRCPrfLeafElement::"
+                                        "deserialize: input buffer too small");
+        }
+        /* LCOV_EXCL_STOP */
+
+        std::array<uint8_t, NBYTES> buffer;
+        memcpy(buffer.data(), in, NBYTES);
+        n_bytes_read = NBYTES;
+
+        return ConstrainedRCPrfLeafElement<NBYTES>(buffer, height, leaf);
+    }
 };
 
 template<uint16_t NBYTES>
@@ -910,8 +1018,64 @@ public:
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
             constrained_elements) const override;
 
+
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prf
+    ///         object).
+    static constexpr size_t kPublicContextSize = sizeof(uint16_t);
+
+
+    /// @brief  The public context of a Prf object. It is an array containing
+    ///         the output length (NBYTES).
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        return std::array<uint8_t, kPublicContextSize>{
+            {((NBYTES >> 8) & 0xFF), (NBYTES & 0XFF)}};
+    }
+
 private:
     std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>> elements_;
+
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    size_t serialized_size() const noexcept;
+
+    /// @brief Serialize the object in the given buffer
+    ///
+    ///
+    /// The object is serialized as follows:
+    ///     - the tree's depth
+    ///     - the number of elements
+    ///     - for every element:
+    ///         - the element's information (subtree height, min and max leaf)
+    ///         - the element's serialization
+    ///
+    /// @param[out] out The serialization buffer. It must be
+    ///                 at least kSerializedSize bytes large.
+    void serialize(uint8_t* out) const;
+
+    /// @brief Deserialize a buffer into a ConstrainedRCPrf object
+    ///
+    /// This static function constructs a new ConstrainedRCPrf object out of the
+    /// binary representation of the input buffer in. The in buffer must be at
+    /// least kSerializedSize bytes large.
+    ///
+    /// @param  in      The byte buffer containing the binary representation of
+    ///                 the ConstrainedRCPrf object.
+    /// @param  in_size The size of the in buffer.
+    /// @param  n_bytes_read    The number of bytes from in read during the
+    ///                         deserialization
+    ///
+    /// @exception  std::invalid_argument   The size of the in buffer (in_size)
+    ///                                     is too small
+    ///
+    /// @exception  std::runtime_error      An error has been encountered during
+    ///                                     deserialization
+    static ConstrainedRCPrf<NBYTES> deserialize(uint8_t*     in,
+                                                const size_t in_size,
+                                                size_t&      n_bytes_read);
 };
 
 template<uint16_t NBYTES>
@@ -973,6 +1137,148 @@ ConstrainedRCPrf<NBYTES> ConstrainedRCPrf<NBYTES>::constrain(uint64_t min,
 
     return ConstrainedRCPrf<NBYTES>(std::move(constrained_elements));
 }
+
+template<uint16_t NBYTES>
+size_t ConstrainedRCPrf<NBYTES>::serialized_size() const noexcept
+{
+    size_t total_size = 0;
+
+    total_size += sizeof(RCPrfParams::depth_type); // the tree depth
+    total_size += sizeof(uint32_t);                // the number of elements
+
+    // for each element:
+    for (const auto& elt : elements_) {
+        total_size // the size of the element's information
+            += ConstrainedRCPrfElement<NBYTES>::kSerializedElementInfoSize;
+        total_size += elt->serialized_size(); // the size of the element itself
+    }
+
+    return total_size;
+}
+
+template<uint16_t NBYTES>
+void ConstrainedRCPrf<NBYTES>::serialize(uint8_t* out) const
+{
+    uint8_t* offset_out = out;
+
+    *(reinterpret_cast<RCPrfParams::depth_type*>(offset_out))
+        = this->tree_height(); // the tree depth
+    offset_out += sizeof(RCPrfParams::depth_type);
+
+    *(reinterpret_cast<uint32_t*>(offset_out)) = elements_.size();
+    offset_out += sizeof(uint32_t); // the number of elements
+
+    // for each element:
+    for (const auto& elt : elements_) {
+        elt->serialize_element_info(offset_out);
+        offset_out
+            += ConstrainedRCPrfElement<NBYTES>::kSerializedElementInfoSize;
+
+        elt->serialize(offset_out);
+        offset_out += elt->serialized_size(); // the size of the element itself
+    }
+}
+
+
+template<uint16_t NBYTES>
+ConstrainedRCPrf<NBYTES> ConstrainedRCPrf<NBYTES>::deserialize(
+    uint8_t*     in,
+    const size_t in_size,
+    size_t&      n_bytes_read)
+{
+    size_t min_size
+        = sizeof(RCPrfParams::depth_type) + sizeof(uint32_t)
+          + ConstrainedRCPrfElement<NBYTES>::kSerializedElementInfoSize;
+
+    if (in_size <= min_size) {
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument(
+            "ConstrainedRCPrf::deserialize: invalid input buffer size. The "
+            "input buffer must at least be "
+            + std::to_string(min_size) + " bytes wide");
+        /* LCOV_EXCL_STOP */
+    }
+
+    uint8_t* offset_in       = in;
+    size_t   remaining_bytes = in_size;
+
+    RCPrfParams::depth_type tree_height
+        = *(reinterpret_cast<RCPrfParams::depth_type*>(offset_in));
+    offset_in += sizeof(RCPrfParams::depth_type);
+    remaining_bytes -= sizeof(RCPrfParams::depth_type);
+    n_bytes_read = sizeof(RCPrfParams::depth_type);
+
+    uint32_t n_elts = *(reinterpret_cast<uint32_t*>(offset_in));
+    offset_in += sizeof(uint32_t);
+    remaining_bytes -= sizeof(uint32_t);
+    n_bytes_read += sizeof(uint32_t);
+
+
+    std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>
+        constrained_elements(n_elts);
+
+    constexpr size_t kSerializedElementInfoSize
+        = ConstrainedRCPrfElement<NBYTES>::kSerializedElementInfoSize;
+
+    for (uint32_t i = 0; i < n_elts; i++) {
+        /* LCOV_EXCL_START */
+        if (remaining_bytes <= kSerializedElementInfoSize) {
+            throw std::runtime_error(
+                "ConstrainedRCPrf::deserialize: not enough bytes remaining to "
+                "deserialize a tree element");
+        }
+        /* LCOV_EXCL_STOP */
+
+        RCPrfParams::depth_type subtree_height;
+        uint64_t                min_leaf;
+        uint64_t                max_leaf;
+
+        ConstrainedRCPrfElement<NBYTES>::deserialize_element_info(
+            offset_in, subtree_height, min_leaf, max_leaf);
+
+        offset_in += kSerializedElementInfoSize;
+        remaining_bytes -= kSerializedElementInfoSize;
+        n_bytes_read += kSerializedElementInfoSize;
+
+        size_t elt_read_bytes = 0;
+        if ((min_leaf == max_leaf) && (subtree_height == 1)) {
+            // it's a leaf
+            constrained_elements[i].reset(
+                new ConstrainedRCPrfLeafElement<NBYTES>(
+                    ConstrainedRCPrfLeafElement<NBYTES>::deserialize(
+                        tree_height,
+                        min_leaf,
+                        offset_in,
+                        remaining_bytes,
+                        elt_read_bytes)));
+
+            offset_in += elt_read_bytes;
+            remaining_bytes -= elt_read_bytes;
+            n_bytes_read += elt_read_bytes;
+
+        } else {
+            // it's an inner node
+            constrained_elements[i].reset(
+                new ConstrainedRCPrfInnerElement<NBYTES>(
+                    ConstrainedRCPrfInnerElement<NBYTES>::deserialize(
+                        tree_height,
+                        subtree_height,
+                        min_leaf,
+                        max_leaf,
+                        offset_in,
+                        remaining_bytes,
+                        elt_read_bytes)));
+
+            offset_in += elt_read_bytes;
+            remaining_bytes -= elt_read_bytes;
+            n_bytes_read += elt_read_bytes;
+        }
+    }
+
+    return ConstrainedRCPrf<NBYTES>(std::move(constrained_elements));
+}
+
+// RCPrfBase implementation
 
 template<uint16_t NBYTES>
 void RCPrfBase<NBYTES>::generate_leaf_from_parent(

@@ -229,6 +229,9 @@ private:
     /// @param  in      The byte buffer containing the binary representation of
     ///                 the Cipher object.
     /// @param  in_size The size of the in buffer.
+    ///
+    /// @exception  std::invalid_argument   The size of the in buffer (in_size)
+    ///                                     is smaller than kKeySize
     static Cipher deserialize(uint8_t* in, const size_t in_size);
 
     Key<kKeySize> key_;

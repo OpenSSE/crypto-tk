@@ -62,7 +62,10 @@ public:
     /// @brief The public context of a Cipher object. It is an empty array.
     static constexpr std::array<uint8_t, kPublicContextSize> public_context()
     {
-        return {};
+        // GCC (4.8) does not support using {} instead of
+        // std::array<uint8_t, kPublicContextSize>()
+        // NOLINTNEXTLINE(modernize-return-braced-init-list)
+        return std::array<uint8_t, kPublicContextSize>();
     }
 
     Cipher() = delete;

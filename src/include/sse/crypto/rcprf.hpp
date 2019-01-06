@@ -1036,13 +1036,13 @@ public:
             constrained_elements) const override;
 
 
-    /// @brief  Size (in bytes) of the public context (used to wrap a Prf
-    ///         object).
+    /// @brief  Size (in bytes) of the public context (used to wrap a
+    ///         ConstrainedRCPrf object).
     static constexpr size_t kPublicContextSize = sizeof(uint16_t);
 
 
-    /// @brief  The public context of a Prf object. It is an array containing
-    ///         the output length (NBYTES).
+    /// @brief  The public context of a ConstrainedRCPrf object. It is an array
+    ///         containing the output length (NBYTES).
     static constexpr std::array<uint8_t, kPublicContextSize> public_context()
     {
         return std::array<uint8_t, kPublicContextSize>{
@@ -1438,6 +1438,8 @@ void RCPrfBase<NBYTES>::generate_constrained_subkeys_from_node(
 template<uint16_t NBYTES>
 class RCPrf : public RCPrfBase<NBYTES>
 {
+    friend class Wrapper;
+
 public:
     ///
     /// @brief Constructor
@@ -1518,8 +1520,81 @@ public:
         std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
             constrained_elements) const override;
 
+    /// @brief  Size (in bytes) of the public context (used to wrap a
+    ///         RCPrf object).
+    static constexpr size_t kPublicContextSize = sizeof(uint16_t);
+
+
+    /// @brief  The public context of a RCPrf object. It is an array
+    ///         containing the output length (NBYTES).
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        return std::array<uint8_t, kPublicContextSize>{
+            {((NBYTES >> 8) & 0xFF), (NBYTES & 0XFF)}};
+    }
+
 private:
     Prg root_prg_;
+
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    size_t serialized_size() const noexcept
+    {
+        return root_prg_.serialized_size() + sizeof(RCPrfParams::depth_type);
+    }
+
+    /// @brief Serialize the object in the given buffer
+    ///
+    /// @param[out] out The serialization buffer. It must be
+    ///                 at least kSerializedSize bytes large.
+    void serialize(uint8_t* out) const
+    {
+        RCPrfParams::depth_type th = this->tree_height();
+        memcpy(out, &th, sizeof(th));
+        root_prg_.serialize(out + sizeof(th));
+    }
+
+    /// @brief Private constructor for deserialization purpose
+    RCPrf<NBYTES>(Prg&& prg, RCPrfParams::depth_type height)
+        : RCPrfBase<NBYTES>(height), root_prg_(std::move(prg))
+    {
+        /* LCOV_EXCL_START */
+        // this is a private constructor that should only be called by the
+        // deserialize function, so the next checks should always fail. Yet, for
+        // the sake of security, let's keep them here. However, they cannot be
+        // tested properly, so remove them from the code coverage.
+        if (height == 0) {
+            throw std::invalid_argument(
+                "Invalid height: height must be non-zero");
+        }
+        if (height > 64) {
+            throw std::invalid_argument(
+                "Invalid height: height must be less than 64");
+        }
+        /* LCOV_EXCL_STOP */
+    }
+    /// @brief Deserialize a buffer into a Prg object
+    ///
+    /// This static function constructs a new Prg object out of the binary
+    /// representation of the input buffer in. The in buffer must be at
+    /// least kSerializedSize bytes large.
+    ///
+    /// @param  in      The byte buffer containing the binary representation
+    /// of
+    ///                 the Prg object.
+    /// @param  in_size The size of the in buffer.
+    /// @param  n_bytes_read    The number of bytes from in read during the
+    ///                         deserialization
+    ///
+    /// @exception  std::invalid_argument   The size of the in buffer
+    /// (in_size)
+    ///                                     is smaller than kKeySize
+    static RCPrf<NBYTES> deserialize(uint8_t*     in,
+                                     const size_t in_size,
+                                     size_t&      n_bytes_read);
 };
 
 template<uint16_t NBYTES>
@@ -1583,6 +1658,35 @@ void RCPrf<NBYTES>::generate_constrained_subkeys(
         max,
         constrained_elements);
 }
+template<uint16_t NBYTES>
+RCPrf<NBYTES> RCPrf<NBYTES>::deserialize(uint8_t*     in,
+                                         const size_t in_size,
+                                         size_t&      n_bytes_read)
+{
+    RCPrfParams::depth_type height;
+
+    if (in_size < sizeof(height)) {
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument(
+            "RCPrf::deserialize: the deserialization "
+            "buffer is too small. It should be larger than "
+            + std::to_string(sizeof(height)) + " bytes");
+        /* LCOV_EXCL_STOP */
+    }
+    memcpy(&height, in, sizeof(height));
+    n_bytes_read = sizeof(height);
+
+
+    RCPrf<NBYTES> result(Prg::deserialize(in + sizeof(height),
+                                          in_size - sizeof(height),
+                                          n_bytes_read),
+                         height);
+
+    n_bytes_read += sizeof(height);
+
+    return result;
+}
+
 
 extern template class ConstrainedRCPrfLeafElement<16>;
 extern template class ConstrainedRCPrfInnerElement<16>;

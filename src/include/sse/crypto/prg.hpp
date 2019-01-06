@@ -49,6 +49,8 @@ class Prg
 {
     template<uint16_t NBYTES>
     friend class ConstrainedRCPrfInnerElement;
+    template<uint16_t NBYTES>
+    friend class RCPrf;
 
     friend class Wrapper;
 

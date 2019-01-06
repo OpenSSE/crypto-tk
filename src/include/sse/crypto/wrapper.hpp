@@ -359,6 +359,14 @@ struct Wrapper::TypeByte<Prp>
 
 
 template<uint16_t NBYTES>
+class RCPrf;
+template<uint16_t NBYTES>
+struct Wrapper::TypeByte<RCPrf<NBYTES>>
+{
+    static constexpr uint8_t value = 0x06;
+};
+
+template<uint16_t NBYTES>
 class ConstrainedRCPrf;
 template<uint16_t NBYTES>
 struct Wrapper::TypeByte<ConstrainedRCPrf<NBYTES>>

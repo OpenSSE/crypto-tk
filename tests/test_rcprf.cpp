@@ -325,8 +325,38 @@ TEST(rc_prf, constructors_exceptions)
                  std::invalid_argument);
 }
 
-
 TEST(rc_prf, wrapping)
+{
+    constexpr size_t test_depth = 5;
+
+    // Create new wrapper
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+
+    // Create a RCPrf object
+    sse::crypto::RCPrf<16> base_rc_prf(sse::crypto::Key<kRCPrfKeySize>(),
+                                       test_depth);
+
+
+    // wrap the object
+    auto rc_prf_rep = wrapper.wrap(base_rc_prf);
+
+    // unwrap the object
+    sse::crypto::RCPrf<16> unwrapped_rc_prf
+        = wrapper.unwrap<sse::crypto::RCPrf<16>>(rc_prf_rep);
+
+
+    for (uint64_t leaf = 0;
+         leaf <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         leaf++) {
+        auto out             = base_rc_prf.eval(leaf);
+        auto out_constrained = unwrapped_rc_prf.eval(leaf);
+        ASSERT_EQ(out, out_constrained);
+    }
+}
+
+TEST(rc_prf, wrapping_constrained)
 {
     constexpr size_t test_depth = 5;
 

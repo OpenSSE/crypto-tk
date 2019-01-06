@@ -178,11 +178,13 @@ public:
     template<class CryptoClass>
     CryptoClass unwrap(std::vector<uint8_t>& c_rep) const;
 
+    static constexpr size_t kDefaultTypeByte = 0x00;
+
 private:
     template<class CryptoClass>
     struct TypeByte
     {
-        static constexpr uint8_t value = 0x00;
+        static constexpr uint8_t value = kDefaultTypeByte;
     };
 
     static constexpr uint16_t kEncryptionKeySize = 32U;
@@ -204,6 +206,8 @@ std::vector<uint8_t> Wrapper::wrap(const CryptoClass& c) const
     // put the random IV at the beggining
     random_bytes(kRandomIVSize, buffer);
     // put the type byte after the IV
+    static_assert(Wrapper::TypeByte<CryptoClass>::value != kDefaultTypeByte,
+                  "Wrapping is not implemented for the class.");
     buffer[kRandomIVSize] = Wrapper::TypeByte<CryptoClass>::value;
     // copy the AD
 
@@ -353,6 +357,14 @@ struct Wrapper::TypeByte<Prp>
     static constexpr uint8_t value = 0x04;
 };
 
+
+template<uint16_t NBYTES>
+class ConstrainedRCPrf;
+template<uint16_t NBYTES>
+struct Wrapper::TypeByte<ConstrainedRCPrf<NBYTES>>
+{
+    static constexpr uint8_t value = 0x06;
+};
 
 } // namespace crypto
 } // namespace sse

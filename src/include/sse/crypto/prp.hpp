@@ -61,7 +61,7 @@ public:
     /// @brief The public context of a Prp object. It is an empty array.
     static constexpr std::array<uint8_t, kPublicContextSize> public_context()
     {
-        return std::array<uint8_t, kPublicContextSize>();
+        return {};
     }
 
     ///
@@ -244,7 +244,7 @@ private:
 
     Key<kContextSize> aez_ctx_;
 
-    Prp(Key<kContextSize>&& context);
+    explicit Prp(Key<kContextSize>&& context);
 
     ///
     /// @brief Initialize the availability flag.

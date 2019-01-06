@@ -288,7 +288,7 @@ public:
     /// @brief The public context of a Prp object. It is an empty array.
     static constexpr std::array<uint8_t, kPublicContextSize> public_context()
     {
-        return std::array<uint8_t, kPublicContextSize>();
+        return {};
     }
 
     ///

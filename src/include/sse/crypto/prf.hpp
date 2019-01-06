@@ -106,9 +106,9 @@ public:
     Prf(const Prf<NBYTES>& key) = delete;
 
     /// @brief Move constructor
-    Prf(Prf<NBYTES>&& prf) = default;
+    Prf(Prf<NBYTES>&& prf) noexcept = default;
 
-    Prf<NBYTES>& operator=(Prf<NBYTES>&& prf) = default;
+    Prf<NBYTES>& operator=(Prf<NBYTES>&& prf) noexcept = default;
     Prf<NBYTES>& operator=(const Prf<NBYTES>& prf) = delete;
 
     /// @brief Destructor.
@@ -227,6 +227,10 @@ private:
         base_.key_.lock();
     }
 
+    // because in is not directly used by the function, clang-tidy thinks it is
+    // ok to set is as pointer to const, while it will be erased by the Key
+    // constructor
+    // NOLINTNEXTLINE(readability-non-const-parameter)
     static Prf<NBYTES> deserialize(uint8_t*     in,
                                    const size_t in_size,
                                    size_t&      n_bytes_read)

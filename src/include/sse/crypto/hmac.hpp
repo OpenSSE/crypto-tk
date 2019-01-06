@@ -113,7 +113,7 @@ public:
     HMac(HMac<H, N>&& hmac) noexcept = default;
 
     /// @brief Move assignment operator
-    HMac<H, N>& operator=(HMac<H, N>&& hmac) = default;
+    HMac<H, N>& operator=(HMac<H, N>&& hmac) noexcept = default;
 
     ///
     /// @brief Evaluate HMac

@@ -111,7 +111,7 @@ public:
     /// @param key  The key used to initialize the wrapper.
     ///             Upon return, key is empty
     ///
-    Wrapper(Key<kKeySize>&& key);
+    explicit Wrapper(Key<kKeySize>&& key);
 
     // deleted copy constructor and operator
     Wrapper(const Wrapper& w) = delete;

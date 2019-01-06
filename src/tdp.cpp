@@ -300,8 +300,8 @@ TdpInverse TdpInverse::deserialize(uint8_t*     in,
         = "-----END RSA PRIVATE KEY-----"; // we have to account for the '\0'
                                            // character ...
 
-    const uint8_t* suffix_start = strstrn_uint8(
-        in, in_size, (const uint8_t*)kKeySuffix, kKeySuffixSize);
+    const uint8_t* suffix_start
+        = strstrn_uint8(in, in_size, kKeySuffix, kKeySuffixSize);
 
     if (suffix_start == nullptr) {
         /* LCOV_EXCL_START */

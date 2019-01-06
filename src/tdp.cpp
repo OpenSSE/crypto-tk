@@ -23,6 +23,7 @@
 #include "prf.hpp"
 #include "random.hpp"
 #include "tdp_impl/tdp_impl.hpp"
+#include "utils.hpp"
 
 #include <cstring>
 
@@ -280,6 +281,48 @@ std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert_mult(
 {
     return tdp_inv_imp_->invert_mult(in, order);
 }
+
+
+void TdpInverse::serialize(uint8_t* out) const
+{
+    std::string sk = private_key();
+    memcpy(out, sk.data(), sk.size());
+}
+
+
+TdpInverse TdpInverse::deserialize(uint8_t*     in,
+                                   const size_t in_size,
+                                   size_t&      n_bytes_read)
+{
+    // search for "-----END RSA PRIVATE KEY-----"
+    static constexpr size_t  kKeySuffixSize = 29;
+    static constexpr uint8_t kKeySuffix[kKeySuffixSize + 1]
+        = "-----END RSA PRIVATE KEY-----"; // we have to account for the '\0'
+                                           // character ...
+
+    const uint8_t* suffix_start = strstrn_uint8(
+        in, in_size, (const uint8_t*)kKeySuffix, kKeySuffixSize);
+
+    if (suffix_start == nullptr) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error(
+            "TdpInverse::deserialize: invalid buffer. The buffer does not "
+            "contain the RSA private key suffix");
+        /* LCOV_EXCL_STOP */
+    }
+    n_bytes_read = kKeySuffixSize + suffix_start - in;
+    std::string sk(
+        reinterpret_cast<const char*>(in),
+        reinterpret_cast<const char*>(suffix_start + kKeySuffixSize));
+    TdpInverse result(sk);
+
+    if ((n_bytes_read < in_size) && (in[n_bytes_read] == '\n')) {
+        n_bytes_read++; // there might be a trailing \n character at the end
+    }
+
+    return result;
+}
+
 
 TdpMultPool::TdpMultPool(const std::string& pk, const uint8_t size)
     : tdp_pool_imp_(new TdpMultPoolImpl_Current(pk, size))

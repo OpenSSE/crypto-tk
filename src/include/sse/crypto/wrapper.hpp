@@ -374,5 +374,12 @@ struct Wrapper::TypeByte<ConstrainedRCPrf<NBYTES>>
     static constexpr uint8_t value = 0x06;
 };
 
+class TdpInverse;
+template<>
+struct Wrapper::TypeByte<TdpInverse>
+{
+    static constexpr uint8_t value = 0x07;
+};
+
 } // namespace crypto
 } // namespace sse

@@ -25,6 +25,7 @@
 #include <sse/crypto/prf.hpp>
 
 #include <cstdint>
+#include <cstring>
 
 #include <array>
 #include <memory>
@@ -272,11 +273,23 @@ private:
 ///
 class TdpInverse
 {
+    friend class Wrapper;
+
 public:
     /// @brief  Size (in bytes) of a message (i.e. the elements on which the TDP
     ///         operates). It is also the size of the RSA modulus.
     static constexpr size_t kMessageSize = Tdp::kMessageSize;
 
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prg
+    ///         object).
+    static constexpr size_t kPublicContextSize = 0;
+
+
+    /// @brief The public context of a Prp object. It is an empty array.
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        return std::array<uint8_t, kPublicContextSize>();
+    }
 
     ///
     /// @brief  Constructor
@@ -301,7 +314,7 @@ public:
     explicit TdpInverse(const std::string& sk);
 
     TdpInverse(const TdpInverse& tdp) = delete;
-    TdpInverse(TdpInverse&& tdp)      = delete;
+    TdpInverse(TdpInverse&& tdp)      = default;
 
     TdpInverse& operator=(const TdpInverse& t) = delete;
 
@@ -561,6 +574,42 @@ public:
 
 private:
     std::unique_ptr<TdpInverseImpl> tdp_inv_imp_; // opaque pointer
+
+
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    size_t serialized_size() const noexcept
+    {
+        return private_key().size();
+    }
+
+    /// @brief Serialize the object in the given buffer
+    ///
+    /// @param[out] out The serialization buffer. It must be
+    ///                 at least kSerializedSize bytes large.
+
+    ///
+    void serialize(uint8_t* out) const;
+
+    /// @brief Deserialize a buffer into a Tdp object
+    ///
+    /// This static function constructs a new Tdp object out of the binary
+    /// representation of the input buffer in. The in buffer must be at least
+    /// kSerializedSize bytes large.
+    ///
+    /// @param  in      The byte buffer containing the binary representation of
+    ///                 the Tdp object.
+    /// @param  in_size The size of the in buffer.
+    /// @param  n_bytes_read    The number of bytes from in read during the
+    ///                         deserialization
+    ///
+    /// @exception  std::runtime_error Error when loading the RSA key.
+    static TdpInverse deserialize(uint8_t*     in,
+                                  const size_t in_size,
+                                  size_t&      n_bytes_read);
 };
 
 /// @class TdpMultPool

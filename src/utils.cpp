@@ -232,5 +232,31 @@ void cleanup_crypto_lib()
 
     kill_locks();
 }
+
+// The next function is a clone of strstr with strong bounds guarantee,
+// similarly to strncmp vs. strcmp
+// Solution copied from https://stackoverflow.com/a/13451104
+const uint8_t* strstrn_uint8(const uint8_t* str1,
+                             const size_t   str1_len,
+                             const uint8_t* str2,
+                             const size_t   str2_len)
+{
+    size_t loc_str2 = 0;
+    size_t loc_str1 = 0;
+    for (loc_str1 = 0; loc_str1 - loc_str2 + str2_len < str1_len; loc_str1++) {
+        char c = str1[loc_str1];
+        if (c == str2[loc_str2]) {
+            loc_str2++;
+            if (loc_str2 == str2_len) {
+                return str1 + loc_str1 - loc_str2 + 1;
+            }
+        } else {
+            loc_str1 -= loc_str2;
+            loc_str2 = 0;
+        }
+    }
+    return nullptr;
+}
+
 } // namespace crypto
 } // namespace sse

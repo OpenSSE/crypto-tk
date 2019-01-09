@@ -243,7 +243,7 @@ const uint8_t* strstrn_uint8(const uint8_t* str1,
 {
     size_t loc_str2 = 0;
     size_t loc_str1 = 0;
-    for (loc_str1 = 0; loc_str1 - loc_str2 + str2_len < str1_len; loc_str1++) {
+    for (loc_str1 = 0; loc_str1 - loc_str2 + str2_len <= str1_len; loc_str1++) {
         char c = str1[loc_str1];
         if (c == str2[loc_str2]) {
             loc_str2++;

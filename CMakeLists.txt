@@ -161,7 +161,7 @@ add_coverage(check)
 
 # add_subdirectory(bench)
 
-# add_subdirectory(fuzzing)
+add_subdirectory(fuzzing)
 
 if(OPENSSL_FOUND)
     add_executable(debug_tool EXCLUDE_FROM_ALL main.cpp)

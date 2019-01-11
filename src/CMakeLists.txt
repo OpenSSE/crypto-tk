@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 3.1)
 
+# Duplicate the project declaration: this should be a standalone file
 project (libsse_crypto VERSION 0.2
                        DESCRIPTION "OpenSSE's cryptographic library")
 
@@ -44,6 +45,8 @@ add_library(sse_crypto SHARED
 set_target_properties(sse_crypto PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # Use the appropriate compiler features
+
+set_property(TARGET sse_crypto PROPERTY CXX_STANDARD 11 APPEND)
 
 target_compile_features(sse_crypto
     PUBLIC

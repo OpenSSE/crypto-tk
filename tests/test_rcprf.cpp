@@ -20,6 +20,7 @@
 
 #include <sse/crypto/random.hpp>
 #include <sse/crypto/rcprf.hpp>
+#include <sse/crypto/wrapper.hpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -322,4 +323,79 @@ TEST(rc_prf, constructors_exceptions)
         std::array<uint8_t, 16>(), tree_height + 1, 1));
     EXPECT_THROW(sse::crypto::ConstrainedRCPrf<16> cprf(std::move(leaf_vec)),
                  std::invalid_argument);
+}
+
+TEST(rc_prf, wrapping)
+{
+    constexpr size_t test_depth = 5;
+
+    // Create new wrapper
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+
+    // Create a RCPrf object
+    sse::crypto::RCPrf<16> base_rc_prf(sse::crypto::Key<kRCPrfKeySize>(),
+                                       test_depth);
+
+
+    // wrap the object
+    auto rc_prf_rep = wrapper.wrap(base_rc_prf);
+
+    // unwrap the object
+    sse::crypto::RCPrf<16> unwrapped_rc_prf
+        = wrapper.unwrap<sse::crypto::RCPrf<16>>(rc_prf_rep);
+
+
+    for (uint64_t leaf = 0;
+         leaf <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         leaf++) {
+        auto out             = base_rc_prf.eval(leaf);
+        auto out_constrained = unwrapped_rc_prf.eval(leaf);
+        ASSERT_EQ(out, out_constrained);
+    }
+}
+
+TEST(rc_prf, wrapping_constrained)
+{
+    constexpr size_t test_depth = 5;
+
+    // Create new wrapper
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+
+    // Create a RCPrf object
+    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(),
+                                  test_depth);
+
+
+    // constrain
+    for (uint64_t min = 0;
+         min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         min++) {
+        uint64_t maximal_range
+            = sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+        if (min == 0) {
+            // we cannot constrain the key to the range [0,
+            // max_leaf_index(test_depth)]
+            maximal_range--;
+        }
+        for (uint64_t max = min; max <= maximal_range; max++) {
+            auto base_constrained_prf = rc_prf.constrain(min, max);
+
+            // wrap the object
+            auto rc_prf_rep = wrapper.wrap(base_constrained_prf);
+
+            // unwrap the object
+            sse::crypto::ConstrainedRCPrf<16> unwrapped_rc_prf
+                = wrapper.unwrap<sse::crypto::ConstrainedRCPrf<16>>(rc_prf_rep);
+
+            for (uint64_t leaf = min; leaf <= max; leaf++) {
+                auto out             = base_constrained_prf.eval(leaf);
+                auto out_constrained = unwrapped_rc_prf.eval(leaf);
+                ASSERT_EQ(out, out_constrained);
+            }
+        }
+    }
 }

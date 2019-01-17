@@ -210,6 +210,25 @@ Prg Prg::duplicate() const
     return Prg(Key<kKeySize>(buffer.data()));
 }
 
+void Prg::serialize(uint8_t* out) const
+{
+    key_.unlock();
+    key_.serialize(out);
+    key_.lock();
+}
+
+Prg Prg::deserialize(uint8_t* in, const size_t in_size, size_t& n_bytes_read)
+{
+    if (in_size < kKeySize) {
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Prg::deserialize: the deserialization "
+                                    "buffer size should be Prg::kKeySize.");
+        /* LCOV_EXCL_STOP */
+    }
+    n_bytes_read = kKeySize;
+    return Prg(Key<kKeySize>(in));
+}
+
 } // namespace crypto
 
 } // namespace sse

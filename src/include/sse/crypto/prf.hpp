@@ -56,12 +56,27 @@ namespace crypto {
 template<uint16_t NBYTES>
 class Prf
 {
+    friend class Wrapper;
+
 public:
     /// @brief PRF key size (in bytes)
     static constexpr uint8_t kKeySize = 32;
 
     static_assert(kKeySize <= Hash::kBlockSize,
                   "The PRF key is too large for the hash block size");
+
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prf
+    ///         object).
+    static constexpr size_t kPublicContextSize = sizeof(uint16_t);
+
+
+    /// @brief  The public context of a Prf object. It is an array containing
+    ///         the output length (NBYTES).
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        return std::array<uint8_t, kPublicContextSize>{
+            {((NBYTES >> 8) & 0xFF), (NBYTES & 0XFF)}};
+    }
 
     ///
     /// @brief Constructor
@@ -85,6 +100,16 @@ public:
     explicit Prf(Key<kKeySize>&& key) : base_(std::move(key))
     {
     }
+
+
+    // delete the copy constructor
+    Prf(const Prf<NBYTES>& key) = delete;
+
+    /// @brief Move constructor
+    Prf(Prf<NBYTES>&& prf) noexcept = default;
+
+    Prf<NBYTES>& operator=(Prf<NBYTES>&& prf) noexcept = default;
+    Prf<NBYTES>& operator=(const Prf<NBYTES>& prf) = delete;
 
     /// @brief Destructor.
     ~Prf() // NOLINT // using = default causes a linker error on Travis
@@ -184,6 +209,43 @@ public:
 
 private:
     /// @internal
+
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    size_t serialized_size() const noexcept
+    {
+        return kKeySize;
+    }
+
+    void serialize(uint8_t* out) const
+    {
+        base_.key_.unlock();
+        base_.key_.serialize(out);
+        base_.key_.lock();
+    }
+
+    // because in is not directly used by the function, clang-tidy thinks it is
+    // ok to set is as pointer to const, while it will be erased by the Key
+    // constructor
+    // NOLINTNEXTLINE(readability-non-const-parameter)
+    static Prf<NBYTES> deserialize(uint8_t*     in,
+                                   const size_t in_size,
+                                   size_t&      n_bytes_read)
+    {
+        if (in_size < kKeySize) {
+            /* LCOV_EXCL_START */
+            throw std::invalid_argument("Prf::deserialize: the deserialization "
+                                        "buffer size should be Prf::kKeySize.");
+            /* LCOV_EXCL_STOP */
+        }
+        n_bytes_read = kKeySize;
+
+        return Prf<NBYTES>(Key<kKeySize>(in));
+    }
+
     /// @brief Inner implementation of the PRF
     using PrfBase = HMac<Hash, kKeySize>;
 

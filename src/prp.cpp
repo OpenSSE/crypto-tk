@@ -62,8 +62,10 @@ Prp::Prp()
                   "Prp: kContextSize and the aez_ctx_t size do not match");
 
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
     auto callback = [](uint8_t* key_content) {
         Key<kKeySize> r_key;
@@ -79,8 +81,10 @@ Prp::Prp()
 Prp::Prp(Key<kKeySize>&& k)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP are unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
     auto callback = [&k](uint8_t* key_content) {
         aez_setup(static_cast<const unsigned char*>(k.unlock_get()),
@@ -90,6 +94,16 @@ Prp::Prp(Key<kKeySize>&& k)
 
     aez_ctx_ = Key<kContextSize>(callback);
     k.erase();
+}
+
+Prp::Prp(Key<kContextSize>&& context) : aez_ctx_(std::move(context))
+{
+    if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error("PRP are unavailable: AES hardware "
+                                 "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
+    }
 }
 
 std::string Prp::encrypt(const std::string& in)
@@ -146,8 +160,10 @@ uint64_t Prp::decrypt_64(const uint64_t in)
 void Prp::encrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
     char iv[16] = {0x00,
                    0x00,
@@ -177,8 +193,10 @@ void Prp::encrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 void Prp::encrypt(const std::string& in, std::string& out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
 
     size_t len = in.size();
@@ -203,8 +221,10 @@ void Prp::encrypt(const std::string& in, std::string& out)
 void Prp::decrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
 
     char iv[16] = {0x00,
@@ -237,8 +257,10 @@ void Prp::decrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
 void Prp::decrypt(const std::string& in, std::string& out)
 {
     if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
     }
 
     size_t len = in.size();
@@ -260,6 +282,39 @@ void Prp::decrypt(const std::string& in, std::string& out)
     out = std::string(reinterpret_cast<const char*>(data), len);
     delete[] data;
 }
+
+void Prp::serialize(uint8_t* out) const
+{
+    if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error("PRP is unavailable: AES hardware "
+                                 "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
+    }
+    aez_ctx_.unlock();
+    aez_ctx_.serialize(out);
+    aez_ctx_.lock();
+}
+
+Prp Prp::deserialize(uint8_t* in, const size_t in_size, size_t& n_bytes_read)
+{
+    if (!Prp::is_available()) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error("PRP is unavailable: AES hardware "
+                                 "acceleration not supported by the CPU");
+        /* LCOV_EXCL_STOP */
+    }
+    if (in_size < kContextSize) {
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Prp::deserialize: the deserialization "
+                                    "buffer size should be Prp::kContextSize.");
+        /* LCOV_EXCL_STOP */
+    }
+    n_bytes_read = kContextSize;
+
+    return Prp(Key<kContextSize>(in));
+}
+
 
 } // namespace crypto
 } // namespace sse

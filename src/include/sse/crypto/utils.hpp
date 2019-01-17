@@ -20,9 +20,10 @@
 
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
 
 namespace sse {
-
 namespace crypto {
 ///
 /// @brief Initialize the library
@@ -38,5 +39,11 @@ void init_crypto_lib();
 /// Properly cleans up the library.
 ///
 void cleanup_crypto_lib();
+
+const uint8_t* strstrn_uint8(const uint8_t* str1,
+                             const size_t   str1_len,
+                             const uint8_t* str2,
+                             const size_t   str2_len);
+
 } // namespace crypto
 } // namespace sse

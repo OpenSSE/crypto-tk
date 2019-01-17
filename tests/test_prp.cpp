@@ -23,6 +23,7 @@
 
 #include <sse/crypto/prp.hpp>
 #include <sse/crypto/random.hpp>
+#include <sse/crypto/wrapper.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -118,6 +119,46 @@ TEST(prp, consistency_64)
     }
 }
 
+TEST(prp, wrapping)
+{
+    // Create new wrapper
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+    // Create a Prg object
+    sse::crypto::Prp base_prp;
+
+
+    // wrap the object
+    auto prp_rep = wrapper.wrap(base_prp);
+
+    // unwrap the object
+    sse::crypto::Prp unwrapped_prp = wrapper.unwrap<sse::crypto::Prp>(prp_rep);
+
+    for (size_t i = 1; i <= 20 * 16; i++) {
+        string in_enc = sse::crypto::random_string(i);
+        string out_enc1, out_enc2, out_dec;
+
+        base_prp.encrypt(in_enc, out_enc1);
+        unwrapped_prp.encrypt(in_enc, out_enc2);
+
+        ASSERT_EQ(in_enc.length(), out_enc1.length());
+        ASSERT_EQ(in_enc.length(), out_enc2.length());
+        EXPECT_EQ(out_enc1, out_enc2);
+
+        string in_dec = string(out_enc1);
+        base_prp.decrypt(in_dec, out_dec);
+
+        ASSERT_EQ(in_dec.length(), out_dec.length());
+        ASSERT_EQ(in_enc, out_dec);
+
+        in_dec = string(out_enc2);
+        base_prp.decrypt(in_dec, out_dec);
+
+        ASSERT_EQ(in_dec.length(), out_dec.length());
+        ASSERT_EQ(in_enc, out_dec);
+    }
+}
 #else
 #pragma message("PRP is disabled (requires support of AES instructions)")
 #endif

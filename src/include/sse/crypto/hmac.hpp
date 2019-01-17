@@ -39,6 +39,10 @@ namespace sse {
 
 namespace crypto {
 
+// forward declare the Prf class so we can use is as a friend
+template<uint16_t NBYTES>
+class Prf;
+
 
 /// @class HMac
 /// @brief Hash-based message authentication code.
@@ -54,6 +58,9 @@ namespace crypto {
 template<class H, uint16_t N>
 class HMac
 {
+    template<uint16_t NBYTES>
+    friend class Prf;
+
 public:
     /// @brief Maximum key size (in bytes) of the H-HMac instantiation
     static constexpr uint16_t kHMACKeySize = H::kBlockSize;
@@ -83,7 +90,6 @@ public:
     {
     }
 
-    HMac(HMac<H, N>& hmac)       = delete;
     HMac(const HMac<H, N>& hmac) = delete;
 
     ///
@@ -103,18 +109,26 @@ public:
         }
     };
 
+    // deleted copy assignement operator
+    HMac(HMac<H, N>&& hmac) noexcept = default;
+
+    /// @brief Move assignment operator
+    HMac<H, N>& operator=(HMac<H, N>&& hmac) noexcept = default;
+
     ///
     /// @brief Evaluate HMac
     ///
-    /// Evaluates HMac on the input buffer and places the result in the output
-    /// buffer (and truncates the result it if necessary).
+    /// Evaluates HMac on the input buffer and places the result in the
+    /// output buffer (and truncates the result it if necessary).
     ///
     ///
     /// @param in       The input buffer. Must be non NULL.
     /// @param length   The size of the input buffer in bytes.
-    /// @param out      The output buffer. Must be non NULL, and larger than
+    /// @param out      The output buffer. Must be non NULL, and larger
+    /// than
     ///                 out_len bytes.
-    /// @param out_len  The size of the output buffer in bytes. Must be smaller
+    /// @param out_len  The size of the output buffer in bytes. Must be
+    /// smaller
     ///                 than kDigestSize.
     ///
     /// @exception std::invalid_argument       One of in or out is NULL

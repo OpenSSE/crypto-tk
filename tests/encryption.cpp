@@ -27,6 +27,7 @@
  ********/
 
 #include <sse/crypto/cipher.hpp>
+#include <sse/crypto/wrapper.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -91,6 +92,31 @@ TEST(encryption, compat)
     cipher.decrypt(out_s, in_dec_s);
 
     EXPECT_EQ(in_dec_s, std::string(in_dec.begin(), in_dec.end()));
+}
+
+TEST(encryption, wrapping)
+{
+    std::string in = "This is a test input.";
+    std::string out1, out2, dec1, dec2;
+
+    sse::crypto::Cipher cipher((sse::crypto::Key<kCipherKeySize>()));
+
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+    auto wrapped_cipher = wrapper.wrap(cipher);
+
+    sse::crypto::Cipher unwrapped_cipher
+        = wrapper.unwrap<sse::crypto::Cipher>(wrapped_cipher);
+
+    cipher.encrypt(in, out1);
+    unwrapped_cipher.encrypt(in, out2);
+
+    cipher.decrypt(out2, dec2);
+    unwrapped_cipher.decrypt(out1, dec1);
+
+    ASSERT_EQ(in, dec1);
+    ASSERT_EQ(in, dec2);
 }
 
 

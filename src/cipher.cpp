@@ -123,9 +123,10 @@ void Cipher::decrypt(const unsigned char* in,
                      unsigned char*       out) const
 {
     if (len < ciphertext_length(0)) {
-        throw std::invalid_argument(
-            "The minimum number of bytes to decrypt is "
-            + std::to_string(ciphertext_length(0))); /* LCOV_EXCL_LINE */
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("The minimum number of bytes to decrypt is "
+                                    + std::to_string(ciphertext_length(0)));
+        /* LCOV_EXCL_STOP */
     }
 
     uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
@@ -186,6 +187,27 @@ void Cipher::decrypt(const std::string& in, std::string& out)
         reinterpret_cast<const unsigned char*>(in.data()), len, data.data());
 
     out = std::string(reinterpret_cast<const char*>(data.data()), p_len);
+}
+
+void Cipher::serialize(uint8_t* out) const
+{
+    key_.unlock();
+    key_.serialize(out);
+    key_.lock();
+}
+
+Cipher Cipher::deserialize(uint8_t*     in,
+                           const size_t in_size,
+                           size_t&      n_bytes_read)
+{
+    if (in_size < kKeySize) {
+        /* LCOV_EXCL_START */
+        throw std::invalid_argument("Cipher::deserialize: the deserialization "
+                                    "buffer size should be Cipher::kKeySize.");
+        /* LCOV_EXCL_STOP */
+    }
+    n_bytes_read += kKeySize;
+    return Cipher(Key<kKeySize>(in));
 }
 
 } // namespace crypto

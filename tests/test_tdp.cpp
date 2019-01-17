@@ -22,6 +22,7 @@
 #include "tdp_impl/tdp_impl_openssl.hpp"
 
 #include <sse/crypto/tdp.hpp>
+#include <sse/crypto/wrapper.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -894,4 +895,36 @@ TEST(tdp, exceptions)
                              sse::crypto::TdpInverse,
                              sse::crypto::TdpMultPool,
                              false>();
+}
+
+TEST(tdp, wrapping)
+{
+    constexpr size_t kNTest = 10;
+
+    // Create new wrapper
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+
+    sse::crypto::TdpInverse tdp_inv_base;
+
+    // wrap the object
+    auto tdp_rep = wrapper.wrap(tdp_inv_base);
+
+    // unwrap the object
+    sse::crypto::TdpInverse unwrapped_tdp_inv
+        = wrapper.unwrap<sse::crypto::TdpInverse>(tdp_rep);
+
+    for (size_t i = 0; i < kNTest; i++) {
+        auto sample = tdp_inv_base.sample_array();
+        auto inv1   = tdp_inv_base.invert(sample);
+        auto inv2   = unwrapped_tdp_inv.invert(sample);
+
+        ASSERT_EQ(inv1, inv2);
+
+        auto eval1 = tdp_inv_base.eval(sample);
+        auto eval2 = unwrapped_tdp_inv.eval(sample);
+
+        ASSERT_EQ(eval1, eval2);
+    }
 }

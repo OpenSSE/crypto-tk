@@ -49,10 +49,27 @@ class Prg
 {
     template<uint16_t NBYTES>
     friend class ConstrainedRCPrfInnerElement;
+    template<uint16_t NBYTES>
+    friend class RCPrf;
+
+    friend class Wrapper;
 
 public:
     /// @brief Size (in bytes) of a PRG key
     static constexpr uint8_t kKeySize = 32;
+
+    /// @brief  Size (in bytes) of the public context (used to wrap a Prg
+    ///         object).
+    static constexpr size_t kPublicContextSize = 0;
+
+    /// @brief The public context of a Prg object. It is an empty array.
+    static constexpr std::array<uint8_t, kPublicContextSize> public_context()
+    {
+        // GCC (4.8) does not support using {} instead of
+        // std::array<uint8_t, kPublicContextSize>()
+        // NOLINTNEXTLINE(modernize-return-braced-init-list)
+        return std::array<uint8_t, kPublicContextSize>();
+    }
 
     Prg() = delete;
     ///
@@ -342,6 +359,40 @@ public:
 
 private:
     Prg duplicate() const;
+
+    /// @brief  Returns the size (in bytes) of the serialized representation of
+    ///         the object
+    ///
+    /// @return The size in bytes of the buffer needed to serialize the object.
+    ///
+    size_t serialized_size() const noexcept
+    {
+        return kKeySize;
+    }
+
+    /// @brief Serialize the object in the given buffer
+    ///
+    /// @param[out] out The serialization buffer. It must be
+    ///                 at least kSerializedSize bytes large.
+    void serialize(uint8_t* out) const;
+
+    /// @brief Deserialize a buffer into a Prg object
+    ///
+    /// This static function constructs a new Prg object out of the binary
+    /// representation of the input buffer in. The in buffer must be at least
+    /// kSerializedSize bytes large.
+    ///
+    /// @param  in      The byte buffer containing the binary representation of
+    ///                 the Prg object.
+    /// @param  in_size The size of the in buffer.
+    /// @param  n_bytes_read    The number of bytes from in read during the
+    ///                         deserialization
+    ///
+    /// @exception  std::invalid_argument   The size of the in buffer (in_size)
+    ///                                     is smaller than kKeySize
+    static Prg deserialize(uint8_t*     in,
+                           const size_t in_size,
+                           size_t&      n_bytes_read);
 
     Key<kKeySize> key_;
 };

@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.1)
 
-project (libsse_crypto VERSION 0.2
+# Duplicate the project declaration: this should be a standalone file
+project (libsse_crypto VERSION 0.3
                        DESCRIPTION "OpenSSE's cryptographic library")
 
 option(RSA_IMPL_OPENSSL "Use OpenSSL's implementation of RSA" OFF)
@@ -30,7 +31,7 @@ option(ENABLE_MEMORY_LOCK "Enable the memory locking mechanisms." ON)
 add_library(sse_crypto SHARED
                 cipher.cpp key.cpp prg.cpp tdp.cpp prp.cpp hmac.cpp prf.cpp
                 puncturable_enc.cpp random.cpp utils.cpp set_hash.cpp rcprf.cpp
-                hash.cpp hash/blake2b.cpp hash/sha512.cpp
+                wrapper.cpp hash.cpp hash/blake2b.cpp hash/sha512.cpp
                 ppke/GMPpke.cpp ppke/util.cpp ppke/relic_wrapper/relic_api.cpp
                 tdp_impl/tdp_impl_mbedtls.cpp tdp_impl/tdp_impl_openssl.cpp
                 aez/aez.c
@@ -44,6 +45,8 @@ add_library(sse_crypto SHARED
 set_target_properties(sse_crypto PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # Use the appropriate compiler features
+
+set_property(TARGET sse_crypto PROPERTY CXX_STANDARD 11 APPEND)
 
 target_compile_features(sse_crypto
     PUBLIC

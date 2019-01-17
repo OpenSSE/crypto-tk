@@ -86,6 +86,7 @@ class Key
     friend class Prg;
     friend class Prp;
     friend class Cipher;
+    friend class Wrapper;
 
     template<size_t K_SIZE>
     friend void tests::prg_test_key_derivation_consistency(); // NOLINT
@@ -376,6 +377,28 @@ private:
 
         unlock();
         return content_;
+    }
+
+    ///
+    /// @brief Serialize the key to the input buffer
+    ///
+    /// Copies the key's data to the input buffer. The buffer must be at least N
+    /// bytes wide.
+    ///
+    /// @param[out] out The serialization buffer.
+    ///
+    /// @exception std::runtime_error The memory cannot be accessed: it is
+    /// absent (happens when the key has been moved) or is locked.
+    ///
+    void serialize(uint8_t* out) const
+    {
+        if (content_ == nullptr) {
+            throw std::runtime_error("Memory is absent");
+        }
+        if (is_locked()) {
+            throw std::runtime_error("Memory is locked");
+        }
+        memcpy(out, content_, N);
     }
 
     /// @brief Pointer to the key content

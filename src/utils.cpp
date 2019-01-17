@@ -70,6 +70,10 @@ static unsigned long id_function()
     return reinterpret_cast<unsigned long>(pthread_self());
 }
 
+// No multithreaded test is performed, hence no lock is used.
+// Disable the code coverage for the creation and destruction of OpenSSL locks
+/* LCOV_EXCL_START */
+
 /**
  * OpenSSL allocate and initialize dynamic crypto lock.
  *
@@ -133,6 +137,7 @@ static void dyn_destroy_function(struct CRYPTO_dynlock_value*        l,
     free(l);
 }
 
+/* LCOV_EXCL_STOP*/
 #endif
 
 
@@ -151,7 +156,9 @@ static int init_locks()
     mutex_buf = static_cast<pthread_mutex_t*>(
         malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t)));
     if (mutex_buf == nullptr) {
+        /* LCOV_EXCL_START */
         return (-1);
+        /* LCOV_EXCL_STOP */
     }
     for (i = 0; i < CRYPTO_num_locks(); i++) {
         pthread_mutex_init(&mutex_buf[i], nullptr);
@@ -174,7 +181,9 @@ static int kill_locks()
     int i;
 
     if (mutex_buf == nullptr) {
+        /* LCOV_EXCL_START */
         return (0);
+        /* LCOV_EXCL_STOP */
     }
 
     CRYPTO_set_dynlock_create_callback(nullptr);
@@ -193,10 +202,12 @@ static int kill_locks()
     return 0;
 }
 
+/* LCOV_EXCL_START */
 static void sodium_misuse_handler()
 {
     throw std::runtime_error("Sodium Misuse");
 }
+/* LCOV_EXCL_STOP */
 
 void init_crypto_lib()
 {
@@ -205,7 +216,9 @@ void init_crypto_lib()
     __relic_handle = new relicxx::relicResourceHandle(true);
 
     if (sodium_init() < 0) {
+        /* LCOV_EXCL_START */
         throw std::runtime_error("Unable to init libsodium");
+        /* LCOV_EXCL_STOP */
     }
     sodium_set_misuse_handler(sodium_misuse_handler);
 
@@ -219,5 +232,38 @@ void cleanup_crypto_lib()
 
     kill_locks();
 }
+
+// The next function is a clone of strstr with strong bounds guarantee,
+// similarly to strncmp vs. strcmp
+// Solution copied from https://stackoverflow.com/a/13451104
+const uint8_t* strstrn_uint8(const uint8_t* str1,
+                             const size_t   str1_len,
+                             const uint8_t* str2,
+                             const size_t   str2_len)
+{
+    if ((str2_len == 0)) {
+        return str1;
+    }
+    if ((str1_len == 0)) {
+        return nullptr;
+    }
+
+    size_t loc_str2 = 0;
+    size_t loc_str1 = 0;
+    for (loc_str1 = 0; loc_str1 - loc_str2 + str2_len <= str1_len; loc_str1++) {
+        char c = str1[loc_str1];
+        if (c == str2[loc_str2]) {
+            loc_str2++;
+            if (loc_str2 == str2_len) {
+                return str1 + loc_str1 - loc_str2 + 1;
+            }
+        } else {
+            loc_str1 -= loc_str2;
+            loc_str2 = 0;
+        }
+    }
+    return nullptr;
+}
+
 } // namespace crypto
 } // namespace sse

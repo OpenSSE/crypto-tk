@@ -20,6 +20,7 @@
 
 #include <sse/crypto/prg.hpp>
 #include <sse/crypto/random.hpp>
+#include <sse/crypto/wrapper.hpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -306,6 +307,31 @@ TEST(prg, consistency_4)
     tests::prg_test_key_derivation_consistency<16>();
     tests::prg_test_key_derivation_consistency<18>();
     tests::prg_test_key_derivation_consistency<32>();
+}
+
+TEST(prg, wrapping)
+{
+    constexpr size_t kLenTest = 1000;
+    // Create new wrapper
+    sse::crypto::Wrapper wrapper(
+        (sse::crypto::Key<sse::crypto::Wrapper::kKeySize>()));
+
+    // Create a Prg object
+    sse::crypto::Prg base_prg((sse::crypto::Key<kPrgKeySize>()));
+
+
+    // wrap the object
+    auto prg_rep = wrapper.wrap(base_prg);
+
+    // unwrap the object
+    sse::crypto::Prg unwrapped_prg = wrapper.unwrap<sse::crypto::Prg>(prg_rep);
+
+    std::string out1, out2;
+
+    out1 = base_prg.derive(kLenTest);
+    out2 = unwrapped_prg.derive(kLenTest);
+
+    ASSERT_EQ(out1, out2);
 }
 
 TEST(prg, exceptions)

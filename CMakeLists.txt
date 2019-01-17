@@ -1,5 +1,16 @@
 cmake_minimum_required (VERSION 3.1)
 
+project (libsse_crypto VERSION 0.3
+                       DESCRIPTION "OpenSSE's cryptographic library")
+
+## Needed on Mac OS for the fuzzing targets
+if(APPLE)
+  cmake_policy(SET CMP0025 OLD)
+endif()
+# Indeed, we need a modern Clang (more modern than AppleClang) with support
+# of libFuzzer. Unfortunately, Clang is not superbly well supported by CMake
+# on Mac OS. I even opened an issue on CMake's tracker about that (and
+# ridiculed myself): https://gitlab.kitware.com/cmake/cmake/issues/18785
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -80,24 +91,77 @@ if (OPENSSL_FOUND)
 endif()
 
 
-list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/*.cpp' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/externals/*')
+list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/externals/*')
 
 
 # To avoid building GTest twice
 if (NOT TARGET gtest)
   set(BUILD_GMOCK OFF CACHE BOOL "Disable GMock" FORCE)
   add_subdirectory(externals/googletest)
+  # Not adding the sanitizers might cause ASan false positives. See
+  # https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
+  add_sanitizers(gtest)
 endif()
 
 add_subdirectory(src)
 add_sanitizers(sse_crypto)
 add_coverage(sse_crypto)
 
+
+
+# # Installation
+
+# include(GNUInstallDirs)
+# include(CMakePackageConfigHelpers)
+
+# install(TARGETS sse_crypto EXPORT OpenSSECryptoTargets
+#         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} 
+#         )
+# install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+
+# ## CMake magic for the packaging
+
+# install(EXPORT OpenSSECryptoTargets 
+#         FILE OpenSSECryptoTargets.cmake
+#         NAMESPACE OpenSSE::
+#         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sse"
+#         )
+# export(TARGETS sse_crypto NAMESPACE OpenSSE:: FILE OpenSSECryptoTargets.cmake)
+
+# configure_package_config_file(
+#     cmake/OpenSSECryptConfig.cmake.in
+#     OpenSSECryptoConfig.cmake
+#     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sse"
+# )
+
+# write_basic_package_version_file(
+#     ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
+#     VERSION ${libsse_crypto_VERSION}
+#     COMPATIBILITY AnyNewerVersion
+#     )
+
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
+#               ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfig.cmake
+#         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse
+#         )
+
+# install(DIRECTORY cmake/modules DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse)
+
+
+
+# Tests
+
 add_subdirectory(tests)
 add_sanitizers(check)
 add_coverage(check)
 
 # add_subdirectory(bench)
+
+add_subdirectory(fuzzing)
 
 if(OPENSSL_FOUND)
     add_executable(debug_tool EXCLUDE_FROM_ALL main.cpp)

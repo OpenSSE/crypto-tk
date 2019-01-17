@@ -127,7 +127,7 @@ static sse::crypto::tag_type test_encryption_tag(uint64_t i)
 TEST(relic, serialization_ZR)
 {
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
-        relicxx::ZR z((int)i);
+        relicxx::ZR z(static_cast<int>(i));
 
         std::array<uint8_t, RELIC_BN_BYTES> bytes;
         z.writeBytes(bytes.data());
@@ -322,10 +322,13 @@ TEST(relic, arithmetic_ZR)
         ASSERT_EQ(z3 << 3, z3 * relicxx::ZR(8));
         ASSERT_EQ(z4 << 4, z4 * relicxx::ZR(16));
 
-        ASSERT_EQ(group.exp(z1, (int)42), group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, (int)10), group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, (int)4675), group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, (int)233453451),
+        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
+                  group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
+                  group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
+                  group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -350,10 +353,13 @@ TEST(relic, arithmetic_G1)
         ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
         ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
 
-        ASSERT_EQ(group.exp(z1, (int)42), group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, (int)10), group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, (int)4675), group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, (int)233453451),
+        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
+                  group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
+                  group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
+                  group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -377,10 +383,13 @@ TEST(relic, arithmetic_G2)
         ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
         ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
 
-        ASSERT_EQ(group.exp(z1, (int)42), group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, (int)10), group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, (int)4675), group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, (int)233453451),
+        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
+                  group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
+                  group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
+                  group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -401,10 +410,13 @@ TEST(relic, arithmetic_GT)
         ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
         ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
 
-        ASSERT_EQ(group.exp(z1, (int)42), group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, (int)10), group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, (int)4675), group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, (int)233453451),
+        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
+                  group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
+                  group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
+                  group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -485,7 +497,8 @@ TEST(ppke, serialization)
     for (size_t i = 0; i < SERIALIZATION_TEST_COUNT; i++) {
         M_type M;
 
-        sse::crypto::random_bytes(sizeof(M_type), (uint8_t*)&M);
+        sse::crypto::random_bytes(sizeof(M_type),
+                                  reinterpret_cast<uint8_t*>(&M));
 
         sse::crypto::tag_type tag = test_encryption_tag(i);
 
@@ -531,7 +544,8 @@ TEST(ppke, probabilitic_correctness)
         for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
             M_type M;
 
-            sse::crypto::random_bytes(sizeof(M_type), (uint8_t*)&M);
+            sse::crypto::random_bytes(sizeof(M_type),
+                                      reinterpret_cast<uint8_t*>(&M));
 
             sse::crypto::tag_type tag = test_encryption_tag(i);
 
@@ -586,7 +600,8 @@ TEST(ppke, deterministic_correctness)
         for (size_t i = 0; i < ENCRYPTION_TEST_COUNT; i++) {
             M_type M;
 
-            sse::crypto::random_bytes(sizeof(M_type), (uint8_t*)&M);
+            sse::crypto::random_bytes(sizeof(M_type),
+                                      reinterpret_cast<uint8_t*>(&M));
 
             sse::crypto::tag_type tag = test_encryption_tag(i);
 

@@ -353,7 +353,7 @@ std::vector<uint8_t> G1::getBytes(bool compress) const
 {
     unsigned int         l = g1_size_bin(g, compress);
     std::vector<uint8_t> data(l);
-    g1_write_bin(&data[0], (int)data.size(), g, compress);
+    g1_write_bin(&data[0], static_cast<int>(data.size()), g, compress);
     return data;
 }
 
@@ -604,7 +604,7 @@ void GT::getBytes(bool compress, const size_t out_len, uint8_t* out) const
             out[i] = 0x00;
         }
     }
-    gt_write_bin(out, (int)MIN(l, out_len), gg.g, compress);
+    gt_write_bin(out, static_cast<int>(MIN(l, out_len)), gg.g, compress);
 }
 
 

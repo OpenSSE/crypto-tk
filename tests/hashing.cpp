@@ -46,9 +46,10 @@ TEST(sha_512, test_vector_1)
     string                                                      in = "abc";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 
-    sse::crypto::hash::sha512::hash((const unsigned char*)in.data(),
-                                    in.length(),
-                                    (unsigned char*)out.data());
+    sse::crypto::hash::sha512::hash(
+        reinterpret_cast<const unsigned char*>(in.data()),
+        in.length(),
+        reinterpret_cast<unsigned char*>(out.data()));
 
     uint8_t reference[]
         = {0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73,
@@ -58,8 +59,9 @@ TEST(sha_512, test_vector_1)
            0xa3, 0xfe, 0xeb, 0xbd, 0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8,
            0x0e, 0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f};
 
-    string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
-    string out_string((char*)out.data(),
+    string ref_string(reinterpret_cast<const char*>(reference),
+                      sse::crypto::hash::sha512::kDigestSize);
+    string out_string(reinterpret_cast<const char*>(out.data()),
                       sse::crypto::hash::sha512::kDigestSize);
 
 
@@ -71,9 +73,10 @@ TEST(sha_512, test_vector_2)
     string                                                      in = "";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 
-    sse::crypto::hash::sha512::hash((const unsigned char*)in.data(),
-                                    in.length(),
-                                    (unsigned char*)out.data());
+    sse::crypto::hash::sha512::hash(
+        reinterpret_cast<const unsigned char*>(in.data()),
+        in.length(),
+        reinterpret_cast<unsigned char*>(out.data()));
 
     uint8_t reference[]
         = {0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd, 0xf1, 0x54, 0x28,
@@ -83,8 +86,9 @@ TEST(sha_512, test_vector_2)
            0x87, 0x7e, 0xec, 0x2f, 0x63, 0xb9, 0x31, 0xbd, 0x47, 0x41, 0x7a,
            0x81, 0xa5, 0x38, 0x32, 0x7a, 0xf9, 0x27, 0xda, 0x3e};
 
-    string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
-    string out_string((char*)out.data(),
+    string ref_string(reinterpret_cast<const char*>(reference),
+                      sse::crypto::hash::sha512::kDigestSize);
+    string out_string(reinterpret_cast<const char*>(out.data()),
                       sse::crypto::hash::sha512::kDigestSize);
 
     ASSERT_EQ(out_string, ref_string);
@@ -95,9 +99,10 @@ TEST(sha_512, test_vector_3)
     string in = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 
-    sse::crypto::hash::sha512::hash((const unsigned char*)in.data(),
-                                    in.length(),
-                                    (unsigned char*)out.data());
+    sse::crypto::hash::sha512::hash(
+        reinterpret_cast<const unsigned char*>(in.data()),
+        in.length(),
+        reinterpret_cast<unsigned char*>(out.data()));
 
     uint8_t reference[]
         = {0x20, 0x4a, 0x8f, 0xc6, 0xdd, 0xa8, 0x2f, 0x0a, 0x0c, 0xed, 0x7b,
@@ -107,8 +112,9 @@ TEST(sha_512, test_vector_3)
            0x57, 0x78, 0x9c, 0xa0, 0x31, 0xad, 0x85, 0xc7, 0xa7, 0x1d, 0xd7,
            0x03, 0x54, 0xec, 0x63, 0x12, 0x38, 0xca, 0x34, 0x45};
 
-    string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
-    string out_string((char*)out.data(),
+    string ref_string(reinterpret_cast<const char*>(reference),
+                      sse::crypto::hash::sha512::kDigestSize);
+    string out_string(reinterpret_cast<const char*>(out.data()),
                       sse::crypto::hash::sha512::kDigestSize);
 
     ASSERT_EQ(out_string, ref_string);
@@ -120,9 +126,10 @@ TEST(sha_512, test_vector_4)
                 "noijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 
-    sse::crypto::hash::sha512::hash((const unsigned char*)in.data(),
-                                    in.length(),
-                                    (unsigned char*)out.data());
+    sse::crypto::hash::sha512::hash(
+        reinterpret_cast<const unsigned char*>(in.data()),
+        in.length(),
+        reinterpret_cast<unsigned char*>(out.data()));
 
     uint8_t reference[]
         = {0x8e, 0x95, 0x9b, 0x75, 0xda, 0xe3, 0x13, 0xda, 0x8c, 0xf4, 0xf7,
@@ -132,8 +139,9 @@ TEST(sha_512, test_vector_4)
            0xc4, 0xb5, 0x43, 0x3a, 0xc7, 0xd3, 0x29, 0xee, 0xb6, 0xdd, 0x26,
            0x54, 0x5e, 0x96, 0xe5, 0x5b, 0x87, 0x4b, 0xe9, 0x09};
 
-    string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
-    string out_string((char*)out.data(),
+    string ref_string(reinterpret_cast<const char*>(reference),
+                      sse::crypto::hash::sha512::kDigestSize);
+    string out_string(reinterpret_cast<const char*>(out.data()),
                       sse::crypto::hash::sha512::kDigestSize);
 
     ASSERT_EQ(out_string, ref_string);
@@ -144,9 +152,10 @@ TEST(sha_512, test_vector_5)
     string                                                      in(1e6, 'a');
     std::array<uint8_t, sse::crypto::hash::sha512::kDigestSize> out;
 
-    sse::crypto::hash::sha512::hash((const unsigned char*)in.data(),
-                                    in.length(),
-                                    (unsigned char*)out.data());
+    sse::crypto::hash::sha512::hash(
+        reinterpret_cast<const unsigned char*>(in.data()),
+        in.length(),
+        reinterpret_cast<unsigned char*>(out.data()));
 
     uint8_t reference[]
         = {0xe7, 0x18, 0x48, 0x3d, 0x0c, 0xe7, 0x69, 0x64, 0x4e, 0x2e, 0x42,
@@ -156,8 +165,9 @@ TEST(sha_512, test_vector_5)
            0xe5, 0x77, 0xc3, 0x1b, 0xeb, 0x00, 0x9c, 0x5c, 0x2c, 0x49, 0xaa,
            0x2e, 0x4e, 0xad, 0xb2, 0x17, 0xad, 0x8c, 0xc0, 0x9b};
 
-    string ref_string((char*)reference, sse::crypto::hash::sha512::kDigestSize);
-    string out_string((char*)out.data(),
+    string ref_string(reinterpret_cast<const char*>(reference),
+                      sse::crypto::hash::sha512::kDigestSize);
+    string out_string(reinterpret_cast<const char*>(out.data()),
                       sse::crypto::hash::sha512::kDigestSize);
 
     ASSERT_EQ(out_string, ref_string);
@@ -181,7 +191,8 @@ TEST(blake2, blake2b)
 
         string ref_string(reinterpret_cast<const char*>(blake2b_kat[i]),
                           sse::crypto::hash::blake2b::kDigestSize);
-        string out_string((char*)hash, sse::crypto::hash::blake2b::kDigestSize);
+        string out_string(reinterpret_cast<const char*>(hash),
+                          sse::crypto::hash::blake2b::kDigestSize);
 
         ASSERT_EQ(ref_string, out_string);
     }

@@ -182,7 +182,7 @@ TEST(prg, consistency_3)
                   std::string(out1.begin() + 6, out1.begin() + 6 + 58));
 
         ASSERT_EQ(out8, std::string(out1.begin() + 18, out1.end()));
-        ASSERT_EQ(std::string((char*)out_bytes, 30),
+        ASSERT_EQ(std::string(reinterpret_cast<char*>(out_bytes), 30),
                   std::string(out1.begin() + 34, out1.end()));
     }
 }

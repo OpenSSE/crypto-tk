@@ -157,6 +157,11 @@ public:
     /* LCOV_EXCL_STOP */
 
     ///
+    /// @brief Destructor
+    ///
+    virtual ~RCPrfBase() = default;
+
+    ///
     /// @brief Return the height of the represented tree
     ///
     inline depth_type tree_height() const

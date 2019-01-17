@@ -78,7 +78,8 @@ TEST(prp, consistency_32)
 
 
         ASSERT_EQ(out_32_s_1, out_32_s_2);
-        ASSERT_EQ(out_32_s_1, string((char*)&out_32_i, sizeof(uint32_t)));
+        ASSERT_EQ(out_32_s_1,
+                  string(reinterpret_cast<char*>(&out_32_i), sizeof(uint32_t)));
 
         std::string dec_32_s_1 = fpe.decrypt(out_32_s_1);
         std::string dec_32_s_2;
@@ -87,7 +88,8 @@ TEST(prp, consistency_32)
 
         ASSERT_EQ(dec_32_i, in_32_i);
         ASSERT_EQ(dec_32_s_1, dec_32_s_2);
-        ASSERT_EQ(dec_32_s_1, string((char*)&dec_32_i, sizeof(uint32_t)));
+        ASSERT_EQ(dec_32_s_1,
+                  string(reinterpret_cast<char*>(&dec_32_i), sizeof(uint32_t)));
     }
 }
 
@@ -97,16 +99,20 @@ TEST(prp, consistency_64)
         sse::crypto::Prp fpe;
 
         uint64_t in_64_i;
-        sse::crypto::random_bytes(sizeof(uint64_t), (uint8_t*)&in_64_i);
-        std::string out_64_s_1
-            = fpe.encrypt(std::string((char*)&in_64_i, sizeof(uint64_t)));
+        sse::crypto::random_bytes(sizeof(uint64_t),
+                                  reinterpret_cast<uint8_t*>(&in_64_i));
+        std::string out_64_s_1 = fpe.encrypt(
+            std::string(reinterpret_cast<char*>(&in_64_i), sizeof(uint64_t)));
         std::string out_64_s_2;
 
-        fpe.encrypt(std::string((char*)&in_64_i, sizeof(uint64_t)), out_64_s_2);
+        fpe.encrypt(
+            std::string(reinterpret_cast<char*>(&in_64_i), sizeof(uint64_t)),
+            out_64_s_2);
         uint64_t out_64_i = fpe.encrypt_64(in_64_i);
 
         ASSERT_EQ(out_64_s_1, out_64_s_2);
-        ASSERT_EQ(out_64_s_1, string((char*)&out_64_i, sizeof(uint64_t)));
+        ASSERT_EQ(out_64_s_1,
+                  string(reinterpret_cast<char*>(&out_64_i), sizeof(uint64_t)));
 
         std::string dec_64_s_1 = fpe.decrypt(out_64_s_1);
         std::string dec_64_s_2;
@@ -115,7 +121,8 @@ TEST(prp, consistency_64)
 
         ASSERT_EQ(dec_64_i, in_64_i);
         ASSERT_EQ(dec_64_s_1, dec_64_s_2);
-        ASSERT_EQ(dec_64_s_1, string((char*)&dec_64_i, sizeof(uint64_t)));
+        ASSERT_EQ(dec_64_s_1,
+                  string(reinterpret_cast<char*>(&dec_64_i), sizeof(uint64_t)));
     }
 }
 

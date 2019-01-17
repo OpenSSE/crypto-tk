@@ -114,7 +114,12 @@ typedef struct
  */
 static inline mbedtls_rsa_context *mbedtls_pk_rsa( const mbedtls_pk_context pk )
 {
-    return( (mbedtls_rsa_context *) (pk).pk_ctx );
+#pragma GCC diagnostic push
+// As the function is static inline, it seems we have to new new C++ casts when
+// including the head in a C++ translation unit
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+    return ((mbedtls_rsa_context*)(pk).pk_ctx);
+#pragma GCC diagnostic pop
 }
 #endif /* MBEDTLS_RSA_C */
 

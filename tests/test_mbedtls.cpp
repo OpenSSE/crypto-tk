@@ -313,7 +313,11 @@ TEST(mbedTLS, key_serialization)
     MBEDTLS_MPI_CHK(mbedtls_rsa_write_key_pem(&rsa, buf, sizeof(buf)));
     // must include the \0 character in the string length
     MBEDTLS_MPI_CHK(mbedtls_rsa_parse_key(
-        &rsa_cp, buf, strnlen((char*)buf, sizeof(buf)) + 1, 0, 0));
+        &rsa_cp,
+        buf,
+        strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)) + 1,
+        0,
+        0));
 
     // check that we parsed everthing correctly
     ASSERT_EQ(mbedtls_rsa_check_pubkey(&rsa_cp), 0);
@@ -334,7 +338,9 @@ TEST(mbedTLS, key_serialization)
     MBEDTLS_MPI_CHK(mbedtls_rsa_write_pubkey_pem(&rsa, buf, sizeof(buf)));
     // must include the \0 character in the string length
     MBEDTLS_MPI_CHK(mbedtls_rsa_parse_public_key(
-        &rsa_pk, buf, strnlen((char*)buf, sizeof(buf)) + 1));
+        &rsa_pk,
+        buf,
+        strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)) + 1));
 
     // check the public key
     ASSERT_TRUE(mbedtls_mpi_cmp_mpi(&rsa.N, &rsa_pk.N) == 0);
@@ -451,7 +457,8 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
         ASSERT_EQ(mbedtls_rsa_write_key_pem(&mbedtls_rsa, buf, sizeof(buf)), 0);
 
         // create the OpenSSL key from the buffer
-        mem    = BIO_new_mem_buf(buf, (int)strnlen((char*)buf, sizeof(buf)));
+        mem = BIO_new_mem_buf(
+            buf, (int)strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)));
         evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
 
         ASSERT_FALSE(evpkey == NULL);
@@ -478,7 +485,8 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
 
 
         // create the OpenSSL key from the buffer
-        mem = BIO_new_mem_buf(buf, (int)strnlen((char*)buf, sizeof(buf)));
+        mem = BIO_new_mem_buf(
+            buf, (int)strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)));
         openssl_pk_rsa = PEM_read_bio_RSA_PUBKEY(mem, NULL, NULL, NULL);
         ASSERT_FALSE(openssl_pk_rsa == NULL);
 
@@ -539,12 +547,14 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         BIO_free_all(bio);
 
         // create an mbedTLS key from the buffer
-        ASSERT_EQ(mbedtls_rsa_parse_key(&mbedtls_rsa_sk,
-                                        buf,
-                                        strnlen((char*)buf, sizeof(buf)) + 1,
-                                        0,
-                                        0),
-                  0);
+        ASSERT_EQ(
+            mbedtls_rsa_parse_key(
+                &mbedtls_rsa_sk,
+                buf,
+                strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)) + 1,
+                0,
+                0),
+            0);
 
 
         // check that the keys are identical
@@ -576,7 +586,9 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         // create an mbedTLS key from the buffer
         ASSERT_EQ(
             mbedtls_rsa_parse_public_key(
-                &mbedtls_rsa_pk, buf, strnlen((char*)buf, sizeof(buf)) + 1),
+                &mbedtls_rsa_pk,
+                buf,
+                strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)) + 1),
             0);
 
 
@@ -674,10 +686,10 @@ TEST(mbedTLS, rsa_errors)
     ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
     rsa.N.p = tmp;
 
-    rsa.N.p[0] ^= (uint)0x01;
+    rsa.N.p[0] ^= 0x01U;
     ret = mbedtls_rsa_check_pubkey(&rsa);
     ASSERT_EQ(ret, MBEDTLS_ERR_RSA_KEY_CHECK_FAILED);
-    rsa.N.p[0] ^= (uint)0x01;
+    rsa.N.p[0] ^= 0x01U;
 
     ASSERT_MPI(mbedtls_mpi_lset(&rsa_cp.E, 9));
     ret = mbedtls_rsa_check_pub_priv(&rsa_cp, &rsa);
@@ -719,42 +731,50 @@ TEST(mbedTLS, pem_errors)
     ASSERT_EQ(ret, MBEDTLS_ERR_PEM_BAD_INPUT_DATA);
 
     ret = mbedtls_pem_read_buffer(
-        &pem_ctx, "toto", "titi", (const unsigned char*)"toto", NULL, 0, NULL);
+        &pem_ctx,
+        "toto",
+        "titi",
+        reinterpret_cast<const unsigned char*>("toto"),
+        NULL,
+        0,
+        NULL);
     ASSERT_EQ(ret, MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT);
-
-    ret = mbedtls_pem_read_buffer(&pem_ctx,
-                                  "toto",
-                                  "titi",
-                                  (const unsigned char*)"tototiti",
-                                  NULL,
-                                  0,
-                                  NULL);
-    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT);
-
-    ret = mbedtls_pem_read_buffer(&pem_ctx,
-                                  "toto",
-                                  "titi",
-                                  (const unsigned char*)"toto\ntiti",
-                                  NULL,
-                                  0,
-                                  &use_len);
-    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_INVALID_DATA);
 
     ret = mbedtls_pem_read_buffer(
         &pem_ctx,
         "toto",
         "titi",
-        (const unsigned char*)"toto\nProc-Type: 4,ENCRYPTED\ntiti",
+        reinterpret_cast<const unsigned char*>("tototiti"),
+        NULL,
+        0,
+        NULL);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_NO_HEADER_FOOTER_PRESENT);
+
+    ret = mbedtls_pem_read_buffer(
+        &pem_ctx,
+        "toto",
+        "titi",
+        reinterpret_cast<const unsigned char*>("toto\ntiti"),
         NULL,
         0,
         &use_len);
+    ASSERT_EQ(ret, MBEDTLS_ERR_PEM_INVALID_DATA);
+
+    ret = mbedtls_pem_read_buffer(&pem_ctx,
+                                  "toto",
+                                  "titi",
+                                  reinterpret_cast<const unsigned char*>(
+                                      "toto\nProc-Type: 4,ENCRYPTED\ntiti"),
+                                  NULL,
+                                  0,
+                                  &use_len);
     ASSERT_EQ(ret, MBEDTLS_ERR_PEM_FEATURE_UNAVAILABLE);
 
     ret = mbedtls_pem_read_buffer(
         &pem_ctx,
         "toto",
         "titi",
-        (const unsigned char*)"toto\nSome content\ntiti",
+        reinterpret_cast<const unsigned char*>("toto\nSome content\ntiti"),
         NULL,
         0,
         &use_len);
@@ -762,13 +782,14 @@ TEST(mbedTLS, pem_errors)
               MBEDTLS_ERR_PEM_INVALID_DATA
                   + MBEDTLS_ERR_BASE64_INVALID_CHARACTER);
 
-    ret = mbedtls_pem_read_buffer(&pem_ctx,
-                                  "toto",
-                                  "titi",
-                                  (const unsigned char*)"toto\ndG90bw==\ntiti",
-                                  NULL,
-                                  0,
-                                  &use_len);
+    ret = mbedtls_pem_read_buffer(
+        &pem_ctx,
+        "toto",
+        "titi",
+        reinterpret_cast<const unsigned char*>("toto\ndG90bw==\ntiti"),
+        NULL,
+        0,
+        &use_len);
     ASSERT_EQ(ret, 0);
 
     std::string   der_content = "Sample content";
@@ -777,22 +798,24 @@ TEST(mbedTLS, pem_errors)
 
     // Test write functions
 
-    ret = mbedtls_pem_write_buffer("header",
-                                   "footer",
-                                   (const unsigned char*)der_content.c_str(),
-                                   der_content.size(),
-                                   buffer,
-                                   4,
-                                   &o_len);
+    ret = mbedtls_pem_write_buffer(
+        "header",
+        "footer",
+        reinterpret_cast<const unsigned char*>(der_content.c_str()),
+        der_content.size(),
+        buffer,
+        4,
+        &o_len);
     ASSERT_EQ(ret, MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL);
 
-    ret = mbedtls_pem_write_buffer("header",
-                                   "footer",
-                                   (const unsigned char*)der_content.c_str(),
-                                   der_content.size(),
-                                   buffer,
-                                   2000,
-                                   &o_len);
+    ret = mbedtls_pem_write_buffer(
+        "header",
+        "footer",
+        reinterpret_cast<const unsigned char*>(der_content.c_str()),
+        der_content.size(),
+        buffer,
+        2000,
+        &o_len);
     ASSERT_EQ(ret, 0);
 
     mbedtls_pk_free(&pk_ctx);

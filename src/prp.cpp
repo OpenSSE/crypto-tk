@@ -56,11 +56,9 @@ void Prp::compute_is_available() noexcept
 #endif
 }
 
-Prp::Prp()
-{
-    static_assert(kContextSize == sizeof(aez_ctx_t),
-                  "Prp: kContextSize and the aez_ctx_t size do not match");
 
+Key<sizeof(aez_ctx_t)> Prp::init_random_aez_ctx()
+{
     if (!Prp::is_available()) {
         /* LCOV_EXCL_START */
         throw std::runtime_error("PRP is unavailable: AES hardware "
@@ -68,21 +66,26 @@ Prp::Prp()
         /* LCOV_EXCL_STOP */
     }
     auto callback = [](uint8_t* key_content) {
-        Key<kKeySize> r_key;
+        Key<Prp::kKeySize> r_key;
         aez_setup(static_cast<const unsigned char*>(r_key.unlock_get()),
                   48,
                   reinterpret_cast<aez_ctx_t*>(key_content));
     };
 
-    aez_ctx_ = Key<sizeof(aez_ctx_t)>(callback);
+    return Key<Prp::kContextSize>(callback);
 }
 
+Prp::Prp() : aez_ctx_(init_random_aez_ctx())
+{
+    static_assert(kContextSize == sizeof(aez_ctx_t),
+                  "Prp: kContextSize and the aez_ctx_t size do not match");
+}
 
-Prp::Prp(Key<kKeySize>&& k)
+Key<sizeof(aez_ctx_t)> Prp::init_aez_ctx(Key<kKeySize>&& k)
 {
     if (!Prp::is_available()) {
         /* LCOV_EXCL_START */
-        throw std::runtime_error("PRP are unavailable: AES hardware "
+        throw std::runtime_error("PRP is unavailable: AES hardware "
                                  "acceleration not supported by the CPU");
         /* LCOV_EXCL_STOP */
     }
@@ -92,8 +95,14 @@ Prp::Prp(Key<kKeySize>&& k)
                   reinterpret_cast<aez_ctx_t*>(key_content));
     };
 
-    aez_ctx_ = Key<kContextSize>(callback);
+    auto key = Key<Prp::kContextSize>(callback);
     k.erase();
+
+    return key;
+}
+
+Prp::Prp(Key<kKeySize>&& k) : aez_ctx_(init_aez_ctx(std::move(k)))
+{
 }
 
 Prp::Prp(Key<kContextSize>&& context) : aez_ctx_(std::move(context))

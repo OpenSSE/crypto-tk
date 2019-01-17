@@ -140,9 +140,7 @@ public:
     /// @param len      The number of pseudo-random bytes to generate.
     /// @param out      The output string.
     ///
-    void derive(const uint32_t offset,
-                const size_t   len,
-                std::string&   out) const;
+    void derive(const size_t offset, const size_t len, std::string& out) const;
     ///
     /// @brief Generate and return a pseudorandom string
     ///
@@ -155,7 +153,7 @@ public:
     /// @param len      The number of pseudo-random bytes to generate.
     /// @return         A len-bytes string filled with random bytes.
     ///
-    std::string derive(const uint32_t offset, const size_t len) const;
+    std::string derive(const size_t offset, const size_t len) const;
 
     ///
     /// @brief Fills buffer with pseudorandom bytes
@@ -171,7 +169,7 @@ public:
     ///
     /// @exception std::invalid_argument       out is NULL
     ///
-    void derive(const uint32_t offset,
+    void derive(const size_t   offset,
                 const size_t   len,
                 unsigned char* out) const;
 
@@ -203,7 +201,7 @@ public:
     /// @param out      The output string.
     ///
     static void derive(Key<kKeySize>&& k,
-                       const uint32_t  offset,
+                       const size_t    offset,
                        const size_t    len,
                        std::string&    out);
 
@@ -224,7 +222,7 @@ public:
     /// @exception std::invalid_argument       out is NULL
     ///
     static void derive(Key<kKeySize>&& k,
-                       const uint32_t  offset,
+                       const size_t    offset,
                        const size_t    len,
                        unsigned char*  out);
 
@@ -259,7 +257,7 @@ public:
     /// @return         A len-bytes string filled with random bytes.
     ///
     static std::string derive(Key<kKeySize>&& k,
-                              const uint32_t  offset,
+                              const size_t    offset,
                               const size_t    len);
 
     ///
@@ -353,7 +351,7 @@ public:
     ///
     template<size_t N>
     static inline void derive(Key<kKeySize>&&         k,
-                              const uint32_t          offset,
+                              const size_t            offset,
                               std::array<uint8_t, N>& out)
     {
         derive(std::move(k), offset, N, out.data());

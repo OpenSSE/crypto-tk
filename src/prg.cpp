@@ -42,7 +42,7 @@ namespace sse {
 namespace crypto {
 
 static void prg_derivation(const unsigned char* key,
-                           const uint32_t       offset,
+                           const size_t         offset,
                            const size_t         len,
                            unsigned char*       out)
 {
@@ -104,9 +104,7 @@ static void prg_derivation(const unsigned char* key,
 }
 
 
-void Prg::derive(const uint32_t offset,
-                 const size_t   len,
-                 std::string&   out) const
+void Prg::derive(const size_t offset, const size_t len, std::string& out) const
 {
     unsigned char* data = new unsigned char[len];
 
@@ -119,7 +117,7 @@ void Prg::derive(const uint32_t offset,
     delete[] data;
 }
 
-std::string Prg::derive(const uint32_t offset, const size_t len) const
+std::string Prg::derive(const size_t offset, const size_t len) const
 {
     std::string out;
 
@@ -128,7 +126,7 @@ std::string Prg::derive(const uint32_t offset, const size_t len) const
     return out;
 }
 
-void Prg::derive(const uint32_t offset,
+void Prg::derive(const size_t   offset,
                  const size_t   len,
                  unsigned char* out) const
 {
@@ -152,7 +150,7 @@ void Prg::derive(Key<kKeySize>&& k, const size_t len, std::string& out)
 }
 
 void Prg::derive(Key<kKeySize>&& k,
-                 const uint32_t  offset,
+                 const size_t    offset,
                  const size_t    len,
                  unsigned char*  out)
 {
@@ -169,7 +167,7 @@ void Prg::derive(Key<kKeySize>&& k,
 }
 
 void Prg::derive(Key<kKeySize>&& k,
-                 const uint32_t  offset,
+                 const size_t    offset,
                  const size_t    len,
                  std::string&    out)
 {
@@ -185,7 +183,7 @@ void Prg::derive(Key<kKeySize>&& k,
 }
 
 std::string Prg::derive(Key<kKeySize>&& k,
-                        const uint32_t  offset,
+                        const size_t    offset,
                         const size_t    len)
 {
     unsigned char* data = new unsigned char[len];

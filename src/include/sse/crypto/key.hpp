@@ -221,6 +221,8 @@ public:
         return *this;
     }
 
+    Key& operator=(const Key<N>&) = delete;
+
     ///
     /// @brief Erase the key
     ///
@@ -402,7 +404,7 @@ private:
     }
 
     /// @brief Pointer to the key content
-    uint8_t* content_;
+    uint8_t* content_{nullptr};
     /// @brief Flag denoting if the content_ point is read_protected
     mutable bool is_locked_{false};
 };

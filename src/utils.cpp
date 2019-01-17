@@ -153,8 +153,8 @@ static int init_locks()
     int i;
 
     /* static locks area */
-    mutex_buf = static_cast<pthread_mutex_t*>(
-        malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t)));
+    mutex_buf = static_cast<pthread_mutex_t*>(malloc(
+        static_cast<size_t>(CRYPTO_num_locks()) * sizeof(pthread_mutex_t)));
     if (mutex_buf == nullptr) {
         /* LCOV_EXCL_START */
         return (-1);

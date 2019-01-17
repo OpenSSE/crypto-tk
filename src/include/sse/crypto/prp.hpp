@@ -249,13 +249,16 @@ private:
 
     explicit Prp(Key<kContextSize>&& context);
 
+    static Key<kContextSize> init_random_aez_ctx();
+    static Key<kContextSize> init_aez_ctx(Key<kKeySize>&& k);
+
     ///
     /// @brief Initialize the availability flag.
     ///
-    /// Calls libsodium to determine if the aesni feature or the neon features
-    /// are enabled on the host CPU. This function **must** be called before any
-    /// use of the Prp class. Otherwise, the availability flag is set to false
-    /// by default.
+    /// Calls libsodium to determine if the aesni feature or the neon
+    /// features are enabled on the host CPU. This function **must** be
+    /// called before any use of the Prp class. Otherwise, the availability
+    /// flag is set to false by default.
     ///
     ///
     static void compute_is_available() noexcept;

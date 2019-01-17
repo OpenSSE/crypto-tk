@@ -429,7 +429,7 @@ public:
     ConstrainedRCPrfElement(const ConstrainedRCPrfElement&) = default;
 
     /// @brief Destructor
-    virtual ~ConstrainedRCPrfElement() = default;
+    ~ConstrainedRCPrfElement() override = default;
 
     /// @brief Returns the minimum leaf index supported by the element.
     uint64_t min_leaf() const
@@ -693,7 +693,8 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrfInnerElement<NBYTES>::eval(
             + ", range max=" + std::to_string(this->max_leaf()));
     }
 
-    uint8_t base_depth = this->tree_height() - this->subtree_height();
+    uint8_t base_depth
+        = static_cast<uint8_t>(this->tree_height() - this->subtree_height());
 
     // we use this trick to avoid compilation errors (at least on clang)
     return static_cast<const ConstrainedRCPrfInnerElement<NBYTES>*>(this)
@@ -1170,7 +1171,7 @@ size_t ConstrainedRCPrf<NBYTES>::serialized_size() const noexcept
     size_t total_size = 0;
 
     total_size += sizeof(RCPrfParams::depth_type); // the tree depth
-    total_size += sizeof(size_t);                  // the number of elements
+    total_size += sizeof(uint32_t);                // the number of elements
 
     // for each element:
     for (const auto& elt : elements_) {
@@ -1197,10 +1198,11 @@ void ConstrainedRCPrf<NBYTES>::serialize(uint8_t* out) const
 
     // *(reinterpret_cast<uint32_t*>(offset_out)) = elements_.size();
 
-    size_t elt_size = elements_.size();
+    assert(elements_.size() <= UINT32_MAX);
+    uint32_t elt_size = static_cast<uint32_t>(elements_.size());
     memcpy(offset_out, &elt_size,
-           sizeof(size_t));       // the tree depth
-    offset_out += sizeof(size_t); // the number of elements
+           sizeof(uint32_t));       // the tree depth
+    offset_out += sizeof(uint32_t); // the number of elements
 
     // for each element:
     for (const auto& elt : elements_) {

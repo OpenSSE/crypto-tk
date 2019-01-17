@@ -46,8 +46,8 @@ ZR::ZR(int x)
     g1_get_ord(order);
     isInit = true;
     if (x < 0) {
-        bn_set_dig(z, static_cast<dig_t>(x * -1)); // set positive value
-        bn_neg(z, z);                              // set bn to negative
+        bn_set_dig(z, static_cast<dig_t>(-x)); // set positive value
+        bn_neg(z, z);                          // set bn to negative
     } else {
         bn_set_dig(z, static_cast<dig_t>(x));
     }

@@ -104,7 +104,7 @@ class ZR
 public:
     bn_t z;
     bn_t order;
-    bool isInit;
+    bool isInit{false};
     ZR()
     {
         error_if_relic_not_init();
@@ -326,7 +326,7 @@ public:
 
 
     g1_t g;
-    bool isInit;
+    bool isInit{false};
     G1()
     {
         error_if_relic_not_init();
@@ -427,7 +427,7 @@ public:
     constexpr static uint16_t kCompactByteSize = 1 + 2 * FP_BYTES;
 
     g2_t g;
-    bool isInit;
+    bool isInit{false};
     G2()
     {
         error_if_relic_not_init();
@@ -526,7 +526,7 @@ public:
     constexpr static uint16_t kCompactByteSize = 8 * FP_BYTES;
 
     gt_t g;
-    bool isInit;
+    bool isInit{false};
     GT()
     {
         error_if_relic_not_init();
@@ -639,7 +639,7 @@ public:
     bool isInitalized();
 
 private:
-    bool isInit;
+    bool isInit{false};
 };
 
 
@@ -727,7 +727,7 @@ public:
     std::string aes_key(const GT& g);
 
 private:
-    bool isInit;
+    bool isInit{false};
     bn_t grp_order;
 };
 

@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1)
 
-project (libsse_crypto VERSION 0.2
+project (libsse_crypto VERSION 0.3
                        DESCRIPTION "OpenSSE's cryptographic library")
 
 ## Needed on Mac OS for the fuzzing targets

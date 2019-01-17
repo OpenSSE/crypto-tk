@@ -26,8 +26,8 @@ set(default_build_type "Debug")
 # Options
 option(opensse_ENABLE_WALL "Enable all warnings" ON)
 option(opensse_ENABLE_WEXTRA "Enable extra warnings" ON)
-option(opensse_ENABLE_WSHADOW "Enable -Wshadow warning" ON)
-option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" ON)
+option(opensse_ENABLE_WSHADOW "Enable shadow warning" OFF)
+option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" OFF)
 option(opensse_ENABLE_WERROR "Make all warnings into errors" ON)
 option(
     opensse_OPTIMIZE_FOR_NATIVE_ARCH

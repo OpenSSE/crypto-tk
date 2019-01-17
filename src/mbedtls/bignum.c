@@ -1059,6 +1059,8 @@ void mpi_mul_hlp( size_t i, mbedtls_mpi_uint *s, mbedtls_mpi_uint *d, mbedtls_mp
 #else /* MULADDC_HUIT */
     for( ; i >= 16; i -= 16 )
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverlength-strings"
         MULADDC_INIT
         MULADDC_CORE   MULADDC_CORE
         MULADDC_CORE   MULADDC_CORE
@@ -1070,6 +1072,7 @@ void mpi_mul_hlp( size_t i, mbedtls_mpi_uint *s, mbedtls_mpi_uint *d, mbedtls_mp
         MULADDC_CORE   MULADDC_CORE
         MULADDC_CORE   MULADDC_CORE
         MULADDC_STOP
+#pragma GCC diagnostic pop
     }
 
     for( ; i >= 8; i -= 8 )

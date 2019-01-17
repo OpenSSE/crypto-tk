@@ -26,6 +26,8 @@ set(default_build_type "Debug")
 # Options
 option(opensse_ENABLE_WALL "Enable all warnings" ON)
 option(opensse_ENABLE_WEXTRA "Enable extra warnings" ON)
+option(opensse_ENABLE_WSHADOW "Enable -Wshadow warning" ON)
+option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" ON)
 option(opensse_ENABLE_WERROR "Make all warnings into errors" ON)
 option(
     opensse_OPTIMIZE_FOR_NATIVE_ARCH
@@ -58,6 +60,20 @@ if(opensse_ENABLE_WEXTRA)
     check_cxx_compiler_flag("-Wextra" COMPILER_OPT_WEXTRA_SUPPORTED)
     if(COMPILER_OPT_WEXTRA_SUPPORTED)
         add_compile_options(-Wextra)
+    endif()
+endif()
+
+if(opensse_ENABLE_WSHADOW)
+    check_cxx_compiler_flag("-Wshadow" COMPILER_OPT_WSHADOW_SUPPORTED)
+    if(COMPILER_OPT_WEXTRA_SUPPORTED)
+        add_compile_options(-Wshadow)
+    endif()
+endif()
+
+if(opensse_ENABLE_PEDANTIC)
+    check_cxx_compiler_flag("-pedantic" COMPILER_OPT_PEDANTIC_SUPPORTED)
+    if(COMPILER_OPT_WEXTRA_SUPPORTED)
+        add_compile_options(-pedantic)
     endif()
 endif()
 

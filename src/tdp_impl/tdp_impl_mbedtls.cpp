@@ -470,9 +470,9 @@ void TdpInverseImpl_mbedTLS::invert(const std::string& in,
                                     std::string&       out) const
 {
     int           ret;
-    unsigned char rsa_out[rsa_size()];
+    unsigned char rsa_out[kMessageSpaceSize];
 
-    if (in.size() != rsa_size()) {
+    if (in.size() != kMessageSpaceSize) {
         throw std::invalid_argument("Invalid TDP input size. Input size should "
                                     "be kMessageSpaceSize bytes long.");
     }
@@ -489,9 +489,9 @@ void TdpInverseImpl_mbedTLS::invert(const std::string& in,
             + std::to_string(ret)); /* LCOV_EXCL_LINE */
     }
 
-    out = std::string(reinterpret_cast<char*>(rsa_out), rsa_size());
+    out = std::string(reinterpret_cast<char*>(rsa_out), kMessageSpaceSize);
 
-    sodium_memzero(rsa_out, rsa_size());
+    sodium_memzero(rsa_out, kMessageSpaceSize);
 }
 
 std::array<uint8_t, TdpImpl_mbedTLS::kMessageSpaceSize> TdpInverseImpl_mbedTLS::

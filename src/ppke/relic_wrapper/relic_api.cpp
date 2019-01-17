@@ -4,6 +4,8 @@
 
 #include <stdexcept>
 
+#include <sodium/utils.h>
+
 namespace relicxx {
 
 void ro_error()
@@ -166,9 +168,9 @@ ZR hashToZR(const bytes_vec& b)
     data[0] = HASH_FUNCTION_BYTES_TO_Zr_CRH;
     std::copy(b.begin(), b.end(), data.begin() + 1);
 
-    ZR            zr;
-    unsigned int  digest_len = SHA_LEN;
-    unsigned char digest[digest_len + 1];
+    ZR                     zr;
+    constexpr unsigned int digest_len = SHA_LEN;
+    unsigned char          digest[digest_len + 1];
     memset(digest, 0, digest_len);
     SHA_FUNC(digest, data.data(), static_cast<int>(data.size()));
     bn_read_bin(zr.z, digest, digest_len);
@@ -197,13 +199,13 @@ std::vector<uint8_t> ZR::getBytes() const
 
 std::ostream& operator<<(std::ostream& s, const ZR& zr)
 {
-    int  length = bn_size_str(zr.z, DECIMAL);
-    char data[length + 1];
-    memset(data, 0, length);
-    bn_write_str(data, length, zr.z, DECIMAL);
-    std::string s1(data, length);
+    int               length = bn_size_str(zr.z, DECIMAL);
+    std::vector<char> data(length + 1);
+    memset(data.data(), 0, length);
+    bn_write_str(data.data(), length, zr.z, DECIMAL);
+    std::string s1(data.data(), length);
     s << s1;
-    memset(data, 0, length);
+    sodium_memzero(data.data(), length);
     return s;
 }
 

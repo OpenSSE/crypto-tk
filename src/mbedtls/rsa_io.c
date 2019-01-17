@@ -29,6 +29,9 @@
 #define mbedtls_free       free
 #endif
 
+#pragma GCC diagnostic push
+// mbedTLS does sign conversion everywhere
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 
 
 int mbedtls_rsa_parse_public_key( mbedtls_rsa_context *rsa_ctx,
@@ -248,3 +251,5 @@ int mbedtls_rsa_write_key_pem( mbedtls_rsa_context *key, unsigned char *buf, siz
     
     return( 0 );
 }
+
+#pragma GCC diagnostic pop

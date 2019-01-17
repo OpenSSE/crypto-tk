@@ -39,7 +39,6 @@ public:
     static constexpr uint kMessageSpaceSize = Tdp::kMessageSize;
 
     virtual ~TdpImpl() = default;
-    ;
 
     virtual size_t rsa_size() const = 0;
 
@@ -70,7 +69,6 @@ class TdpInverseImpl : virtual public TdpImpl
 {
 public:
     ~TdpInverseImpl() override = default;
-    ;
 
     virtual std::string private_key() const                            = 0;
     virtual void invert(const std::string& in, std::string& out) const = 0;
@@ -89,7 +87,6 @@ class TdpMultPoolImpl : virtual public TdpImpl
 {
 public:
     ~TdpMultPoolImpl() override = default;
-    ;
 
     virtual std::array<uint8_t, TdpImpl::kMessageSpaceSize> eval_pool(
         const std::array<uint8_t, kMessageSpaceSize>& in,

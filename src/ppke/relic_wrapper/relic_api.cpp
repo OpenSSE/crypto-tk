@@ -8,10 +8,10 @@
 
 namespace relicxx {
 
-void ro_error()
-{
+[[noreturn]] void ro_error() {
     throw std::invalid_argument("writing to read only object");
 }
+
 void error_if_relic_not_init()
 {
     if (nullptr == core_get()) {
@@ -46,10 +46,10 @@ ZR::ZR(int x)
     g1_get_ord(order);
     isInit = true;
     if (x < 0) {
-        bn_set_dig(z, x * -1); // set positive value
-        bn_neg(z, z);          // set bn to negative
+        bn_set_dig(z, static_cast<dig_t>(x * -1)); // set positive value
+        bn_neg(z, z);                              // set bn to negative
     } else {
-        bn_set_dig(z, x);
+        bn_set_dig(z, static_cast<dig_t>(x));
     }
 }
 
@@ -182,7 +182,7 @@ ZR hashToZR(const bytes_vec& b)
 
 size_t ZR::byte_size() const
 {
-    return bn_size_bin(z);
+    return static_cast<size_t>(bn_size_bin(z));
 }
 
 bool ZR::ismember() const
@@ -199,10 +199,10 @@ std::vector<uint8_t> ZR::getBytes() const
 
 std::ostream& operator<<(std::ostream& s, const ZR& zr)
 {
-    int               length = bn_size_str(zr.z, DECIMAL);
+    size_t            length = static_cast<size_t>(bn_size_str(zr.z, DECIMAL));
     std::vector<char> data(length + 1);
     memset(data.data(), 0, length);
-    bn_write_str(data.data(), length, zr.z, DECIMAL);
+    bn_write_str(data.data(), static_cast<int>(length), zr.z, DECIMAL);
     std::string s1(data.data(), length);
     s << s1;
     sodium_memzero(data.data(), length);
@@ -351,7 +351,7 @@ bool G1::ismember(const bn_t order) const
 
 std::vector<uint8_t> G1::getBytes(bool compress) const
 {
-    unsigned int         l = g1_size_bin(g, compress);
+    size_t               l = static_cast<size_t>(g1_size_bin(g, compress));
     std::vector<uint8_t> data(l);
     g1_write_bin(&data[0], static_cast<int>(data.size()), g, compress);
     return data;
@@ -359,7 +359,7 @@ std::vector<uint8_t> G1::getBytes(bool compress) const
 
 void G1::writeBytes(uint8_t* bytes, bool compress) const
 {
-    unsigned int l = g1_size_bin(g, compress);
+    int l = g1_size_bin(g, compress);
 
     assert(l == ((compress) ? kCompactByteSize : kByteSize));
 
@@ -467,16 +467,16 @@ bool G2::ismember(bn_t order)
 std::vector<uint8_t> G2::getBytes(bool compress) const
 {
     RELICXX_G2unconst(*this, gg);
-    unsigned int l = g2_size_bin(gg.g, compress);
+    int l = g2_size_bin(gg.g, compress);
 
-    std::vector<uint8_t> data(l);
+    std::vector<uint8_t> data(static_cast<size_t>(l));
     g2_write_bin(&data[0], l, gg.g, compress);
     return data;
 }
 
 void G2::writeBytes(uint8_t* bytes, bool compress) const
 {
-    unsigned int l = g2_size_bin(const_cast<G2*>(this)->g, compress);
+    int l = g2_size_bin(const_cast<G2*>(this)->g, compress);
 
     assert(l == ((compress) ? kCompactByteSize : kByteSize));
 
@@ -586,9 +586,9 @@ bool GT::ismember(bn_t order)
 std::vector<uint8_t> GT::getBytes(bool compress) const
 {
     RELICXX_GTunconst(*this, gg);
-    unsigned int l = gt_size_bin(gg.g, compress);
+    int l = gt_size_bin(gg.g, compress);
 
-    std::vector<uint8_t> data(l);
+    std::vector<uint8_t> data(static_cast<size_t>(l));
     gt_write_bin(&data[0], l, gg.g, compress);
     return data;
 }
@@ -596,7 +596,7 @@ std::vector<uint8_t> GT::getBytes(bool compress) const
 void GT::getBytes(bool compress, const size_t out_len, uint8_t* out) const
 {
     RELICXX_GTunconst(*this, gg);
-    unsigned int l = gt_size_bin(gg.g, compress);
+    size_t l = static_cast<size_t>(gt_size_bin(gg.g, compress));
 
     if (l < out_len) {
         // fill the rest with 0's
@@ -610,7 +610,7 @@ void GT::getBytes(bool compress, const size_t out_len, uint8_t* out) const
 
 void GT::writeBytes(uint8_t* bytes, bool compress) const
 {
-    unsigned int l = gt_size_bin(const_cast<GT*>(this)->g, compress);
+    int l = gt_size_bin(const_cast<GT*>(this)->g, compress);
 
     assert(l == ((compress) ? kCompactByteSize : kByteSize));
 
@@ -635,7 +635,7 @@ std::ostream& operator<<(std::ostream& s, const GT& gt)
     return s;
 }
 
-relicResourceHandle::relicResourceHandle(const bool& allowAlreadyInitialized)
+relicResourceHandle::relicResourceHandle(const bool allowAlreadyInitialized)
 {
     isInit = false;
     if (nullptr != core_get()) {

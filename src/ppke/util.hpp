@@ -26,7 +26,7 @@ relicxx::ZR LagrangeBasisCoefficients(
                                 group.sub(polynomial_xcordinates.at(j),
                                           polynomial_xcordinates.at(m)));
                 prod = group.mul(prod, interim);
-            } catch (const relicxx::RelicDividByZero& t) {
+            } catch (const relicxx::RelicDividByZero& /*t*/) {
                 throw std::logic_error("LagrangeBasisCoefficient calculation "
                                        "failed. RelicDividByZero"
                                        " Almost certainly a duplicate "

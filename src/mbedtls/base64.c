@@ -131,7 +131,11 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
         *p++ = '=';
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
     *olen = p - dst;
+#pragma GCC diagnostic pop
+
     *p = 0;
 
     return( 0 );
@@ -221,7 +225,11 @@ int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
         }
     }
 
+#pragma GCC diagnostic push
+// mbedTLS does sign conversion everywhere
+#pragma GCC diagnostic ignored "-Wsign-conversion"
     *olen = p - dst;
+#pragma GCC diagnostic pop
 
     return( 0 );
 }

@@ -74,8 +74,14 @@ const mbedtls_pk_info_t * mbedtls_pk_info_from_type( mbedtls_pk_type_t pk_type )
             return( &mbedtls_rsa_info );
 #endif
         /* MBEDTLS_PK_RSA_ALT omitted on purpose */
-        default:
-            return( NULL );
+        case MBEDTLS_PK_NONE:
+        case MBEDTLS_PK_ECKEY:
+        case MBEDTLS_PK_ECKEY_DH:
+        case MBEDTLS_PK_ECDSA:
+        case MBEDTLS_PK_RSA_ALT:
+        case MBEDTLS_PK_RSASSA_PSS:
+        default :
+            return (NULL);
     }
 }
 

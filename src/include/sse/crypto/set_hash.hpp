@@ -79,7 +79,7 @@ public:
     /// Creates a new SetHash from an already computed hash, in its hexadecimal
     /// representation
     ///
-    /// @param data A bytes array representing a set hash.
+    /// @param bytes A bytes array representing a set hash.
     ///
     explicit SetHash(const std::array<uint8_t, kSetHashSize>& bytes);
 

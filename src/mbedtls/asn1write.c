@@ -38,6 +38,11 @@
 // Do not check coverage for ASN.1
 /* LCOV_EXCL_START */
 
+#pragma GCC diagnostic push
+// mbedTLS MBEDTLS_ASN1_CHK_ADD macro mixes int and unsigned long
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
+
 int mbedtls_asn1_write_len( unsigned char **p, unsigned char *start, size_t len )
 {
     if( len < 0x80 )
@@ -239,7 +244,11 @@ int mbedtls_asn1_write_int( unsigned char **p, unsigned char *start, int val )
         return( MBEDTLS_ERR_ASN1_BUF_TOO_SMALL );
 
     len += 1;
+#pragma GCC diagnostic push
+// The only val value used in our code base is 0
+#pragma GCC diagnostic ignored "-Wconversion"
     *--(*p) = val;
+#pragma GCC diagnostic pop
 
     if( val > 0 && **p & 0x80 )
     {
@@ -388,5 +397,7 @@ mbedtls_asn1_named_data *mbedtls_asn1_store_named_data( mbedtls_asn1_named_data 
 }
 
 /* LCOV_EXCL_STOP */
+
+#pragma GCC diagnostic pop
 
 #endif /* MBEDTLS_ASN1_WRITE_C */

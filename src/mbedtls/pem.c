@@ -40,6 +40,10 @@
 #define mbedtls_free       free
 #endif
 
+#pragma GCC diagnostic push
+// mbedTLS does sign conversion everywhere
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
 #if defined(MBEDTLS_PEM_PARSE_C)
 /* Implementation that should never be optimized out by the compiler */
 static void mbedtls_zeroize( void *v, size_t n ) {
@@ -177,5 +181,9 @@ int mbedtls_pem_write_buffer( const char *header, const char *footer,
     mbedtls_free( encode_buf );
     return( 0 );
 }
+#pragma GCC diagnostic push
+// mbedTLS does sign conversion everywhere
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
 #endif /* MBEDTLS_PEM_WRITE_C */
 #endif /* MBEDTLS_PEM_PARSE_C || MBEDTLS_PEM_WRITE_C */

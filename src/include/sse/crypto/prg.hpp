@@ -82,7 +82,9 @@ public:
     /// @param k    The key used to initialize the PRG.
     ///             Upon return, k is empty
     ///
-    explicit Prg(Key<kKeySize>&& k) : key_(std::move(k)){};
+    explicit Prg(Key<kKeySize>&& k) : key_(std::move(k))
+    {
+    }
 
     ///
     /// @brief Move constructor
@@ -110,7 +112,7 @@ public:
     inline void derive(const size_t len, std::string& out) const
     {
         derive(0, len, out);
-    };
+    }
 
     ///
     /// @brief Generate and return a pseudorandom string
@@ -124,7 +126,7 @@ public:
     inline std::string derive(const size_t len) const
     {
         return derive(0, len);
-    };
+    }
 
     ///
     /// @brief Generate a pseudorandom string
@@ -240,7 +242,7 @@ public:
     static inline std::string derive(Key<kKeySize>&& k, const size_t len)
     {
         return derive(std::move(k), 0, len);
-    };
+    }
 
     ///
     /// @brief Generate and return a pseudorandom string from the input seed

@@ -82,7 +82,7 @@ static_assert(MULTI == OPENMP,
 
 namespace relicxx {
 using bytes_vec = std::vector<uint8_t>;
-void ro_error();
+[[noreturn]] void ro_error();
 
 constexpr static uint8_t HASH_FUNCTION_STRINGS         = 0x00;
 constexpr static uint8_t HASH_FUNCTION_BYTES_TO_Zr_CRH = 0x01;
@@ -625,9 +625,13 @@ public:
      * Tries to initialize relic.  If allowAlreadyInitilazed, will
      * simply become a no op if someone has already initialized the
      * code.
-     * @param allowAlreadyInitilazed
+     * @param allowAlreadyInitialized  If true, the constructor does not throw
+     *                                 if RELIC is already initialized
+     *
+     * @exception std::runtime_error   RELIC was already initialized or failed
+     *                                 to initialize
      */
-    explicit relicResourceHandle(const bool& allowAlreadyInitialized = true);
+    explicit relicResourceHandle(const bool allowAlreadyInitialized = true);
     ~relicResourceHandle();
 
     // you cannot meaningfully copy this resource

@@ -167,8 +167,8 @@ public:
     ///                         The Wrapper::TypeByte<CryptoClass> static
     ///                         struct must be specialized for CryptoClass.
     ///
-    /// @param c    The buffer containing the encrypted representation of
-    ///             the object.
+    /// @param c_rep    The buffer containing the encrypted representation of
+    ///                 the object.
     ///
     /// @return     The object represented by the encrypted buffer.
     ///

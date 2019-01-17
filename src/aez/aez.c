@@ -40,6 +40,10 @@
 
 #include <string.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+
+
 /* ------------------------------------------------------------------------- */
 #if __AES__                /* Defined by gcc/clang when compiling for AES-NI */
 /* ------------------------------------------------------------------------- */
@@ -667,3 +671,5 @@ int aez_decrypt(const aez_ctx_t *ctx, const char *n, unsigned nbytes,
     }
     return cipher_aez_core(ctx, t, 1, src, bytes, abytes, dst);
 }
+
+#pragma GCC diagnostic pop

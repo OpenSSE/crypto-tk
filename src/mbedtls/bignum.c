@@ -44,6 +44,11 @@
 
 #include <string.h>
 
+#pragma GCC diagnostic push
+// mbedTLS does sign conversion everywhere
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
+
 #if defined(MBEDTLS_PLATFORM_C)
 #include "platform.h"
 #else
@@ -2385,5 +2390,7 @@ cleanup:
 /* LCOV_EXCL_STOP */
 
 #endif /* MBEDTLS_SELF_TEST */
+
+#pragma GCC diagnostic pop
 
 #endif /* MBEDTLS_BIGNUM_C */

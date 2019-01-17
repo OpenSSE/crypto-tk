@@ -374,7 +374,7 @@ public:
     /// Creates a ConstrainedRCPrfElement representing a subtree of given
     /// height and spanning over the specified leaves range.
     ///
-    /// @param tree_height     The height of the tree.
+    /// @param height          The height of the tree.
     /// @param subtree_height  The height of the subtree represented by the
     ///                        element.
     /// @param min             The minimum leaf index spanned by the
@@ -425,6 +425,10 @@ public:
         }
     }
 
+    /// @brief Copy constructor
+    ConstrainedRCPrfElement(const ConstrainedRCPrfElement&) = default;
+
+    /// @brief Destructor
     virtual ~ConstrainedRCPrfElement() = default;
 
     /// @brief Returns the minimum leaf index supported by the element.
@@ -754,8 +758,8 @@ public:
     ///
     /// Creates a ConstrainedRCPrfLeafElement representing a leaf.
     ///
-    /// @param tree_height     The height of the tree.
-    /// @param leaf            The index of the represented leaf.
+    /// @param height   The height of the tree.
+    /// @param leaf     The index of the represented leaf.
     ///
     /// @exception std::invalid_argument    An std::invalid_argument
     /// exception
@@ -1166,7 +1170,7 @@ size_t ConstrainedRCPrf<NBYTES>::serialized_size() const noexcept
     size_t total_size = 0;
 
     total_size += sizeof(RCPrfParams::depth_type); // the tree depth
-    total_size += sizeof(uint32_t);                // the number of elements
+    total_size += sizeof(size_t);                  // the number of elements
 
     // for each element:
     for (const auto& elt : elements_) {
@@ -1193,10 +1197,10 @@ void ConstrainedRCPrf<NBYTES>::serialize(uint8_t* out) const
 
     // *(reinterpret_cast<uint32_t*>(offset_out)) = elements_.size();
 
-    uint32_t elt_size = elements_.size();
+    size_t elt_size = elements_.size();
     memcpy(offset_out, &elt_size,
-           sizeof(uint32_t));       // the tree depth
-    offset_out += sizeof(uint32_t); // the number of elements
+           sizeof(size_t));       // the tree depth
+    offset_out += sizeof(size_t); // the number of elements
 
     // for each element:
     for (const auto& elt : elements_) {

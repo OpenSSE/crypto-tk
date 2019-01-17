@@ -32,10 +32,7 @@
 #include <iostream>
 
 #define SSE_CRYPTO_TDP_IMPL_MBEDTLS 1
-
-#ifdef WITH_OPENSSL
 #define SSE_CRYPTO_TDP_IMPL_OPENSSL 2
-#endif
 
 /*
  * The default TDP implementation used mbedTLS
@@ -44,7 +41,9 @@
  * or pass the option -DSSE_CRYPTO_TDP_IMPL=SSE_CRYPTO_TDP_IMPL_OPENSSL
  * to the compiler
  */
-//#define SSE_CRYPTO_TDP_IMPL SSE_CRYPTO_TDP_IMPL_MBEDTLS
+#if !defined(SSE_CRYPTO_TDP_IMPL)
+#define SSE_CRYPTO_TDP_IMPL SSE_CRYPTO_TDP_IMPL_MBEDTLS
+#endif
 
 #if defined(SSE_CRYPTO_TDP_IMPL)                                               \
     && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_OPENSSL)
@@ -55,15 +54,18 @@
 
 #include "tdp_impl/tdp_impl_openssl.hpp"
 
-#else
+#elif defined(SSE_CRYPTO_TDP_IMPL)                                             \
+    && (SSE_CRYPTO_TDP_IMPL == SSE_CRYPTO_TDP_IMPL_MBEDTLS)
 #include "tdp_impl/tdp_impl_mbedtls.hpp"
 
+#else
+
+#error("No valid TDP implementation defined")
 
 #endif
 
 
 namespace sse {
-
 namespace crypto {
 
 #if defined(SSE_CRYPTO_TDP_IMPL)                                               \
@@ -297,27 +299,28 @@ TdpInverse TdpInverse::deserialize(uint8_t*     in,
     // search for "-----END RSA PRIVATE KEY-----"
     static constexpr size_t  kKeySuffixSize = 29;
     static constexpr uint8_t kKeySuffix[kKeySuffixSize + 1]
-        = "-----END RSA PRIVATE KEY-----"; // we have to account for the '\0'
-                                           // character ...
+        = "-----END RSA PRIVATE KEY-----"; // we have to account for the
+                                           // '\0' character ...
 
     const uint8_t* suffix_start
         = strstrn_uint8(in, in_size, kKeySuffix, kKeySuffixSize);
 
-    if (suffix_start == nullptr) {
+    if (suffix_start <= in) {
         /* LCOV_EXCL_START */
-        throw std::runtime_error(
-            "TdpInverse::deserialize: invalid buffer. The buffer does not "
-            "contain the RSA private key suffix");
+        throw std::runtime_error("TdpInverse::deserialize: invalid "
+                                 "buffer. The buffer does not "
+                                 "contain the RSA private key suffix");
         /* LCOV_EXCL_STOP */
     }
-    n_bytes_read = kKeySuffixSize + suffix_start - in;
+    n_bytes_read = kKeySuffixSize + static_cast<size_t>(suffix_start - in);
     std::string sk(
         reinterpret_cast<const char*>(in),
         reinterpret_cast<const char*>(suffix_start + kKeySuffixSize));
     TdpInverse result(sk);
 
     if ((n_bytes_read < in_size) && (in[n_bytes_read] == '\n')) {
-        n_bytes_read++; // there might be a trailing \n character at the end
+        n_bytes_read++; // there might be a trailing \n character at the
+                        // end
     }
 
     return result;

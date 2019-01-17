@@ -387,8 +387,8 @@ PartialGmmppkeCT Gmppke::blind(const GmppkeSecretParameters& sp,
 GT Gmppke::recoverBlind(const GmppkePrivateKey& sk,
                         const PartialGmmppkeCT& ct) const
 {
-    static ZR zr_zero = ZR(0);
-    ZR        ctTag   = group.hashListToZR(ct.tag);
+    static const ZR zr_zero = ZR(0);
+    ZR              ctTag   = group.hashListToZR(ct.tag);
 
     const unsigned int numshares = static_cast<unsigned int>(sk.shares.size());
 

@@ -107,14 +107,14 @@ public:
         = 3 * relicxx::G2::kCompactByteSize + kTagSize;
 
     GmppkePrivateKeyShare() = default;
-    ;
+
     explicit GmppkePrivateKeyShare(const uint8_t* bytes)
         : sk1(bytes, true), sk2(bytes + relicxx::G2::kCompactByteSize, true),
           sk3(bytes + 2 * relicxx::G2::kCompactByteSize, true)
     {
         ::memcpy(
             sk4.data(), bytes + 3 * relicxx::G2::kCompactByteSize, kTagSize);
-    };
+    }
 
 
     friend bool operator==(const GmppkePrivateKeyShare& x,
@@ -157,10 +157,12 @@ class GmppkePrivateKey
 {
 public:
     GmppkePrivateKey() = default;
-    ;
+
     // cppcheck-suppress passedByValue
     explicit GmppkePrivateKey(std::vector<GmppkePrivateKeyShare> s)
-        : shares(std::move(s)){};
+        : shares(std::move(s))
+    {
+    }
 
     friend bool operator==(const GmppkePrivateKey& l, const GmppkePrivateKey& r)
     {
@@ -211,13 +213,13 @@ public:
         = 2 * relicxx::G1::kCompactByteSize + kTagSize;
 
     PartialGmmppkeCT() = default;
-    ;
+
     explicit PartialGmmppkeCT(const uint8_t* bytes)
         : ct2(bytes, true), ct3(bytes + relicxx::G1::kCompactByteSize, true)
     {
         ::memcpy(
             tag.data(), bytes + 2 * relicxx::G1::kCompactByteSize, kTagSize);
-    };
+    }
 
     friend bool operator==(const PartialGmmppkeCT& x, const PartialGmmppkeCT& y)
     {
@@ -227,15 +229,6 @@ public:
     {
         return !(x == y);
     }
-
-    /** Checks if you can decrypt a GMPfse ciphertext
-     *
-     * @param sk
-     * @param ct
-     * @return
-     */
-    friend bool canDecrypt(const GmppkePrivateKey& sk,
-                           const PartialGmmppkeCT& ct);
 
     void writeBytes(uint8_t* bytes) const
     {
@@ -262,12 +255,12 @@ public:
         = PartialGmmppkeCT::kByteSize + sizeof(T);
 
     GmmppkeCT() = default;
-    ;
+
     explicit GmmppkeCT(const uint8_t* bytes)
         : PartialGmmppkeCT(bytes + sizeof(T))
     {
         ::memcpy(&ct1, bytes, sizeof(T));
-    };
+    }
     explicit GmmppkeCT(const PartialGmmppkeCT& c) : PartialGmmppkeCT(c), ct1(0)
     {
     }
@@ -304,7 +297,6 @@ public:
 
     Gmppke()  = default;
     ~Gmppke() = default;
-    ;
 
     void keygen(GmppkePublicKey&        pk,
                 GmppkePrivateKey&       sk,

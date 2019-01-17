@@ -107,7 +107,7 @@ public:
         if (key_.is_empty()) {
             throw std::invalid_argument("Invalid key: key is empty");
         }
-    };
+    }
 
     // deleted copy assignement operator
     HMac(HMac<H, N>&& hmac) noexcept = default;

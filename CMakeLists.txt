@@ -1,23 +1,24 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required(VERSION 3.1)
 
-project (libsse_crypto VERSION 0.3
-                       DESCRIPTION "OpenSSE's cryptographic library")
+project(libsse_crypto VERSION 0.3 DESCRIPTION "OpenSSE's cryptographic library")
 
-## Needed on Mac OS for the fuzzing targets
+# Needed on Mac OS for the fuzzing targets
 if(APPLE)
-  cmake_policy(SET CMP0025 OLD)
+    cmake_policy(SET CMP0025 OLD)
 endif()
-# Indeed, we need a modern Clang (more modern than AppleClang) with support
-# of libFuzzer. Unfortunately, Clang is not superbly well supported by CMake
-# on Mac OS. I even opened an issue on CMake's tracker about that (and
-# ridiculed myself): https://gitlab.kitware.com/cmake/cmake/issues/18785
-
+# Indeed, we need a modern Clang (more modern than AppleClang) with support of
+# libFuzzer. Unfortunately, Clang is not superbly well supported by CMake on Mac
+# OS. I even opened an issue on CMake's tracker about that (and ridiculed
+# myself): https://gitlab.kitware.com/cmake/cmake/issues/18785
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/CMake-codecov/cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cmake")
-
-
+list(
+    APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/CMake-codecov/cmake"
+)
+list(
+    APPEND
+        CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cmake"
+)
 
 # Build in Debug mode by default
 set(default_build_type "Debug")
@@ -26,7 +27,11 @@ set(default_build_type "Debug")
 option(opensse_ENABLE_WALL "Enable all warnings" ON)
 option(opensse_ENABLE_WEXTRA "Enable extra warnings" ON)
 option(opensse_ENABLE_WERROR "Make all warnings into errors" ON)
-option(opensse_OPTIMIZE_FOR_NATIVE_ARCH "Enable compiler optimizations for the native processor architecture (if available)" ON)
+option(
+    opensse_OPTIMIZE_FOR_NATIVE_ARCH
+    "Enable compiler optimizations for the native processor architecture (if available)"
+    ON
+)
 
 # Load modules
 
@@ -42,116 +47,70 @@ find_package(Sanitizers)
 # We use CMake's integrated testing features
 enable_testing()
 
-if (opensse_ENABLE_WALL)
-  CHECK_CXX_COMPILER_FLAG("-Wall" COMPILER_OPT_WALL_SUPPORTED)
-  if (COMPILER_OPT_WALL_SUPPORTED)
-    add_compile_options(-Wall)
-  endif()
+if(opensse_ENABLE_WALL)
+    check_cxx_compiler_flag("-Wall" COMPILER_OPT_WALL_SUPPORTED)
+    if(COMPILER_OPT_WALL_SUPPORTED)
+        add_compile_options(-Wall)
+    endif()
 endif()
 
-if (opensse_ENABLE_WEXTRA)
-  CHECK_CXX_COMPILER_FLAG("-Wextra" COMPILER_OPT_WEXTRA_SUPPORTED)
-  if (COMPILER_OPT_WEXTRA_SUPPORTED)
-    add_compile_options(-Wextra)
-  endif()
+if(opensse_ENABLE_WEXTRA)
+    check_cxx_compiler_flag("-Wextra" COMPILER_OPT_WEXTRA_SUPPORTED)
+    if(COMPILER_OPT_WEXTRA_SUPPORTED)
+        add_compile_options(-Wextra)
+    endif()
 endif()
 
-if (opensse_ENABLE_WERROR)
-  CHECK_CXX_COMPILER_FLAG("-Werror" COMPILER_OPT_WERROR_SUPPORTED)
-  if (COMPILER_OPT_WERROR_SUPPORTED)
-      add_compile_options(-Werror -Wno-error=unknown-pragmas)
-  endif()
+if(opensse_ENABLE_WERROR)
+    check_cxx_compiler_flag("-Werror" COMPILER_OPT_WERROR_SUPPORTED)
+    if(COMPILER_OPT_WERROR_SUPPORTED)
+        add_compile_options(-Werror -Wno-error=unknown-pragmas)
+    endif()
 endif()
 
-if (opensse_OPTIMIZE_FOR_NATIVE_ARCH)
-  CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
-  if (COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
-      add_compile_options(-march=native)
-  endif()
+if(opensse_OPTIMIZE_FOR_NATIVE_ARCH)
+    check_cxx_compiler_flag("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+    if(COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+        add_compile_options(-march=native)
+    endif()
 endif()
 
-
-
-CHECK_C_COMPILER_FLAG("-Wpsabi" WARNING_PSABI)
+check_c_compiler_flag("-Wpsabi" WARNING_PSABI)
 if(WARNING_PSABI)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=psabi")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=psabi")
 endif()
 
-
-# This might be redundant with what is done in the main source
-# CMakeLists.txt file: we will look for OpenSSL there too.
-# Yet, sse_crypto's CMakeLists.txt file must be standalone, so
-# OpenSSL must be looked for in there, and, at the same time,
-# the WITH_OPENSSL is needed in the tests.
+# This might be redundant with what is done in the main source CMakeLists.txt
+# file: we will look for OpenSSL there too. Yet, sse_crypto's CMakeLists.txt
+# file must be standalone, so OpenSSL must be looked for in there, and, at the
+# same time, the WITH_OPENSSL is needed in the tests.
 find_package(OpenSSL 1.0.0) # Optional
 
-if (OPENSSL_FOUND)
+if(OPENSSL_FOUND)
     add_definitions(-DWITH_OPENSSL)
 endif()
 
-
-list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*' '${CMAKE_CURRENT_SOURCE_DIR}/bench/*' '${CMAKE_CURRENT_SOURCE_DIR}/externals/*')
-
+list(
+    APPEND
+        LCOV_REMOVE_PATTERNS
+        '${CMAKE_CURRENT_SOURCE_DIR}/tests/*'
+        '${CMAKE_CURRENT_SOURCE_DIR}/bench/*'
+        '${CMAKE_CURRENT_SOURCE_DIR}/externals/*'
+)
 
 # To avoid building GTest twice
-if (NOT TARGET gtest)
-  set(BUILD_GMOCK OFF CACHE BOOL "Disable GMock" FORCE)
-  add_subdirectory(externals/googletest)
-  # Not adding the sanitizers might cause ASan false positives. See
-  # https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
-  add_sanitizers(gtest)
+if(NOT TARGET gtest)
+    set(BUILD_GMOCK OFF CACHE BOOL "Disable GMock" FORCE)
+    add_subdirectory(externals/googletest)
+    # Not adding the sanitizers might cause ASan false positives. See https://gi
+    # thub.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
+    add_sanitizers(gtest)
 endif()
 
 add_subdirectory(src)
 add_sanitizers(sse_crypto)
 add_coverage(sse_crypto)
-
-
-
-# # Installation
-
-# include(GNUInstallDirs)
-# include(CMakePackageConfigHelpers)
-
-# install(TARGETS sse_crypto EXPORT OpenSSECryptoTargets
-#         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} 
-#         )
-# install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-
-# ## CMake magic for the packaging
-
-# install(EXPORT OpenSSECryptoTargets 
-#         FILE OpenSSECryptoTargets.cmake
-#         NAMESPACE OpenSSE::
-#         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sse"
-#         )
-# export(TARGETS sse_crypto NAMESPACE OpenSSE:: FILE OpenSSECryptoTargets.cmake)
-
-# configure_package_config_file(
-#     cmake/OpenSSECryptConfig.cmake.in
-#     OpenSSECryptoConfig.cmake
-#     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sse"
-# )
-
-# write_basic_package_version_file(
-#     ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
-#     VERSION ${libsse_crypto_VERSION}
-#     COMPATIBILITY AnyNewerVersion
-#     )
-
-# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfigVersion.cmake
-#               ${CMAKE_CURRENT_BINARY_DIR}/OpenSSECryptoConfig.cmake
-#         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse
-#         )
-
-# install(DIRECTORY cmake/modules DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sse)
-
-
 
 # Tests
 
@@ -168,7 +127,10 @@ if(OPENSSL_FOUND)
 
     set_property(TARGET debug_tool PROPERTY CXX_STANDARD 11)
 
-    target_include_directories(debug_tool PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_include_directories(
+        debug_tool
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 
     target_link_libraries(debug_tool sse_crypto ${OPENSSL_CRYPTO_LIBRARY})
 

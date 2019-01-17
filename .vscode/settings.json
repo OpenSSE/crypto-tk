@@ -1,4 +1,8 @@
 {
+    "cmakeFormat.args": [
+        "--config-file",
+        "cmake-format.json"
+    ],
     "cmake.configureOnOpen": true,
     "files.associations": {
         ".clang-format": "yaml",

@@ -1,9 +1,15 @@
-set(FUZZING_FLAGS   "-fsanitize=fuzzer -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep"
-                    "-fsanitize=fuzzer")
+set(
+    FUZZING_FLAGS
+    "-fsanitize=fuzzer -fsanitize-coverage=trace-pc-guard,trace-cmp,trace-gep"
+    "-fsanitize=fuzzer"
+)
 set(FUZZING_STANDALONE_FLAGS "-fsanitize=fuzzer-no-link")
 
 sanitizer_check_compiler_flags("${FUZZING_FLAGS}" "libFuzzer" "libFuzzer")
-sanitizer_check_compiler_flags("${FUZZING_STANDALONE_FLAGS}" "libFuzzer (standalone target)" "libFuzzer_standalone")
+sanitizer_check_compiler_flags(
+    "${FUZZING_STANDALONE_FLAGS}" "libFuzzer (standalone target)"
+    "libFuzzer_standalone"
+)
 
 add_custom_target(fuzz)
 
@@ -19,14 +25,20 @@ function(add_fuzz_target target_name target_source)
 
         if(libFuzzer_standalone_FLAG_DETECTED)
 
-            add_executable(${target_name}_standalone StandaloneFuzzTargetMain.c
-                                                     ${target_source}
-                                                     ${ARGN})
+            add_executable(
+                ${target_name}_standalone
+                StandaloneFuzzTargetMain.c
+                ${target_source}
+                ${ARGN}
+            )
 
             target_link_libraries(${target_name}_standalone OpenSSE::crypto)
             add_sanitizers(${target_name}_standalone)
 
-            sanitizer_add_flags(${target_name}_standalone "libFuzzer (standalone target)" "libFuzzer_standalone")
+            sanitizer_add_flags(
+                ${target_name}_standalone "libFuzzer (standalone target)"
+                "libFuzzer_standalone"
+            )
             add_dependencies(fuzz ${target_name}_standalone)
         endif()
     endif()

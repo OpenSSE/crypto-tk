@@ -31,7 +31,7 @@ set(default_build_type "Debug")
 option(opensse_ENABLE_WALL "Enable all warnings" ON)
 option(opensse_ENABLE_WEXTRA "Enable extra warnings" ON)
 option(opensse_ENABLE_WSHADOW "Enable shadow warning" OFF)
-option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" OFF)
+option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" ON)
 option(opensse_ENABLE_WERROR "Make all warnings into errors" ON)
 option(
     opensse_OPTIMIZE_FOR_NATIVE_ARCH
@@ -82,7 +82,8 @@ endif()
 save_compile_option(-Wmissing-include-dirs)
 save_compile_option(-Wpsabi)
 save_compile_option(
-    -Weffc++
+    # -Weffc++
+    -Wnon-virtual-dtor
     -Wold-style-cast
     -Woverloaded-virtual
     -Wctor-dtor-privacy

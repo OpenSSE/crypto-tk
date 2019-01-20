@@ -122,7 +122,7 @@ int mbedtls_rsa_write_pubkey_der( mbedtls_rsa_context *key, unsigned char *buf, 
     //#warning WORKAROUND
     // we want to avoid using the oid functions, so the oid is hardcoded here
     size_t oid_len = 9;
-    const char oid[10] = {0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, '\0'};
+    const unsigned char oid[10] = {0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, '\0'};
     
     c = buf + size;
     
@@ -149,7 +149,7 @@ int mbedtls_rsa_write_pubkey_der( mbedtls_rsa_context *key, unsigned char *buf, 
 //            return( ret );
 //        }
 
-    MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_algorithm_identifier( &c, buf, oid, oid_len,
+    MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_algorithm_identifier( &c, buf, (char*)oid, oid_len,
                                                                        par_len ) );
     
     MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_len( &c, buf, len ) );

@@ -481,9 +481,9 @@ void TdpInverseImpl_OpenSSL::invert(const std::string& in,
                                     std::string&       out) const
 {
     int           ret;
-    unsigned char rsa_out[rsa_size()];
+    unsigned char rsa_out[kMessageSpaceSize];
 
-    if (in.size() != rsa_size()) {
+    if (in.size() != kMessageSpaceSize) {
         throw std::invalid_argument("Invalid TDP input size. Input size should "
                                     "be kMessageSpaceSize bytes long.");
     }

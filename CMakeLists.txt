@@ -72,7 +72,7 @@ if(opensse_ENABLE_PEDANTIC)
 endif()
 
 if(opensse_ENABLE_WERROR)
-    save_compile_option(-Werror)
+    save_compile_option(-Wno-error=unknown-pragmas -Werror)
 endif()
 
 if(opensse_OPTIMIZE_FOR_NATIVE_ARCH)

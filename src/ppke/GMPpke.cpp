@@ -294,9 +294,9 @@ GmppkePrivateKeyShare Gmppke::skShareGen(
 
     const ZR l_d = group.pseudoRandomZR(prf, ("param_l_" + d_string));
     const ZR l_d_1
-        = (d > 1) ? (group.pseudoRandomZR(
-                        prf, std::string("param_l_" + std::to_string(d - 1))))
-                  : (-sp.alpha);
+        = (d > 1)
+              ? (group.pseudoRandomZR(prf, "param_l_" + std::to_string(d - 1)))
+              : (-sp.alpha);
 
     share.sk1 = group.exp(group.generatorG2(), sp.beta * (l_d - l_d_1 + r1));
     share.sk3 = group.exp(group.generatorG2(), r1);          // g^r

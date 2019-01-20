@@ -76,6 +76,8 @@ public:
 protected:
     TdpImpl_mbedTLS();
 
+    // mbedTLS APIs don't seem to be really const-correct.
+    // for the moment, use a mutable member instead of const_cast everywhere
     mutable mbedtls_rsa_context rsa_key_;
 };
 

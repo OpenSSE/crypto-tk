@@ -149,7 +149,7 @@ int mbedtls_rsa_write_pubkey_der( mbedtls_rsa_context *key, unsigned char *buf, 
 //            return( ret );
 //        }
 
-    MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_algorithm_identifier( &c, buf, (char*)oid, oid_len,
+    MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_algorithm_identifier( &c, buf, (const char*)oid, oid_len,
                                                                        par_len ) );
     
     MBEDTLS_ASN1_CHK_ADD( len, mbedtls_asn1_write_len( &c, buf, len ) );

@@ -63,24 +63,7 @@ add_library(
     mbedtls/pk_wrap.c
     mbedtls/rsa.c
 )
-target_compile_options(
-    sse_crypto
-    PRIVATE
-        # -Weverything
-        # -Wextra-semi
-        # -Wsign-conversion
-        # -Wconversion
-        # -Wno-c++98-compat
-        # -Wno-c++98-compat-pedantic
-        # -Wno-error=padded
-        # -Wno-weak-vtables
-        # -Wno-documentation-unknown-command
-        # -Wno-weak-template-vtables
-        # -Wno-exit-time-destructors
-        # -Wno-error=source-uses-openmp
-        # -Wno-covered-switch-default
-        # -Wno-unused-macros
-)
+
 
 # Generate PIC for the library
 set_target_properties(sse_crypto PROPERTIES POSITION_INDEPENDENT_CODE ON)

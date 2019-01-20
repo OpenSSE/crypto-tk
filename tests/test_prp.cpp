@@ -46,7 +46,7 @@ TEST(prp, correctness)
 
         ASSERT_EQ(in_enc.length(), out_enc.length());
 
-        string in_dec = string(out_enc);
+        string in_dec = out_enc;
 
         fpe.decrypt(in_dec, out_dec);
 
@@ -155,13 +155,13 @@ TEST(prp, wrapping)
         ASSERT_EQ(in_enc.length(), out_enc2.length());
         EXPECT_EQ(out_enc1, out_enc2);
 
-        string in_dec = string(out_enc1);
+        string in_dec = out_enc1;
         base_prp.decrypt(in_dec, out_dec);
 
         ASSERT_EQ(in_dec.length(), out_dec.length());
         ASSERT_EQ(in_enc, out_dec);
 
-        in_dec = string(out_enc2);
+        in_dec = out_enc2;
         base_prp.decrypt(in_dec, out_dec);
 
         ASSERT_EQ(in_dec.length(), out_dec.length());

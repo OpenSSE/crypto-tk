@@ -92,6 +92,34 @@ save_compile_option(
 save_compile_option(
     -Wextra-semi
 )
+# save_compile_option(
+    # -fstack-protector
+    # -Wstack-protector
+# )
+save_compile_option(
+    -Wunsafe-loop-optimizations
+    -Wuseless-cast
+    -Wformat=2
+    -Wcast-qual
+    -Wcast-align
+)
+save_compile_option(LIST_NAME "Lib_Warnings"
+    -Weverything
+    -Wextra-semi
+    -Wsign-conversion
+    -Wconversion
+    -Wno-c++98-compat
+    -Wno-c++98-compat-pedantic
+    -Wno-error=padded
+    -Wno-weak-vtables
+    -Wno-documentation-unknown-command
+    -Wno-weak-template-vtables
+    -Wno-exit-time-destructors
+    -Wno-error=source-uses-openmp
+    -Wno-covered-switch-default
+    -Wno-unused-macros
+    -Wno-padded
+)
 
 # This might be redundant with what is done in the main source CMakeLists.txt
 # file: we will look for OpenSSL there too. Yet, sse_crypto's CMakeLists.txt
@@ -122,6 +150,7 @@ endif()
 
 add_subdirectory(src)
 target_apply_saved_options(sse_crypto)
+target_apply_saved_options(LIST_NAME "Lib_Warnings" sse_crypto)
 add_sanitizers(sse_crypto)
 add_coverage(sse_crypto)
 

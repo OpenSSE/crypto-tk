@@ -504,7 +504,7 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpInverseImpl_OpenSSL::
     std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> out;
 
     RSA_private_decrypt(static_cast<int>(in.size()),
-                        static_cast<const unsigned char*>(in.data()),
+                        in.data(),
                         out.data(),
                         get_rsa_key(),
                         RSA_NO_PADDING);
@@ -662,7 +662,7 @@ TdpMultPoolImpl_OpenSSL::eval_pool(
     if (order == 1) {
         // regular eval
         RSA_public_encrypt(static_cast<int>(in.size()),
-                           static_cast<const unsigned char*>(in.data()),
+                           in.data(),
                            out.data(),
                            get_rsa_key(),
                            RSA_NO_PADDING);
@@ -670,7 +670,7 @@ TdpMultPoolImpl_OpenSSL::eval_pool(
     } else if (order <= maximum_order()) {
         // get the right RSA context, i.e. the one in keys_[order-1]
         RSA_public_encrypt(static_cast<int>(in.size()),
-                           static_cast<const unsigned char*>(in.data()),
+                           in.data(),
                            out.data(),
                            keys_[order - 2],
                            RSA_NO_PADDING);

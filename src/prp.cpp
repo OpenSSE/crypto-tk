@@ -67,9 +67,8 @@ Key<sizeof(aez_ctx_t)> Prp::init_random_aez_ctx()
     }
     auto callback = [](uint8_t* key_content) {
         Key<Prp::kKeySize> r_key;
-        aez_setup(static_cast<const unsigned char*>(r_key.unlock_get()),
-                  48,
-                  reinterpret_cast<aez_ctx_t*>(key_content));
+        aez_setup(
+            r_key.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
     };
 
     return Key<Prp::kContextSize>(callback);
@@ -90,9 +89,8 @@ Key<sizeof(aez_ctx_t)> Prp::init_aez_ctx(Key<kKeySize>&& k)
         /* LCOV_EXCL_STOP */
     }
     auto callback = [&k](uint8_t* key_content) {
-        aez_setup(static_cast<const unsigned char*>(k.unlock_get()),
-                  48,
-                  reinterpret_cast<aez_ctx_t*>(key_content));
+        aez_setup(
+            k.unlock_get(), 48, reinterpret_cast<aez_ctx_t*>(key_content));
     };
 
     auto key = Key<Prp::kContextSize>(callback);

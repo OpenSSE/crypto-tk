@@ -67,7 +67,7 @@ static void locking_function(int                                 mode,
 static unsigned long id_function()
 {
     // NOLINTNEXTLINE(google-runtime-int)
-    return reinterpret_cast<unsigned long>(pthread_self());
+    return pthread_self();
 }
 
 // No multithreaded test is performed, hence no lock is used.

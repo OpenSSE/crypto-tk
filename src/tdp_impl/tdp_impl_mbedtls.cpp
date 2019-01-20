@@ -130,8 +130,9 @@ std::string TdpImpl_mbedTLS::public_key() const
     int           ret;
     unsigned char buf[5000];
 
+    // we don't need the const_cast as rsa_key_ is declared mutable
     ret = mbedtls_rsa_write_pubkey_pem(
-        const_cast<mbedtls_rsa_context*>(&rsa_key_), buf, sizeof(buf));
+        /*const_cast<mbedtls_rsa_context*>*/ (&rsa_key_), buf, sizeof(buf));
 
     if (ret != 0) {
         throw std::runtime_error(

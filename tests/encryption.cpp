@@ -50,7 +50,7 @@ TEST(encryption, correctness)
     sse::crypto::Cipher cipher(sse::crypto::Key<kCipherKeySize>(k.data()));
     cipher.encrypt(in_enc, out_enc);
 
-    string in_dec = string(out_enc);
+    string in_dec = out_enc;
 
     cipher.decrypt(in_dec, out_dec);
 

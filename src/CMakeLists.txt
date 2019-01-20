@@ -105,6 +105,12 @@ target_compile_features(
     cxx_lambdas
 )
 
+target_compile_features(
+    sse_crypto
+    PRIVATE
+    c_std_99
+)
+
 target_include_directories(
     sse_crypto
     PUBLIC

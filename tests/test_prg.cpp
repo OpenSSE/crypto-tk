@@ -217,6 +217,9 @@ void prg_test_key_derivation_consistency()
     }
 
     constexpr size_t n_derived_keys_max = TEST_COUNT + 1;
+    static_assert(n_derived_keys_max <= UINT16_MAX,
+                  "The number of derived keys is too large");
+
 
     for (size_t i = 0; i < TEST_COUNT; i++) {
         sse::crypto::random_bytes(k);
@@ -225,9 +228,9 @@ void prg_test_key_derivation_consistency()
         k_cp3 = k;
         k_cp4 = k;
 
-        constexpr size_t derived_key_size = K_SIZE;
-        size_t           n_derived_keys   = i + 1;
-        constexpr size_t key_offset       = 3;
+        constexpr size_t   derived_key_size = K_SIZE;
+        uint16_t           n_derived_keys   = static_cast<uint16_t>(i + 1);
+        constexpr uint16_t key_offset       = 3;
 
         std::array<uint8_t,
                    (n_derived_keys_max + key_offset) * derived_key_size>
@@ -257,7 +260,7 @@ void prg_test_key_derivation_consistency()
         sse::crypto::Prg::derive(
             sse::crypto::Key<kPrgKeySize>(k_cp2.data()), 0, out);
 
-        for (size_t j = 0; j < n_derived_keys; j++) {
+        for (uint16_t j = 0; j < n_derived_keys; j++) {
             k_loc = k_cp4;
 
             key_vec[j].unlock();

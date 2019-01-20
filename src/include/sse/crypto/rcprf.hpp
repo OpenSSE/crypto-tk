@@ -311,7 +311,9 @@ std::array<uint8_t, NBYTES> RCPrfBase<NBYTES>::derive_leaf(
     depth_type base_depth,
     uint64_t   leaf) const
 {
-    assert(this->tree_height() > base_depth + 1);
+    assert(this->tree_height() >= 2); // this has to be an inner node
+    // with the previous check, we can substract 1 without risking an underflow
+    assert(this->tree_height() - 1 > base_depth);
 
     if (this->tree_height() == base_depth + 2) {
         // only one derivation to do
@@ -325,7 +327,9 @@ std::array<uint8_t, NBYTES> RCPrfBase<NBYTES>::derive_leaf(
         return result;
     }
 
-    assert(this->tree_height() - base_depth > 2);
+    // the previous test ensures that the tree_height is >= 2
+    assert(this->tree_height() - 2 > base_depth);
+
     // the first step is done from the base PRG
     RCPrfTreeNodeChild child = get_child(leaf, base_depth);
     Key<kKeySize>      subkey

@@ -183,7 +183,7 @@ TEST(blake2, blake2b)
     uint8_t hash[HASH_LENGTH] = {0};
 
     for (size_t i = 0; i < sizeof(in); ++i) {
-        in[i] = i;
+        in[i] = static_cast<uint8_t>(i);
     }
 
     for (size_t i = 0; i < sizeof(in); ++i) {

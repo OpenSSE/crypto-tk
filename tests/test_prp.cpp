@@ -70,8 +70,10 @@ TEST(prp, consistency_32)
         std::string out_32_s_1
             = fpe.encrypt(std::string(arr_32.begin(), arr_32.end()));
         std::string out_32_s_2;
-        uint32_t    in_32_i = arr_32[0] + (arr_32[1] << 8) + (arr_32[2] << 16)
-                           + (arr_32[3] << 24);
+        uint32_t    in_32_i = static_cast<uint32_t>(arr_32[0])
+                           + (static_cast<uint32_t>(arr_32[1]) << 8UL)
+                           + (static_cast<uint32_t>(arr_32[2]) << 16UL)
+                           + (static_cast<uint32_t>(arr_32[3]) << 24UL);
 
         fpe.encrypt(std::string(arr_32.begin(), arr_32.end()), out_32_s_2);
         uint32_t out_32_i = fpe.encrypt(in_32_i);

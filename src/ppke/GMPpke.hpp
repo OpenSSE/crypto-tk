@@ -76,13 +76,12 @@ public:
 class Gmppke;
 class PartialGmmppkeCT;
 class GmppkePrivateKey;
-class GmppkePublicKey : public virtual baseKey
+class GmppkePublicKey : public baseKey
 {
 public:
     friend bool operator==(const GmppkePublicKey& x, const GmppkePublicKey& y)
     {
-        return (dynamic_cast<const baseKey&>(x)
-                    == dynamic_cast<const baseKey&>(y)
+        return (static_cast<const baseKey&>(x) == static_cast<const baseKey&>(y)
                 && x.ppkeg1 == y.ppkeg1 && x.gqofxG1 == y.gqofxG1
                 && x.gqofxG2 == y.gqofxG2);
     }
@@ -277,8 +276,8 @@ protected:
     friend bool operator==(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y)
     {
         return x.ct1 == y.ct1
-               && dynamic_cast<const PartialGmmppkeCT&>(x)
-                      == dynamic_cast<const PartialGmmppkeCT&>(y);
+               && static_cast<const PartialGmmppkeCT&>(x)
+                      == static_cast<const PartialGmmppkeCT&>(y);
     }
     friend bool operator!=(const GmmppkeCT<T>& x, const GmmppkeCT<T>& y)
     {

@@ -636,7 +636,7 @@ TEST(puncturable, correctness)
 {
     std::array<uint8_t, 32> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
-        master_key[i] = 1 << i;
+        master_key[i] = static_cast<uint8_t>(5 * i);
     }
 
     sse::crypto::punct::master_key_type key(master_key.data());

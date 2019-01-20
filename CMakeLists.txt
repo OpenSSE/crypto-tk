@@ -87,6 +87,10 @@ save_compile_option(
     -Wold-style-cast
     -Woverloaded-virtual
     -Wctor-dtor-privacy
+    -fno-rtti
+)
+save_compile_option(
+    -Wextra-semi
 )
 
 # This might be redundant with what is done in the main source CMakeLists.txt

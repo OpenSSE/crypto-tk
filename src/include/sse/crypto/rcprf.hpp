@@ -148,12 +148,7 @@ public:
     ///
     /// @brief Copy constructor
     ///
-    RCPrfBase(const RCPrfBase& rcprf) = default;
-
-    ///
-    /// @brief Move constructor
-    ///
-    RCPrfBase(RCPrfBase&& rcprf) noexcept = default;
+    RCPrfBase(const RCPrfBase<NBYTES>& rcprf) = default;
     /* LCOV_EXCL_STOP */
 
     ///
@@ -301,7 +296,7 @@ protected:
             constrained_elements);
 
 private:
-    const depth_type tree_height_;
+    depth_type tree_height_;
 };
 
 
@@ -964,8 +959,8 @@ public:
         }
     }
 
-    ConstrainedRCPrf(const ConstrainedRCPrf& cprf) = delete;
-    ConstrainedRCPrf& operator=(const ConstrainedRCPrf& cprf) = delete;
+    ConstrainedRCPrf(const ConstrainedRCPrf<NBYTES>& cprf) = delete;
+    ConstrainedRCPrf& operator=(const ConstrainedRCPrf<NBYTES>& cprf) = delete;
 
     /* LCOV_EXCL_START */
     ///
@@ -973,11 +968,15 @@ public:
     ///
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
-    ConstrainedRCPrf(ConstrainedRCPrf&& cprf) noexcept
-        : RCPrfBase<NBYTES>(std::forward<RCPrfBase<NBYTES>>(cprf)),
-          elements_(std::move(cprf.elements_))
-    {
-    }
+    ConstrainedRCPrf(ConstrainedRCPrf<NBYTES>&& cprf) noexcept = default;
+
+    ///
+    /// @brief Move assignment operator
+    ///
+    /// @param cprf The ConstrainedRCPrfInnerElement to be moved
+    ///
+    ConstrainedRCPrf& operator=(ConstrainedRCPrf<NBYTES>&& cprf) noexcept
+        = default;
     /* LCOV_EXCL_STOP */
 
     /// @brief Returns the minimum leaf index supported by the constrained

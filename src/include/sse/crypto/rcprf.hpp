@@ -148,7 +148,7 @@ public:
     ///
     /// @brief Copy constructor
     ///
-    RCPrfBase(const RCPrfBase<NBYTES>& rcprf) = default;
+    RCPrfBase(const RCPrfBase<NBYTES>& rcprf) noexcept = default;
     /* LCOV_EXCL_STOP */
 
     ///
@@ -975,8 +975,18 @@ public:
     ///
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
+    // The following implementation is equivalent to the defaulted
+    // move-assignment operator. Unfortunately, gcc-4.8 does not allow us to
+    // declare this operator noexcept by default. However, a hand-written
+    // implementation bypasses the problem.
     ConstrainedRCPrf& operator=(ConstrainedRCPrf<NBYTES>&& cprf) noexcept
-        = default;
+    {
+        static_cast<RCPrfBase<NBYTES>&>(*this)
+            = std::move(static_cast<RCPrfBase<NBYTES>&&>(cprf));
+        elements_ = std::move(cprf.elements_);
+
+        return *this;
+    }
     /* LCOV_EXCL_STOP */
 
     /// @brief Returns the minimum leaf index supported by the constrained

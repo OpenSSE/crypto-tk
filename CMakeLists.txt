@@ -134,9 +134,13 @@ add_subdirectory(tests)
 add_sanitizers(check)
 add_coverage(check)
 
-# add_subdirectory(bench)
+# Fuzzing
 
 add_subdirectory(fuzzing)
+
+# Benchmarks
+
+add_subdirectory(bench)
 
 if(OPENSSL_FOUND)
     add_executable(debug_tool EXCLUDE_FROM_ALL main.cpp)

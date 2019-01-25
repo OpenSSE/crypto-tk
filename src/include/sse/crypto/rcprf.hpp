@@ -1371,10 +1371,6 @@ void ConstrainedRCPrf<NBYTES>::eval_range(uint64_t             min,
             // we are passed the interesting elements
             return;
         }
-        if (min > elt_max_leaf) {
-            // we are not there yet
-            continue;
-        }
         if (RCPrfParams::ranges_intersect(
                 min, max, elt_min_leaf, elt_max_leaf)) {
             elt->eval_range(std::max(min, elt_min_leaf),

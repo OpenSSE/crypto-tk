@@ -157,11 +157,10 @@ TEST(rc_prf, range_eval)
         reference[i] = rc_prf.eval(i);
     }
 
-    auto check_callback
-        = [&reference, &rc_prf](uint64_t                leaf_index,
-                                std::array<uint8_t, 16> leaf_value) {
-              EXPECT_EQ(leaf_value, reference[leaf_index]);
-          };
+    auto check_callback = [&reference](uint64_t                leaf_index,
+                                       std::array<uint8_t, 16> leaf_value) {
+        EXPECT_EQ(leaf_value, reference[leaf_index]);
+    };
     for (uint64_t min = 0;
          min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
          min++) {
@@ -192,11 +191,10 @@ TEST(rc_prf, constrain_range_eval)
         reference[i] = rc_prf.eval(i);
     }
 
-    auto check_callback
-        = [&reference, &rc_prf](uint64_t                leaf_index,
-                                std::array<uint8_t, 16> leaf_value) {
-              EXPECT_EQ(leaf_value, reference[leaf_index]);
-          };
+    auto check_callback = [&reference](uint64_t                leaf_index,
+                                       std::array<uint8_t, 16> leaf_value) {
+        EXPECT_EQ(leaf_value, reference[leaf_index]);
+    };
 
     for (uint64_t constrain_min = 0;
          constrain_min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);

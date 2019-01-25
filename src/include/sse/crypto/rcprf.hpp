@@ -1363,10 +1363,22 @@ void ConstrainedRCPrf<NBYTES>::eval_range(uint64_t             min,
             + std::to_string(max_leaf()) + ")");
     }
     for (const auto& elt : elements_) {
+        uint64_t elt_min_leaf = elt->min_leaf();
+        uint64_t elt_max_leaf = elt->max_leaf();
+
+        // remember that elements_ is ordered by increasing min_leaf
+        if (max < elt_min_leaf) {
+            // we are passed the interesting elements
+            return;
+        }
+        if (min > elt_max_leaf) {
+            // we are not there yet
+            continue;
+        }
         if (RCPrfParams::ranges_intersect(
-                min, max, elt->min_leaf(), elt->max_leaf())) {
-            elt->eval_range(std::max(min, elt->min_leaf()),
-                            std::min(max, elt->max_leaf()),
+                min, max, elt_min_leaf, elt_max_leaf)) {
+            elt->eval_range(std::max(min, elt_min_leaf),
+                            std::min(max, elt_max_leaf),
                             callback);
         }
     }

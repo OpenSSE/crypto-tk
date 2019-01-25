@@ -73,6 +73,14 @@ TEST(rc_prf, constrain)
     sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
                                   test_depth);
 
+    std::vector<std::array<uint8_t, 16>> reference(
+        sse::crypto::RCPrfParams::max_leaf_index(test_depth) + 1);
+    for (uint64_t i = 0;
+         i <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         i++) {
+        reference[i] = rc_prf.eval(i);
+    }
+
     for (uint64_t min = 0;
          min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
          min++) {
@@ -86,9 +94,8 @@ TEST(rc_prf, constrain)
         for (uint64_t max = min; max <= maximal_range; max++) {
             auto constrained_prf = rc_prf.constrain(min, max);
             for (uint64_t leaf = min; leaf <= max; leaf++) {
-                auto out             = rc_prf.eval(leaf);
                 auto out_constrained = constrained_prf.eval(leaf);
-                ASSERT_EQ(out, out_constrained);
+                ASSERT_EQ(reference[leaf], out_constrained);
             }
         }
     }
@@ -136,7 +143,7 @@ TEST(rc_prf, double_constrain)
 
 TEST(rc_prf, range_eval)
 {
-    constexpr uint8_t                  test_depth = 3;
+    constexpr uint8_t                  test_depth = 6;
     std::array<uint8_t, kRCPrfKeySize> k{
         {0x00}}; // fixed key for easy debugging and bug reproducing
     sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
@@ -162,6 +169,60 @@ TEST(rc_prf, range_eval)
             = sse::crypto::RCPrfParams::max_leaf_index(test_depth);
         for (uint64_t max = min; max <= maximal_range; max++) {
             rc_prf.eval_range(min, max, check_callback);
+        }
+    }
+}
+
+TEST(rc_prf, constrain_range_eval)
+{
+    // This test has a very high complexity (something like 2^(4*test_depth)).
+    // Do not choose a test_depth too large
+    constexpr uint8_t test_depth = 6;
+
+    std::array<uint8_t, kRCPrfKeySize> k{
+        {0x00}}; // fixed key for easy debugging and bug reproducing
+    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
+                                  test_depth);
+
+    std::vector<std::array<uint8_t, 16>> reference(
+        sse::crypto::RCPrfParams::max_leaf_index(test_depth) + 1);
+    for (uint64_t i = 0;
+         i <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         i++) {
+        reference[i] = rc_prf.eval(i);
+    }
+
+    auto check_callback
+        = [&reference, &rc_prf](uint64_t                leaf_index,
+                                std::array<uint8_t, 16> leaf_value) {
+              EXPECT_EQ(leaf_value, reference[leaf_index]);
+          };
+
+    for (uint64_t constrain_min = 0;
+         constrain_min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         constrain_min++) {
+        uint64_t maximal_constrain_range
+            = sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+        if (constrain_min == 0) {
+            // we cannot constrain the key to the range [0,
+            // max_leaf_index(test_depth)]
+            maximal_constrain_range--;
+        }
+        for (uint64_t constrain_max = constrain_min;
+             constrain_max <= maximal_constrain_range;
+             constrain_max++) {
+            auto constrained_prf
+                = rc_prf.constrain(constrain_min, constrain_max);
+
+
+            for (uint64_t min = constrained_prf.min_leaf();
+                 min <= constrained_prf.min_leaf();
+                 min++) {
+                for (uint64_t max = min; max <= constrained_prf.max_leaf();
+                     max++) {
+                    constrained_prf.eval_range(min, max, check_callback);
+                }
+            }
         }
     }
 }

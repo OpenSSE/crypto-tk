@@ -475,6 +475,8 @@ class ConstrainedRCPrfElement : public RCPrfBase<NBYTES>
     friend class ConstrainedRCPrf<NBYTES>;
 
 public:
+    using callback_type = typename RCPrfBase<NBYTES>::callback_type;
+
     ///
     /// @brief Constructor
     ///
@@ -566,7 +568,30 @@ public:
     ///
     /// @return A buffer containing the value of the leaf.
     ///
+    /// @exception std::out_of_range    The leaf in not in the contrained
+    ///                                 element's range.
     virtual std::array<uint8_t, NBYTES> eval(uint64_t leaf) const = 0;
+
+
+    ///
+    /// @brief Evaluate the RC-PRF on a range
+    ///
+    /// Evaluates the Constrained RC-PRF on the input range by deriving all the
+    /// leaves  of the tree whose indices are in the range. The given callback
+    /// is called with every given leaf as input.
+    ///
+    /// @param min      The minimum leaf index of the range.
+    /// @param max      The maximum leaf index of the range.
+    /// @param callback The function to be called for every generated value. The
+    ///                 callback must take as input the leaf's index and its
+    ///                 value
+    ///
+    /// @exception std::invalid_argument    max is smaller than min
+    /// @exception std::out_of_range        The range is not included in
+    ///                                     [min_leaf(),max_leaf()]
+    virtual void eval_range(uint64_t             min,
+                            uint64_t             max,
+                            const callback_type& callback) const = 0;
 
 
 private:
@@ -579,14 +604,6 @@ private:
     /// subtree height, the minimum leaf and the maximum leaf.
     void serialize_element_info(uint8_t* out) const noexcept
     {
-        // *(reinterpret_cast<RCPrfParams::depth_type*>(out))
-        // = this->subtree_height();
-        // *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)))
-        // = this->min_leaf();
-        // *(reinterpret_cast<uint64_t*>(out + sizeof(RCPrfParams::depth_type)
-        //   + sizeof(uint64_t)))
-        // = this->max_leaf();
-
         memcpy(out, &this->subtree_height_, sizeof(this->subtree_height_));
         memcpy(out + sizeof(this->subtree_height_),
                &this->min_leaf_,
@@ -602,13 +619,6 @@ private:
         uint64_t&                min_leaf,
         uint64_t&                max_leaf) noexcept
     {
-        // subtree_height = *(reinterpret_cast<RCPrfParams::depth_type*>(in));
-        // min_leaf       = *(
-        //     reinterpret_cast<uint64_t*>(in +
-        //     sizeof(RCPrfParams::depth_type)));
-        // max_leaf = *(reinterpret_cast<uint64_t*>(
-        //     in + sizeof(RCPrfParams::depth_type) + sizeof(uint64_t)));
-
         memcpy(&subtree_height, in, sizeof(subtree_height_));
         memcpy(&min_leaf, in + sizeof(subtree_height), sizeof(min_leaf));
         memcpy(&max_leaf,
@@ -648,6 +658,8 @@ class ConstrainedRCPrfInnerElement : public ConstrainedRCPrfElement<NBYTES>
     friend class ConstrainedRCPrf<NBYTES>;
 
 public:
+    using callback_type = typename RCPrfBase<NBYTES>::callback_type;
+
     ///
     /// @brief Constructor
     ///
@@ -746,6 +758,11 @@ public:
     std::array<uint8_t, NBYTES> eval(uint64_t leaf) const override;
 
     // Already documented by the parent class
+    void eval_range(uint64_t             min,
+                    uint64_t             max,
+                    const callback_type& callback) const override;
+
+    // Already documented by the parent class
     void generate_constrained_subkeys(
         const uint64_t min,
         const uint64_t max,
@@ -809,6 +826,37 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrfInnerElement<NBYTES>::eval(
 }
 
 template<uint16_t NBYTES>
+void ConstrainedRCPrfInnerElement<NBYTES>::eval_range(
+    uint64_t             min,
+    uint64_t             max,
+    const callback_type& callback) const
+{
+    if (max < min) {
+        throw std::invalid_argument(
+            "ConstrainedRCPrfInnerElement::eval_range: Invalid "
+            "range: min is larger than max: max="
+            + std::to_string(max) + ", min=" + std::to_string(min));
+    }
+    if (min < this->min_leaf() || max > this->max_leaf()) {
+        throw std::out_of_range(
+            "ConstrainedRCPrfInnerElement::eval_range: evaluation range (="
+            + std::to_string(min) + ", " + std::to_string(max)
+            + ") out of constrained range (" + std::to_string(this->min_leaf())
+            + ", " + std::to_string(this->max_leaf()) + ")");
+    }
+    uint8_t base_depth
+        = static_cast<uint8_t>(this->tree_height() - this->subtree_height());
+
+    static_cast<const ConstrainedRCPrfInnerElement<NBYTES>*>(this)
+        ->RCPrfBase<NBYTES>::derive_leaf_range(base_prg_,
+                                               base_depth,
+                                               this->min_leaf(),
+                                               min - this->min_leaf(),
+                                               max - this->min_leaf(),
+                                               callback);
+}
+
+template<uint16_t NBYTES>
 void ConstrainedRCPrfInnerElement<NBYTES>::generate_constrained_subkeys(
     const uint64_t min,
     const uint64_t max,
@@ -861,6 +909,8 @@ class ConstrainedRCPrfLeafElement : public ConstrainedRCPrfElement<NBYTES>
     friend class ConstrainedRCPrf<NBYTES>;
 
 public:
+    using callback_type = typename RCPrfBase<NBYTES>::callback_type;
+
     ///
     /// @brief Constructor
     ///
@@ -911,6 +961,10 @@ public:
     // Already documented by the superclass
     std::array<uint8_t, NBYTES> eval(uint64_t leaf) const override;
 
+    void eval_range(uint64_t             min,
+                    uint64_t             max,
+                    const callback_type& callback) const override;
+
     // Already documented by the parent class
     void generate_constrained_subkeys(
         const uint64_t min,
@@ -958,12 +1012,36 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrfLeafElement<NBYTES>::eval(
     uint64_t leaf) const
 {
     if (leaf != this->min_leaf()) {
-        throw std::out_of_range(
-            "Invalid leaf value in 'eval': leaf(=" + std::to_string(leaf)
-            + ") should be equal to min(=" + std::to_string(this->min_leaf())
-            + ")");
+        throw std::out_of_range("ConstrainedRCPrfLeafElement::eval: Invalid "
+                                "leaf value: leaf(="
+                                + std::to_string(leaf)
+                                + ") should be equal to min(="
+                                + std::to_string(this->min_leaf()) + ")");
     }
     return leaf_buffer_;
+}
+
+
+template<uint16_t NBYTES>
+void ConstrainedRCPrfLeafElement<NBYTES>::eval_range(
+    uint64_t             min,
+    uint64_t             max,
+    const callback_type& callback) const
+{
+    if (max != min) {
+        throw std::invalid_argument(
+            "ConstrainedRCPrfLeafElement::eval_range: Invalid "
+            "range: min is different from max: max="
+            + std::to_string(max) + ", min=" + std::to_string(min));
+    }
+    if (min != this->min_leaf()) {
+        throw std::out_of_range("ConstrainedRCPrfLeafElement::eval_"
+                                "range: Invalid leaf value: leaf(=min="
+                                + std::to_string(min)
+                                + ") should be equal to min(="
+                                + std::to_string(this->min_leaf()) + ")");
+    }
+    callback(min, leaf_buffer_);
 }
 
 template<uint16_t NBYTES>
@@ -1005,6 +1083,8 @@ class ConstrainedRCPrf : public RCPrfBase<NBYTES>
     friend class Wrapper;
 
 public:
+    using callback_type = typename RCPrfBase<NBYTES>::callback_type;
+
     static RCPrfParams::depth_type get_element_height(
         const std::vector<std::unique_ptr<ConstrainedRCPrfElement<NBYTES>>>&
             elements)
@@ -1132,6 +1212,25 @@ public:
     ///
     std::array<uint8_t, NBYTES> eval(uint64_t leaf) const;
 
+    ///
+    /// @brief Evaluate the RC-PRF on a range
+    ///
+    /// Evaluates the Constrained RC-PRF on the input range by deriving all the
+    /// leaves  of the tree whose indices are in the range. The given callback
+    /// is called with every given leaf as input.
+    ///
+    /// @param min      The minimum leaf index of the range.
+    /// @param max      The maximum leaf index of the range.
+    /// @param callback The function to be called for every generated value. The
+    ///                 callback must take as input the leaf's index and its
+    ///                 value
+    ///
+    /// @exception std::invalid_argument    max is smaller than min
+    /// @exception std::out_of_range        The range is not included in
+    ///                                     [min_leaf(),max_leaf()]
+    void eval_range(uint64_t             min,
+                    uint64_t             max,
+                    const callback_type& callback) const;
 
     ///
     /// @brief Reconstrain the PRF to a range.
@@ -1243,6 +1342,34 @@ std::array<uint8_t, NBYTES> ConstrainedRCPrf<NBYTES>::eval(uint64_t leaf) const
     /* LCOV_EXCL_START */
     throw std::runtime_error("ConstrainedRCPrf::eval: invalid state");
     /* LCOV_EXCL_STOP */
+}
+
+template<uint16_t NBYTES>
+void ConstrainedRCPrf<NBYTES>::eval_range(uint64_t             min,
+                                          uint64_t             max,
+                                          const callback_type& callback) const
+{
+    if (max < min) {
+        throw std::invalid_argument("ConstrainedRCPrf::eval_range: Invalid "
+                                    "range: min is larger than max: max="
+                                    + std::to_string(max)
+                                    + ", min=" + std::to_string(min));
+    }
+    if (min < min_leaf() || max > max_leaf()) {
+        throw std::out_of_range(
+            "ConstrainedRCPrf::eval_range: evaluation range (="
+            + std::to_string(min) + ", " + std::to_string(max)
+            + ") out of constrained range (" + std::to_string(min_leaf()) + ", "
+            + std::to_string(max_leaf()) + ")");
+    }
+    for (const auto& elt : elements_) {
+        if (RCPrfParams::ranges_intersect(
+                min, max, elt->min_leaf(), elt->max_leaf())) {
+            elt->eval_range(std::max(min, elt->min_leaf()),
+                            std::min(max, elt->max_leaf()),
+                            callback);
+        }
+    }
 }
 
 template<uint16_t NBYTES>
@@ -1634,7 +1761,7 @@ public:
     ///                 value
     ///
     /// @exception std::invalid_argument    max is smaller than min
-    /// @exception std::out_of_rang         The range is not included in
+    /// @exception std::out_of_range        The range is not included in
     ///                                     [0,max_leaf]
     void eval_range(uint64_t             min,
                     uint64_t             max,

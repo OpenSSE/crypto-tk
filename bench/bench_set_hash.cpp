@@ -18,9 +18,9 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "hash.hpp"
-#include "random.hpp"
-#include "set_hash.hpp"
+#include <sse/crypto/hash.hpp>
+#include <sse/crypto/random.hpp>
+#include <sse/crypto/set_hash.hpp>
 
 #include <benchmark/benchmark.h>
 

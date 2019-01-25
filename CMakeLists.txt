@@ -19,11 +19,7 @@ list(
     APPEND
         CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cmake"
 )
-list(
-    APPEND
-        CMAKE_MODULE_PATH
-        "${CMAKE_SOURCE_DIR}/externals/cmake-flag-manager/cmake"
-)
+
 # Build in Debug mode by default
 set(default_build_type "Debug")
 
@@ -31,7 +27,7 @@ set(default_build_type "Debug")
 option(opensse_ENABLE_WALL "Enable all warnings" ON)
 option(opensse_ENABLE_WEXTRA "Enable extra warnings" ON)
 option(opensse_ENABLE_WSHADOW "Enable shadow warning" OFF)
-option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" ON)
+option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" OFF)
 option(opensse_ENABLE_WERROR "Make all warnings into errors" ON)
 option(
     opensse_OPTIMIZE_FOR_NATIVE_ARCH
@@ -44,8 +40,6 @@ option(
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
-include(FlagManager)
-
 # enable code coverage
 find_package(codecov)
 
@@ -56,70 +50,52 @@ find_package(Sanitizers)
 enable_testing()
 
 if(opensse_ENABLE_WALL)
-    save_compile_option(-Wall)
+    check_cxx_compiler_flag("-Wall" COMPILER_OPT_WALL_SUPPORTED)
+    if(COMPILER_OPT_WALL_SUPPORTED)
+        add_compile_options(-Wall)
+    endif()
 endif()
 
 if(opensse_ENABLE_WEXTRA)
-    save_compile_option(-Wextra)
+    check_cxx_compiler_flag("-Wextra" COMPILER_OPT_WEXTRA_SUPPORTED)
+    if(COMPILER_OPT_WEXTRA_SUPPORTED)
+        add_compile_options(-Wextra)
+    endif()
 endif()
 
 if(opensse_ENABLE_WSHADOW)
-    save_compile_option(-Wshadow)
+    check_cxx_compiler_flag("-Wshadow" COMPILER_OPT_WSHADOW_SUPPORTED)
+    if(COMPILER_OPT_WEXTRA_SUPPORTED)
+        add_compile_options(-Wshadow)
+    endif()
 endif()
 
 if(opensse_ENABLE_PEDANTIC)
-    save_compile_option(-pedantic)
+    check_cxx_compiler_flag("-pedantic" COMPILER_OPT_PEDANTIC_SUPPORTED)
+    if(COMPILER_OPT_WEXTRA_SUPPORTED)
+        add_compile_options(-pedantic)
+    endif()
 endif()
 
 if(opensse_ENABLE_WERROR)
-    save_compile_option(-Wno-error=unknown-pragmas -Werror)
+    check_cxx_compiler_flag("-Werror" COMPILER_OPT_WERROR_SUPPORTED)
+    if(COMPILER_OPT_WERROR_SUPPORTED)
+        add_compile_options(-Werror -Wno-error=unknown-pragmas)
+    endif()
 endif()
 
 if(opensse_OPTIMIZE_FOR_NATIVE_ARCH)
-    save_compile_option(-march=native)
+    check_cxx_compiler_flag("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+    if(COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+        add_compile_options(-march=native)
+    endif()
 endif()
 
-save_compile_option(-Wmissing-include-dirs)
-save_compile_option(-Wpsabi)
-save_compile_option(
-    # -Weffc++
-    -Wnon-virtual-dtor
-    -Wold-style-cast
-    -Woverloaded-virtual
-    -Wctor-dtor-privacy
-    -fno-rtti
-)
-save_compile_option(
-    -Wextra-semi
-)
-# save_compile_option(
-    # -fstack-protector
-    # -Wstack-protector
-# )
-save_compile_option(
-    -Wunsafe-loop-optimizations
-    -Wuseless-cast
-    -Wformat=2
-    -Wcast-qual
-    -Wcast-align
-)
-save_compile_option(LIST_NAME "Lib_Warnings"
-    -Weverything
-    -Wextra-semi
-    -Wsign-conversion
-    -Wconversion
-    -Wno-c++98-compat
-    -Wno-c++98-compat-pedantic
-    -Wno-error=padded
-    -Wno-weak-vtables
-    -Wno-documentation-unknown-command
-    -Wno-weak-template-vtables
-    -Wno-exit-time-destructors
-    -Wno-error=source-uses-openmp
-    -Wno-covered-switch-default
-    -Wno-unused-macros
-    -Wno-padded
-)
+check_c_compiler_flag("-Wpsabi" WARNING_PSABI)
+if(WARNING_PSABI)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=psabi")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=psabi")
+endif()
 
 # This might be redundant with what is done in the main source CMakeLists.txt
 # file: we will look for OpenSSL there too. Yet, sse_crypto's CMakeLists.txt
@@ -149,22 +125,22 @@ if(NOT TARGET gtest)
 endif()
 
 add_subdirectory(src)
-target_apply_saved_options(sse_crypto)
-target_apply_saved_options(LIST_NAME "Lib_Warnings" sse_crypto)
 add_sanitizers(sse_crypto)
 add_coverage(sse_crypto)
 
 # Tests
 
 add_subdirectory(tests)
-target_apply_saved_options(check)
 add_sanitizers(check)
 add_coverage(check)
 
-# add_subdirectory(bench)
+# Fuzzing
 
 add_subdirectory(fuzzing)
 
+# Benchmarks
+
+add_subdirectory(bench)
 
 if(OPENSSL_FOUND)
     add_executable(debug_tool EXCLUDE_FROM_ALL main.cpp)

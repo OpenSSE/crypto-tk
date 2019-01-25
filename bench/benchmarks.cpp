@@ -18,6 +18,18 @@
 // along with libsse_crypto.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <sse/crypto/utils.hpp>
+
 #include <benchmark/benchmark.h>
 
-BENCHMARK_MAIN();
+int main(int argc, char** argv)
+{
+    sse::crypto::init_crypto_lib();
+
+    ::benchmark::Initialize(&argc, argv);
+    if (::benchmark::ReportUnrecognizedArguments(argc, argv))
+        return 1;
+    ::benchmark::RunSpecifiedBenchmarks();
+
+    sse::crypto::cleanup_crypto_lib();
+}

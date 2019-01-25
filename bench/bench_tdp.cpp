@@ -24,12 +24,14 @@
 #include <benchmark/benchmark.h>
 
 using sse::crypto::TdpImpl_mbedTLS;
-using sse::crypto::TdpImpl_OpenSSL;
 using sse::crypto::TdpInverseImpl_mbedTLS;
-using sse::crypto::TdpInverseImpl_OpenSSL;
 using sse::crypto::TdpMultPoolImpl_mbedTLS;
-using sse::crypto::TdpMultPoolImpl_OpenSSL;
 
+#ifdef WITH_OPENSSL
+using sse::crypto::TdpImpl_OpenSSL;
+using sse::crypto::TdpInverseImpl_OpenSSL;
+using sse::crypto::TdpMultPoolImpl_OpenSSL;
+#endif
 
 template<class TDP_INV>
 void Tdp_key_generation(benchmark::State& state)
@@ -45,17 +47,21 @@ void Tdp_key_generation(benchmark::State& state)
 BENCHMARK_TEMPLATE(Tdp_key_generation, TdpInverseImpl_mbedTLS)
     ->Unit(benchmark::kMicrosecond)
     ->Iterations(20);
+
+#ifdef WITH_OPENSSL
 BENCHMARK_TEMPLATE(Tdp_key_generation, TdpInverseImpl_OpenSSL)
     ->Unit(benchmark::kMicrosecond)
     ->Iterations(20);
+#endif
 
-
+#ifdef WITH_OPENSSL
 struct OpenSSL_Impl
 {
     typedef TdpImpl_OpenSSL         TdpImpl;
     typedef TdpInverseImpl_OpenSSL  TdpInverseImpl;
     typedef TdpMultPoolImpl_OpenSSL TdpMultPoolImpl;
 };
+#endif
 
 struct mbedTLS_Impl
 {
@@ -73,7 +79,7 @@ public:
           tdp_mult_(tdp_inv_.public_key(), MAX_POOL_SIZE)
     {
     }
-    void SetUp(const ::benchmark::State& state)
+    void SetUp(const ::benchmark::State& /*state*/)
     {
         message = tdp_.sample();
     }
@@ -142,13 +148,21 @@ public:
 #define INVERT_MULT_BENCH(LIB) INVERT_MULT_BENCH_AUX(LIB, LIB##_Impl)
 
 EVAL_BENCH(mbedTLS);
+#ifdef WITH_OPENSSL
 EVAL_BENCH(OpenSSL);
+#endif
 
 EVAL_MULT_BENCH(mbedTLS);
+#ifdef WITH_OPENSSL
 EVAL_MULT_BENCH(OpenSSL);
+#endif
 
 INVERT_BENCH(mbedTLS);
+#ifdef WITH_OPENSSL
 INVERT_BENCH(OpenSSL);
+#endif
 
 INVERT_MULT_BENCH(mbedTLS);
+#ifdef WITH_OPENSSL
 INVERT_MULT_BENCH(OpenSSL);
+#endif

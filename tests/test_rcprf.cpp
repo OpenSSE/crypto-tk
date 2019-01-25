@@ -259,11 +259,25 @@ TEST(rc_prf, eval_constrain_exceptions)
     EXPECT_THROW(constrained_rc_prf.eval(range_min - 1), std::out_of_range);
     EXPECT_THROW(constrained_rc_prf.eval(range_max + 1), std::out_of_range);
 
+    // Exceptions raised by ConstrainedRCPrf::eval_range
+    EXPECT_THROW(constrained_rc_prf.eval_range(
+                     0, 1UL << (test_depth + 1), empty_callback),
+                 std::out_of_range);
+    EXPECT_THROW(
+        constrained_rc_prf.eval_range(0, 1UL << test_depth, empty_callback),
+        std::out_of_range);
+    EXPECT_THROW(constrained_rc_prf.eval_range(2, 1, empty_callback),
+                 std::invalid_argument);
+
     // Exceptions raised by ConstrainedRCPrfLeafElement::eval
     std::array<uint8_t, 16> buffer = sse::crypto::random_bytes<uint8_t, 16>();
     sse::crypto::ConstrainedRCPrfLeafElement<16> leaf(buffer, test_depth, 1);
     EXPECT_THROW(leaf.eval(0), std::out_of_range);
     EXPECT_THROW(leaf.eval(2), std::out_of_range);
+
+    // Exceptions raised by ConstrainedRCPrfLeafElement::eval_range
+    EXPECT_THROW(leaf.eval_range(0, 0, empty_callback), std::out_of_range);
+    EXPECT_THROW(leaf.eval_range(2, 0, empty_callback), std::invalid_argument);
 
     // Exceptions raised by ConstrainedRCPrfInnerElement::eval
     range_min              = 4;
@@ -278,6 +292,13 @@ TEST(rc_prf, eval_constrain_exceptions)
         range_max);
     EXPECT_THROW(elt.eval(range_min - 1), std::out_of_range);
     EXPECT_THROW(elt.eval(range_max + 1), std::out_of_range);
+
+    // Exceptions raised by ConstrainedRCPrfInnerElement::eval_range
+    EXPECT_THROW(elt.eval_range(range_min - 1, range_max, empty_callback),
+                 std::out_of_range);
+    EXPECT_THROW(elt.eval_range(range_min, range_max + 1, empty_callback),
+                 std::out_of_range);
+    EXPECT_THROW(elt.eval_range(2, 0, empty_callback), std::invalid_argument);
 }
 
 // Exceptions that can be raised when re-constaining an already constrained

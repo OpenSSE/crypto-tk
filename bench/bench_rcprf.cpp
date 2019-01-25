@@ -28,7 +28,7 @@ using sse::crypto::Key;
 using sse::crypto::RCPrf;
 using sse::crypto::RCPrfParams;
 
-static void BM_RCPrf_eval(benchmark::State& state)
+static void RCPrf_eval(benchmark::State& state)
 {
     uint8_t  depth          = state.range(0);
     uint64_t max_leaf_index = RCPrfParams::max_leaf_index_generic(depth);
@@ -47,7 +47,7 @@ static void BM_RCPrf_eval(benchmark::State& state)
     state.SetItemsProcessed(state.iterations());
 }
 
-static void BM_RCPrf_eval_range(benchmark::State& state)
+static void RCPrf_eval_range(benchmark::State& state)
 {
     uint8_t  depth          = state.range(0);
     uint64_t max_leaf_index = RCPrfParams::max_leaf_index_generic(depth);
@@ -70,7 +70,7 @@ static void BM_RCPrf_eval_range(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * state.range(1));
 }
 
-static void BM_RCPrf_eval_range_constrain(benchmark::State& state)
+static void RCPrf_eval_range_constrain(benchmark::State& state)
 {
     uint8_t  depth          = state.range(0);
     uint64_t max_leaf_index = RCPrfParams::max_leaf_index_generic(depth);
@@ -100,14 +100,12 @@ static void BM_RCPrf_eval_range_constrain(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * state.range(1));
 }
 
-BENCHMARK(BM_RCPrf_eval)->RangeMultiplier(2)->Range(48, 48);
+BENCHMARK(RCPrf_eval)->RangeMultiplier(2)->Range(48, 48);
 
-BENCHMARK(BM_RCPrf_eval_range)
-    ->RangeMultiplier(2)
-    ->Ranges({{48, 48}, {8, 128}});
+BENCHMARK(RCPrf_eval_range)->RangeMultiplier(2)->Ranges({{48, 48}, {8, 128}});
 // ->Ranges({{16, 32}, {8, 128}});
 
-BENCHMARK(BM_RCPrf_eval_range_constrain)
+BENCHMARK(RCPrf_eval_range_constrain)
     ->RangeMultiplier(2)
     ->Ranges({{48, 48}, {8, 128}});
 // ->Ranges({{16, 32}, {8, 128}});

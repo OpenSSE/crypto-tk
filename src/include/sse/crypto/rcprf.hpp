@@ -134,7 +134,7 @@ class RCPrfBase : public RCPrfParams
 public:
     /// @brief The callback type used in the range evaluation functions
     using callback_type
-        = std::function<void(uint64_t, std::array<uint8_t, NBYTES>)>;
+        = std::function<void(uint64_t, const std::array<uint8_t, NBYTES>&)>;
 
     RCPrfBase() = delete;
     ///

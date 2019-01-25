@@ -1160,7 +1160,14 @@ public:
     ///
     /// @param cprf The ConstrainedRCPrfInnerElement to be moved
     ///
-    ConstrainedRCPrf(ConstrainedRCPrf<NBYTES>&& cprf) noexcept = default;
+    // The following implementation is equivalent to the defaulted
+    // move constructor. On gcc-4.8, there is a linkage issue when the
+    // constructor is defaulted.
+    ConstrainedRCPrf(ConstrainedRCPrf<NBYTES>&& cprf) noexcept
+        : RCPrfBase<NBYTES>(std::move(static_cast<RCPrfBase<NBYTES>&&>(cprf))),
+          elements_(std::move(cprf.elements_))
+    {
+    }
 
     ///
     /// @brief Move assignment operator

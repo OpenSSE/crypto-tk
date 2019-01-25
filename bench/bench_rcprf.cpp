@@ -28,7 +28,7 @@ using sse::crypto::Key;
 using sse::crypto::RCPrf;
 using sse::crypto::RCPrfParams;
 
-static void BM_RCPrf_eval_all_loop(benchmark::State& state)
+static void BM_RCPrf_eval_range_loop(benchmark::State& state)
 {
     uint8_t  depth          = state.range(0);
     uint64_t max_leaf_index = RCPrfParams::max_leaf_index_generic(depth);
@@ -50,7 +50,7 @@ static void BM_RCPrf_eval_all_loop(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * state.range(1));
 }
 
-static void BM_RCPrf_eval_all_range(benchmark::State& state)
+static void BM_RCPrf_eval_range_native(benchmark::State& state)
 {
     uint8_t  depth          = state.range(0);
     uint64_t max_leaf_index = RCPrfParams::max_leaf_index_generic(depth);
@@ -73,10 +73,47 @@ static void BM_RCPrf_eval_all_range(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * state.range(1));
 }
 
-BENCHMARK(BM_RCPrf_eval_all_loop)
-    ->RangeMultiplier(2)
-    ->Ranges({{16, 32}, {8, 128}});
+static void BM_RCPrf_eval_range_constrain(benchmark::State& state)
+{
+    uint8_t  depth          = state.range(0);
+    uint64_t max_leaf_index = RCPrfParams::max_leaf_index_generic(depth);
 
-BENCHMARK(BM_RCPrf_eval_all_range)
+    std::random_device                      rnd;
+    std::mt19937_64                         rnd_gen(rnd());
+    std::uniform_int_distribution<uint64_t> unif_dist(
+        0, max_leaf_index - state.range(1));
+
+    RCPrf<32> rcprf(Key<RCPrfParams::kKeySize>(), depth);
+
+    auto callback = [](size_t, std::array<uint8_t, 32>) {};
+
+    for (auto _ : state) {
+        // randomly generate a starting point
+        uint64_t start_index = unif_dist(rnd_gen);
+
+        state.PauseTiming();
+        auto constrained
+            = rcprf.constrain(start_index, start_index + state.range(1));
+
+        state.ResumeTiming();
+
+        constrained.eval_range(
+            start_index, start_index + state.range(1), callback);
+    }
+    state.SetItemsProcessed(state.iterations() * state.range(1));
+}
+
+BENCHMARK(BM_RCPrf_eval_range_loop)
     ->RangeMultiplier(2)
-    ->Ranges({{16, 32}, {8, 128}});
+    ->Ranges({{48, 48}, {8, 128}});
+// ->Ranges({{16, 32}, {8, 128}});
+
+BENCHMARK(BM_RCPrf_eval_range_native)
+    ->RangeMultiplier(2)
+    ->Ranges({{48, 48}, {8, 128}});
+// ->Ranges({{16, 32}, {8, 128}});
+
+BENCHMARK(BM_RCPrf_eval_range_constrain)
+    ->RangeMultiplier(2)
+    ->Ranges({{48, 48}, {8, 128}});
+// ->Ranges({{16, 32}, {8, 128}});

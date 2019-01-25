@@ -134,6 +134,38 @@ TEST(rc_prf, double_constrain)
     }
 }
 
+TEST(rc_prf, range_eval)
+{
+    constexpr uint8_t                  test_depth = 3;
+    std::array<uint8_t, kRCPrfKeySize> k{
+        {0x00}}; // fixed key for easy debugging and bug reproducing
+    sse::crypto::RCPrf<16> rc_prf(sse::crypto::Key<kRCPrfKeySize>(k.data()),
+                                  test_depth);
+
+    std::vector<std::array<uint8_t, 16>> reference(
+        sse::crypto::RCPrfParams::max_leaf_index(test_depth) + 1);
+    for (uint64_t i = 0;
+         i <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         i++) {
+        reference[i] = rc_prf.eval(i);
+    }
+
+    auto check_callback
+        = [&reference, &rc_prf](uint64_t                leaf_index,
+                                std::array<uint8_t, 16> leaf_value) {
+              EXPECT_EQ(leaf_value, reference[leaf_index]);
+          };
+    for (uint64_t min = 0;
+         min <= sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+         min++) {
+        uint64_t maximal_range
+            = sse::crypto::RCPrfParams::max_leaf_index(test_depth);
+        for (uint64_t max = min; max <= maximal_range; max++) {
+            rc_prf.eval_range(min, max, check_callback);
+        }
+    }
+}
+
 // Exceptions that can be raised by using the normal APIs
 TEST(rc_prf, eval_constrain_exceptions)
 {
@@ -145,6 +177,15 @@ TEST(rc_prf, eval_constrain_exceptions)
     // Exceptions raised by RCPRF::eval
     EXPECT_THROW(rc_prf.eval(1UL << (test_depth + 1)), std::out_of_range);
     EXPECT_THROW(rc_prf.eval(1UL << test_depth), std::out_of_range);
+
+    // Exceptions raised by RCPRF::eval_range
+    auto empty_callback = [](uint64_t, std::array<uint8_t, 16>) {};
+    EXPECT_THROW(rc_prf.eval_range(0, 1UL << (test_depth + 1), empty_callback),
+                 std::out_of_range);
+    EXPECT_THROW(rc_prf.eval_range(0, 1UL << test_depth, empty_callback),
+                 std::out_of_range);
+    EXPECT_THROW(rc_prf.eval_range(2, 1, empty_callback),
+                 std::invalid_argument);
 
     // Exceptions raised by RCPrf::constrain
     EXPECT_THROW(rc_prf.constrain(3, 2), std::invalid_argument);

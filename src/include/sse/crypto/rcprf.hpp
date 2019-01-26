@@ -1090,7 +1090,7 @@ public:
             elements)
     {
         if (elements.empty()) {
-            throw std::invalid_argument("Empty key elements vector");
+            return 0;
         }
         RCPrfParams::depth_type h = elements[0]->tree_height();
 
@@ -1143,10 +1143,13 @@ public:
         };
         std::sort(elements_.begin(), elements_.end(), MinComparator());
 
-        // check that the elements are consecutive
-        for (auto it = elements_.begin() + 1; it != elements_.end(); ++it) {
-            if ((*(it - 1))->max_leaf() + 1 != (*it)->min_leaf()) {
-                throw std::invalid_argument("Non consecutive elements");
+        // check that the elements are consecutive (if the elements_ array is
+        // non empty)
+        if (!is_empty()) {
+            for (auto it = elements_.begin() + 1; it != elements_.end(); ++it) {
+                if ((*(it - 1))->max_leaf() + 1 != (*it)->min_leaf()) {
+                    throw std::invalid_argument("Non consecutive elements");
+                }
             }
         }
     }
@@ -1188,17 +1191,37 @@ public:
     }
     /* LCOV_EXCL_STOP */
 
+    /// @brief Check if the constrain is empty (i.e. the range of supported
+    /// leaves is empty)
+    ///
+    bool is_empty() const
+    {
+        return elements_.empty();
+    }
+
     /// @brief Returns the minimum leaf index supported by the constrained
     /// RC-PRF.
+    ///
+    /// If the constrain is empty (the array of elements is empty), returns
+    /// UINT64_MAX.
+
     uint64_t min_leaf() const
     {
+        if (is_empty()) {
+            return UINT64_MAX;
+        }
         return elements_[0]->min_leaf();
     }
 
     /// @brief Returns the maximum leaf index supported by the constrained
     /// RC-PRF.
+    ///
+    /// If the constrain is empty (the array of elements is empty), returns 0.
     uint64_t max_leaf() const
     {
+        if (is_empty()) {
+            return 0;
+        }
         return elements_[elements_.size() - 1]->max_leaf();
     }
 

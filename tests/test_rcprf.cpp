@@ -350,6 +350,24 @@ TEST(rc_prf, reconstrain_exceptions)
                  std::out_of_range);
 }
 
+// Check the behavior of empty constrains
+TEST(rc_prf, empty_constrain)
+{
+    std::vector<std::unique_ptr<sse::crypto::ConstrainedRCPrfElement<16>>>
+        empty_vec;
+
+    sse::crypto::ConstrainedRCPrf<16> cprf(std::move(empty_vec));
+
+    EXPECT_TRUE(cprf.is_empty());
+    EXPECT_EQ(cprf.min_leaf(), UINT64_MAX);
+    EXPECT_EQ(cprf.max_leaf(), 0);
+
+    EXPECT_THROW(cprf.eval(0), std::out_of_range);
+    EXPECT_THROW(cprf.eval(1), std::out_of_range);
+    EXPECT_THROW(cprf.eval(UINT64_MAX - 1), std::out_of_range);
+    EXPECT_THROW(cprf.eval(UINT64_MAX), std::out_of_range);
+}
+
 // Exceptions raised by the constructors
 TEST(rc_prf, constructors_exceptions)
 {
@@ -419,12 +437,6 @@ TEST(rc_prf, constructors_exceptions)
 
 
     // Exceptions raised by the ConstrainedRCPrf constructor
-    std::vector<std::unique_ptr<sse::crypto::ConstrainedRCPrfElement<16>>>
-        empty_vec;
-
-    EXPECT_THROW(sse::crypto::ConstrainedRCPrf<16> cprf(std::move(empty_vec)),
-                 std::invalid_argument);
-
 
     std::vector<std::unique_ptr<sse::crypto::ConstrainedRCPrfElement<16>>>
         leaf_vec;

@@ -162,9 +162,7 @@ public:
     ///
     /// @brief Destructor
     ///
-    virtual ~RCPrfBase()
-    {
-    }
+    virtual ~RCPrfBase() = default;
 
     //
     /// @brief Return the height of the represented tree
@@ -179,7 +177,7 @@ public:
     ///
     /// @param base     The object to be copied
     ///
-    RCPrfBase<NBYTES>& operator=(RCPrfBase<NBYTES>& base) noexcept
+    RCPrfBase<NBYTES>& operator=(const RCPrfBase<NBYTES>& base) noexcept
     {
         tree_height_ = base.tree_height_;
         return *this;

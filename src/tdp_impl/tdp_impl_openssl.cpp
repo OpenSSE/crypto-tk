@@ -50,6 +50,9 @@ static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize,
 
 #define RSA_PK 0x10001L // RSA_F4 for OpenSSL
 
+
+#define BN_num_bytes_U(a) static_cast<unsigned int>(BN_num_bytes((a)))
+
 // OpenSSL implementation of the trapdoor permutation
 
 TdpImpl_OpenSSL::TdpImpl_OpenSSL() = default;
@@ -203,15 +206,18 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::eval(
     BN_CTX* ctx = BN_CTX_new();
 
     BIGNUM* x = BN_new();
-    BN_bin2bn(in.data(), static_cast<unsigned int>(in.size()), x);
+    BN_bin2bn(in.data(), static_cast<int>(in.size()), x);
 
     BIGNUM* y = BN_new();
 
     BN_mod_exp(y, x, get_rsa_key()->e, get_rsa_key()->n, ctx);
 
+    // Unless there is a bug in OpenSSL, the number of bytes used by y, should
+    // be less than the size of the message.
+    assert(BN_num_bytes_U(y) <= kMessageSpaceSize);
 
     // bn2bin returns a BIG endian array, so be careful ...
-    size_t pos = kMessageSpaceSize - BN_num_bytes(y);
+    size_t pos = kMessageSpaceSize - BN_num_bytes_U(y);
     // set the leading bytes to 0
     std::fill(out.begin(), out.begin() + pos, 0);
     BN_bn2bin(y, out.data() + pos);
@@ -251,7 +257,7 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::
             "Invalid random number generation."); /* LCOV_EXCL_LINE */
         /* LCOV_EXCL_STOP */
     }
-    size_t offset = kMessageSpaceSize - BN_num_bytes(rnd);
+    size_t offset = kMessageSpaceSize - BN_num_bytes_U(rnd);
 
     BN_bn2bin(rnd, out.data() + offset);
     BN_free(rnd);
@@ -287,7 +293,7 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::
 
     std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> out;
     std::fill(out.begin(), out.end(), 0);
-    size_t offset = kMessageSpaceSize - BN_num_bytes(rnd_mod);
+    size_t offset = kMessageSpaceSize - BN_num_bytes_U(rnd_mod);
 
     BN_bn2bin(rnd_mod, out.data() + offset);
 
@@ -494,8 +500,15 @@ void TdpInverseImpl_OpenSSL::invert(const std::string& in,
                               get_rsa_key(),
                               RSA_NO_PADDING);
 
+    if (ret < 0) {
+        /* LCOV_EXCL_START */
+        throw std::runtime_error(
+            "Error while inverting the trapdoor permutation");
+        /* LCOV_EXCL_STOP */
+    }
 
-    out = std::string(reinterpret_cast<char*>(rsa_out), ret);
+    out = std::string(reinterpret_cast<char*>(rsa_out),
+                      static_cast<size_t>(ret));
 }
 
 std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpInverseImpl_OpenSSL::
@@ -540,7 +553,7 @@ TdpInverseImpl_OpenSSL::invert_mult(
     BN_mod_exp(d_q, get_rsa_key()->d, bn_order, q_1_, ctx);
 
     BIGNUM* x = BN_new();
-    BN_bin2bn(in.data(), static_cast<unsigned int>(in.size()), x);
+    BN_bin2bn(in.data(), static_cast<int>(in.size()), x);
 
     BIGNUM* y_p = BN_new();
     BIGNUM* y_q = BN_new();
@@ -558,7 +571,7 @@ TdpInverseImpl_OpenSSL::invert_mult(
 
 
     // bn2bin returns a BIG endian array, so be careful ...
-    size_t pos = kMessageSpaceSize - BN_num_bytes(y);
+    size_t pos = kMessageSpaceSize - BN_num_bytes_U(y);
     // set the leading bytes to 0
     std::fill(out.begin(), out.begin() + pos, 0);
     BN_bn2bin(y, out.data() + pos);

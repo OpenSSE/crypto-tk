@@ -31,8 +31,12 @@ set(default_build_type "Debug")
 option(opensse_ENABLE_WALL "Enable all warnings" ON)
 option(opensse_ENABLE_WEXTRA "Enable extra warnings" ON)
 option(opensse_ENABLE_WSHADOW "Enable shadow warning" OFF)
-option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" OFF)
+option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" ON)
 option(opensse_ENABLE_WERROR "Make all warnings into errors" ON)
+option(opensse_ENABLE_BASIC_WARNINGS "Enable basic additional warnings" ON)
+option(
+    opensse_ENABLE_ADVANCED_WARNINGS "Enable advanced additional warnings" ON
+)
 option(
     opensse_OPTIMIZE_FOR_NATIVE_ARCH
     "Enable compiler optimizations for the native processor architecture (if available)"
@@ -79,43 +83,55 @@ if(opensse_OPTIMIZE_FOR_NATIVE_ARCH)
     save_compile_option(-march=native)
 endif()
 
-save_compile_option(-Wmissing-include-dirs)
-save_compile_option(
-    # -Weffc++ # Weffc++ is too annoying on gcc
-    -Wnon-virtual-dtor
-    -Wold-style-cast
-    -Woverloaded-virtual
-    -Wctor-dtor-privacy
-    -fno-rtti
-)
-# save_compile_option(
-    # -fstack-protector
-    # -Wstack-protector
-# )
-save_compile_option(
-    -Wunsafe-loop-optimizations
-    -Wuseless-cast
-    -Wformat=2
-    -Wcast-qual
-    -Wcast-align
-)
-save_compile_option(LIST_NAME "Lib_Warnings"
-    -Weverything # All Clang warnings
-    -Wextra-semi # Extra, unnecessary semicolumns
-    -Wsign-conversion
-    -Wconversion
-    -Wno-c++98-compat # No need to be C++98 compatible: we require C++11
-    -Wno-c++98-compat-pedantic
-    -Wno-error=padded
-    -Wno-weak-vtables
-    -Wno-documentation-unknown-command
-    -Wno-weak-template-vtables
-    -Wno-exit-time-destructors
-    -Wno-error=source-uses-openmp
-    -Wno-covered-switch-default
-    -Wno-unused-macros
-    -Wno-padded
-)
+if(opensse_ENABLE_BASIC_WARNINGS)
+
+    save_compile_option(
+        -Wmissing-include-dirs
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wctor-dtor-privacy
+        -Wunsafe-loop-optimizations
+        -Wuseless-cast
+        -Wformat=2
+        -Wcast-qual
+        -Wcast-align
+    )
+    save_compile_option(
+        -fno-rtti
+        # -fstack-protector -Wstack-protector
+    )
+endif()
+
+if(opensse_ENABLE_ADVANCED_WARNINGS)
+    save_compile_option(
+        LIST_NAME "Lib_Warnings"
+        # -Weffc++ # Weffc++ is too annoying on gcc
+        -Wextra-semi # Extra, unnecessary semicolumns
+        # -Wsign-conversion # To be enabled
+        # -Wconversion # Extremely strict on gcc
+        -Wno-c++98-compat # No need to be C++98 compatible: we require C++11
+        -Wno-c++98-compat-pedantic
+        -Wno-error=padded
+        -Wno-error=source-uses-openmp
+        -Wno-unused-macros
+        -Wno-padded
+    )
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+
+        save_compile_option(
+            LIST_NAME
+            "Clang_Lib_Warnings"
+            -Weverything # All Clang warnings
+            -Wno-covered-switch-default
+            -Wno-exit-time-destructors
+            -Wno-weak-vtables
+            -Wno-weak-template-vtables
+            -Wno-documentation-unknown-command
+        )
+    endif()
+endif()
 
 # This might be redundant with what is done in the main source CMakeLists.txt
 # file: we will look for OpenSSL there too. Yet, sse_crypto's CMakeLists.txt
@@ -147,6 +163,7 @@ endif()
 add_subdirectory(src)
 target_apply_saved_options(sse_crypto)
 target_apply_saved_options(LIST_NAME "Lib_Warnings" sse_crypto)
+target_apply_saved_options(LIST_NAME "Clang_Lib_Warnings" sse_crypto)
 add_sanitizers(sse_crypto)
 add_coverage(sse_crypto)
 

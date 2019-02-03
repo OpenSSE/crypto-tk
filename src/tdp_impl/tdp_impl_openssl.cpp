@@ -53,6 +53,13 @@ static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize,
 
 #define BN_num_bytes_U(a) static_cast<unsigned int>(BN_num_bytes((a)))
 
+// A drop-in replacement of BIO_set_close that is C++11 friendly
+#define OpenSSE_BIO_set_close(b, c)                                            \
+    BIO_ctrl(b, BIO_CTRL_SET_CLOSE, (c), nullptr)
+
+// A drop-in replacement of BN_mod that is C++11 friendly
+#define OpenSSE_BN_mod(rem, m, d, ctx) BN_div(nullptr, (rem), (m), (d), (ctx))
+
 // OpenSSL implementation of the trapdoor permutation
 
 TdpImpl_OpenSSL::TdpImpl_OpenSSL() = default;
@@ -82,7 +89,7 @@ TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(nullptr)
     }
 
     // close and destroy the BIO
-    if (BIO_set_close(mem, BIO_CLOSE)
+    if (OpenSSE_BIO_set_close(mem, BIO_CLOSE)
         != 1) // So BIO_free() leaves BUF_MEM alone
     {
         // always returns 1 ...
@@ -288,7 +295,7 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::
     // now, take rnd_bn mod N
     rnd_mod = BN_new();
 
-    BN_mod(rnd_mod, rnd_bn, rsa_key_->n, ctx);
+    OpenSSE_BN_mod(rnd_mod, rnd_bn, rsa_key_->n, ctx);
 
 
     std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> out;
@@ -401,7 +408,7 @@ TdpInverseImpl_OpenSSL::TdpInverseImpl_OpenSSL(const std::string& sk)
 
 
     // close and destroy the BIO
-    if (BIO_set_close(mem, BIO_CLOSE)
+    if (OpenSSE_BIO_set_close(mem, BIO_CLOSE)
         != 1) // So BIO_free() leaves BUF_MEM alone
     {
         // always returns 1 ...

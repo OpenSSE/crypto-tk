@@ -25,6 +25,8 @@
 
 #include <pthread.h>
 
+#include <thread>
+
 #include <sodium/core.h>
 
 #ifdef WITH_OPENSSL
@@ -65,8 +67,9 @@ static void locking_function(int                                 mode,
 // NOLINTNEXTLINE(google-runtime-int)
 static unsigned long id_function()
 {
-    // NOLINTNEXTLINE(google-runtime-int)
-    return pthread_self();
+    std::thread::id tid = std::this_thread::get_id();
+
+    return std::hash<std::thread::id>()(tid);
 }
 
 // No multithreaded test is performed, hence no lock is used.

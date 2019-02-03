@@ -44,7 +44,6 @@ static pthread_mutex_t* mutex_buf = nullptr;
  * @param    n        lock number
  * @param    file    source file name
  * @param    line    source file line number
- * @return    none
  */
 static void locking_function(int                                 mode,
                              int                                 n,
@@ -106,7 +105,6 @@ err:
  * @param    l        lock structure pointer
  * @param    file    source file name
  * @param    line    source file line number
- * @return    none
  */
 static void dyn_lock_function(int                                 mode,
                               struct CRYPTO_dynlock_value*        l,
@@ -126,7 +124,6 @@ static void dyn_lock_function(int                                 mode,
  * @param    l        lock structure pointer
  * @param    file    source file name
  * @param    line    source file line number
- * @return    none
  */
 
 static void dyn_destroy_function(struct CRYPTO_dynlock_value*        l,

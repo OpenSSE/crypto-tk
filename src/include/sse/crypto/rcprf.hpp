@@ -153,15 +153,20 @@ public:
     ///
     /// @brief Copy constructor
     ///
-    RCPrfBase(const RCPrfBase<NBYTES>& rcprf) noexcept = default;
+    RCPrfBase(const RCPrfBase<NBYTES>& rcprf) noexcept
+        : tree_height_(rcprf.tree_height_)
+    {
+    }
     /* LCOV_EXCL_STOP */
 
     ///
     /// @brief Destructor
     ///
-    virtual ~RCPrfBase() = default;
+    virtual ~RCPrfBase()
+    {
+    }
 
-    ///
+    //
     /// @brief Return the height of the represented tree
     ///
     inline depth_type tree_height() const
@@ -169,17 +174,30 @@ public:
         return tree_height_;
     }
 
+    ///
+    /// @brief Copy assignment operator
+    ///
+    /// @param base     The object to be copied
+    ///
+    RCPrfBase<NBYTES>& operator=(RCPrfBase<NBYTES>& base) noexcept
+    {
+        tree_height_ = base.tree_height_;
+        return *this;
+    }
+
 protected:
     ///
-    /// @brief Compute the direction of the root-to-leaf path at a given depth
+    /// @brief Compute the direction of the root-to-leaf path at a given
+    /// depth
     ///
-    /// When following the root-to-leaf path, return which of the left of the
-    /// right child of the node at the given depth we have to take next.
+    /// When following the root-to-leaf path, return which of the left of
+    /// the right child of the node at the given depth we have to take next.
     ///
     /// @param leaf         The leaf to go to from the tree's root
-    /// @param node_depth   The depth of the node on the root-to-leaf path (a 0
-    ///                     node-depth points to the root, a tree_height-1 depth
-    ///                     is the leaf).
+    /// @param node_depth   The depth of the node on the root-to-leaf path
+    /// (a 0
+    ///                     node-depth points to the root, a tree_height-1
+    ///                     depth is the leaf).
     ///
     /// @return             The child to go to in the root-to-leaf path.
     ///
@@ -1188,7 +1206,7 @@ public:
     ConstrainedRCPrf& operator=(ConstrainedRCPrf<NBYTES>&& cprf) noexcept
     {
         static_cast<RCPrfBase<NBYTES>&>(*this)
-            = std::move(static_cast<RCPrfBase<NBYTES>&&>(cprf));
+            = static_cast<RCPrfBase<NBYTES>&>(cprf);
         elements_ = std::move(cprf.elements_);
 
         return *this;

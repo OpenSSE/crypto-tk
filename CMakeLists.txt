@@ -81,15 +81,12 @@ endif()
 
 save_compile_option(-Wmissing-include-dirs)
 save_compile_option(
-    # -Weffc++
+    # -Weffc++ # Weffc++ is too annoying on gcc
     -Wnon-virtual-dtor
     -Wold-style-cast
     -Woverloaded-virtual
     -Wctor-dtor-privacy
     -fno-rtti
-)
-save_compile_option(
-    -Wextra-semi
 )
 # save_compile_option(
     # -fstack-protector
@@ -103,11 +100,11 @@ save_compile_option(
     -Wcast-align
 )
 save_compile_option(LIST_NAME "Lib_Warnings"
-    -Weverything
-    -Wextra-semi
+    -Weverything # All Clang warnings
+    -Wextra-semi # Extra, unnecessary semicolumns
     -Wsign-conversion
     -Wconversion
-    -Wno-c++98-compat
+    -Wno-c++98-compat # No need to be C++98 compatible: we require C++11
     -Wno-c++98-compat-pedantic
     -Wno-error=padded
     -Wno-weak-vtables

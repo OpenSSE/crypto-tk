@@ -12,6 +12,7 @@ build_test
 build_bench
 bin
 static_analysis
+Ubuntu
 
 debug_crypto
 check

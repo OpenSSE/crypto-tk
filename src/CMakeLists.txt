@@ -64,6 +64,7 @@ add_library(
     mbedtls/rsa.c
 )
 
+
 # Generate PIC for the library
 set_target_properties(sse_crypto PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
@@ -85,6 +86,12 @@ target_compile_features(
     cxx_thread_local
     PRIVATE
     cxx_lambdas
+)
+
+target_compile_features(
+    sse_crypto
+    PRIVATE
+    c_std_99
 )
 
 target_include_directories(

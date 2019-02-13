@@ -25,6 +25,8 @@
 
 #include <pthread.h>
 
+#include <thread>
+
 #include <sodium/core.h>
 
 #ifdef WITH_OPENSSL
@@ -44,7 +46,6 @@ static pthread_mutex_t* mutex_buf = nullptr;
  * @param    n        lock number
  * @param    file    source file name
  * @param    line    source file line number
- * @return    none
  */
 static void locking_function(int                                 mode,
                              int                                 n,
@@ -66,8 +67,9 @@ static void locking_function(int                                 mode,
 // NOLINTNEXTLINE(google-runtime-int)
 static unsigned long id_function()
 {
-    // NOLINTNEXTLINE(google-runtime-int)
-    return reinterpret_cast<unsigned long>(pthread_self());
+    std::thread::id tid = std::this_thread::get_id();
+
+    return std::hash<std::thread::id>()(tid);
 }
 
 // No multithreaded test is performed, hence no lock is used.
@@ -106,7 +108,6 @@ err:
  * @param    l        lock structure pointer
  * @param    file    source file name
  * @param    line    source file line number
- * @return    none
  */
 static void dyn_lock_function(int                                 mode,
                               struct CRYPTO_dynlock_value*        l,
@@ -126,7 +127,6 @@ static void dyn_lock_function(int                                 mode,
  * @param    l        lock structure pointer
  * @param    file    source file name
  * @param    line    source file line number
- * @return    none
  */
 
 static void dyn_destroy_function(struct CRYPTO_dynlock_value*        l,

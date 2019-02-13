@@ -458,7 +458,9 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
 
         // create the OpenSSL key from the buffer
         mem = BIO_new_mem_buf(
-            buf, (int)strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)));
+            buf,
+            static_cast<int>(
+                strnlen(reinterpret_cast<const char*>(buf), sizeof(buf))));
         evpkey = PEM_read_bio_PrivateKey(mem, NULL, NULL, NULL);
 
         ASSERT_FALSE(evpkey == NULL);
@@ -486,7 +488,9 @@ TEST(mbedTLS, key_serialization_compat_mbedtls2openssl)
 
         // create the OpenSSL key from the buffer
         mem = BIO_new_mem_buf(
-            buf, (int)strnlen(reinterpret_cast<const char*>(buf), sizeof(buf)));
+            buf,
+            static_cast<int>(
+                strnlen(reinterpret_cast<const char*>(buf), sizeof(buf))));
         openssl_pk_rsa = PEM_read_bio_RSA_PUBKEY(mem, NULL, NULL, NULL);
         ASSERT_FALSE(openssl_pk_rsa == NULL);
 
@@ -540,7 +544,7 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         size_t len = BIO_ctrl_pending(bio);
         ASSERT_LE(len + 1, sizeof(buf));
 
-        ASSERT_NE(BIO_read(bio, buf, (int)len), 0);
+        ASSERT_NE(BIO_read(bio, buf, static_cast<int>(len)), 0);
 
         EVP_PKEY_free(evpkey);
 
@@ -576,7 +580,7 @@ TEST(mbedTLS, key_serialization_compat_openssl2mbedtls)
         len = BIO_ctrl_pending(bio);
         ASSERT_LE(len + 1, sizeof(buf));
 
-        ASSERT_NE(BIO_read(bio, buf, (int)len), 0);
+        ASSERT_NE(BIO_read(bio, buf, static_cast<int>(len)), 0);
 
         BIO_free_all(bio);
 

@@ -49,7 +49,7 @@ TEST(sha_512, test_vector_1)
     sse::crypto::hash::sha512::hash(
         reinterpret_cast<const unsigned char*>(in.data()),
         in.length(),
-        reinterpret_cast<unsigned char*>(out.data()));
+        out.data());
 
     uint8_t reference[]
         = {0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73,
@@ -76,7 +76,7 @@ TEST(sha_512, test_vector_2)
     sse::crypto::hash::sha512::hash(
         reinterpret_cast<const unsigned char*>(in.data()),
         in.length(),
-        reinterpret_cast<unsigned char*>(out.data()));
+        out.data());
 
     uint8_t reference[]
         = {0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd, 0xf1, 0x54, 0x28,
@@ -102,7 +102,7 @@ TEST(sha_512, test_vector_3)
     sse::crypto::hash::sha512::hash(
         reinterpret_cast<const unsigned char*>(in.data()),
         in.length(),
-        reinterpret_cast<unsigned char*>(out.data()));
+        out.data());
 
     uint8_t reference[]
         = {0x20, 0x4a, 0x8f, 0xc6, 0xdd, 0xa8, 0x2f, 0x0a, 0x0c, 0xed, 0x7b,
@@ -129,7 +129,7 @@ TEST(sha_512, test_vector_4)
     sse::crypto::hash::sha512::hash(
         reinterpret_cast<const unsigned char*>(in.data()),
         in.length(),
-        reinterpret_cast<unsigned char*>(out.data()));
+        out.data());
 
     uint8_t reference[]
         = {0x8e, 0x95, 0x9b, 0x75, 0xda, 0xe3, 0x13, 0xda, 0x8c, 0xf4, 0xf7,
@@ -155,7 +155,7 @@ TEST(sha_512, test_vector_5)
     sse::crypto::hash::sha512::hash(
         reinterpret_cast<const unsigned char*>(in.data()),
         in.length(),
-        reinterpret_cast<unsigned char*>(out.data()));
+        out.data());
 
     uint8_t reference[]
         = {0xe7, 0x18, 0x48, 0x3d, 0x0c, 0xe7, 0x69, 0x64, 0x4e, 0x2e, 0x42,
@@ -183,7 +183,7 @@ TEST(blake2, blake2b)
     uint8_t hash[HASH_LENGTH] = {0};
 
     for (size_t i = 0; i < sizeof(in); ++i) {
-        in[i] = i;
+        in[i] = static_cast<uint8_t>(i);
     }
 
     for (size_t i = 0; i < sizeof(in); ++i) {

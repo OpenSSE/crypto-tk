@@ -35,7 +35,7 @@ TEST(rc_prf, parameters)
 {
     // leaf count
     EXPECT_EQ(sse::crypto::RCPrfParams::max_leaf_index(0), 0);
-    constexpr sse::crypto::RCPrfParams::depth_type max_depth = ~0;
+    constexpr sse::crypto::RCPrfParams::depth_type max_depth = 0xFF;
     for (sse::crypto::RCPrfParams::depth_type i
          = sse::crypto::RCPrfParams::kMaxHeight;
          i < max_depth;

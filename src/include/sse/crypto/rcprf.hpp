@@ -153,7 +153,10 @@ public:
     ///
     /// @brief Copy constructor
     ///
-    RCPrfBase(const RCPrfBase<NBYTES>& rcprf) noexcept = default;
+    RCPrfBase(const RCPrfBase<NBYTES>& rcprf) noexcept
+        : tree_height_(rcprf.tree_height_)
+    {
+    }
     /* LCOV_EXCL_STOP */
 
     ///
@@ -161,7 +164,7 @@ public:
     ///
     virtual ~RCPrfBase() = default;
 
-    ///
+    //
     /// @brief Return the height of the represented tree
     ///
     inline depth_type tree_height() const
@@ -169,17 +172,30 @@ public:
         return tree_height_;
     }
 
+    ///
+    /// @brief Copy assignment operator
+    ///
+    /// @param base     The object to be copied
+    ///
+    RCPrfBase<NBYTES>& operator=(const RCPrfBase<NBYTES>& base) noexcept
+    {
+        tree_height_ = base.tree_height_;
+        return *this;
+    }
+
 protected:
     ///
-    /// @brief Compute the direction of the root-to-leaf path at a given depth
+    /// @brief Compute the direction of the root-to-leaf path at a given
+    /// depth
     ///
-    /// When following the root-to-leaf path, return which of the left of the
-    /// right child of the node at the given depth we have to take next.
+    /// When following the root-to-leaf path, return which of the left of
+    /// the right child of the node at the given depth we have to take next.
     ///
     /// @param leaf         The leaf to go to from the tree's root
-    /// @param node_depth   The depth of the node on the root-to-leaf path (a 0
-    ///                     node-depth points to the root, a tree_height-1 depth
-    ///                     is the leaf).
+    /// @param node_depth   The depth of the node on the root-to-leaf path
+    /// (a 0
+    ///                     node-depth points to the root, a tree_height-1
+    ///                     depth is the leaf).
     ///
     /// @return             The child to go to in the root-to-leaf path.
     ///
@@ -337,7 +353,9 @@ std::array<uint8_t, NBYTES> RCPrfBase<NBYTES>::derive_leaf(
     depth_type base_depth,
     uint64_t   leaf) const
 {
-    assert(this->tree_height() > base_depth + 1);
+    assert(this->tree_height() >= 2); // this has to be an inner node
+    // with the previous check, we can substract 1 without risking an underflow
+    assert(this->tree_height() - 1 > base_depth);
 
     if (this->tree_height() == base_depth + 2) {
         // only one derivation to do
@@ -351,7 +369,9 @@ std::array<uint8_t, NBYTES> RCPrfBase<NBYTES>::derive_leaf(
         return result;
     }
 
-    assert(this->tree_height() - base_depth > 2);
+    // the previous test ensures that the tree_height is >= 2
+    assert(this->tree_height() - 2 > base_depth);
+
     // the first step is done from the base PRG
     RCPrfTreeNodeChild child = get_child(leaf, base_depth);
     Key<kKeySize>      subkey
@@ -484,7 +504,7 @@ public:
     /// height and spanning over the specified leaves range.
     ///
     /// @param height          The height of the tree.
-    /// @param subtree_height  The height of the subtree represented by the
+    /// @param st_height       The height of the subtree represented by the
     ///                        element.
     /// @param min             The minimum leaf index spanned by the
     /// subtree.
@@ -500,20 +520,20 @@ public:
     ///                                        minimum leaf index.
     ///
     ConstrainedRCPrfElement(RCPrfParams::depth_type height,
-                            RCPrfParams::depth_type subtree_height,
+                            RCPrfParams::depth_type st_height,
                             uint64_t                min,
                             uint64_t                max)
-        : RCPrfBase<NBYTES>(height), subtree_height_(subtree_height),
-          min_leaf_(min), max_leaf_(max)
+        : RCPrfBase<NBYTES>(height), subtree_height_(st_height), min_leaf_(min),
+          max_leaf_(max)
     {
-        if (subtree_height == 0) {
+        if (st_height == 0) {
             /* LCOV_EXCL_START */
             // already covered by the subclasses
             throw std::invalid_argument("Subtree height should be strictly "
                                         "larger than 0.");
             /* LCOV_EXCL_STOP */
         }
-        if (subtree_height >= this->tree_height()) {
+        if (st_height >= this->tree_height()) {
             throw std::invalid_argument(
                 "Subtree height is not smaller than the tree height");
         }
@@ -668,7 +688,7 @@ public:
     ///
     /// @param key             The value of the subtree's node. The key given as
     ///                        input is moved, and is invalidated.
-    /// @param subtree_height  The height of the subtree represented by the
+    /// @param st_height       The height of the subtree represented by the
     ///                        element.
     /// @param min             The minimum leaf index spanned by the subtree.
     /// @param max             The maximum leaf index spanned by the subtree.
@@ -682,13 +702,13 @@ public:
     ///
     ConstrainedRCPrfInnerElement(Key<RCPrfParams::kKeySize>&& key,
                                  RCPrfParams::depth_type      height,
-                                 RCPrfParams::depth_type      subtree_height,
+                                 RCPrfParams::depth_type      st_height,
                                  uint64_t                     min,
                                  uint64_t                     max)
-        : ConstrainedRCPrfElement<NBYTES>(height, subtree_height, min, max),
+        : ConstrainedRCPrfElement<NBYTES>(height, st_height, min, max),
           base_prg_(std::move(key))
     {
-        if (subtree_height <= 1) {
+        if (st_height <= 1) {
             throw std::invalid_argument("Subtree height should be strictly "
                                         "larger than 1 for an inner element.");
         }
@@ -703,7 +723,7 @@ public:
     /// @param subtree_prg     The Prg representing the subtree's root. The Prg
     ///                        object is moved by the constructor, and is
     ///                        invalidated.
-    /// @param subtree_height  The height of the subtree represented by the
+    /// @param st_height       The height of the subtree represented by the
     ///                        element.
     /// @param min             The minimum leaf index spanned by the subtree.
     /// @param max             The maximum leaf index spanned by the subtree.
@@ -717,13 +737,13 @@ public:
     ///
     ConstrainedRCPrfInnerElement(Prg&&                   subtree_prg,
                                  RCPrfParams::depth_type height,
-                                 RCPrfParams::depth_type subtree_height,
+                                 RCPrfParams::depth_type st_height,
                                  uint64_t                min,
                                  uint64_t                max)
-        : ConstrainedRCPrfElement<NBYTES>(height, subtree_height, min, max),
+        : ConstrainedRCPrfElement<NBYTES>(height, st_height, min, max),
           base_prg_(std::move(subtree_prg))
     {
-        if (subtree_height <= 1) {
+        if (st_height <= 1) {
             throw std::invalid_argument("Subtree height should be strictly "
                                         "larger than 1 for an inner element.");
         }
@@ -1184,7 +1204,7 @@ public:
     ConstrainedRCPrf& operator=(ConstrainedRCPrf<NBYTES>&& cprf) noexcept
     {
         static_cast<RCPrfBase<NBYTES>&>(*this)
-            = std::move(static_cast<RCPrfBase<NBYTES>&&>(cprf));
+            = static_cast<RCPrfBase<NBYTES>&>(cprf);
         elements_ = std::move(cprf.elements_);
 
         return *this;

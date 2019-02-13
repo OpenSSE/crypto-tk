@@ -363,7 +363,7 @@ static void test_tdp_impl_multiple_eval(const size_t string_test_count,
 
         string v1, v2, v3;
         v2 = sample;
-        for (size_t j = 1; j < pool.maximum_order(); j++) {
+        for (uint8_t j = 1; j < pool.maximum_order(); j++) {
             v1 = tdp_test::tdp_eval_pool(pool, sample, j);
             tdp_inv.eval(v2, v2);
             tdp_test::tdp_eval_pool(pool, sample, v3, j);
@@ -396,7 +396,7 @@ static void test_tdp_impl_multiple_eval(const size_t string_test_count,
 
         string                                                      v1;
         std::array<uint8_t, sse::crypto::TdpMultPool::kMessageSize> v2;
-        for (size_t j = 1; j < pool.maximum_order(); j++) {
+        for (uint8_t j = 1; j < pool.maximum_order(); j++) {
             tdp_test::tdp_eval_pool(pool, sample, v1, j);
             v2 = tdp_test::tdp_eval_pool(pool, sample_arr, j);
 

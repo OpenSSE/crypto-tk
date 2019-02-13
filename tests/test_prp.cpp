@@ -46,7 +46,7 @@ TEST(prp, correctness)
 
         ASSERT_EQ(in_enc.length(), out_enc.length());
 
-        string in_dec = string(out_enc);
+        string in_dec = out_enc;
 
         fpe.decrypt(in_dec, out_dec);
 
@@ -70,8 +70,10 @@ TEST(prp, consistency_32)
         std::string out_32_s_1
             = fpe.encrypt(std::string(arr_32.begin(), arr_32.end()));
         std::string out_32_s_2;
-        uint32_t    in_32_i = arr_32[0] + (arr_32[1] << 8) + (arr_32[2] << 16)
-                           + (arr_32[3] << 24);
+        uint32_t    in_32_i = static_cast<uint32_t>(arr_32[0])
+                           + (static_cast<uint32_t>(arr_32[1]) << 8UL)
+                           + (static_cast<uint32_t>(arr_32[2]) << 16UL)
+                           + (static_cast<uint32_t>(arr_32[3]) << 24UL);
 
         fpe.encrypt(std::string(arr_32.begin(), arr_32.end()), out_32_s_2);
         uint32_t out_32_i = fpe.encrypt(in_32_i);
@@ -153,13 +155,13 @@ TEST(prp, wrapping)
         ASSERT_EQ(in_enc.length(), out_enc2.length());
         EXPECT_EQ(out_enc1, out_enc2);
 
-        string in_dec = string(out_enc1);
+        string in_dec = out_enc1;
         base_prp.decrypt(in_dec, out_dec);
 
         ASSERT_EQ(in_dec.length(), out_dec.length());
         ASSERT_EQ(in_enc, out_dec);
 
-        in_dec = string(out_enc2);
+        in_dec = out_enc2;
         base_prp.decrypt(in_dec, out_dec);
 
         ASSERT_EQ(in_dec.length(), out_dec.length());

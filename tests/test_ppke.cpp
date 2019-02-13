@@ -322,13 +322,10 @@ TEST(relic, arithmetic_ZR)
         ASSERT_EQ(z3 << 3, z3 * relicxx::ZR(8));
         ASSERT_EQ(z4 << 4, z4 * relicxx::ZR(16));
 
-        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
-                  group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
-                  group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
-                  group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
+        ASSERT_EQ(group.exp(z1, 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, 233453451),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -353,13 +350,10 @@ TEST(relic, arithmetic_G1)
         ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
         ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
 
-        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
-                  group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
-                  group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
-                  group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
+        ASSERT_EQ(group.exp(z1, 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, 233453451),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -383,13 +377,10 @@ TEST(relic, arithmetic_G2)
         ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
         ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
 
-        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
-                  group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
-                  group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
-                  group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
+        ASSERT_EQ(group.exp(z1, 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, 233453451),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -410,13 +401,10 @@ TEST(relic, arithmetic_GT)
         ASSERT_EQ(group.div(z1, z2), group.mul(group.inv(z2), z1));
         ASSERT_EQ(group.div(z2, z1), group.inv(group.div(z1, z2)));
 
-        ASSERT_EQ(group.exp(z1, static_cast<int>(42)),
-                  group.exp(z1, relicxx::ZR(42)));
-        ASSERT_EQ(group.exp(z2, static_cast<int>(10)),
-                  group.exp(z2, relicxx::ZR(10)));
-        ASSERT_EQ(group.exp(z3, static_cast<int>(4675)),
-                  group.exp(z3, relicxx::ZR(4675)));
-        ASSERT_EQ(group.exp(z4, static_cast<int>(233453451)),
+        ASSERT_EQ(group.exp(z1, 42), group.exp(z1, relicxx::ZR(42)));
+        ASSERT_EQ(group.exp(z2, 10), group.exp(z2, relicxx::ZR(10)));
+        ASSERT_EQ(group.exp(z3, 4675), group.exp(z3, relicxx::ZR(4675)));
+        ASSERT_EQ(group.exp(z4, 233453451),
                   group.exp(z4, relicxx::ZR(233453451)));
     }
 }
@@ -636,7 +624,7 @@ TEST(puncturable, correctness)
 {
     std::array<uint8_t, 32> master_key;
     for (size_t i = 0; i < master_key.size(); i++) {
-        master_key[i] = 1 << i;
+        master_key[i] = static_cast<uint8_t>(5 * i);
     }
 
     sse::crypto::punct::master_key_type key(master_key.data());

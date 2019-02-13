@@ -22,6 +22,7 @@ function(add_fuzz_target target_name target_source)
         sanitizer_add_flags(${target_name} "libFuzzer" "libFuzzer")
 
         add_dependencies(fuzz ${target_name})
+        target_apply_saved_options(${target_name})
 
         if(libFuzzer_standalone_FLAG_DETECTED)
 
@@ -31,6 +32,7 @@ function(add_fuzz_target target_name target_source)
                 ${target_source}
                 ${ARGN}
             )
+            target_apply_saved_options(${target_name}_standalone)
 
             target_link_libraries(${target_name}_standalone OpenSSE::crypto)
             add_sanitizers(${target_name}_standalone)

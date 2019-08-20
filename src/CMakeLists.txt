@@ -103,7 +103,7 @@ target_include_directories(
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/sse/crypto
 )
 
-target_link_libraries(sse_crypto sodium ${RELIC_LIBRARIES})
+target_link_libraries(sse_crypto sodium ${RLC_LIBRARY})
 
 if(OPENSSL_FOUND)
     target_link_libraries(sse_crypto OpenSSL::Crypto)

@@ -31,7 +31,7 @@ static void invertZR(ZR& c, const ZR& a, const bn_t order)
     bn_inits(s);
     // compute c = (1 / a) mod n
     bn_gcd_ext(s, c.z, nullptr, a1.z, order);
-    if (bn_sign(c.z) == BN_NEG) {
+    if (bn_sign(c.z) == RLC_NEG) {
         bn_add(c.z, c.z, order);
     }
     bn_free(s);
@@ -101,7 +101,7 @@ ZR operator-(const ZR& x, const ZR& y)
     ZR zr;
 
     bn_sub(zr.z, x.z, y.z);
-    if (bn_sign(zr.z) == BN_NEG) {
+    if (bn_sign(zr.z) == RLC_NEG) {
         bn_add(zr.z, zr.z, zr.order);
     } else {
         bn_mod(zr.z, zr.z, zr.order);
@@ -113,7 +113,7 @@ ZR operator-(const ZR& x)
 {
     ZR zr;
     bn_neg(zr.z, x.z);
-    if (bn_sign(zr.z) == BN_NEG) {
+    if (bn_sign(zr.z) == RLC_NEG) {
         bn_add(zr.z, zr.z, zr.order);
     }
     return zr;
@@ -124,7 +124,7 @@ ZR operator*(const ZR& x, const ZR& y)
 {
     ZR zr;
     bn_mul(zr.z, x.z, y.z);
-    if (bn_sign(zr.z) == BN_NEG) {
+    if (bn_sign(zr.z) == RLC_NEG) {
         bn_add(zr.z, zr.z, zr.order);
     } else {
         bn_mod(zr.z, zr.z, zr.order);
@@ -174,7 +174,7 @@ ZR hashToZR(const bytes_vec& b)
     memset(digest, 0, digest_len);
     SHA_FUNC(digest, data.data(), static_cast<int>(data.size()));
     bn_read_bin(zr.z, digest, digest_len);
-    if (bn_cmp(zr.z, zr.order) == CMP_GT) {
+    if (bn_cmp(zr.z, zr.order) == RLC_GT) {
         bn_mod(zr.z, zr.z, zr.order);
     }
     return zr;
@@ -187,7 +187,7 @@ size_t ZR::byte_size() const
 
 bool ZR::ismember() const
 {
-    return ((bn_cmp(z, order) < CMP_EQ) && (bn_sign(z) == BN_POS));
+    return ((bn_cmp(z, order) < RLC_EQ) && (bn_sign(z) == RLC_POS));
 }
 
 std::vector<uint8_t> ZR::getBytes() const
@@ -214,7 +214,7 @@ ZR operator<<(const ZR& a, int b)
     // left shift
     ZR zr;
     bn_lsh(zr.z, a.z, b);
-    if (bn_cmp(zr.z, zr.order) == CMP_GT) {
+    if (bn_cmp(zr.z, zr.order) == RLC_GT) {
         bn_mod(zr.z, zr.z, zr.order);
     }
     return zr;
@@ -604,7 +604,7 @@ void GT::getBytes(bool compress, const size_t out_len, uint8_t* out) const
             out[i] = 0x00;
         }
     }
-    gt_write_bin(out, static_cast<int>(MIN(l, out_len)), gg.g, compress);
+    gt_write_bin(out, static_cast<int>(RLC_MIN(l, out_len)), gg.g, compress);
 }
 
 
@@ -646,13 +646,13 @@ relicResourceHandle::relicResourceHandle(const bool allowAlreadyInitialized)
         throw std::runtime_error("ERROR Relic already initialized.");
     }
     const int err_code = core_init();
-    if (err_code != STS_OK) {
+    if (err_code != RLC_OK) {
         throw std::runtime_error(
             "ERROR cannot initialize  relic: core_init returned: "
             + std::to_string(err_code) + ".");
     }
     const int err_code_2 = pc_param_set_any();
-    if (err_code_2 != STS_OK) {
+    if (err_code_2 != RLC_OK) {
         throw std::runtime_error(
             "ERROR cannot initialize  relic: pc_param_set_any returned: "
             + std::to_string(err_code_2) + ".");
@@ -687,7 +687,7 @@ PairingGroup::~PairingGroup()
 ZR PairingGroup::randomZR() const
 {
     ZR zr, tt;
-    bn_rand(tt.z, BN_POS, bn_bits(grp_order));
+    bn_rand(tt.z, RLC_POS, bn_bits(grp_order));
     bn_mod(zr.z, tt.z, grp_order);
     return zr;
 }
@@ -698,7 +698,7 @@ ZR PairingGroup::pseudoRandomZR(const sse::crypto::Prf<kPrfOutputSize>& prf,
     ZR                                  zr, tt;
     std::array<uint8_t, kPrfOutputSize> prf_out = prf.prf(seed);
     bn_read_bin(tt.z, prf_out.data(), kPrfOutputSize);
-    //        bn_rand(tt.z, BN_POS, bn_bits(grp_order));
+    //        bn_rand(tt.z, RLC_POS, bn_bits(grp_order));
     bn_mod(zr.z, tt.z, grp_order);
     return zr;
 }

@@ -29,7 +29,7 @@ constexpr static size_t kPPKEPrfOutputSize
     = relicxx::PairingGroup::kPrfOutputSize;
 
 // cppcheck-suppress constStatement
-using PPKE_HKDF = sse::crypto::HMac<sse::crypto::Hash, 12 * FP_BYTES>;
+using PPKE_HKDF = sse::crypto::HMac<sse::crypto::Hash, 12 * RLC_FP_BYTES>;
 
 using tag_type = std::array<uint8_t, kTagSize>;
 
@@ -339,7 +339,7 @@ public:
         sse::crypto::HMac<sse::crypto::Hash, kTagSize> hkdf(
             sse::crypto::Key<kTagSize>(arr.data()));
 
-        std::array<uint8_t, 12 * FP_BYTES> gt_blind_bytes;
+        std::array<uint8_t, 12 * RLC_FP_BYTES> gt_blind_bytes;
         group.exp(group.pair(pk.g2G1, pk.ppkeg1), s)
             .getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
 
@@ -365,7 +365,7 @@ public:
         sse::crypto::HMac<sse::crypto::Hash, kTagSize> hkdf(
             sse::crypto::Key<kTagSize>(arr.data()));
 
-        std::array<uint8_t, 12 * FP_BYTES> gt_blind_bytes;
+        std::array<uint8_t, 12 * RLC_FP_BYTES> gt_blind_bytes;
         group.exp(group.generatorGT(), sp.alpha * sp.beta * s)
             .getBytes(false, gt_blind_bytes.size(), gt_blind_bytes.data());
 

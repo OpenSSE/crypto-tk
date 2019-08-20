@@ -85,8 +85,8 @@ enum Other_type
     gt_null(g);                                                                \
     gt_new(g);
 
-#define FP_STR (((((FP_BYTES * 2 + 1)))))
-#define G1_LEN ((((((FP_BYTES * 2) + 2)))))
+#define FP_STR (((((RLC_FP_BYTES * 2 + 1)))))
+#define G1_LEN ((((((RLC_FP_BYTES * 2) + 2)))))
 /* KSS_P508 */
 #define G2_LEN G1_LEN
 #define GT_LEN G1_LEN

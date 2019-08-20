@@ -77,7 +77,7 @@ static_assert(MULTI == OPENMP,
 // Do it ourself if necessary.
 
 #ifndef RELIC_BN_BYTES
-#define RELIC_BN_BYTES CEIL(RELIC_BN_BITS, 8)
+#define RELIC_BN_BYTES RLC_CEIL(RLC_BN_BITS, 8)
 #endif
 
 namespace relicxx {
@@ -215,7 +215,7 @@ public:
     friend std::ostream& operator<<(std::ostream& /*s*/, const ZR& /*zr*/);
     friend bool          operator==(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) == CMP_EQ) {
+        if (bn_cmp(x.z, y.z) == RLC_EQ) {
             {
                 {
                     {
@@ -240,7 +240,7 @@ public:
     }
     friend bool operator!=(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) != CMP_EQ) {
+        if (bn_cmp(x.z, y.z) != RLC_EQ) {
             {
                 {
                     {
@@ -265,7 +265,7 @@ public:
     }
     friend bool operator>(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) == CMP_GT) {
+        if (bn_cmp(x.z, y.z) == RLC_GT) {
             {
                 {
                     {
@@ -290,7 +290,7 @@ public:
     }
     friend bool operator<(const ZR& x, const ZR& y)
     {
-        if (bn_cmp(x.z, y.z) == CMP_LT) {
+        if (bn_cmp(x.z, y.z) == RLC_LT) {
             {
                 {
                     {
@@ -321,8 +321,8 @@ ZR hashToZR(const bytes_vec& b);
 class G1
 {
 public:
-    constexpr static uint16_t kByteSize        = 1 + 2 * FP_BYTES;
-    constexpr static uint16_t kCompactByteSize = 1 + FP_BYTES;
+    constexpr static uint16_t kByteSize        = 1 + 2 * RLC_FP_BYTES;
+    constexpr static uint16_t kCompactByteSize = 1 + RLC_FP_BYTES;
 
 
     g1_t g;
@@ -412,19 +412,19 @@ public:
     friend std::ostream& operator<<(std::ostream& /*s*/, const G1& /*g1*/);
     friend bool          operator==(const G1& x, const G1& y)
     {
-        return g1_cmp(x.g, y.g) == CMP_EQ;
+        return g1_cmp(x.g, y.g) == RLC_EQ;
     }
     friend bool operator!=(const G1& x, const G1& y)
     {
-        return g1_cmp(x.g, y.g) != CMP_EQ;
+        return g1_cmp(x.g, y.g) != RLC_EQ;
     }
 };
 
 class G2
 {
 public:
-    constexpr static uint16_t kByteSize        = 1 + 4 * FP_BYTES;
-    constexpr static uint16_t kCompactByteSize = 1 + 2 * FP_BYTES;
+    constexpr static uint16_t kByteSize        = 1 + 4 * RLC_FP_BYTES;
+    constexpr static uint16_t kCompactByteSize = 1 + 2 * RLC_FP_BYTES;
 
     g2_t g;
     bool isInit{false};
@@ -511,19 +511,19 @@ public:
     friend std::ostream& operator<<(std::ostream& s, const G2& /*g2*/);
     friend bool          operator==(const G2& x, const G2& y)
     {
-        return g2_cmp(const_cast<G2&>(x).g, const_cast<G2&>(y).g) == CMP_EQ;
+        return g2_cmp(const_cast<G2&>(x).g, const_cast<G2&>(y).g) == RLC_EQ;
     }
     friend bool operator!=(const G2& x, const G2& y)
     {
-        return g2_cmp(const_cast<G2&>(x).g, const_cast<G2&>(y).g) != CMP_EQ;
+        return g2_cmp(const_cast<G2&>(x).g, const_cast<G2&>(y).g) != RLC_EQ;
     }
 };
 
 class GT
 {
 public:
-    constexpr static uint16_t kByteSize        = 12 * FP_BYTES;
-    constexpr static uint16_t kCompactByteSize = 8 * FP_BYTES;
+    constexpr static uint16_t kByteSize        = 12 * RLC_FP_BYTES;
+    constexpr static uint16_t kCompactByteSize = 8 * RLC_FP_BYTES;
 
     gt_t g;
     bool isInit{false};
@@ -610,11 +610,11 @@ public:
     friend std::ostream& operator<<(std::ostream& s, const GT& /*gt*/);
     friend bool          operator==(const GT& x, const GT& y)
     {
-        return gt_cmp(const_cast<GT&>(x).g, const_cast<GT&>(y).g) == CMP_EQ;
+        return gt_cmp(const_cast<GT&>(x).g, const_cast<GT&>(y).g) == RLC_EQ;
     }
     friend bool operator!=(const GT& x, const GT& y)
     {
-        return gt_cmp(const_cast<GT&>(x).g, const_cast<GT&>(y).g) != CMP_EQ;
+        return gt_cmp(const_cast<GT&>(x).g, const_cast<GT&>(y).g) != RLC_EQ;
     }
 };
 

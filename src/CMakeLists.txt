@@ -105,10 +105,6 @@ target_include_directories(
 
 target_link_libraries(sse_crypto sodium ${RLC_LIBRARY})
 
-
-message(STATUS "RELIC1 : ${RLC_LIBRARY}")
-message(STATUS "RELIC2 : ${RLC_LIBRARIES}")
-
 if(OPENSSL_FOUND)
     target_link_libraries(sse_crypto OpenSSL::Crypto)
     if(RSA_IMPL_OPENSSL)

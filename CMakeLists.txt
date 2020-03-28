@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(libsse_crypto VERSION 0.3 DESCRIPTION "OpenSSE's cryptographic library")
+project(
+    libsse_crypto
+    VERSION 0.3
+    DESCRIPTION "OpenSSE's cryptographic library"
+)
 
 # Needed on Mac OS for the fuzzing targets
 if(APPLE)
@@ -12,17 +16,14 @@ endif()
 # myself): https://gitlab.kitware.com/cmake/cmake/issues/18785
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-list(
-    APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/CMake-codecov/cmake"
+list(APPEND CMAKE_MODULE_PATH
+     "${CMAKE_SOURCE_DIR}/externals/CMake-codecov/cmake"
 )
-list(
-    APPEND
-        CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cmake"
+list(APPEND CMAKE_MODULE_PATH
+     "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cmake"
 )
-list(
-    APPEND
-        CMAKE_MODULE_PATH
-        "${CMAKE_SOURCE_DIR}/externals/cmake-flag-manager/cmake"
+list(APPEND CMAKE_MODULE_PATH
+     "${CMAKE_SOURCE_DIR}/externals/cmake-flag-manager/cmake"
 )
 # Build in Debug mode by default
 set(default_build_type "Debug")
@@ -34,8 +35,8 @@ option(opensse_ENABLE_WSHADOW "Enable shadow warning" OFF)
 option(opensse_ENABLE_PEDANTIC "Enable pedantic warning" ON)
 option(opensse_ENABLE_WERROR "Make all warnings into errors" ON)
 option(opensse_ENABLE_BASIC_WARNINGS "Enable basic additional warnings" ON)
-option(
-    opensse_ENABLE_ADVANCED_WARNINGS "Enable advanced additional warnings" ON
+option(opensse_ENABLE_ADVANCED_WARNINGS "Enable advanced additional warnings"
+       ON
 )
 option(
     opensse_OPTIMIZE_FOR_NATIVE_ARCH
@@ -76,7 +77,10 @@ if(opensse_ENABLE_PEDANTIC)
 endif()
 
 if(opensse_ENABLE_WERROR)
-    save_compile_option(-Wno-error=unknown-pragmas -Werror)
+    save_compile_option(
+        -Wno-error=unknown-pragmas -Wno-error=unused-function
+        -Wno-error=useless-cast -Werror
+    )
 endif()
 
 if(opensse_OPTIMIZE_FOR_NATIVE_ARCH)
@@ -105,11 +109,12 @@ endif()
 
 if(opensse_ENABLE_ADVANCED_WARNINGS)
     save_compile_option(
-        LIST_NAME "Lib_Warnings"
+        LIST_NAME
+        "Lib_Warnings"
         # -Weffc++ # Weffc++ is too annoying on gcc
         -Wextra-semi # Extra, unnecessary semicolumns
-        # -Wsign-conversion # To be enabled
-        # -Wconversion # Extremely strict on gcc
+        # -Wsign-conversion # To be enabled -Wconversion # Extremely strict on
+        # gcc
         -Wno-c++98-compat # No need to be C++98 compatible: we require C++11
         -Wno-c++98-compat-pedantic
         -Wno-error=padded
@@ -140,20 +145,20 @@ endif()
 find_package(OpenSSL 1.0.0) # Optional
 
 if(OPENSSL_FOUND)
-    add_definitions(-DWITH_OPENSSL)
+    # add_definitions(-DWITH_OPENSSL)
 endif()
 
-list(
-    APPEND
-        LCOV_REMOVE_PATTERNS
-        '${CMAKE_CURRENT_SOURCE_DIR}/tests/*'
-        '${CMAKE_CURRENT_SOURCE_DIR}/bench/*'
-        '${CMAKE_CURRENT_SOURCE_DIR}/externals/*'
+list(APPEND LCOV_REMOVE_PATTERNS '${CMAKE_CURRENT_SOURCE_DIR}/tests/*'
+     '${CMAKE_CURRENT_SOURCE_DIR}/bench/*'
+     '${CMAKE_CURRENT_SOURCE_DIR}/externals/*'
 )
 
 # To avoid building GTest twice
 if(NOT TARGET gtest)
-    set(BUILD_GMOCK OFF CACHE BOOL "Disable GMock" FORCE)
+    set(BUILD_GMOCK
+        OFF
+        CACHE BOOL "Disable GMock" FORCE
+    )
     add_subdirectory(externals/googletest)
     # Not adding the sanitizers might cause ASan false positives. See https://gi
     # thub.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow
@@ -188,8 +193,7 @@ if(OPENSSL_FOUND)
     set_property(TARGET debug_tool PROPERTY CXX_STANDARD 11)
 
     target_include_directories(
-        debug_tool
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+        debug_tool PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
     target_link_libraries(debug_tool sse_crypto ${OPENSSL_CRYPTO_LIBRARY})

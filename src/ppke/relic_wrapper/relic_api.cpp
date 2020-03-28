@@ -8,7 +8,8 @@
 
 namespace relicxx {
 
-[[noreturn]] void ro_error() {
+[[noreturn]] void ro_error()
+{
     throw std::invalid_argument("writing to read only object");
 }
 
@@ -315,7 +316,7 @@ G1 operator-(const G1& x)
 G1 power(const G1& g, const ZR& zr)
 {
     G1 g1;
-    g1_mul(g1.g, g.g, zr.z);
+    g1_mul(g1.g, const_cast<ep_st*>(g.g), const_cast<bn_st*>(zr.z));
     return g1;
 }
 
@@ -341,7 +342,7 @@ bool G1::ismember(const bn_t order) const
     g1_t r;
     g1_inits(r);
 
-    g1_mul(r, g, order);
+    g1_mul(r, const_cast<ep_st*>(g), const_cast<bn_st*>(order));
     if (g1_is_infty(r) == 1) {
         result = true;
     }

@@ -4,7 +4,7 @@
 
 set -ex
 
-git clone https://github.com/relic-toolkit/relic.git
+git clone -b relic-toolkit-0.5.0 https://github.com/relic-toolkit/relic.git
 cd relic
 mkdir build
 cd build

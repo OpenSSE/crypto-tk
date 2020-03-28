@@ -14,7 +14,7 @@ find_package(relic REQUIRED)
 if(OPENSSL_FOUND)
     message(STATUS "OpenSSL Include directories:" ${OPENSSL_INCLUDE_DIR})
 
-    add_definitions(-DWITH_OPENSSL)
+    # add_definitions(-DWITH_OPENSSL)
 else()
     if(RSA_IMPL_OPENSSL)
         message(

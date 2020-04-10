@@ -199,7 +199,7 @@ void HMac<H, N>::hmac(const unsigned char* in,
     constexpr size_t tmp_len    = kHMACKeySize + kDigestSize;
     size_t           buffer_len = (i_len > kDigestSize) ? i_len : (kDigestSize);
 
-    buffer = static_cast<uint8_t*>(sodium_malloc(buffer_len));
+    buffer = new uint8_t[buffer_len];
     uint8_t tmp[tmp_len];
 
     key_.unlock();
@@ -241,7 +241,7 @@ void HMac<H, N>::hmac(const unsigned char* in,
     memcpy(out, buffer, out_len);
 
     sodium_memzero(buffer, buffer_len);
-    sodium_free(buffer);
+    delete[] buffer;
 
     sodium_memzero(tmp, tmp_len);
 

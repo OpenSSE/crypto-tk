@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 find_package(Sodium REQUIRED)
 find_package(OpenSSL 1.0.0) # Optional
 find_package(relic REQUIRED)
+find_package(LibGmp REQUIRED)
 
 if(OPENSSL_FOUND)
     message(STATUS "OpenSSL Include directories:" ${OPENSSL_INCLUDE_DIR})
@@ -99,11 +100,11 @@ target_include_directories(
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${LIBGMP_INCLUDE_DIR} ${RLC_INCLUDE_DIR}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/sse/crypto
 )
 
-target_link_libraries(sse_crypto sodium ${RLC_LIBRARY})
+target_link_libraries(sse_crypto sodium ${LIBGMP_LIBRARIES} ${RLC_LIBRARY})
 
 if(OPENSSL_FOUND)
     target_link_libraries(sse_crypto OpenSSL::Crypto)

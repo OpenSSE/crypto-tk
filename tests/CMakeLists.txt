@@ -2,6 +2,11 @@ if(${CMAKE_VERSION} VERSION_GREATER "3.10.0")
     include(GoogleTest)
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../src/cmake/modules")
+
+find_package(relic REQUIRED)
+find_package(LibGmp REQUIRED)
+
 add_executable(
     check
     checks.cpp
@@ -19,8 +24,8 @@ add_executable(
     test_utility.cpp
 )
 
-target_link_libraries(check gtest OpenSSE::crypto)
-target_include_directories(check PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_link_libraries(check gtest OpenSSE::crypto ${LIBGMP_LIBRARIES} ${RLC_LIBRARY})
+target_include_directories(check PRIVATE ${LIBGMP_INCLUDE_DIR} ${RLC_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.10.0")
     gtest_discover_tests(check)

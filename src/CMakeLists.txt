@@ -71,7 +71,7 @@ set_target_properties(sse_crypto PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # Use the appropriate compiler features
 
-set_property(TARGET sse_crypto PROPERTY CXX_STANDARD 11 APPEND)
+set_property(TARGET sse_crypto PROPERTY CXX_STANDARD 11)
 
 target_compile_features(
     sse_crypto

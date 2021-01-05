@@ -121,6 +121,8 @@ if(opensse_ENABLE_ADVANCED_WARNINGS)
         -Wno-error=source-uses-openmp
         -Wno-unused-macros
         -Wno-padded
+        # New to MacOs
+        -Wno-poison-system-directories
     )
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

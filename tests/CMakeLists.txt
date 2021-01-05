@@ -25,7 +25,12 @@ add_executable(
 )
 
 target_link_libraries(check gtest OpenSSE::crypto ${LIBGMP_LIBRARIES} ${RLC_LIBRARY})
-target_include_directories(check PRIVATE ${LIBGMP_INCLUDE_DIR} ${RLC_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+target_include_directories(
+    check
+    SYSTEM
+    PRIVATE ${LIBGMP_INCLUDE_DIR} ${RLC_INCLUDE_DIR}
+)
+target_include_directories(check PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
 if(${CMAKE_VERSION} VERSION_GREATER "3.10.0")
     gtest_discover_tests(check)

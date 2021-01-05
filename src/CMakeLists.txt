@@ -100,8 +100,14 @@ target_include_directories(
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${LIBGMP_INCLUDE_DIR} ${RLC_INCLUDE_DIR}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/sse/crypto
+)
+
+target_include_directories(
+    sse_crypto
+    SYSTEM
+    PRIVATE ${LIBGMP_INCLUDE_DIR} ${RLC_INCLUDE_DIR}
 )
 
 target_link_libraries(sse_crypto sodium ${LIBGMP_LIBRARIES} ${RLC_LIBRARY})

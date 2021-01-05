@@ -398,7 +398,6 @@ GT Gmppke::recoverBlind(const GmppkePrivateKey& sk,
 
 
     relicxx::relicResourceHandle h(true);
-#pragma omp parallel for private(h) firstprivate(shareTags)
     for (unsigned int i = 0; i < numshares; i++) {
         const GmppkePrivateKeyShare& s0         = sk.shares.at(i);
         ZR                           currentTag = group.hashListToZR(s0.sk4);

@@ -1,7 +1,7 @@
 branches:
    except:
-     - doc
-     - benchmarks
+      - doc
+      - benchmarks
 
 language: cpp
 
@@ -9,19 +9,17 @@ os: linux
 dist: xenial
 sudo: required
 
-
 addons:
    apt:
-     sources: &basic_sources
-       - ubuntu-toolchain-r-test
-       - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main'
-       - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
-         key_url: 'http://llvm.org/apt/llvm-snapshot.gpg.key'
-     packages: &basic_deps
-       - libssl-dev
-       - libgmp-dev
-       - lcov
-
+      sources: &basic_sources
+         - ubuntu-toolchain-r-test
+         - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main"
+         - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main"
+           key_url: "http://llvm.org/apt/llvm-snapshot.gpg.key"
+      packages: &basic_deps
+         - libssl-dev
+         - libgmp-dev
+         - lcov
 
 env:
    global:
@@ -30,29 +28,28 @@ env:
       - secure: "duw9VsNsbzKZ/tPkL1D0u7TfCvkfh8XEIg9VM//YX4HNkKJqBhC6zFE5MDLJ1bFLpNUkC8NaIZmXEVTMWAnjDKTIaWTmDu3gTQsdNFIIiQKSY4avaHqnJvj7H8g/hEpJIZODlTTwnqS67FVKGbRPruk9gG7aO6F0xRkvr6GOGee2pWKi81b+kB2S08h5Biasr+9ZrRsd86MGgrKFLH4p+dwpSTTFLgJtgpcfJD5T0CTxACuBjYDodiVlfXYvU6NvyC38cPegRcE/D6wcxOet4+sIqgKCqzrIjA+d3mAXcdAOq0Fg8qb320PvGS/yfIdAbc13YkZ2wxteHsYm52hU3HGtEOSXuIZeUdZzag68mC6AOzSStWRiFOgwXwU+8dUGFOF8ccvLie0Se5hemX+A/lKeeutVq7G3Fs68RpISgSx9L7k/WOAf5QqBGToxqLuKwNt4h1NySQquCb2X2ctMu+MO+ODTMNOXEhA/jO0Se/1vx9esTAv0MLMLi119g/TvT5o+1oZAMLzeffN6hT7YbnbIWa8U4hwm9W6xOhmb/IOBXW0wftKK6Xx1+XBxHyUQU0tCx+u36+Jox7fpaIvW4uulC3rUhyzgTVjpE3JSNI6aomRVKRhBU/JPasarPkgoHQnnRdM3Mm998lij50uLup/zC/r/u+PXFtHxHJhgoH4="
 
 install:
-  - cd install_dependencies
-  - ./install_libsodium.sh
-  - ./install_relic_easy.sh
-  - cd ..
-  - gem install coveralls-lcov
-  - sudo ldconfig
+   - cd install_dependencies
+   - ./install_libsodium.sh
+   - ./install_relic_easy.sh
+   - cd ..
+   - gem install coveralls-lcov
+   - sudo ldconfig
 
 before_script:
    - mkdir -p build
    - cd build
    - cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DENABLE_COVERAGE=${ENABLE_COVERAGE} -DSANITIZE_ADDRESS=On -DSANITIZE_UNDEFINED=On ..
 
-
 matrix:
    include:
       - env:
-          - STATIC_ANALYSIS=false
-          - RUN_CHECKS=true
-          - COMPILER=gcc
-          - ENABLE_COVERAGE=On
+           - STATIC_ANALYSIS=false
+           - RUN_CHECKS=true
+           - COMPILER=gcc
+           - ENABLE_COVERAGE=On
         compiler: gcc
         addons:
-            apt:
+           apt:
               sources: *basic_sources
               packages:
                  - *basic_deps
@@ -62,21 +59,20 @@ matrix:
            - if [ "${TRAVIS_BRANCH}" != "coverity_scan" ]; then ./coverage/upload_report.sh; fi # upload the report to coveralls
 
       - env:
-          - STATIC_ANALYSIS=false
-          - RUN_CHECKS=true
-          - COMPILER=clang
+           - STATIC_ANALYSIS=false
+           - RUN_CHECKS=true
+           - COMPILER=clang
         compiler: clang
         addons:
-            apt:
+           apt:
               sources: *basic_sources
               packages:
                  - *basic_deps
 
-
       - env:
-          - STATIC_ANALYSIS=true
-          - RUN_CHECKS=false
-          - CLANG_TIDY=clang-tidy-5.0
+           - STATIC_ANALYSIS=true
+           - RUN_CHECKS=false
+           - CLANG_TIDY=clang-tidy-5.0
         addons:
            apt:
               sources: *basic_sources
@@ -91,9 +87,9 @@ matrix:
            - ./scripts/tidy.sh
 
       - env:
-          - STATIC_ANALYSIS=false
-          - RUN_CHECKS=false
-          - CLANG_FORMAT=clang-format-5.0
+           - STATIC_ANALYSIS=false
+           - RUN_CHECKS=false
+           - CLANG_FORMAT=clang-format-5.0
         addons:
            apt:
               sources: *basic_sources
@@ -105,25 +101,25 @@ matrix:
            - cd $TRAVIS_BUILD_DIR
            - ./scripts/check_format.sh
 
-      - env:
-          - STATIC_ANALYSIS=false
-          - RUN_CHECKS=false
-          - COMPILER=gcc
-          - ENABLE_COVERAGE=Off
-        compiler: gcc
-        addons:
-            apt:
-              sources: *basic_sources
-              packages:
-                 - *basic_deps
-            coverity_scan:
-               project:
-                  name: "OpenSSE/crypto-tk"
-                  description: "Cryptographic toolkit for searchable encryption."
-               notification_email: raphael_bost@alumni.brown.edu
-               build_command: "make -j2"
-               branch_pattern: coverity_scan
+      # - env:
+      #     - STATIC_ANALYSIS=false
+      #     - RUN_CHECKS=false
+      #     - COMPILER=gcc
+      #     - ENABLE_COVERAGE=Off
+      #   compiler: gcc
+      #   addons:
+      #       apt:
+      #         sources: *basic_sources
+      #         packages:
+      #            - *basic_deps
+      #       coverity_scan:
+      #          project:
+      #             name: "OpenSSE/crypto-tk"
+      #             description: "Cryptographic toolkit for searchable encryption."
+      #          notification_email: raphael_bost@alumni.brown.edu
+      #          build_command: "make -j2"
+      #          branch_pattern: coverity_scan
 
 script:
-  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ] && [ "${TRAVIS_BRANCH}" != "coverity_scan" ]; then VERBOSE=1 cmake --build .; fi
-  - if [ "${RUN_CHECKS}" == "true" ] && [ "${TRAVIS_BRANCH}" != "coverity_scan" ]; then ./tests/check; fi
+   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ] && [ "${TRAVIS_BRANCH}" != "coverity_scan" ]; then VERBOSE=1 cmake --build .; fi
+   - if [ "${RUN_CHECKS}" == "true" ] && [ "${TRAVIS_BRANCH}" != "coverity_scan" ]; then ./tests/check; fi

@@ -550,7 +550,7 @@ public:
                 + std::to_string(max - min + 1) + "(max=" + std::to_string(max)
                 + ", min=" + std::to_string(min) + "), expected width = "
                 + std::to_string(
-                      RCPrfParams::max_leaf_index(this->subtree_height()) + 1));
+                    RCPrfParams::max_leaf_index(this->subtree_height()) + 1));
         }
     }
 
@@ -763,7 +763,7 @@ public:
     ///
     ConstrainedRCPrfInnerElement(ConstrainedRCPrfInnerElement&& cprf) noexcept
         : ConstrainedRCPrfElement<NBYTES>(
-              std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
+            std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
           base_prg_(std::move(cprf.base_prg_))
     {
     }
@@ -967,7 +967,7 @@ public:
     ///
     ConstrainedRCPrfLeafElement(ConstrainedRCPrfLeafElement&& cprf) noexcept
         : ConstrainedRCPrfElement<NBYTES>(
-              std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
+            std::forward<ConstrainedRCPrfElement<NBYTES>>(cprf)),
           leaf_buffer_(std::move(cprf.leaf_buffer_))
     {
     }

@@ -69,21 +69,31 @@ enum Other_type
     None_t    = 13
 };
 
-#define bn_inits(b)                                                            \
-    bn_null(b);                                                                \
+inline void bn_inits(bn_t b)
+{
+    (void)b;
+    bn_null(b);
     bn_new(b);
+}
 
-#define g1_inits(g)                                                            \
-    g1_null(g);                                                                \
+inline void g1_inits(g1_t g)
+{
+    (void)g;
+    g1_null(g);
     g1_new(g);
-
-#define g2_inits(g)                                                            \
-    g2_null(g);                                                                \
+}
+inline void g2_inits(g2_t g)
+{
+    (void)g;
+    g2_null(g);
     g2_new(g);
-
-#define gt_inits(g)                                                            \
-    gt_null(g);                                                                \
+}
+inline void gt_inits(gt_t g)
+{
+    (void)g;
+    gt_null(g);
     gt_new(g);
+}
 
 #define FP_STR (((((RLC_FP_BYTES * 2 + 1)))))
 #define G1_LEN ((((((RLC_FP_BYTES * 2) + 2)))))

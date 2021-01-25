@@ -287,7 +287,8 @@ std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> TdpImpl_OpenSSL::
 {
     std::array<uint8_t, Tdp::kRSAPrfSize> rnd = prg.prf(seed);
 
-    BIGNUM *rnd_bn, *rnd_mod;
+    BIGNUM* rnd_bn;
+    BIGNUM* rnd_mod;
     BN_CTX* ctx = BN_CTX_new();
 
     rnd_bn = BN_bin2bn(rnd.data(), Tdp::kRSAPrfSize, nullptr);
@@ -684,11 +685,9 @@ TdpMultPoolImpl_OpenSSL::eval_pool(
     // NOLINTNEXTLINE(bugprone-branch-clone)
     if (order == 1) {
         // regular eval
-
-        key = get_rsa_key()
+        key = get_rsa_key();
     } else if (order <= maximum_order()) {
         // get the right RSA context, i.e. the one in keys_[order-1]
-
         key = keys_[order - 2];
     } else {
         throw std::invalid_argument(

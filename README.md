@@ -42,10 +42,10 @@ Building is done using CMake. The minimum required version is CMake 3.1.
 
 -   [libsodium](https://download.libsodium.org/doc/). libsodium version >=1.0.16 is necessary.
 
--   [RELIC](https://github.com/relic-toolkit/relic) Some features (puncturable encryption) are based on cryptographic pairings. These are implemented using the RELIC toolkit. RELIC has many compilation options. To install RELIC, you can do the following:
+-   [RELIC](https://github.com/relic-toolkit/relic) Some features (puncturable encryption) are based on cryptographic pairings. These are implemented using the RELIC toolkit. RELIC has many compilation options. The current code has been tested against RELIC v0.5.0. To install RELIC in that version, you can do the following:
 
 ```sh
-git clone https://github.com/relic-toolkit/relic.git
+git clone -b relic-toolkit-0.5.0 https://github.com/relic-toolkit/relic.git
 cd relic
 mkdir build; cd build
 cmake -G "Unix Makefiles" -DMULTI=PTHREAD -DCOMP="-O3 -funroll-loops -fomit-frame-pointer -finline-small-functions -march=native -mtune=native" -DARCH="X64"  -DRAND="UDEV" -DWITH="BN;DV;FP;FPX;EP;EPX;PP;PC;MD" -DCHECK=off -DVERBS=off -DDEBUG=off -DBENCH=0 -DTESTS=1 -DARITH=gmp -DFP_PRIME=254 -DFP_QNRES=off -DFP_METHD="INTEG;INTEG;INTEG;MONTY;LOWER;SLIDE" -DFPX_METHD="INTEG;INTEG;LAZYR" -DPP_METHD="LAZYR;OATEP" -DBN_PRECI=256 -DFP_QNRES=on ../.
@@ -57,7 +57,7 @@ You can also replace the `-DARITH=gmp` option by `-DARITH=x64-asm-254` (for bett
 
 #### Optional Dependencies
 
--   [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The trapdoor permutation is based on RSA, and `libsse_crypto` can use OpenSSL to implement RSA. The code has been compiled and tested using OpenSSL 1.0.2.
+-   [OpenSSL](https://www.openssl.org)'s cryptographic library (`libcrypto`). The trapdoor permutation is based on RSA, and `libsse_crypto` can use OpenSSL to implement RSA. The code has been compiled and tested using OpenSSL 1.0.2. Note that this part of the code is now deprecated and is incompatible with OpenSSL 1.1.0 APIs.
 
 ### Compiler
 
@@ -143,10 +143,6 @@ For example, if you wish to use Clang, you can set the project up with the follo
 
 This project's CMake takes the following options:
 
--   `RSA_IMPL_OPENSSL=On|Off`: enables the RSA implementation using OpenSSL. Available options are `RSA_IMPL_OPENSSL=On` and `RSA_IMPL_OPENSSL=Off`. By default, the RSA implementation uses mbedTLS, which is believed to be more secure, but is slower. When `RSA_IMPL_OPENSSL` is set to `On`, the `libsse_crypto` links against `libcrypto`, and OpenSSL must be found by CMake (see next option).
-
--   `OPENSSL_ROOT_DIR`: The location of the OpenSSL library. OpenSSL is necessary if `-DRSA_IMPL_OPENSSL=On` is passed to CMake. If you are on Mac OS, and that you used Homebrew to install OpenSSL, you will want pass the `-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl` option to CMake. Otherwise, it will not be able to find OpenSSL's library.
-
 -   `ENABLE_COVERAGE=On|Off`: Respectively enables and disable the code coverage functionalities. Disabled by default.
 
 -   `SANITIZE_ADDRESS=On|Off`: Compiles the library with [AddressSanitizer (ASan)](https://github.com/google/sanitizers/wiki/AddressSanitizer) when set to `On`. Great to check for stack/heap buffer overflows, memory leaks, ... Disabled by default.
@@ -164,6 +160,9 @@ This project's CMake takes the following options:
 To see all the available options, and interactively edit them, you can also use the `ccmake` tool.
 
 For more information about how to use CMake, take a look at [CMake's FAQ](https://gitlab.kitware.com/cmake/community/wikis/FAQ), or at the [documentation](https://cmake.org/cmake/help/v3.0/index.html).
+
+This project used to support an OpenSSL-based backend for trapdoor functions. It is now deprecated as it is incompatible with the new OpenSSL 1.1.0 APIs.
+The corresponding code will be removed at some point.
 
 ## Documentation
 

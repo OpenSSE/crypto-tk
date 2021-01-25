@@ -347,7 +347,9 @@ bool G1::ismember(const bn_t order) const
     if (g1_is_infty(r) == 1) {
         result = true;
     }
-    g1_free(r);
+    {
+        g1_free(r)
+    }
     return result;
 }
 
@@ -404,8 +406,7 @@ G2 operator+(const G2& x, const G2& y)
     G2 z;
     RELICXX_G2unconst(x, x1);
     RELICXX_G2unconst(y, y1);
-    g2_add(z.g, x1.g, y1.g);
-    g2_norm(z.g, z.g);
+    {g2_add(z.g, x1.g, y1.g)} g2_norm(z.g, z.g);
     return z;
 }
 
@@ -462,7 +463,9 @@ bool G2::ismember(bn_t order)
     if (g2_is_infty(r) == 1) {
         result = true;
     }
-    g2_free(r);
+    {
+        g2_free(r)
+    }
     return result;
 }
 
@@ -536,7 +539,9 @@ GT operator/(const GT& x, const GT& y)
     gt_inits(t);
     gt_inv(t, y1.g);
     gt_mul(z.g, x1.g, t);
-    gt_free(t);
+    {
+        gt_free(t)
+    }
     return z;
 }
 
@@ -550,7 +555,9 @@ GT power(const GT& g, const ZR& zr)
         return -g;
     }
 
-    gt_exp(gt.g, gg.g, zr1.z);
+    {
+        gt_exp(gt.g, gg.g, zr1.z)
+    }
     return gt;
 }
 
@@ -579,11 +586,15 @@ bool GT::ismember(bn_t order)
     bool result = false;
     gt_t r;
     gt_inits(r);
-    gt_exp(r, g, order);
+    {
+        gt_exp(r, g, order)
+    }
     if (gt_is_unity(r) == 1) {
         result = true;
     }
-    gt_free(r);
+    {
+        gt_free(r)
+    }
     return result;
 }
 

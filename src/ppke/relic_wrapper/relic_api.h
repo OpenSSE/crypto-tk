@@ -345,7 +345,9 @@ public:
     ~G1()
     {
         if (isInit) {
-            g1_free(g);
+            {
+                g1_free(g)
+            }
         }
     }
 #ifdef RELICXX_MOVEG1
@@ -446,7 +448,9 @@ public:
     ~G2()
     {
         if (isInit) {
-            g2_free(g);
+            {
+                g2_free(g)
+            }
         }
     }
 #ifdef RELICXX_MOVEG2
@@ -546,7 +550,9 @@ public:
     ~GT()
     {
         if (isInit) {
-            gt_free(g);
+            {
+                gt_free(g)
+            }
         }
     }
 

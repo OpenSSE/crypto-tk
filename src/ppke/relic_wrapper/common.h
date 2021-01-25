@@ -72,27 +72,31 @@ enum Other_type
 inline void bn_inits(bn_t b)
 {
     (void)b;
-    bn_null(b);
-    bn_new(b);
+    {bn_null(b)} {
+        bn_new(b)
+    }
 }
 
 inline void g1_inits(g1_t g)
 {
     (void)g;
-    g1_null(g);
-    g1_new(g);
+    {g1_null(g)} {
+        g1_new(g)
+    }
 }
 inline void g2_inits(g2_t g)
 {
     (void)g;
-    g2_null(g);
-    g2_new(g);
+    {g2_null(g)} {
+        g2_new(g)
+    }
 }
 inline void gt_inits(gt_t g)
 {
     (void)g;
-    gt_null(g);
-    gt_new(g);
+    {gt_null(g)} {
+        gt_new(g)
+    }
 }
 
 #define FP_STR (((((RLC_FP_BYTES * 2 + 1)))))

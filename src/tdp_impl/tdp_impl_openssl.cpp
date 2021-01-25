@@ -64,7 +64,7 @@ static_assert(Tdp::kMessageSize == TdpInverse::kMessageSize,
 
 TdpImpl_OpenSSL::TdpImpl_OpenSSL() = default;
 
-TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk) : rsa_key_(nullptr)
+TdpImpl_OpenSSL::TdpImpl_OpenSSL(const std::string& pk)
 {
     // create a BIO from the std::string
     BIO* mem;

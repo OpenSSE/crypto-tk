@@ -636,7 +636,7 @@ public:
 
     // you cannot meaningfully copy this resource
     relicResourceHandle(const relicResourceHandle& t) = delete;
-    bool isInitalized();
+    bool isInitalized() const;
 
 private:
     bool isInit{false};

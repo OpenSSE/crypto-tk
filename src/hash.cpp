@@ -25,6 +25,7 @@
 
 #include <cstring>
 
+#include <array>
 #include <stdexcept>
 
 namespace sse {
@@ -71,20 +72,20 @@ void Hash::hash(const unsigned char* in,
     }
 
 
-    unsigned char digest[kDigestSize];
+    std::array<unsigned char, kDigestSize> digest;
 
-    hash(in, len, digest);
-    memcpy(out, digest, out_len);
+    hash(in, len, digest.data());
+    memcpy(out, digest.data(), out_len);
 }
 
 void Hash::hash(const std::string& in, std::string& out)
 {
-    unsigned char tmp_out[kDigestSize];
+    std::array<uint8_t, kDigestSize> tmp_out;
     hash(reinterpret_cast<const unsigned char*>(in.data()),
          in.length(),
-         tmp_out);
+         tmp_out.data());
 
-    out = std::string(reinterpret_cast<char*>(tmp_out), kDigestSize);
+    out = std::string(reinterpret_cast<char*>(tmp_out.data()), kDigestSize);
 }
 
 void Hash::hash(const std::string& in, const size_t out_len, std::string& out)
@@ -94,13 +95,13 @@ void Hash::hash(const std::string& in, const size_t out_len, std::string& out)
             "Invalid output length: out_len > kDigestSize");
     }
 
-    unsigned char tmp_out[kDigestSize];
+    std::array<uint8_t, kDigestSize> tmp_out;
 
     hash(reinterpret_cast<const unsigned char*>(in.data()),
          in.length(),
-         tmp_out);
+         tmp_out.data());
 
-    out = std::string(reinterpret_cast<char*>(tmp_out), out_len);
+    out = std::string(reinterpret_cast<char*>(tmp_out.data()), out_len);
 }
 
 std::string Hash::hash(const std::string& in)

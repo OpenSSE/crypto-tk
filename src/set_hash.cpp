@@ -59,7 +59,7 @@ SetHash::SetHash(const std::vector<std::string>& in_set)
 {
     std::array<uint8_t, crypto_core_ed25519_BYTES> p;
 
-    for (auto& s : in_set) {
+    for (const auto& s : in_set) {
         SetHash::gen_curve_point(
             p, reinterpret_cast<const uint8_t*>(s.data()), s.size());
 

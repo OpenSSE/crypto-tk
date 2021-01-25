@@ -169,12 +169,12 @@ ZR hashToZR(const bytes_vec& b)
     data[0] = HASH_FUNCTION_BYTES_TO_Zr_CRH;
     std::copy(b.begin(), b.end(), data.begin() + 1);
 
-    ZR                     zr;
-    constexpr unsigned int digest_len = SHA_LEN;
-    unsigned char          digest[digest_len + 1];
-    memset(digest, 0, digest_len);
-    SHA_FUNC(digest, data.data(), static_cast<int>(data.size()));
-    bn_read_bin(zr.z, digest, digest_len);
+    ZR                                        zr;
+    constexpr unsigned int                    digest_len = SHA_LEN;
+    std::array<unsigned char, digest_len + 1> digest;
+    memset(digest.data(), 0, digest_len);
+    SHA_FUNC(digest.data(), data.data(), static_cast<int>(data.size()));
+    bn_read_bin(zr.z, digest.data(), digest_len);
     if (bn_cmp(zr.z, zr.order) == RLC_GT) {
         bn_mod(zr.z, zr.z, zr.order);
     }
@@ -231,7 +231,8 @@ ZR operator>>(const ZR& a, int b)
 
 ZR operator&(const ZR& a, const ZR& b)
 {
-    int  i, d = (a.z->used > b.z->used) ? b.z->used : a.z->used;
+    int  i;
+    int  d = (a.z->used > b.z->used) ? b.z->used : a.z->used;
     bn_t c;
     bn_inits(c);
 
@@ -518,7 +519,9 @@ GT::GT(const uint8_t* bytes, bool compress)
 
 GT operator*(const GT& x, const GT& y)
 {
-    GT z, x1 = x, y1 = y;
+    GT z;
+    GT x1 = x;
+    GT y1 = y;
     gt_mul(z.g, x1.g, y1.g);
     return z;
 }
@@ -666,7 +669,7 @@ relicResourceHandle::~relicResourceHandle()
         core_clean();
     }
 }
-bool relicResourceHandle::isInitalized()
+bool relicResourceHandle::isInitalized() const
 {
     return isInit;
 }
@@ -687,7 +690,8 @@ PairingGroup::~PairingGroup()
 
 ZR PairingGroup::randomZR() const
 {
-    ZR zr, tt;
+    ZR zr;
+    ZR tt;
     bn_rand(tt.z, RLC_POS, bn_bits(grp_order));
     bn_mod(zr.z, tt.z, grp_order);
     return zr;
@@ -696,7 +700,8 @@ ZR PairingGroup::randomZR() const
 ZR PairingGroup::pseudoRandomZR(const sse::crypto::Prf<kPrfOutputSize>& prf,
                                 const std::string& seed) const
 {
-    ZR                                  zr, tt;
+    ZR                                  zr;
+    ZR                                  tt;
     std::array<uint8_t, kPrfOutputSize> prf_out = prf.prf(seed);
     bn_read_bin(tt.z, prf_out.data(), kPrfOutputSize);
     //        bn_rand(tt.z, RLC_POS, bn_bits(grp_order));

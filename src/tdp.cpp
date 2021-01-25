@@ -288,6 +288,7 @@ std::array<uint8_t, TdpInverse::kMessageSize> TdpInverse::invert_mult(
 void TdpInverse::serialize(uint8_t* out) const
 {
     std::string sk = private_key();
+    // NOLINTNEXTLINE(bugprone-not-null-terminated-result)
     memcpy(out, sk.data(), sk.size());
 }
 
@@ -297,7 +298,8 @@ TdpInverse TdpInverse::deserialize(uint8_t*     in,
                                    size_t&      n_bytes_read)
 {
     // search for "-----END RSA PRIVATE KEY-----"
-    static constexpr size_t  kKeySuffixSize = 29;
+    static constexpr size_t kKeySuffixSize = 29;
+    // NOLINTNEXTLINE(modernize-avoid-c-arrays)
     static constexpr uint8_t kKeySuffix[kKeySuffixSize + 1]
         = "-----END RSA PRIVATE KEY-----"; // we have to account for the
                                            // '\0' character ...

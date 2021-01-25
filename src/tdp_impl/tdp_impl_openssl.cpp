@@ -493,8 +493,8 @@ std::string TdpInverseImpl_OpenSSL::private_key() const
 void TdpInverseImpl_OpenSSL::invert(const std::string& in,
                                     std::string&       out) const
 {
-    int           ret;
-    unsigned char rsa_out[kMessageSpaceSize];
+    int                                          ret;
+    std::array<unsigned char, kMessageSpaceSize> rsa_out;
 
     if (in.size() != kMessageSpaceSize) {
         throw std::invalid_argument("Invalid TDP input size. Input size should "
@@ -503,7 +503,7 @@ void TdpInverseImpl_OpenSSL::invert(const std::string& in,
 
     ret = RSA_private_decrypt(static_cast<int>(in.size()),
                               reinterpret_cast<const unsigned char*>(in.data()),
-                              rsa_out,
+                              rsa_out.data(),
                               get_rsa_key(),
                               RSA_NO_PADDING);
 
@@ -514,7 +514,7 @@ void TdpInverseImpl_OpenSSL::invert(const std::string& in,
         /* LCOV_EXCL_STOP */
     }
 
-    out = std::string(reinterpret_cast<char*>(rsa_out),
+    out = std::string(reinterpret_cast<char*>(rsa_out.data()),
                       static_cast<size_t>(ret));
 }
 
@@ -679,27 +679,29 @@ TdpMultPoolImpl_OpenSSL::eval_pool(
 {
     std::array<uint8_t, TdpImpl_OpenSSL::kMessageSpaceSize> out;
 
+    RSA* key = nullptr;
+
+    // NOLINTNEXTLINE(bugprone-branch-clone)
     if (order == 1) {
         // regular eval
-        RSA_public_encrypt(static_cast<int>(in.size()),
-                           in.data(),
-                           out.data(),
-                           get_rsa_key(),
-                           RSA_NO_PADDING);
 
+        key = get_rsa_key()
     } else if (order <= maximum_order()) {
         // get the right RSA context, i.e. the one in keys_[order-1]
-        RSA_public_encrypt(static_cast<int>(in.size()),
-                           in.data(),
-                           out.data(),
-                           keys_[order - 2],
-                           RSA_NO_PADDING);
+
+        key = keys_[order - 2];
     } else {
         throw std::invalid_argument(
             "Invalid order for this TDP pool. The input order must be less "
             "than the maximum order supported by the pool, and strictly "
             "positive.");
     }
+
+    RSA_public_encrypt(static_cast<int>(in.size()),
+                       in.data(),
+                       out.data(),
+                       key,
+                       RSA_NO_PADDING);
 
     return out;
 }
@@ -714,7 +716,9 @@ void TdpMultPoolImpl_OpenSSL::eval_pool(const std::string& in,
                                     "be kMessageSpaceSize bytes long.");
     }
 
-    std::array<uint8_t, kMessageSpaceSize> a_in, a_out;
+    std::array<uint8_t, kMessageSpaceSize> a_in;
+    std::array<uint8_t, kMessageSpaceSize> a_out;
+
     memcpy(a_in.data(), in.data(), kMessageSpaceSize);
 
     a_out = eval_pool(a_in, order);

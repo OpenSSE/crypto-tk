@@ -35,8 +35,9 @@ namespace crypto {
 
 #define NONCE_SIZE crypto_generichash_blake2b_SALTBYTES
 
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 static constexpr uint8_t
-    hash_personal__[crypto_generichash_blake2b_PERSONALBYTES]
+    g_hash_personal_[crypto_generichash_blake2b_PERSONALBYTES]
     = "encryption_key";
 
 static_assert(crypto_generichash_blake2b_KEYBYTES == Cipher::kKeySize,
@@ -61,7 +62,7 @@ void Cipher::encrypt(const unsigned char* in,
                      const size_t&        len,
                      unsigned char*       out) const
 {
-    uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
+    std::array<uint8_t, crypto_aead_chacha20poly1305_KEYBYTES> chacha_key;
     unsigned long long c_len = 0; // NOLINT
 
     // generate a random nonce, and place it at the beginning of the output
@@ -71,14 +72,14 @@ void Cipher::encrypt(const unsigned char* in,
     key_.unlock();
 
     // start by deriving a subkey from the master and the nonce
-    crypto_generichash_blake2b_salt_personal(chacha_key,
-                                             sizeof(chacha_key),
+    crypto_generichash_blake2b_salt_personal(chacha_key.data(),
+                                             chacha_key.size(),
                                              nullptr,
                                              0,
                                              key_.data(),
                                              kKeySize,
                                              out,
-                                             hash_personal__);
+                                             g_hash_personal_);
 
     // re-lock the master key
     key_.lock();
@@ -92,10 +93,10 @@ void Cipher::encrypt(const unsigned char* in,
                                               0,
                                               nullptr,
                                               out,
-                                              chacha_key);
+                                              chacha_key.data());
 
     // delete the derived key
-    sodium_memzero(chacha_key, crypto_aead_chacha20poly1305_KEYBYTES);
+    sodium_memzero(chacha_key.data(), crypto_aead_chacha20poly1305_KEYBYTES);
 }
 
 void Cipher::encrypt(const std::string& in, std::string& out)
@@ -129,21 +130,21 @@ void Cipher::decrypt(const unsigned char* in,
         /* LCOV_EXCL_STOP */
     }
 
-    uint8_t            chacha_key[crypto_aead_chacha20poly1305_KEYBYTES];
+    std::array<uint8_t, crypto_aead_chacha20poly1305_KEYBYTES> chacha_key;
     unsigned long long m_len = 0; // NOLINT
 
     // unlock the master key
     key_.unlock();
 
     // start by deriving a subkey from the master and the nonce
-    crypto_generichash_blake2b_salt_personal(chacha_key,
-                                             sizeof(chacha_key),
+    crypto_generichash_blake2b_salt_personal(chacha_key.data(),
+                                             chacha_key.size(),
                                              nullptr,
                                              0,
                                              key_.data(),
                                              kKeySize,
                                              in,
-                                             hash_personal__);
+                                             g_hash_personal_);
 
     // re-lock the master key
     key_.lock();
@@ -157,10 +158,10 @@ void Cipher::decrypt(const unsigned char* in,
                                                         nullptr,
                                                         0,
                                                         in,
-                                                        chacha_key);
+                                                        chacha_key.data());
 
     // delete the derived key
-    sodium_memzero(chacha_key, crypto_aead_chacha20poly1305_KEYBYTES);
+    sodium_memzero(chacha_key.data(), crypto_aead_chacha20poly1305_KEYBYTES);
 
     if (ret == -1) { // invalid decryption
         // erase the decrypted plaintext

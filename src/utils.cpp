@@ -145,7 +145,7 @@ namespace sse {
 
 namespace crypto {
 
-static relicxx::relicResourceHandle* __relic_handle;
+static relicxx::relicResourceHandle* g_relic_handle_;
 
 static int init_locks()
 {
@@ -213,7 +213,7 @@ void init_crypto_lib()
 {
     init_locks();
 
-    __relic_handle = new relicxx::relicResourceHandle(true);
+    g_relic_handle_ = new relicxx::relicResourceHandle(true);
 
     if (sodium_init() < 0) {
         /* LCOV_EXCL_START */
@@ -227,8 +227,8 @@ void init_crypto_lib()
 
 void cleanup_crypto_lib()
 {
-    delete __relic_handle;
-    __relic_handle = nullptr;
+    delete g_relic_handle_;
+    g_relic_handle_ = nullptr;
 
     kill_locks();
 }

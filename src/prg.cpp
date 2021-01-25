@@ -34,7 +34,7 @@
 #define CHACHA20_BLOCK_SIZE 64
 
 // static nonce
-static const uint8_t chacha_nonce[8]
+static const std::array<uint8_t, 8> chacha_nonce
     = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 namespace sse {
@@ -65,10 +65,10 @@ static void prg_derivation(const unsigned char* key,
     if (offset % CHACHA20_BLOCK_SIZE == 0) {
         // things are aligned, good !
         crypto_stream_chacha20_xor_ic(
-            out, out, len, chacha_nonce, block_offset, key);
+            out, out, len, chacha_nonce.data(), block_offset, key);
     } else {
-        unsigned char buffer[CHACHA20_BLOCK_SIZE];
-        memset(buffer, 0, CHACHA20_BLOCK_SIZE);
+        std::array<unsigned char, CHACHA20_BLOCK_SIZE> buffer;
+        memset(buffer.data(), 0, CHACHA20_BLOCK_SIZE);
 
         size_t prefix_len = CHACHA20_BLOCK_SIZE - mod_offset;
         // start by generating the inner blocks
@@ -77,7 +77,7 @@ static void prg_derivation(const unsigned char* key,
             crypto_stream_chacha20_xor_ic(out + prefix_len,
                                           out + prefix_len,
                                           tmp_len,
-                                          chacha_nonce,
+                                          chacha_nonce.data(),
                                           block_offset + 1,
                                           key);
         } else {
@@ -88,18 +88,18 @@ static void prg_derivation(const unsigned char* key,
         // Now, we have to generate the first bytes of out
         // These are the last out_offset bytes of the block index block_offset
 
-        crypto_stream_chacha20_xor_ic(buffer,
-                                      buffer,
+        crypto_stream_chacha20_xor_ic(buffer.data(),
+                                      buffer.data(),
                                       CHACHA20_BLOCK_SIZE,
-                                      chacha_nonce,
+                                      chacha_nonce.data(),
                                       block_offset,
                                       key);
 
         // copy these last bytes
-        memcpy(out, buffer + mod_offset, prefix_len);
+        memcpy(out, buffer.data() + mod_offset, prefix_len);
 
         // zeroize the buffer
-        sodium_memzero(buffer, CHACHA20_BLOCK_SIZE);
+        sodium_memzero(buffer.data(), CHACHA20_BLOCK_SIZE);
     }
 }
 

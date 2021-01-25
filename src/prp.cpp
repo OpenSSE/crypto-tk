@@ -29,6 +29,7 @@
 #include <climits>
 #include <cstring>
 
+#include <array>
 #include <exception>
 #include <iomanip>
 
@@ -172,25 +173,25 @@ void Prp::encrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
                                  "acceleration not supported by the CPU");
         /* LCOV_EXCL_STOP */
     }
-    char iv[16] = {0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00};
+    std::array<char, 16> iv = {0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00};
     aez_encrypt(reinterpret_cast<const aez_ctx_t*>(aez_ctx_.unlock_get()),
-                iv,
-                16,
+                iv.data(),
+                iv.size(),
                 0,
                 reinterpret_cast<const char*>(in),
                 len,
@@ -234,25 +235,25 @@ void Prp::decrypt(const uint8_t* in, const unsigned int len, uint8_t* out)
         /* LCOV_EXCL_STOP */
     }
 
-    char iv[16] = {0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00};
+    std::array<char, 16> iv = {0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00,
+                               0x00};
     aez_decrypt(reinterpret_cast<const aez_ctx_t*>(aez_ctx_.unlock_get()),
-                iv,
-                16,
+                iv.data(),
+                iv.size(),
                 0,
                 reinterpret_cast<const char*>(in),
                 len,
